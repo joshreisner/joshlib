@@ -1,4 +1,9 @@
 <?php
+/* welcome to joshlib
+website: http://joshlib.joshreisner.com/
+svn etc: http://code.google.com/p/joshlib/
+
+*/
 $_josh["time_start"] = microtime(true);	//count processing time -- use format_time_exec() to access this
 
 //parse environment variables
