@@ -3,7 +3,6 @@
 http://code.google.com/p/joshlib/ (wiki / documentation / tracking)
 http://joshlib.joshreisner.com/ (eventual website)
 
-dude!!!!!!!!!!!
 */
 $_josh["time_start"] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
 
