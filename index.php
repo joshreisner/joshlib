@@ -8,7 +8,7 @@ $_josh["time_start"] = microtime(true);	//count processing time -- use format_ti
 
 //parse environment variables
 	/* 
-	because environment variables can change by platform, $_josh["server"] variables are supposed to be direct representations
+	because these can change by platform, $_josh["server"] variables are supposed to be direct representations
 	of particular variables.  they're not really for script use, although they can be.  $_josh["request"] and $_josh["referrer"]
 	are better for those purposes
 	*/
@@ -31,7 +31,6 @@ $_josh["time_start"] = microtime(true);	//count processing time -- use format_ti
 		$_josh["server"]["isunix"]	= true;
 		$_josh["folder"]			= "/";
 		$_josh["newline"]			= "\n";
-		//$_josh["root"]			= str_replace($_josh["server"]["request"], "", $_SERVER["SCRIPT_FILENAME"]);
 		$_josh["root"]				= $_SERVER["DOCUMENT_ROOT"];
 		if (!isset($_josh["slow"]))	$_josh["slow"] = false;
 	}
