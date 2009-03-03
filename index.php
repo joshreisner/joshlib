@@ -5,7 +5,7 @@ http://joshlib.joshreisner.com/ (eventual website)
 
 
 */
-$_josh["time_start"] = microtime(true);	//count processing time -- use format_time_exec() to access this
+$_josh["time_start"] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
 
 //parse environment variables
 	/* 
