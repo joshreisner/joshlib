@@ -3,7 +3,7 @@
 http://code.google.com/p/joshlib/ (wiki / documentation / tracking)
 http://joshlib.joshreisner.com/ (eventual website)
 
-this hmac thing is driving me crazy
+this hmac thing is driving me craz
 */
 $_josh["time_start"] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
 
