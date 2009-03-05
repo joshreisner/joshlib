@@ -161,6 +161,7 @@ function format_file_size($file) {
 } 
 
 function format_highlight($haystack, $needles, $style="background-color:#FFFFBB;padding:1px;font-weight:bold;") {
+	//sometimes you want to use a highlighter on html -- usually in search results
 	if (is_array($needles)) $needles = implode("|", $needles);
 	return preg_replace("/($needles)/i","<span style='" . $style . "'><b>\\0</b></span>", $haystack);
 }
@@ -171,26 +172,7 @@ function format_hilite($haystack, $needles, $style="background-color:#FFFFBB;pad
 }
 
 function format_html($text) {
-	/*clean up M$FT font crap -- OLD CODE
-	$text = str_replace("font-size: 13pt;",					"", $text);
-	$text = str_replace("color: #12253c;",					"", $text);
-	$text = str_replace("font-family: Perpetua;",			"", $text);
-	$text = str_replace("mso-bidi-font-family: Times;",		"", $text);
-	$text = str_replace("font-size: 17px;",					"", $text);
-	$text = str_replace("font-family: Times New Roman;",	"", $text);
-	$text = str_replace("font-size: small;",				"",	$text);
-	$text = str_replace('font-family: "',					'"', $text);
-	$text = str_replace("<p><span>&nbsp;</span></p>",		"",	$text);
-	$text = str_replace("<p>&nbsp;</p>",					"",	$text);
-	$text = str_replace("font-size: medium;",				"",	$text);
-	$text = str_replace("font-size: 16px;",					"",	$text);
-	$text = str_replace("font-size: 12pt;",					"",	$text);
-	$text = str_replace("font-size: 10pt;",					"",	$text);
-	$text = str_replace("font-size: x-small;",				"",	$text);
-	$text = str_replace(" class=MsoNormal",					"",	$text);
-	$text = str_replace(' class="MsoNormal"',				"",	$text);
-	$text = str_replace("font-family: Arial;",				"",	$text);
-	*/
+	//clean up microsoft formatting when pasted into TinyMCE
 	error_debug("<b>format_html</b> about to clean up " . format_string($text, 300));
 	$text = htmLawed($text, array('comment'=>1, 'cdata'=>1));
 	$text = str_replace("<p>&nbsp;</p>", "", $text);
