@@ -92,6 +92,7 @@ function format_date($timestamp=false, $error="", $format="M d, Y", $relativetim
 
 function format_date_iso8601($timestamp=false) {
 	//this looks like DATE_W3C http://www.php.net/manual/en/datetime.constants.php
+	//use this for xml
 	if (!$timestamp) $timestamp = time();
 	if (!is_int($timestamp)) $timestamp = strToTime($timestamp);
 	return date("Y-m-d", $timestamp) . "T" . date("H:i:s", $timestamp) . "-07:00";
