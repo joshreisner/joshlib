@@ -151,7 +151,7 @@ function format_email($address) {
 
 function format_file_name($str, $ext) {
 	//formatting for downloaded files
-	//todo ~ needs work.  only truly invalid characters should be checked.  i'm sure it's ok to download files with spaces, for example.
+	//TODO: only truly invalid characters should be checked.  i'm sure it's ok to download files with spaces, for example.
 	$str = str_replace("  ",	" ",	$str);
 	$str = str_replace("'",		"", 	$str);
 	$str = str_replace(".",		"", 	$str);
