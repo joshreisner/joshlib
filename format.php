@@ -342,7 +342,7 @@ function format_post_nulls($fieldnames) {
 	error_debug("<b>format_post_nulls</b> for " . $fieldnames);
 	$fields = array_post_fields($fieldnames);
 	foreach ($fields as $field) {
-		if (!strlen($_POST[$field])) {
+		if (!isset($_POST[$field]) || !strlen($_POST[$field])) {
 			error_debug("<b>format_post_nulls</b> nullifying " . $field);
 			$_POST[$field] = "NULL";
 		}

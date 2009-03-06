@@ -103,7 +103,34 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	
 	
 //get configuration variables
-	configure();
+	error_debug("<b>configure</b> running");
+	$filename = isset($_josh["config"]) ? $_josh["config"] : "/_site/config-" . $_josh["request"]["sanswww"] . ".php";
+	if (file_exists($filename)) {
+		error_debug("<b>configure</b> found file");
+		require($filename);
+	} elseif (file_exists($_josh["root"] . $filename)) {
+		error_debug("<b>configure</b> found file");
+		require($_josh["root"] . $filename);
+	} else {
+		error_debug("<b>configure</b> couldn't find config file");
+		$_josh["mode"] = "dev";
+		error_handle("config file missing", "joshserver couldn't find the config file which should be at <span class='josh_code'>" . $_josh["root"] . $filename . "</span>.  please create a file there and put db connection info in it.");
+	}
+
+	//set defaults
+	if (!isset($_josh["db"]["location"]))	$_josh["db"]["location"]	= "localhost";
+	if (!isset($_josh["db"]["language"]))	$_josh["db"]["language"]	= "mysql";
+	if (!isset($_josh["basedblanguage"]))	$_josh["basedblanguage"]	= $_josh["db"]["language"];
+	if (!isset($_josh["is_secure"]))		$_josh["is_secure"]			= false;
+	if (!isset($_josh["email_admin"]))		$_josh["email_admin"]		= "josh@joshreisner.com";
+	if (!isset($_josh["email_default"]))	$_josh["email_default"]		= "josh@joshreisner.com";
+	
+	//required variables
+	if (!isset($_josh["db"]["username"]) || 
+		!isset($_josh["db"]["password"]) || 
+		!isset($_josh["db"]["database"])) {
+		error_handle("config variables missing", "joshserver found a db file but was missing a username, password or database variable.");
+	}
 	
 	
 //set error reporting level by determining whether this is a dev or live situation
@@ -143,38 +170,6 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	
 	
 //special functions that don't fit into a category (yet)
-function configure() {
-	global $_josh;
-	error_debug("<b>configure</b> running");
-	$filename = isset($_josh["config"]) ? $_josh["config"] : "/_site/config-" . $_josh["request"]["sanswww"] . ".php";
-	if (file_exists($filename)) {
-		error_debug("<b>configure</b> found file");
-		require($filename);
-	} elseif (file_exists($_josh["root"] . $filename)) {
-		error_debug("<b>configure</b> found file");
-		require($_josh["root"] . $filename);
-	} else {
-		error_debug("<b>configure</b> couldn't find config file");
-		$_josh["mode"] = "dev";
-		error_handle("config file missing", "joshserver couldn't find the config file which should be at <span class='josh_code'>" . $_josh["root"] . $filename . "</span>.  please create a file there and put db connection info in it.");
-	}
-
-	//set defaults
-	if (!isset($_josh["db"]["location"]))	$_josh["db"]["location"]	= "localhost";
-	if (!isset($_josh["db"]["language"]))	$_josh["db"]["language"]	= "mysql";
-	if (!isset($_josh["basedblanguage"]))	$_josh["basedblanguage"]	= $_josh["db"]["language"];
-	if (!isset($_josh["is_secure"]))		$_josh["is_secure"]			= false;
-	if (!isset($_josh["email_admin"]))		$_josh["email_admin"]		= "josh@joshreisner.com";
-	if (!isset($_josh["email_default"]))	$_josh["email_default"]		= "josh@joshreisner.com";
-	
-	//required variables
-	if (!isset($_josh["db"]["username"]) || 
-		!isset($_josh["db"]["password"]) || 
-		!isset($_josh["db"]["database"])) {
-		error_handle("config variables missing", "joshserver found a db file but was missing a username, password or database variable.");
-	}
-	return true;
-}
 
 function cookie($name=false, $value=false) {
 	global $_josh, $_COOKIE, $_SERVER;
