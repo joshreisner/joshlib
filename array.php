@@ -29,6 +29,12 @@ function array_post_fields($fieldnames, $delimiter=",") {
 	return $return;
 }
 
+function array_remove($needle, $haystack) {
+	$return = array();
+	foreach ($haystack as $value) if ($value != $needle) $return[] = $value;
+	return $return;
+}
+
 function array_sort($array, $direction="asc", $key=false) {
 	global $_josh;
 	$_josh["sort_key"] = ($key) ? $key : array_shift(array_keys($array[0]));
