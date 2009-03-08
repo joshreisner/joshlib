@@ -29,6 +29,11 @@ function draw_array($array, $nice=false) {
 	return $return;
 }
 
+function draw_autorefresh($minutes) {
+	global $_josh;
+	return '<meta http-equiv="refresh" content="' . $minutes * 60 . '">' . $_josh["newline"];
+}
+
 function draw_css($keepalive=false) {
 	global $_josh;
 	error_debug("drawing css");
@@ -401,7 +406,7 @@ function draw_img($path, $link=false, $alt=false, $name=false) {
 	$width	= $image[0];
 	$height	= $image[1];
 	
-	$return = '<img src="' . $path . '" width="' . $width . '" height="' . $height . '" border="0"';
+	$return = '<img src="' . url_base() . $path . '" width="' . $width . '" height="' . $height . '" border="0"';
 	if ($alt)	$return .= ' alt="' . $alt . '"';
 	if ($name)	$return .= ' name="' . $name . '" id="' . $name . '"';
 	$return .= '/>';

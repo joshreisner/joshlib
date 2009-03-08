@@ -94,6 +94,20 @@ function file_get($filename) {
 	return ($data);
 }
 
+function file_image_resize($src, $target, $newwidth) {
+	//src is not root because it's probably uploaded
+	global $_josh;
+	if (!$src = imagecreatefromjpeg($src)) error_handle("couldn't create image", "the system could not create an image from " . $src);
+	list($width, $height) = getimagesize($_josh["root"] . $filename);
+	$newheight = ($height / $width) * $newwidth;
+	$tmp = imagecreatetruecolor($newwidth, $newheight);
+	imagecopyresampled($tmp, $src, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+	imagejpeg($tmp, $_josh["root"] . $target, 100);
+	imagedestroy($src);
+	imagedestroy($tmp);
+	return true;
+}
+
 function file_import_fixedlength($content, $definitions) {
 	$return = array();
 	$lines = explode("\n", $content);

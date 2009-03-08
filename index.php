@@ -176,8 +176,8 @@ function cookie($name=false, $value=false) {
 	//if you don't specify name, it will try to delete all the cookies
 	if ($name) {
 		$time = ($value) ? mktime(0, 0, 0, 1, 1, 2030) : time()-3600;
-		$_COOKIE[$name] = $value;
 		if (!$value) $value = "";
+		$_COOKIE[$name] = $value;
 		setcookie($name, $value, $time, "/", "." . $_josh["request"]["domain"]);
 	} elseif (isset($_SERVER['HTTP_COOKIE'])) {
 	    $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
