@@ -94,17 +94,22 @@ function file_get($filename) {
 	return ($data);
 }
 
-function file_image_resize($src, $target, $newwidth) {
+function file_image_resize($source_name, $target_name, $new_width) {
 	//src is not root because it's probably uploaded
 	global $_josh;
-	if (!$src = imagecreatefromjpeg($src)) error_handle("couldn't create image", "the system could not create an image from " . $src);
-	list($width, $height) = getimagesize($_josh["root"] . $filename);
-	$newheight = ($height / $width) * $newwidth;
-	$tmp = imagecreatetruecolor($newwidth, $newheight);
-	imagecopyresampled($tmp, $src, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
-	imagejpeg($tmp, $_josh["root"] . $target, 100);
-	imagedestroy($src);
-	imagedestroy($tmp);
+	if (!file_exists($source_name)) return false; //return if no file source
+	list($width, $height) = getimagesize($source_name);
+	if ($width == $new_width) {
+		copy($source_name, $target_name);
+	} else {
+		if (!$image = @imagecreatefromjpeg($source_name)) error_handle("couldn't create image", "the system could not create an image from " . $src);
+		$new_height = ($height / $width) * $new_width;
+		$tmp = imagecreatetruecolor($new_width, $new_height);
+		imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+		imagejpeg($tmp, $_josh["root"] . $target_name, 100);
+		imagedestroy($image);
+		imagedestroy($tmp);
+	}
 	return true;
 }
 

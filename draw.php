@@ -34,38 +34,18 @@ function draw_autorefresh($minutes) {
 	return '<meta http-equiv="refresh" content="' . $minutes * 60 . '">' . $_josh["newline"];
 }
 
-function draw_css($keepalive=false) {
-	global $_josh;
-	error_debug("drawing css");
-	if (!isset($_josh["drawn"]["css"]) || !$_josh["drawn"]["css"]) {
-		if (!$keepalive) $_josh["drawn"]["css"] = true;
-		return ('<style type="text/css">
-			.josh_body			{ margin:0px; background-color:' . $_josh["colors"]["grey3"] . '; font-family:verdana, arial, sans-serif; }
-			.josh_title			{ font-family:verdana, arial, sans-serif; font-size:20px; font-weight:bold; }
-			.josh_heading		{ font-family:verdana, arial, sans-serif; font-size:14px; }
-			.josh_heading_large	{ font-family:verdana, arial, sans-serif; font-size:17px; }
-			.josh_manage_site	{ font-family:verdana, arial, sans-serif; font-size:20px; font-weight:bold; color:' . $_josh["colors"]["red2"] . '; background-color:' . $_josh["colors"]["yellow"] . '; text-decoration:none; }
-			.josh_message		{ font-family:verdana, arial, sans-serif; font-size:12px; line-height:18px; }
-			.josh_smaller		{ font-family:verdana, arial, sans-serif; font-size:10px; }
-			.josh_small			{ font-family:verdana, arial, sans-serif; font-size:9px; }
-			.josh_field			{ background-color:' . $_josh["colors"]["grey2"] . '; font-family:verdana, arial, sans-serif; font-size:11px; border-width:1px; padding:2px;  }
-			.josh_textarea		{ background-color:' . $_josh["colors"]["grey2"] . '; font-family:verdana, arial, sans-serif; font-size:11px; border-width:1px; padding:2px; width:200px; height:100px; }
-			.josh_button		{ font-family:verdana, arial, sans-serif; background-color:' . $_josh["colors"]["grey4"] . '; font-size:10px; width:130px; border-width:1px; color: ' . $_josh["colors"]["white"] . ';}
-			.josh_button_prompt	{ font-family:verdana, arial, sans-serif; background-color:' . $_josh["colors"]["grey2"] . '; font-size:10px; width:130px; border-width:1px; color: ' . $_josh["colors"]["grey5"] . ';}
-			.josh_code          { font-family:droid sans mono, monaco, courier new, courier; font-size:12px; line-height:18px; }
-			.josh_drawer_open	{ background-color:' . $_josh["colors"]["grey5"] . '; margin:0px; margin-top:13px; }
-			.josh_drawer_closed { background-color:' . $_josh["colors"]["grey5"] . '; margin:0px; margin-top:13px; }
-			a.josh_dark:link	{ color:' . $_josh["colors"]["red2"] . '; }
-			a.josh_dark:active	{ color:' . $_josh["colors"]["red2"] . '; }
-			a.josh_dark:visited	{ color:' . $_josh["colors"]["red2"] . '; }
-			a.josh_dark:hover	{ color:' . $_josh["colors"]["red1"] . '; }
-			a.josh_lite:link	{ color:' . $_josh["colors"]["white"] . '; text-decoration:none; }
-			a.josh_lite:active	{ color:' . $_josh["colors"]["white"] . '; text-decoration:none; }
-			a.josh_lite:visited	{ color:' . $_josh["colors"]["white"] . '; text-decoration:none; }
-			a.josh_lite:hover	{ color:' . $_josh["colors"]["white"] . '; text-decoration:underline; }
-			span.clickable:hover	{ background-color:#f3f3f3; cursor:hand; cursor:pointer; }
-		</style>');
-	}
+function draw_css($content) {
+	return '<style type="text/css">' . $content . '</style>';
+}
+
+function draw_css_src($location, $media=false) {
+	$ie = ($media == "ie");
+	if ($ie) $media = "screen";
+	$return = '<link rel="stylesheet" type="text/css"';
+	if ($media) $return .= ' media="' . $media . '"';
+	$return .= ' href="' . $location . '" />';
+	if ($ie) $return = '<!--[if IE]>' . $return . '<![endif]-->';
+	return $return;
 }
 
 function draw_focus($form_element) {
@@ -417,7 +397,7 @@ function draw_img($path, $link=false, $alt=false, $name=false) {
 function draw_javascript($javascript=false) {
 	if (!$javascript) return draw_javascript_src();
 	return 	'
-	<script language="javascript">
+	<script language="javascript" type="text/javascript">
 		<!--
 		' . $javascript . '
 		//-->
@@ -428,10 +408,12 @@ function draw_javascript($javascript=false) {
 function draw_javascript_src($src=false) {
 	global $_josh;
 	if (!$src && isset($_josh["javascript"])) {
+		if ($_josh["drawn"]["js"]) return false;
 		$src = $_josh["javascript"];
 		if (!file_exists($_josh["root"] . $_josh["javascript"]) || (filemtime($_josh["joshlib"] . "javascript.js") > filemtime($_josh["root"] . $_josh["javascript"]))) {
 			if ($content = file_get($_josh["joshlib"] . "javascript.js")) {
 				file_put($_josh["javascript"], $content);
+				$_josh["drawn"]["javascript"] = true;
 			} else {
 				error_handle("couldn't get javascript", "system needs that file");
 			}
@@ -494,48 +476,6 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 	if ($type == "rollovers") $return = draw_javascript('if (document.images) {' . $javascript . '}
 		function roll(what, how) { eval("document." + what + ".src = " + what + "_" + how + ".src;"); }') . $return;
 	return $return;
-}
-
-function draw_page($title, $html, $severe=false, $keepalive=false) {
-	global $_josh;
-	error_debug("drawing page");
-	$_josh["drawn"]["css"] = false;
-	if ($severe) $title = "<font color='" . $_josh["colors"]["red2"] . "'>" . $title . "</font>";
-	$return = "<html>
-		<head>
-			<title>" . strip_tags($title) . "</title>
-			" . draw_css($keepalive) . "
-			<script language='javascript'>
-				<!--
-				function josh_confirm(action, message, id) {
-					var url = '/j/' + action + '/';
-					if (id) url += '/' + id + '/';
-					if (confirm('Are you sure you want to ' + message + '?')) location.href = url;
-				}
-				//-->
-			</script>
-		</head>
-		<body class='josh_body' bgcolor='" . $_josh["colors"]["grey3"] . "'>
-			<table width='100%' height='100%' cellpadding='0' cellspacing='0' border='0'>
-				<tr height='90%'>
-					<td align='center' height='350'>
-						<table width='400' height='250' cellpadding='20' cellspacing='0' border='0' bgcolor='" . $_josh["colors"]["white"] . "'>
-							<tr>
-								<td valign='top'>
-								<div class='josh_title'>" . $title . "</div>
-								<br>
-								<div class='josh_message'>" . $html . "</div>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-		</body>
-	</html>";
-	if ($keepalive) return $return;
-	echo $return;
-	db_close();
 }
 
 function draw_rss_link($address) {

@@ -17,20 +17,37 @@ function error_debug($message) {
 	}
 }
 
+function error_draw($title, $html) {	
+	global $_josh;
+	error_debug("drawing error handling page");
+	return "<html><head><title>" . strip_tags($title) . "</title></head>
+			<body style='background-color:#d2d2d2; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;'>
+				<div style='background-color:#fff; padding:10px 20px 10px 20px; width:360px; height:260px; position:absolute; left:50%; top:50%; margin:-150px 0px 0px -200px;'>
+					<h1 style='color:#5599cc; font-weight:normal; font-size:30px;'>" . $title . "</h1>" . $html . "
+				</div>
+			</body>
+		</html>";
+}
+
+error_handle("this is a test", "this is test of the error-handling system.  please be patient.  this is only a test.");
+
 function error_handle($type, $message, $run_trace=true) {
 	global $_josh;
 	if ($run_trace) {
 		$backtrace = debug_backtrace();
 		$level = count($backtrace) - 1;
-		$message .= " on line " . $backtrace[$level]["line"] . " of file " . $backtrace[$level]["file"];
+		$message .= "<br><br>on line " . $backtrace[$level]["line"] . " of " . str_replace($_josh["root"], "", $backtrace[$level]["file"]);
 	}
 	if (function_exists("error_email")) {
 		$email	= $message;
 		$email .= "<br><br>Of page: <a href='" . $_josh["request"]["uri"] . "'>" . $_josh["request"]["uri"] . "</a>";
 		$email .= "<br><br>Encountered by user: <!--user-->";
-		error_email(draw_page($type, $email, true, true));
+		error_email(error_draw($type, $email));
 	}
-	if (isset($_josh["mode"]) && ($_josh["mode"] == "dev")) draw_page($type, $message, true);
+	if ($_josh["mode"] == "dev") {
+		echo error_draw($type, $message, true);
+		db_close();
+	}
 }
 
 function error_handle_php($number, $str, $file, $line) {

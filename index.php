@@ -61,8 +61,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 									"yellow"=>"#ffffcc"
 									);
 	$_josh["drawn"]["bottom"]	= false;
-	$_josh["drawn"]["css"]		= false;	//only run josh_draw_css() once
-	$_josh["drawn"]["js"]		= false;	//only run josh_draw_javascript() once
+	$_josh["drawn"]["js"]		= false;	//only include javascript.js once
 	$_josh["drawn"]["focus"]	= false;	//only autofocus on one form
 	$_josh["drawn"]["top"]		= false;
 	$_josh["forms"]				= array();	//for handling multiple forms in a page (eg which one gets autofocus?)
@@ -81,7 +80,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	$_josh["numbers"]			= array("zero","one","two","three","four","five","six","seven","eight","nine");
 	$_josh["queries"]			= array();	//for counting trips to the database
 	
-
+$_josh["mode"] = "dev";
 //get library files
 	require("error.php");
 	require("array.php");
