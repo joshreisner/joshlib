@@ -3,57 +3,68 @@
 http://code.google.com/p/joshlib/ (wiki / documentation / tracking)
 http://joshlib.joshreisner.com/ (eventual website)
 
-tesitng 
+the purpose of this page (index.php) is to set a bunch of variables that joshlib is going to need, 
+and define some functions that don't fit anywhere else
+
+variables you can pass joshlib that it won't overwrite are:
+
+	$_josh["config"]			the file location of the configuration file
+	
+	$_josh["db"]["location"]	the server location of the configuration file
+	$_josh["db"]["username"]
+	$_josh["db"]["password"]
+	$_josh["db"]["language"]	the lanugage to use -- currently mssql or mysql
+	$_josh["db"]["database"]	the database it should connect to
+	
+	$_josh["email_default"]		the address general message should come from
+	$_josh["email_admin"]		the address of the site administrator, for error reporting
+	
+	$_josh["javascript"]		the location of where to put javascript.js, if you're going to use the javascript functions
+	$_josh["basedblanguage"]	mysql or mssql -- if it doesn't match db language, will try to translate
+	$_josh["is_secure"]			true (use https) or false (don't)
+
+in addition, there are some variables you can pass that will be overwritten if there is $_SERVER info to be had.  
+so if joshlib is run from the command line, these variables would be good to have
+
+	$_josh["request"]			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)
+	$_josh["referrer"]			same as request
+	$_josh["folder"]			/ or \
+	$_josh["newline"]			\n or \r\n
+	$_josh["root"]				path to the site, eg /Users/yourusername/Sites/thissite
+	$_josh["slow"]				true or false; whether to use javascript when redirecting (true) or header variables (false)
+	$_josh["mobile"]			true or false
+
+functions defined here:
+	cookie
+	daysInMonth
+	debug
+	geocode
+	
+classes defined here:
+	table
+	form
+	
 */
 $_josh["time_start"] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
 
-//parse environment variables
-	/* 
-	because these can change by platform, $_josh["server"] variables are supposed to be direct representations
-	of particular variables.  they're not really for script use, although they can be.  $_josh["request"] and $_josh["referrer"]
-	are better for those purposes
-	*/
-	$_josh["server"]["host"]		= (isset($_SERVER["HTTP_HOST"])) ? $_SERVER["HTTP_HOST"] : false;
-	$_josh["server"]["mobile"]		= (isset($_SERVER["HTTP_HOST"]) && strstr($_SERVER["HTTP_USER_AGENT"], "iPhone"));
-	$_josh["server"]["refer"]		= (isset($_SERVER["HTTP_REFERER"])) ? $_SERVER["HTTP_REFERER"] : false;
-	$_josh["server"]["request"]		= $_SERVER["SCRIPT_NAME"];
-	$_josh["server"]["protocol"]	= (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) ? "https" : "http";
-	$_josh["server"]["query"]		= (isset($_SERVER["QUERY_STRING"])) ? $_SERVER["QUERY_STRING"] : false;
-	
-	if (isset($_SERVER["SERVER_SOFTWARE"]) && strstr($_SERVER["SERVER_SOFTWARE"], "Microsoft")) {
-		//iis
-		$_josh["server"]["isunix"]	= false;
-		$_josh["folder"]			= "\\";
-		$_josh["newline"]			= "\r\n";
-		$_josh["root"]				= str_replace(str_replace("/", "\\", $_josh["server"]["request"]), "", str_replace("\\\\", "\\", $_SERVER["PATH_TRANSLATED"]));
-		$_josh["slow"]				= true;
-	} else {
-		//apache
-		$_josh["server"]["isunix"]	= true;
-		$_josh["folder"]			= "/";
-		$_josh["newline"]			= "\n";
-		$_josh["root"]				= $_SERVER["DOCUMENT_ROOT"];
-		if (!isset($_josh["slow"]))	$_josh["slow"] = false;
-	}
-	
-	//echo $_josh["root"];
-	//phpinfo();
-
-
-//set possibly-already-set variables
-	if (!isset($_josh["debug"]))	$_josh["debug"]		= false;
-	if (!isset($_josh["styles"]))	$_josh["styles"]	= array("field"=>"josh_field", "select"=>"josh_field", "button"=>"josh_button", "textarea"=>"josh_textarea");
-
+//get includes
+	require("error.php"); //get this one first to handle errors in other 
+	//debug(); //this is nearly the highest level that you could start reporting at
+	require("array.php");
+	require("db.php");
+	require("draw.php");
+	require("email.php");
+	require("file.php");
+	require("format.php");
+	require("htmlawed.php");
+	require("url.php");
 
 //set static variables
-	$_josh["today"]				= date("j");		//useful date info.  todo -- combine these into an array
+	$_josh["today"]				= date("j");
 	$_josh["year"]				= date("Y");
 	$_josh["month"]				= date("n");
-	$_josh["drawn"]["bottom"]	= false;
 	$_josh["drawn"]["js"]		= false;	//only include javascript.js once
 	$_josh["drawn"]["focus"]	= false;	//only autofocus on one form element
-	$_josh["drawn"]["top"]		= false;
-	$_josh["forms"]				= array();	//for handling multiple forms in a page (eg which one gets autofocus?)
 	$_josh["ignored_words"]		= array("1","2","3","4","5","6","7","8","9","0","about","after","all","also","an","and","another","any","are",
 									"as","at","be","because","been","before","being","between","both","but","by","came","can","come",
 									"could","did","do","does","each","else","for","from","get","got","has","had","he","have","her","here",
@@ -69,64 +80,69 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	$_josh["numbers"]			= array("zero","one","two","three","four","five","six","seven","eight","nine");
 	$_josh["queries"]			= array();	//for counting trips to the database
 	
-$_josh["mode"] = "dev";
-//get library files
-	require("error.php");
-	require("array.php");
-	require("db.php");
-	require("draw.php");
-	require("email.php");
-	require("file.php");
-	require("format.php");
-	require("htmlawed.php");
-	require("url.php");
-
-
-//hook up error.php
-	set_error_handler("error_handle_php");
-	
-//find out about environment (you can use draw_array($array, false) to display these arrays for debugging -- see line 75 below)
-	$_josh["request"]	= ($_josh["server"]["host"])	? url_parse($_josh["server"]["protocol"] . "://" . $_josh["server"]["host"] . $_josh["server"]["request"] . "?" . $_josh["server"]["query"]) : false;
-	$_josh["referrer"]	= ($_josh["server"]["refer"])	? url_parse($_josh["server"]["refer"]) : false;
-	
+//parse environment variables
+	if (isset($_SERVER)) { //this could not be set if this were running from the command line (eg by a cron)
+		//build request as string, then set it to array with url_parse
+		$_josh["request"] = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) ? "https" : "http";
+		$_josh["request"] .= "://";
+		$_josh["request"] .= $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"];
+		if (isset($_SERVER["QUERY_STRING"])) $_josh["request"] .= "?" . $_SERVER["QUERY_STRING"];
+		$_josh["request"] = url_parse($_josh["request"]);
+			
+		//platform-specific info
+		if (isset($_SERVER["SERVER_SOFTWARE"]) && strstr($_SERVER["SERVER_SOFTWARE"], "Microsoft")) { //platform is PC
+			$_josh["folder"]			= "\\";
+			$_josh["newline"]			= "\r\n";
+			$_josh["root"]				= str_replace(str_replace("/", "\\", $_josh["server"]["request"]), "", str_replace("\\\\", "\\", $_SERVER["PATH_TRANSLATED"]));
+			$_josh["slow"]				= true;
+		} else { //platform is UNIX or Mac
+			$_josh["folder"]			= "/";
+			$_josh["newline"]			= "\n";
+			$_josh["root"]				= $_SERVER["DOCUMENT_ROOT"];
+			if (!isset($_josh["slow"]))	$_josh["slow"] = false;
+		}
+		
+		//only checking for iphone right now
+		$_josh["request"]["mobile"]		= (isset($_SERVER["HTTP_USER_AGENT"]) && strstr($_SERVER["HTTP_USER_AGENT"], "iPhone"));
+	 	$_josh["referrer"]				= (isset($_SERVER["HTTP_REFERER"]))	? url_parse(isset($_SERVER["HTTP_REFERER"])) : false;
+	} else {
+		//set defaults and hope for the best
+		if (!isset($_josh["request"]))	$_josh["request"]	= false;
+		if (!isset($_josh["folder"]))	$_josh["folder"]	= "/";
+		if (!isset($_josh["newline"]))	$_josh["newline"]	= "\n";
+		if (!isset($_josh["root"]))		$_josh["root"]		= false;
+		if (!isset($_josh["slow"]))		$_josh["slow"]		= false;
+		if (!isset($_josh["mobile"]))	$_josh["mobile"]	= false;
+		if (!isset($_josh["referrer"]))	$_josh["referrer"]	= false;
+	}
 	
 //get configuration variables
-	error_debug("<b>configure</b> running");
-	$filename = isset($_josh["config"]) ? $_josh["config"] : "/_site/config-" . $_josh["request"]["sanswww"] . ".php";
-	if (file_exists($filename)) {
+	if (!isset($_josh["config"])) $_josh["config"] = "/_site/config-" . $_josh["request"]["sanswww"] . ".php";
+	if (file_exists($_josh["config"])) {
 		error_debug("<b>configure</b> found file");
-		require($filename);
-	} elseif (file_exists($_josh["root"] . $filename)) {
+		require($_josh["config"]);
+	} elseif (file_exists($_josh["root"] . $_josh["config"])) {
 		error_debug("<b>configure</b> found file");
-		require($_josh["root"] . $filename);
+		require($_josh["root"] . $_josh["config"]);
 	} else {
 		error_debug("<b>configure</b> couldn't find config file");
-		$_josh["mode"] = "dev";
-		error_handle("config file missing", "joshserver couldn't find the config file which should be at <span class='josh_code'>" . $_josh["root"] . $filename . "</span>.  please create a file there and put db connection info in it.");
 	}
 
-	//set defaults
+//set defaults for configuration for variables it didn't find
 	if (!isset($_josh["db"]["location"]))	$_josh["db"]["location"]	= "localhost";
 	if (!isset($_josh["db"]["language"]))	$_josh["db"]["language"]	= "mysql";
 	if (!isset($_josh["basedblanguage"]))	$_josh["basedblanguage"]	= $_josh["db"]["language"];
 	if (!isset($_josh["is_secure"]))		$_josh["is_secure"]			= false;
 	if (!isset($_josh["email_admin"]))		$_josh["email_admin"]		= "josh@joshreisner.com";
 	if (!isset($_josh["email_default"]))	$_josh["email_default"]		= "josh@joshreisner.com";
-	
-	//required variables
-	if (!isset($_josh["db"]["username"]) || 
-		!isset($_josh["db"]["password"]) || 
-		!isset($_josh["db"]["database"])) {
-		error_handle("config variables missing", "joshserver found a db file but was missing a username, password or database variable.");
-	}
-	
+		
 	
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_josh["mode"]) && ($_josh["mode"] == "dev")) {
 		//1: you can set the option manually
 		error_reporting(E_ALL);
-	} elseif (format_text_starts("dev-", $_SERVER["HTTP_HOST"]) || format_text_starts("beta.", $_SERVER["HTTP_HOST"]) || format_text_ends(".site", $_SERVER["HTTP_HOST"])) {
-		//2: urls start with dev- or end with .site are automatically considered dev sites
+	} elseif (isset($_SERVER["HTTP_HOST"]) && (format_text_starts("dev-", $_SERVER["HTTP_HOST"]) || format_text_starts("beta.", $_SERVER["HTTP_HOST"]) || format_text_ends(".site", $_SERVER["HTTP_HOST"]))) {
+		//2: urls start with dev- or beta or end with .site are automatically considered dev sites
 		$_josh["mode"] = "dev";
 		error_reporting(E_ALL);
 	} else {
@@ -135,7 +151,7 @@ $_josh["mode"] = "dev";
 	}
 
 
-//handle https
+//handle https forwarding
 	if (isset($_josh["request"]["protocol"])) {
 		if ($_josh["is_secure"] && ($_josh["request"]["protocol"] != "https")) {
 			url_change("https://" . $_josh["request"]["host"] . $_josh["request"]["path_query"]);
@@ -157,7 +173,7 @@ $_josh["mode"] = "dev";
 	extract($_josh);
 	
 	
-//special functions that don't fit into a category (yet)
+//special functions that don't yet fit into a category
 
 function cookie($name=false, $value=false) {
 	global $_josh, $_COOKIE, $_SERVER;

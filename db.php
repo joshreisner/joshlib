@@ -124,7 +124,6 @@ function db_delete($table, $id=false) {
 
 function db_fetch($result) {
 	global $_josh;
-	db_open();
 	if ($_josh["db"]["language"] == "mysql") {
 		return mysql_fetch_assoc($result);
 	} elseif ($_josh["db"]["language"] == "mssql") {
@@ -209,36 +208,31 @@ function db_num_fields($result) {
 	}
 }
 
-function db_open() {
+function db_open($location=false, $username=false, $password=false, $database=false, $language=false) {
 	global $_josh;
-	
+	error_debug("<b>db_open</b> running");
+
 	//skip if already connected
 	if (isset($_josh["db"]["pointer"])) return;
 	
-	error_debug("<b>db_open</b> running");
-
-	//todo: be able to specify new variables.  it should close the open connection and connect to the new thing.
+	//reset variables if you're specifying which ones to use
+	if ($location) $_josh["db"]["location"] = $location;
+	if ($username) $_josh["db"]["username"] = $username;
+	if ($password) $_josh["db"]["password"] = $password;
+	if ($database) $_josh["db"]["database"] = $database;
+	if ($language) $_josh["db"]["language"] = $language;
 		
 	//connect to db
-	if (
-		!isset($_josh["db"]["language"]) || 
-		!isset($_josh["db"]["database"]) || 
-		!isset($_josh["db"]["username"]) || 
-		!isset($_josh["db"]["password"]) || 
-		!isset($_josh["db"]["location"])
-	) {
-		configure();
-		//error_handle("database variables error", "joshserver could not find the right database connection variables.  please fix this before proceeding.");
+	if (!isset($_josh["db"]["database"]) || !isset($_josh["db"]["username"]) || !isset($_josh["db"]["password"])) {
+		error_handle("database variables error", "joshserver could not find the right database connection variables.  please fix this before proceeding.");
 	} elseif ($_josh["db"]["language"] == "mysql") {
 		error_debug("<b>db_open</b> trying to connect mysql on " . $_josh["db"]["location"]);
-		if ($_josh["db"]["pointer"] = @mysql_connect($_josh["db"]["location"], $_josh["db"]["username"], $_josh["db"]["password"])) {
-		} else {
+		if (!$_josh["db"]["pointer"] = @mysql_connect($_josh["db"]["location"], $_josh["db"]["username"], $_josh["db"]["password"])) {
 			error_handle("database connection error", "this application is not able to connect its database.  we're sorry for the inconvenience, the administrator is attempting to fix the issue.");
 		}
 	} elseif ($_josh["db"]["language"] == "mssql") {
 		error_debug("<b>db_open</b> trying to connect mssql on " . $_josh["db"]["location"] . " with username " . $_josh["db"]["username"]);
-		if ($_josh["db"]["pointer"] = @mssql_connect($_josh["db"]["location"], $_josh["db"]["username"], $_josh["db"]["password"])) {
-		} else {
+		if (!$_josh["db"]["pointer"] = @mssql_connect($_josh["db"]["location"], $_josh["db"]["username"], $_josh["db"]["password"])) {
 			error_handle("database connection error", "this application is not able to connect its database.  we're sorry for the inconvenience, the administrator is attempting to fix the issue.");
 		}
 	}
@@ -266,7 +260,9 @@ function db_query($query, $limit=false, $suppress_error=false) {
 	$_josh["queries"][] = $query;
 	if ($_josh["db"]["language"] == "mysql") {
 		if ($limit) $query .= " LIMIT " . $limit;
-		if ($result = @mysql_query($query, $_josh["db"]["pointer"])) {
+		$result = @mysql_query($query, $_josh["db"]["pointer"]);
+		$error = mysql_error();
+		if (!$error) {
 			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
 			error_debug("<b>db_query</b> <i>" . $query . "</i>, " . db_found($result) . " results returned");
 			if (format_text_starts("insert", $query)) return db_id();
@@ -275,7 +271,8 @@ function db_query($query, $limit=false, $suppress_error=false) {
 			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
 			error_debug("<b>db_query</b> failed <i>" . $query . "</i>");
 			if ($suppress_error) return false;
-			error_handle("mysql error", format_code($query) . "<br>" . mysql_error());
+			//error_handle("mysql error", format_code($query) . $error);
+			error_handle("mysql error", $error);
 		}
 	} elseif ($_josh["db"]["language"] == "mssql") {
 		//echo $_josh["db"]["location"]. " db";
@@ -289,7 +286,7 @@ function db_query($query, $limit=false, $suppress_error=false) {
 		} else {
 			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
 			if ($suppress_error) return false;
-			error_handle("mssql error", format_code($query) . "<br>" . mssql_get_last_message());
+			error_handle("mssql error", format_code($query) . mssql_get_last_message());
 		}
 	}
 }

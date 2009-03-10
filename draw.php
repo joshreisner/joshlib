@@ -4,11 +4,10 @@ error_debug("~ including draw.php");
 function draw_array($array, $nice=false) {
 	global $_josh;
 	if (!is_array($array)) return false;
-	$return = '<table width="100%" cellpadding="3" cellspacing="1" border="0" bgcolor="' . $_josh["colors"]["grey2"] . '">';
+	$return = '<table width="100%" cellpadding="3" cellspacing="1" border="0" bgcolor="#eee">';
 	if (!$nice) ksort($array);
 	while(list($key, $value) = each($array)) {
 		if ($nice && (strToLower($key) == "j")) continue;
-		if (is_int($key)) continue;
 		$value = format_quotes($value);
 		if (strToLower($key) == "email") $value = "<a href='mailto:" . $value . "'>" . $value . "</a>";
 		if (is_array($value)) {
@@ -19,9 +18,9 @@ function draw_array($array, $nice=false) {
 			$value = $return2;
 		}
 		$return  .= '
-			<tr bgcolor="' . $_josh["colors"]["white"] . '" style="font-family: verdana; font-size:11px; padding:6px; line-height:16px; width:100%;" valign="top"';
+			<tr bgcolor="#fff" style="font-family: verdana; font-size:11px; padding:6px; line-height:16px; width:100%;" valign="top"';
 		if (strToLower($key) == "message") $return .= ' height="160"';
-		$return .= '><td bgcolor="' . $_josh["colors"]["grey1"] . '" width="21%"><nobr>';
+		$return .= '><td bgcolor="#eee" width="21%"><nobr>';
 		$return .= ($nice) ? format_text_human($key)  : $key;
 		$return .= '&nbsp;</nobr></td><td width="79%">' . nl2br($value) . '</td></tr>';
 	}
@@ -54,7 +53,7 @@ function draw_focus($form_element) {
 
 function draw_form_button($text, $location=false, $class=false, $disabled=false, $javascript=false) {
 	global $_josh;
-	if (!$class) $class = $_josh["styles"]["button"];
+	$class = ($class) ? $class . " button" : "button";
 	$return  = '<input type="button" value="' . $text . '" id="' . $text . '" class="' . $class . '" onclick="';
 	if ($location) {
 		$return .= 'javascript:location.href=\'' . $location . '\'"';
@@ -69,7 +68,7 @@ function draw_form_button($text, $location=false, $class=false, $disabled=false,
 
 function draw_form_checkbox($name, $checked=false, $class=false, $javascript=false) {
 	global $_josh;
-	if (!$class) $class = (isset($_josh["styles"]["checkbox"])) ? $_josh["styles"]["checkbox"] : "checkbox";
+	$class = ($class) ? $class . " checkbox" : "checkbox";
 	$return  = '<input type="checkbox" name="' . $name . '" id="' . $name . '" class="' . $class . '"';
 	if ($javascript) $return .= ' onclick="javascript:' . $javascript . '"';
 	if ($checked) $return .= ' checked';
@@ -95,7 +94,7 @@ function draw_form_checkboxes($name, $linking_table=false, $object_col=false, $o
 
 function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=false, $required=true) {
 	global $_josh;
-	if (!$class) $class = $_josh["styles"]["select"];
+	$class = ($class) ? $class . " select" : "select";
 
 	//get time into proper format
 	$nulled = (!$required && !$timestamp);
@@ -208,7 +207,7 @@ function draw_form_hidden($name, $value="") {
 
 function draw_form_password($name, $value="", $class=false, $maxlength=255, $autocomplete=true) {
 	global $_josh;
-	if (!$class) $class = $_josh["styles"]["field"];
+	$class = ($class) ? $class . " password" : "password";
 	$return = '<input type="password" name="' . $name . '" id="' . $name . '" value="' . $value . '" class="' . $class . '" maxlength="' . $maxlength . '" class="' . $class . '"';
 	if (!$autocomplete) $return .= ' autocomplete="off"';
 	$return .= '>';
@@ -226,7 +225,7 @@ function draw_form_radio($name, $value="", $checked=false, $class=false) {
 
 function draw_form_select($name, $sql_options, $value=false, $required=true, $class=false, $action=false, $nullvalue="", $maxlength=false) {
 	global $_josh;
-	if (!$class) $class = $_josh["styles"]["select"];
+	$class = ($class) ? $class . " select" : "select";
 	$return  = '<select name="' . $name . '" id="' . $name . '" class="' . $class . '"';
 	if ($action) $return .= ' onchange="javascript:' . $action . '"';
 	$return .= '>';
@@ -256,7 +255,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 function draw_form_select_month($name, $start, $default=false, $length=false, $class=false, $js=false, $nullable=false) {
 	//select of months going back to $start mm/yyyy format
 	global $_josh;
-	if (!$class) $class = $_josh["styles"]["field"];
+	$class = ($class) ? $class . " select" : "select";
 	list($startMonth, $startYear) = explode("/", $start);
 	$array = array();
 	$break = false;
@@ -276,13 +275,13 @@ function draw_form_select_month($name, $start, $default=false, $length=false, $c
 
 function draw_form_submit($message="Submit Form", $class=false) {
 	global $_josh;
-	if (!$class) $class = $_josh["styles"]["button"];
+	$class = ($class) ? $class . " button" : "button";
 	return '<input type="submit" value="   ' . $message . '   " class="' . $class . '">';
 }
 
 function draw_form_text($name, $value="", $class=false, $maxlength=255, $style=false, $autocomplete=true) {
 	global $_josh;
-	if (!$class) $class = $_josh["styles"]["field"];
+	$class = ($class) ? $class . " text" : "text";
 	$return  = '<input type="text" name="' . $name . '" id="' . $name . '" value="' . $value . '" class="' . $class . '" maxlength="' . $maxlength . '"';
 	if ($style) $return .= ' style="' . $style . '"';
 	if (!$autocomplete) $return .= ' autocomplete="off"';
@@ -293,7 +292,7 @@ function draw_form_text($name, $value="", $class=false, $maxlength=255, $style=f
 function draw_form_textarea($name, $value="", $class=false) {
 	error_debug("drawing textarea");
 	global $_josh;
-	if (!$class) $class = $_josh["styles"]["textarea"];
+	$class = ($class) ? $class . " textarea" : "textarea";
 	return '<textarea name="' . $name . '" id="' . $name . '" class="' . $class . '">' . $value . '</textarea>';
 }
 

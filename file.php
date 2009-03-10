@@ -97,6 +97,7 @@ function file_get($filename) {
 function file_image_resize($source_name, $target_name, $new_width) {
 	//src is not root because it's probably uploaded
 	global $_josh;
+	if (!function_exists("imagecreatefromjpeg")) error_handle("library missing", "the GD library needs to be installed to run file_image_resize");
 	if (!file_exists($source_name)) return false; //return if no file source
 	list($width, $height) = getimagesize($source_name);
 	if ($width == $new_width) {

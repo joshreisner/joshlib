@@ -46,7 +46,7 @@ function format_check($variable, $type="int") {
 }
 
 function format_code($code) {
-	return "<div class='josh_code'>" . nl2br(str_replace("\t", "&nbsp;", $code)) . "</div>";
+	return "<p style='font-family:courier; font-size:13px;'>" . nl2br(str_replace("\t", "&nbsp;", $code)) . "</p>";
 }
 
 function format_date($timestamp=false, $error="", $format="M d, Y", $relativetime=true) {
