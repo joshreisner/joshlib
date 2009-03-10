@@ -75,7 +75,6 @@ function db_close($keepalive=false) { //close connection and quit
 function db_columns($tablename) {
 	global $_josh;
 	error_debug("<b>db_columns</b> running");
-	db_open();
 	$return = array();
 	if ($_josh["db"]["language"] == "mysql") {
 		$result = db_query("DESCRIBE " . $tablename);
@@ -86,19 +85,19 @@ function db_columns($tablename) {
 			$default = $r["Default"];
 			$return[] = compact("name","type","required","default");
 		}
+	} else {
+		error_handle("mssql not supported yet", "mssql is not yet supported for db_columns");
 	}
 	return $return;
 }
 
 function db_date() {
 	global $_josh;
-	db_open();
 	return ($_josh["db"]["language"] == "mssql") ? "GETDATE()" : "NOW()";
 }
 
 function db_datediff($date1=false, $date2=false) {
 	global $_josh;
-	db_open();
 	if ($_josh["db"]["language"] == "mssql") {
 		if (!$date1) $date1 = "GETDATE()";
 		if (!$date2) $date2 = "GETDATE()";
@@ -133,7 +132,6 @@ function db_fetch($result) {
 
 function db_fetch_field($result, $i) {
 	global $_josh;
-	db_open();
 	if ($_josh["db"]["language"] == "mysql") {
 		return mysql_fetch_field($result, $i);
 	} elseif ($_josh["db"]["language"] == "mssql") {
@@ -143,7 +141,6 @@ function db_fetch_field($result, $i) {
 
 function db_field_type($result, $i) {
 	global $_josh;
-	db_open();
 	if ($_josh["db"]["language"] == "mysql") {
 		return mysql_field_type($result, $i);
 	} elseif ($_josh["db"]["language"] == "mssql") {
@@ -153,7 +150,6 @@ function db_field_type($result, $i) {
 
 function db_found($result) {
 	global $_josh;
-	db_open();
 	if ($_josh["db"]["language"] == "mysql") {
 		return @mysql_num_rows($result);
 	} elseif ($_josh["db"]["language"] == "mssql") {
@@ -180,7 +176,6 @@ function db_grab($query, $checking=false) {
 
 function db_id() {
 	global $_josh;
-	db_open();
 	if ($_josh["db"]["language"] == "mysql") {
 		return mysql_insert_id();
 	} elseif ($_josh["db"]["language"] == "mssql") {
@@ -190,7 +185,6 @@ function db_id() {
 
 function db_key() {
 	global $_josh;
-	db_open();
 	if ($_josh["db"]["language"] == "mssql") {
 		return ""; //todo: not yet implemented for mssql
 	} elseif ($_josh["db"]["language"] == "mysql") {
@@ -200,7 +194,6 @@ function db_key() {
 
 function db_num_fields($result) {
 	global $_josh;
-	db_open();
 	if ($_josh["db"]["language"] == "mysql") {
 		return mysql_num_fields($result);
 	} elseif ($_josh["db"]["language"] == "mssql") {
@@ -244,7 +237,6 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 function db_pwdcompare($string, $field) {
 	global $_josh;
 	error_debug("<b>db_pwdcompare</b> running");
-	db_open();
 	if ($_josh["db"]["language"] == "mssql") {
 		return "PWDCOMPARE('" . $string . "', " . $field . ")";
 	} else {
@@ -271,8 +263,8 @@ function db_query($query, $limit=false, $suppress_error=false) {
 			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
 			error_debug("<b>db_query</b> failed <i>" . $query . "</i>");
 			if ($suppress_error) return false;
-			//error_handle("mysql error", format_code($query) . $error);
-			error_handle("mysql error", $error);
+			error_handle("mysql error", format_code($query) . $error);
+			//error_handle("mysql error", $error);
 		}
 	} elseif ($_josh["db"]["language"] == "mssql") {
 		//echo $_josh["db"]["location"]. " db";

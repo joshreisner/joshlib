@@ -9,6 +9,8 @@ and define some functions that don't fit anywhere else
 variables you can pass joshlib that it won't overwrite are:
 
 	$_josh["config"]			the file location of the configuration file
+
+	$_josh["debug"]				true / false.  turn this on to get detailed error logging output to the browser
 	
 	$_josh["db"]["location"]	the server location of the configuration file
 	$_josh["db"]["username"]
@@ -49,7 +51,6 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 
 //get includes
 	require("error.php"); //get this one first to handle errors in other 
-	//debug(); //this is nearly the highest level that you could start reporting at
 	require("array.php");
 	require("db.php");
 	require("draw.php");
@@ -107,6 +108,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	 	$_josh["referrer"]				= (isset($_SERVER["HTTP_REFERER"]))	? url_parse(isset($_SERVER["HTTP_REFERER"])) : false;
 	} else {
 		//set defaults and hope for the best
+		if (!isset($_josh["debug"]))	$_josh["debug"]	= false;
 		if (!isset($_josh["request"]))	$_josh["request"]	= false;
 		if (!isset($_josh["folder"]))	$_josh["folder"]	= "/";
 		if (!isset($_josh["newline"]))	$_josh["newline"]	= "\n";
@@ -177,7 +179,12 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 
 function cookie($name=false, $value=false) {
 	global $_josh, $_COOKIE, $_SERVER;
-	//if you don't specify name, it will try to delete all the cookies
+
+	if ($_josh["debug"]) {
+		error_debug("not actually setting cookie because buffer is already broken by debugging");
+		return false;
+	}
+
 	if ($name) {
 		$time = ($value) ? mktime(0, 0, 0, 1, 1, 2030) : time()-3600;
 		if (!$value) $value = "";
