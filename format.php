@@ -250,7 +250,7 @@ format_numeric forces out a number from a string
 */
 
 function format_numeric($value, $integer=false) {
-	//input function
+	//take possibly string function and reduce it to just the numeric elements
 	$characters = "0123456789";
 	if (!$integer) $characters .= ".";
 	$newval = "";
@@ -383,13 +383,32 @@ function format_quotes($value) {
 }
 
 function format_size($size) {
-	$a = array("B", "KB", "MB", "GB", "TB", "PB");
+	//take bytes and make pretty
+	$a = array("B", "K", "M", "G", "T", "P");
 	$pos = 0;
 	while ($size >= 1024) {
 		$size /= 1024;
 		$pos++;
 	}
-	return round($size) . " " . $a[$pos];
+	return round($size) . $a[$pos];
+}
+
+function format_size_bytes($size) {
+	//take pretty and make bytes
+	$multiplier = 1;
+	$size = strtoupper($size);
+	if (format_text_ends("P", $size)) {
+		$multiplier = pow(1024, 5);
+	} elseif (format_text_ends("T", $size)) {
+		$multiplier = pow(1024, 4);
+	} elseif (format_text_ends("G", $size)) {
+		$multiplier = pow(1024, 3);
+	} elseif (format_text_ends("M", $size)) {
+		$multiplier = pow(1024, 2);
+	} elseif (format_text_ends("K", $size)) {
+		$multiplier = 1024;
+	}
+	return format_numeric($size) * $multiplier;
 }
 
 function format_ssn($str) {

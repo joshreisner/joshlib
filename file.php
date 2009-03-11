@@ -94,6 +94,14 @@ function file_get($filename) {
 	return ($data);
 }
 
+function file_get_max($pretty=true) {
+	$filesize = format_size_bytes(ini_get("upload_max_filesize"));
+	$postsize = format_size_bytes(ini_get("post_max_size"));
+	$max_size = ($filesize > $postsize) ? $postsize : $filesize;
+	if ($pretty) return format_size($max_size);
+	return $max_size;
+}
+
 function file_image_resize($source_name, $target_name, $new_width) {
 	//src is not root because it's probably uploaded
 	global $_josh;

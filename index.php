@@ -80,6 +80,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	$_josh["mos"]				= array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 	$_josh["numbers"]			= array("zero","one","two","three","four","five","six","seven","eight","nine");
 	$_josh["queries"]			= array();	//for counting trips to the database
+	$_josh["debug_log"]			= array();	//for holding execution messages
 	
 //parse environment variables
 	if (isset($_SERVER)) { //this could not be set if this were running from the command line (eg by a cron)
