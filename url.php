@@ -162,7 +162,7 @@ function url_parse($url) {
 	$return["protocol"] = $return["scheme"];
 	
 	//get full browser address
-	$return["uri"]			= $return["protocol"] . "://" . $return["host"] . $return["path_query"];
+	$return["url"]			= $return["protocol"] . "://" . $return["host"] . $return["path_query"];
 	
 	//handle possible mod_rewrite slots
 	if (isset($_GET["slot1"])) {

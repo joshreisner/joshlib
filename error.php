@@ -21,18 +21,22 @@ function error_debug($message) {
 function error_draw($title, $html) {	
 	global $_josh;
 	error_debug("drawing error handling page");
-	if (!$_josh["request"]) return strip_tags($title . $_josh["newline"] . $_josh["newline"] . $html);
+	if (!$_josh["request"]) return strip_tags($title . $_josh["newline"] . $_josh["newline"] . $html); //this is a cron, so no html needed
 	return "<html><head><title>" . strip_tags($title) . "</title></head>
-			<body style='background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;'>
-				<div style='border:none; background-color:#fff; text-align:left; padding:10px 20px 10px 20px; width:360px; min-height:260px; position:absolute; left:50%; top:50%; margin:-150px 0px 0px -200px;'>
-					<h1 style='color:#444; font-weight:normal; font-size:24px; margin-bottom:30px;'><span style='background-color:#5599cc; color:#fff; padding:0px 11px 3px 11px'>error</span> " . $title . "</h1>" . $html . "
+			<body style='font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; min-height:100%; min-width:100%; color:#444; margin:0px; text-align:center;'>
+				<div style='background-color:#ddd; min-height:100%; min-width:100%; text-align:center;'>
+					<div style='padding:20px; text-align:center;'>
+						<div style='border:none; background-color:#fff; text-align:left; padding:10px 20px 10px 20px; width:360px; min-height:260px; position:absolute; top:50%; left:50%; margin:-150px 0px 0px -200px;'>
+							<h1 style='color:#444; font-weight:normal; font-size:24px; margin-bottom:30px;'><span style='background-color:#5599cc; color:#fff; padding:0px 11px 3px 11px'>error</span> " . $title . "</h1>" . $html . "
+						</div>
+					</div>
 				</div>
 			</body>
 		</html>";
 }
 
 function error_handle($type, $message) {
-	global $_josh;
+	global $_josh, $_SESSION;
 	error_debug("ERROR! type is:" . $type . " and message is: " . $message);
 
 	$backtrace = debug_backtrace();
@@ -49,14 +53,23 @@ function error_handle($type, $message) {
 	//take out full path -- security hazard and decreases readability
 	$message = str_replace($_josh["root"], "", $message);
 	
-	if (function_exists("errorNotify")) {
-		//in your application, you can define an error handling function errorNotify($message)
-		//the reason this isn't handled here is because of the <!--user--> thing; you are encouraged to replace this with a link to the user's profile page
+	if (isset($_josh["email_admin"])) {
+		//error reporting email report
+		$from   = $_josh["email_default"];
 		$email	= $message;
-		$email .= "<p>Of page: <a href='" . $_josh["request"]["uri"] . "'>" . $_josh["request"]["uri"] . "</a></p>";
-		$email .= "<p>Encountered by user: <!--user--></p>";
-		errorNotify(error_draw($type, $email));
+		$email .= "<p>Link: <a href='" . $_josh["request"]["url"] . "'>" . $_josh["request"]["url"] . "</a></p>";
+		if (isset($_SESSION["email"])) {
+			$email .= "<p>User: <a href='mailto:" . $_SESSION["email"] . "'>" . $_SESSION["email"] . "</a></p>";
+			$from = $_SESSION["email"];
+		}
+		$subject = "Error on " . $_josh["request"]["host"];
+		$email = error_draw($type, $email);
+		if (!isset($_SESSION["email"]) || ($_SESSION["email"] != $_josh["email_admin"])) email($_josh["email_admin"], $email, $subject, $from);
 	}
+
+	//still very much under development JSON / POST web hooks
+	//array_send(array("subject"=>$subject, "message"=>$message, "url"=>$_josh["request"]["url"], "email"=>$from), "http://work.joshreisner.com/api/hook.php");
+
 	if ($_josh["mode"] == "dev") {
 		echo error_draw($type, $message, true);
 		db_close();
