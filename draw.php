@@ -5,7 +5,7 @@ function draw_array($array, $nice=false) {
 	global $_josh;
 	if (!is_array($array)) return false;
 	$return = '<table width="100%" cellpadding="3" cellspacing="1" border="0" bgcolor="#eee">';
-	if (!$nice) ksort($array);
+	//if (!$nice) ksort($array);
 	while(list($key, $value) = each($array)) {
 		if ($nice && (strToLower($key) == "j")) continue;
 		$value = format_quotes($value);
@@ -13,7 +13,7 @@ function draw_array($array, $nice=false) {
 		if (is_array($value)) {
 			$return2 = "";
 			foreach ($value as $key2 => $value2) {
-				$return2 .= "&#183; " . $value2 . "<br>";
+				$return2 .= "&#8226; " . $value2 . "<br>";
 			}
 			$value = $return2;
 		}

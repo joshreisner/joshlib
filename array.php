@@ -91,4 +91,16 @@ function array_to_lower($array) {
 	foreach ($array as $a) $return[] = strToLower($a);
 	return $return;
 }
+
+function array_url($str, $defaults=false, $separator="&") {
+	//takes a key/pair string in the form you'd find in a query string and returns an array
+	//separator is an argument because cookie strings are separated with semicolons
+	$return = array();
+	$pairs = explode($separator, $str);
+	foreach ($pairs as $p) {
+		list($key, $value) = explode("=", trim($p));
+		$return[urldecode($key)] = urldecode($value);
+	}
+	return $return;
+}
 ?>

@@ -37,20 +37,17 @@ function error_draw($title, $html) {
 }
 
 function error_handle($type, $message) {
-	global $_josh, $_SESSION;
+	global $_josh, $_SESSION, $_SERVER;
 	error_debug("ERROR! type is:" . $type . " and message is: " . $message);
 	
 	if (!isset($_josh["mode"])) $_josh["mode"] = "dev";
 	
 	$backtrace = debug_backtrace();
-	//$level = count($backtrace) - 1;
 	$level = 1;
 	if (isset($backtrace[$level]["line"]) && isset($backtrace[$level]["file"])) {
 		$message .= "<p>At line " . $backtrace[$level]["line"] . " of " . $backtrace[$level]["file"];
 		if (isset($backtrace[$level+1]["function"])) $message .= ", inside function " . $backtrace[$level+1]["function"];
-		//$message .= " with arguments " . implode(", ", $backtrace[$level]["args"]);
 		$message .= ".</p>";
-		//$message .= draw_array($backtrace);
 	}
 
 	//take out full path -- security hazard and decreases readability
@@ -66,18 +63,34 @@ function error_handle($type, $message) {
 		$message .= "<p>User: <a href='mailto:" . $_SESSION["email"] . "'>" . $_SESSION["full_name"] . "</a></p>";
 		$from	= $_SESSION["full_name"] . " <" . $_SESSION["email"] . ">";
 	}
-	$subject = "Error: " . $type;
-	$message = error_draw($type, $message);
+	if (isset($_SESSION["HTTP_USER_AGENT"])) $message .= "<p>Browser: " . $_SESSION["HTTP_USER_AGENT"] . "</p>";
 	
-	//try to post to work website, or otherwise
-	//don't like to squash variables, but kind of need to because error could occur between setting error handler and getting config vars
-	if (@$_josh["error_log_api"] && array_send(array("subject"=>$subject, "message"=>$message, "url"=>$_josh["request"]["url"], "email"=>$from), $_josh["error_log_api"])) {
-		//cool, we sent the request via json and fsockopen!
-	} elseif (@$_josh["email_admin"]) {
-		//send email to admin
-		if (!isset($_SESSION["email"]) || ($_SESSION["email"] != $_josh["email_admin"])) email($_josh["email_admin"], $email, $subject, $from);
+	//backtrace
+	$message .= "<p>Backtrace:";
+	foreach ($backtrace as $b) {
+		unset($b["args"]);
+		if (isset($b["file"])) $b["file"] = str_replace($_josh["root"], "", $b["file"]);
+		$message .= draw_array($b, true) . "<br>";
 	}
+	
+	//cookies
+	if (isset($_SERVER["HTTP_COOKIE"])) $message .= "Cookies: " . draw_array(array_url($_SERVER["HTTP_COOKIE"], false, ";")) . "</p>";
+	$subject = "Error: " . $type;
+	$message .= "</p>";
+	
+	$message = error_draw($type, $message);
 
+	//try to post to work website
+	//i don't like to squash variables, but need to here because an error could occur between setting error handler and getting the config vars
+	if (!isset($_SESSION["email"]) || ($_SESSION["email"] != $_josh["email_admin"])) {
+		if (@$_josh["error_log_api"] && array_send(array("subject"=>$subject, "message"=>$message, "url"=>$_josh["request"]["url"], "email"=>$from), $_josh["error_log_api"])) {
+			//cool, we sent the request via json and fsockopen!
+		} elseif (@$_josh["email_admin"]) {
+			//send email to admin
+			email($_josh["email_admin"], $message, $subject, $from);
+		}
+	}
+	
 	//quit if it's dev
 	if ($_josh["mode"] == "dev") db_close();
 

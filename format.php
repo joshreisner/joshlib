@@ -554,7 +554,7 @@ function format_title($str) {
 	error_debug("<b>format_title</b> starting with " . $str);
 	$return = array();
 	$lower = array("a", "an", "and", "but", "for", "from", "if", "in", "nor", "of", "on", "or", "so", "the", "to", "via", "with");
-	$mixed = array("DBs", "CBOs", "iPhone", "iPhones", "IDs", "IPs", "LLCs", "SSNs", "TinyMCE", "URLs", "WordPress");
+	$mixed = array("DBs", "CBOs", "iPhone", "iPhones", "IDs", "IPs", "LLCs", "MySQL", "SSNs", "TinyMCE", "URLs", "WordPress");
 	$upper = array("ADA", "ASAP", "BIF", "CCT", "CSS", "DB", "EBO", "FSS", "FTP", "HTML", "I", "II", "III", "IP", "IV", "LLC", "NHP", "NVN", "OMG", "ONYC", "OS", "PC", "PHP", "PLC", "RSS", "SF", "SFS", "SQL", "SSN", "URL", "V", "VI", "VII", "VIII", "WTF", "X", "XML");
 	$words = explode(" ", ucwords(strToLower(trim($str))));
 	$counter = 1;
