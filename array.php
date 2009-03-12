@@ -46,38 +46,32 @@ function array_send($array, $target) {
 	
 	//must have JSON
 	if (!function_exists("json_encode")) return error_handle("JSON Not Installed", "You need the JSON library for array_send to work.");
-	$content = utf8_encode(json_encode($array));
+	$postdata = utf8_encode(json_encode($array));
 
 	$target = url_parse($target);
 
-	//assemble message
-	$headers	= array();
-	$headers[]	= 'POST ' . $target["path_query"] . ' HTTP/1.0';
-	$headers[]	= 'Content-Type: text/html';
-	$headers[]	= 'Host: ' . $_josh["request"]["host"];
-	$headers[]	= 'Content-Length: ' . strlen($content);
-	$headers[]	= 'Connection: Close';
-	$headers	= implode("\r\n", $headers) . "\r\n\r\n" . $content;
-	error_debug("<b>array_send</b> headers are " . $headers);
+	if ($target["host"] == $_josh["request"]["host"]) continue; //i'm worried that since API site uses joshlib, an error loop could be created
 	
-	//send message
-	if ($pointer = fsockopen($target["host"], 80, $errno, $errstr)) {
+	if ($pointer = fsockopen($target["host"], 80, $errno, $errstr, 30)) {
 		error_debug("<b>array_send</b> has a stream to " . $target["host"]);
-	
-		if (!fwrite($pointer, $headers)) {
-		    fclose($pointer);
-		    return false;
-		}
-	
-		//get response (it's only polite)
-		$response = '';
-		while(!feof($pointer)) { $response .= fgets($pointer, 8192); }
-		fclose($pointer);
-		echo $response;
+		fputs($pointer, "POST " . $target["path_query"] . " HTTP/1.0\r\n");
+		fputs($pointer, "Host: " . $target["host"] . "\r\n");
+		fputs($pointer, "Content-type: application/json; charset=utf-8\r\n");
+		fputs($pointer, "Content-length: " . strlen($postdata) . "\r\n");
+		fputs($pointer, "User-agent: Mozilla/4.0 (compatible: MSIE 7.0; Windows NT 6.0)\r\n");
+		fputs($pointer, "Connection: close\r\n\r\n");
+		fputs($pointer, $postdata);
+		
+		//get server response and strip it of http headers
+		$response = "";
+		while (!feof($pointer)) $response .= fgets($pointer, 128);
+		fclose($pointer);		
 		error_debug("<b>array_send</b> was returned " . $response);
+		$response = substr($response, strpos($response, "\r\n\r\n") + 4);
+		if ($response == "you seem like a nice enough person") return true;
 	}
-	//don't know what the behavior should be now
-	return true;	
+	echo $response;
+	return false;	
 }
 
 function array_sort($array, $direction="asc", $key=false) {

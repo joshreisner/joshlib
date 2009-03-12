@@ -24,6 +24,7 @@ variables you can pass joshlib that it won't overwrite are:
 	$_josh["javascript"]		the location of where to put javascript.js, if you're going to use the javascript functions
 	$_josh["basedblanguage"]	mysql or mssql -- if it doesn't match db language, will try to translate
 	$_josh["is_secure"]			true (use https) or false (don't)
+	$_josh["error_log_api"]		post hook -- should be full urL, eg http://work.joshreisner.com/api/hook.php
 
 in addition, there are some variables you can pass that will be overwritten if there is $_SERVER info to be had.  
 so if joshlib is run from the command line, these variables would be good to have
@@ -49,8 +50,13 @@ classes defined here:
 */
 $_josh["time_start"] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
 
+//set up error handling.  needs to go first to handle subsequent errors
+	if (!isset($_josh["debug"])) $_josh["debug"] = false;
+	require("error.php");
+	set_error_handler("error_handle_php");
+	set_exception_handler("error_handle_exception");
+
 //get includes
-	require("error.php"); //get this one first to handle errors in other 
 	require("array.php");
 	require("db.php");
 	require("draw.php");
@@ -59,6 +65,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	require("format.php");
 	require("htmlawed.php");
 	require("url.php");
+
 
 //set static variables
 	$_josh["today"]				= date("j");
@@ -138,6 +145,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	if (!isset($_josh["is_secure"]))		$_josh["is_secure"]			= false;
 	if (!isset($_josh["email_admin"]))		$_josh["email_admin"]		= "josh@joshreisner.com";
 	if (!isset($_josh["email_default"]))	$_josh["email_default"]		= "josh@joshreisner.com";
+	if (!isset($_josh["error_log_api"]))	$_josh["error_log_api"]		= false;
 		
 	
 //set error reporting level by determining whether this is a dev or live situation
