@@ -1,9 +1,9 @@
 <?php
-error_debug("~ including email.php");
+error_debug("including email.php", __file__, __line__);
 
 function email($to, $message, $subject="Email from Your Website", $from=false) {
 	global $_josh;
-	error_debug("<b>email </b> sending message to <i>" . $to . "</i> with subject " . $subject);
+	error_debug("<b>email </b> sending message to <i>" . $to . "</i> with subject " . $subject, __file__, __line__);
 	$headers  = "MIME-Version: 1.0" . $_josh["newline"];
 	$headers .= "Content-type: text/html; charset=iso-8859-1" . $_josh["newline"];
 	if ($from) {

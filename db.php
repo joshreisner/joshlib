@@ -1,5 +1,5 @@
 <?php
-error_debug("~ including db.php");
+error_debug("including db.php", __file__, __line__);
 
 function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false) {
 	//exec a sql query and return an associate array of the results

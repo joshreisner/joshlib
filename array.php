@@ -1,17 +1,17 @@
 <?php
-error_debug("~ including array.php");
+error_debug("including array.php", __file__, __line__);
 
 function array_key_compare_asc($a, $b) {
 	//for use by array_sort() below
 	global $_josh;
-	error_debug("<b>arrayKeyCompare</b> comparing" . $a[$_josh["sort_key"]]);
+	error_debug("<b>arrayKeyCompare</b> comparing" . $a[$_josh["sort_key"]], __file__, __line__);
 	return strcmp($a[$_josh["sort_key"]], $b[$_josh["sort_key"]]);
 }
 
 function array_key_compare_desc($a, $b) {
 	//for use by array_sort() below
 	global $_josh;
-	error_debug("<b>arrayKeyCompare</b> comparing" . $a[$_josh["sort_key"]]);
+	error_debug("<b>arrayKeyCompare</b> comparing" . $a[$_josh["sort_key"]], __file__, __line__);
 	return strcmp($b[$_josh["sort_key"]], $a[$_josh["sort_key"]]);
 }
 
@@ -53,7 +53,7 @@ function array_send($array, $target) {
 	if ($target["host"] == $_josh["request"]["host"]) continue; //i'm worried that since API site uses joshlib, an error loop could be created
 	
 	if ($pointer = fsockopen($target["host"], 80, $errno, $errstr, 30)) {
-		error_debug("<b>array_send</b> has a stream to " . $target["host"]);
+		error_debug("<b>array_send</b> has a stream to " . $target["host"], __file__, __line__);
 		fputs($pointer, "POST " . $target["path_query"] . " HTTP/1.0\r\n");
 		fputs($pointer, "Host: " . $target["host"] . "\r\n");
 		fputs($pointer, "Content-type: application/json; charset=utf-8\r\n");
@@ -66,7 +66,7 @@ function array_send($array, $target) {
 		$response = "";
 		while (!feof($pointer)) $response .= fgets($pointer, 128);
 		fclose($pointer);		
-		error_debug("<b>array_send</b> was returned " . $response);
+		error_debug("<b>array_send</b> was returned " . $response, __file__, __line__);
 		$response = substr($response, strpos($response, "\r\n\r\n") + 4);
 		if ($response == "you seem like a nice enough person") return true;
 	}
@@ -78,7 +78,7 @@ function array_sort($array, $direction="asc", $key=false) {
 	//sort an array by the names of its keys
 	global $_josh;
 	$_josh["sort_key"] = ($key) ? $key : array_shift(array_keys($array[0]));
-	error_debug("<b>arraySort</b> running for $key");
+	error_debug("<b>arraySort</b> running for $key", __file__, __line__);
 	usort($array, "array_key_compare_" . strToLower($direction));
 	return $array;
 }

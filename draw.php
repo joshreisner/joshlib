@@ -1,5 +1,5 @@
 <?php
-error_debug("~ including draw.php");
+error_debug("including draw.php", __file__, __line__);
 
 function draw_array($array, $nice=false) {
 	global $_josh;
@@ -22,7 +22,9 @@ function draw_array($array, $nice=false) {
 		if (strToLower($key) == "message") $return .= ' height="160"';
 		$return .= '><td bgcolor="#eee" width="21%"><nobr>';
 		$return .= ($nice) ? format_text_human($key)  : $key;
-		$return .= '&nbsp;</nobr></td><td width="79%">' . nl2br($value) . '</td></tr>';
+		$return .= '&nbsp;</nobr></td><td width="79%">';
+		$return .= is_object($value) ? "object value" : nl2br($value);
+		$return .= '</td></tr>';
 	}
 	$return .= '</table>';
 	return $return;
@@ -194,11 +196,7 @@ function draw_form_file($name, $class="file", $onchange=false) {
 }
 
 function draw_form_focus($name) {
-	return '<script lanugage="javascript">
-		<!--
-			document.getElementById("' . $name . '").focus();
-		//-->
-		</script>';
+	return draw_javascript('document.getElementById("' . $name . '").focus();');
 }
 
 function draw_form_hidden($name, $value="") {
@@ -404,30 +402,26 @@ function draw_javascript($javascript=false) {
 	';
 }
 
-function draw_javascript_src($src=false) {
+function draw_javascript_src($filename=false) {
 	global $_josh;
-	if (!$src && isset($_josh["javascript"])) {
-		if ($_josh["drawn"]["js"]) return false;
-		$src = $_josh["javascript"];
-		if (!file_exists($_josh["root"] . $_josh["javascript"]) || (filemtime($_josh["joshlib"] . "javascript.js") > filemtime($_josh["root"] . $_josh["javascript"]))) {
-			if ($content = file_get($_josh["joshlib"] . "javascript.js")) {
-				file_put($_josh["javascript"], $content);
-				$_josh["drawn"]["javascript"] = true;
-			} else {
-				error_handle("couldn't get javascript", "system needs that file");
-			}
+	if (!$filename && isset($_josh["write_folder"])) {
+		if ($_josh["drawn"]["javascript"]) return false; //only draw this file once
+		$filename = $_josh["write_folder"] . "/javascript.js";
+		$content = file_get($_josh["joshlib_folder"] . "/javascript.js");
+		if (!file_exists($_josh["root"] . $filename) || (file_get($filename) != $content)) {
+			file_put($filename, $content);
+			$_josh["drawn"]["javascript"] = true;
 		}
-	} elseif (!$src && !isset($_josh["javascript"])) {
-		return false;
+	} elseif (!$filename) {
+		return error_handle(__FUNCTION__ . " needs the variable _josh[\"write_folder\"] to be set.", __file__, __line__);
 	}
 	//$src = "http://joshlib.joshreisner.com/javascript.js";
-	return $_josh["newline"] . '<script language="javascript" src="' . $src . '" type="text/javascript"></script>';
+	return $_josh["newline"] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
 function draw_navigation($options, $match=false, $type="text", $class="navigation") {
 	//type could be text, images or rollovers
 	global $_josh;
-	//debug();
 	$return = $_josh["newline"] . $_josh["newline"] . "<!--start nav-->" . $_josh["newline"] . "<ul class='" . $class . "'>";
 	if ($match === false) {
 		$match = $_josh["request"]["path"];

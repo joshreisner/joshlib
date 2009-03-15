@@ -1,5 +1,5 @@
 <?php
-error_debug("~ including url.php");
+error_debug("including url.php");
 
 function url_action($matches, $key="action") {
 	//don't know whether this is any good.  matches possible $_GET["action"] values

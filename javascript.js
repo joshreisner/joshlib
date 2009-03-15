@@ -62,6 +62,15 @@ function form_tinymce_init(cssLocation) {
 	});
 }
 
+function form_checkboxes_empty(form, name) {
+	oneFound = false;
+	for (var i = 0; i < form.elements.length; i++) {
+		var checkParts = form.elements[i].name.split("_");
+		if ((checkParts[0] == "chk") && (checkParts[1] == name) && (form.elements[i].checked)) oneFound = true;
+	}
+	return !oneFound;
+}
+
 function form_field_default(which, clear, str) {
 	if (clear && (which.value == str)) {
 		which.value = "";
@@ -70,6 +79,17 @@ function form_field_default(which, clear, str) {
 	}
 }
 
+function form_radio_empty(radio) {
+	var oneFound = false;
+	for (var i = 0; i < radio.length; i++) {
+		if (radio[i].checked) oneFound=true;
+	}
+	return !oneFound;
+}
+
+function form_text_empty(text) {
+	return !text.value.length;
+}
 
 /* format */
 function format_title(string) {

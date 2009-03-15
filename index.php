@@ -51,29 +51,22 @@ classes defined here:
 $_josh["time_start"] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
 
 //set up error handling.  needs to go first to handle subsequent errors
+	error_reporting(E_ALL);
+	ini_set('display_errors', TRUE);
+	ini_set('display_startup_errors', TRUE);
+	$_josh["joshlib_folder"]	= dirname(__file__);
+	//$_josh["debug"]	= true;
 	if (!isset($_josh["debug"])) $_josh["debug"] = false;
-	require("error.php");
+	require($_josh["joshlib_folder"] . "/error.php");
 	set_error_handler("error_handle_php");
 	set_exception_handler("error_handle_exception");
-
-//get includes
-	require("array.php");
-	require("db.php");
-	require("draw.php");
-	require("email.php");
-	require("file.php");
-	require("format.php");
-	require("htmlawed.php");
-	require("url.php");
-
-
+	error_debug("error handling set up", __file__, __line__);
+	
 //set static variables
-	$_josh["today"]				= date("j");
-	$_josh["year"]				= date("Y");
-	$_josh["month"]				= date("n");
-	$_josh["drawn"]["js"]		= false;	//only include javascript.js once
-	$_josh["drawn"]["focus"]	= false;	//only autofocus on one form element
-	$_josh["ignored_words"]		= array("1","2","3","4","5","6","7","8","9","0","about","after","all","also","an","and","another","any","are",
+	$_josh["debug_log"]				= array();	//for holding execution messages
+	$_josh["drawn"]["javascript"] 	= false;	//only include javascript.js once
+	$_josh["drawn"]["focus"]		= false;	//only autofocus on one form element
+	$_josh["ignored_words"]			= array("1","2","3","4","5","6","7","8","9","0","about","after","all","also","an","and","another","any","are",
 									"as","at","be","because","been","before","being","between","both","but","by","came","can","come",
 									"could","did","do","does","each","else","for","from","get","got","has","had","he","have","her","here",
 									"him","himself","his","how","if","in","into","is","it","its","just","like","make","many","me","might",
@@ -83,18 +76,29 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 									"want","was","way","we","well","were","what","when","where","which","while","who","will","with",
 									"would","you","your","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s",
 									"t","u","v","w","x","y","z",""); //ignore these words when making search indexes
-	$_josh["months"]			= array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
-	$_josh["mos"]				= array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-	$_josh["numbers"]			= array("zero","one","two","three","four","five","six","seven","eight","nine");
-	$_josh["queries"]			= array();	//for counting trips to the database
-	$_josh["debug_log"]			= array();	//for holding execution messages
-	
+	$_josh["month"]					= date("n");
+	$_josh["months"]				= array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+	$_josh["mos"]					= array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+	$_josh["numbers"]				= array("zero","one","two","three","four","five","six","seven","eight","nine");
+	$_josh["queries"]				= array();	//for counting trips to the database
+	$_josh["today"]					= date("j");
+	$_josh["year"]					= date("Y");
+
+//get includes
+	require($_josh["joshlib_folder"] . "/array.php");
+	require($_josh["joshlib_folder"] . "/db.php");
+	require($_josh["joshlib_folder"] . "/draw.php");
+	require($_josh["joshlib_folder"] . "/email.php");
+	require($_josh["joshlib_folder"] . "/file.php");
+	require($_josh["joshlib_folder"] . "/format.php");
+	require($_josh["joshlib_folder"] . "/htmlawed.php");
+	require($_josh["joshlib_folder"] . "/url.php");
+
 //parse environment variables
 	if (isset($_SERVER)) { //this could not be set if this were running from the command line (eg by a cron)
 		//build request as string, then set it to array with url_parse
 		$_josh["request"] = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) ? "https" : "http";
-		$_josh["request"] .= "://";
-		$_josh["request"] .= $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"];
+		$_josh["request"] .= "://" . $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"];
 		if (isset($_SERVER["QUERY_STRING"])) $_josh["request"] .= "?" . $_SERVER["QUERY_STRING"];
 		$_josh["request"] = url_parse($_josh["request"]);
 			
@@ -116,7 +120,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	 	$_josh["referrer"]				= (isset($_SERVER["HTTP_REFERER"]))	? url_parse(isset($_SERVER["HTTP_REFERER"])) : false;
 	} else {
 		//set defaults and hope for the best
-		if (!isset($_josh["debug"]))	$_josh["debug"]	= false;
+		if (!isset($_josh["debug"]))	$_josh["debug"]		= false;
 		if (!isset($_josh["request"]))	$_josh["request"]	= false;
 		if (!isset($_josh["folder"]))	$_josh["folder"]	= "/";
 		if (!isset($_josh["newline"]))	$_josh["newline"]	= "\n";
@@ -126,17 +130,20 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 		if (!isset($_josh["referrer"]))	$_josh["referrer"]	= false;
 	}
 	
+	
 //get configuration variables
-	if (!isset($_josh["config"])) $_josh["config"] = "/_site/config-" . $_josh["request"]["sanswww"] . ".php";
+	if (!isset($_josh["write_folder"])) $_josh["write_folder"] = "/_site";
+	if (!isset($_josh["config"])) $_josh["config"] = $_josh["write_folder"] . "/config-" . $_josh["request"]["sanswww"] . ".php";
 	if (file_exists($_josh["config"])) {
-		error_debug("<b>configure</b> found file");
+		error_debug("<b>configure</b> found file", __file__, __line__);
 		require($_josh["config"]);
 	} elseif (file_exists($_josh["root"] . $_josh["config"])) {
-		error_debug("<b>configure</b> found file");
+		error_debug("<b>configure</b> found file", __file__, __line__);
 		require($_josh["root"] . $_josh["config"]);
 	} else {
-		error_debug("<b>configure</b> couldn't find config file");
+		error_debug("<b>configure</b> couldn't find config file", __file__, __line__);
 	}
+
 
 //set defaults for configuration for variables it didn't find
 	if (!isset($_josh["db"]["location"]))	$_josh["db"]["location"]	= "localhost";
@@ -149,13 +156,8 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 		
 	
 //set error reporting level by determining whether this is a dev or live situation
-	if (isset($_josh["mode"]) && ($_josh["mode"] == "dev")) {
-		//1: you can set the option manually
-		error_reporting(E_ALL);
-	} elseif (isset($_SERVER["HTTP_HOST"]) && (format_text_starts("dev-", $_SERVER["HTTP_HOST"]) || format_text_starts("beta.", $_SERVER["HTTP_HOST"]) || format_text_ends(".site", $_SERVER["HTTP_HOST"]))) {
-		//2: urls start with dev- or beta or end with .site are automatically considered dev sites
-		$_josh["mode"] = "dev";
-		error_reporting(E_ALL);
+	if (isset($_SERVER["HTTP_HOST"]) && (format_text_starts("dev-", $_SERVER["HTTP_HOST"]) || format_text_starts("beta.", $_SERVER["HTTP_HOST"]) || format_text_ends(".site", $_SERVER["HTTP_HOST"]))) {
+		//do nothing, just don't want to reflow the logic
 	} else {
 		$_josh["mode"] = "live";
 		error_reporting(0);
@@ -178,10 +180,6 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	
 	$_josh["posting"] = !empty($_POST);
 	if ($_josh["posting"]) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes($value);
-
-
-//extract for easier accessibility
-	extract($_josh);
 	
 	
 //special functions that don't yet fit into a category
@@ -190,7 +188,7 @@ function cookie($name=false, $value=false) {
 	global $_josh, $_COOKIE, $_SERVER;
 
 	if ($_josh["debug"]) {
-		error_debug("not actually setting cookie because buffer is already broken by debugging");
+		error_debug("not actually setting cookie because buffer is already broken by debugging", __file__, __line__);
 		return false;
 	}
 
@@ -290,8 +288,8 @@ class table {
 				if ($hover) {
 					if (isset($v["link"])) $this->return .= ' onclick="location.href=\'' . $v["link"] . '\';"';
 					//hover class must exist
-					$this->return .= ' onmouseover="cssAdd(this, \'hover\');"';
-					$this->return .= ' onmouseout="cssRemove(this, \'hover\');"';
+					$this->return .= ' onmouseover="css_add(this, \'hover\');"';
+					$this->return .= ' onmouseout="css_remove(this, \'hover\');"';
 				}
 				$this->return .= '>';
 				foreach ($this->columns as $c) {
@@ -345,7 +343,7 @@ class form {
 		
 		if ((($type == "text") || ($type == "password")) && !isset($array["additional"]) && $required) $additional = "(required)";
 
-		error_debug("adding field " . $label);
+		error_debug("adding field " . $label, __file__, __line__);
 		
 		if (!$name)	$name	= format_text_code($label);
 		if (!$label) $label	= format_text_human($name);

@@ -1,5 +1,5 @@
 <?php
-error_debug("~ including file.php");
+error_debug("including file.php", __file__, __line__);
 
 function file_array($content, $filename=false) {
 	$header = false;
@@ -38,19 +38,19 @@ function file_download($content, $filename, $extension) {
 
 function file_folder($folder, $types=false) {
 	global $_josh;
-	error_debug("<b>file folder</b> running with $folder");
+	error_debug("<b>file folder</b> running with $folder", __file__, __line__);
 	if (!is_dir($folder)) {
-		error_debug("<b>file folder</b> $folder is not a directory");
+		error_debug("<b>file folder</b> $folder is not a directory", __file__, __line__);
 		$folder = $_josh["root"] . $folder;
 		if (!is_dir(!$folder)) {
-			error_debug("<b>file folder</b> $folder is not a directory either, exiting");
+			error_debug("<b>file folder</b> $folder is not a directory either, exiting", __file__, __line__);
 			return false;
 		}
 	}
-	error_debug("<b>file folder</b> $folder is a directory!");
+	error_debug("<b>file folder</b> $folder is a directory!", __file__, __line__);
 	if ($types) $types = explode(",", $types);
 	if ($handle = opendir($folder)) {
-		error_debug("<b>file folder</b> $folder opened");
+		error_debug("<b>file folder</b> $folder opened", __file__, __line__);
 		$return = array();
 		while (($name = readdir($handle)) !== false) {
 			if (($name == ".") || ($name == "..") || ($name == ".DS_Store")) continue;
@@ -64,7 +64,7 @@ function file_folder($folder, $types=false) {
 				"size"=>filesize($folder . $name)
 			);
 			if ($thisfile["type"] == "dir") $thisfile["path_name"] .= "/";
-			error_debug("<b>file folder</b> found " . $thisfile["name"] . " of type " . $thisfile["type"]);
+			error_debug("<b>file folder</b> found " . $thisfile["name"] . " of type " . $thisfile["type"], __file__, __line__);
 			if ($types) {
 				$oneFound = false;
 				foreach ($types as $type) if (($thisfile["ext"] == trim($type)) || (($type == "dir") && ($thisfile["type"] == "dir"))) $oneFound = true;
@@ -73,10 +73,10 @@ function file_folder($folder, $types=false) {
 				$return[] = $thisfile;
 			}
 		}
-		error_debug("<b>file folder</b> closing handle");
+		error_debug("<b>file folder</b> closing handle", __file__, __line__);
 		closedir($handle);
-		if (count($return)) return arraySort($return);
-		error_debug("<b>file folder</b> no return count");
+		if (count($return)) return array_sort($return);
+		error_debug("<b>file folder</b> no return count", __file__, __line__);
 	}
 	return false;
 }
@@ -87,7 +87,7 @@ function file_get($filename) {
 		$filename = $_josh["root"] . $filename;
 		if (!$file = @fopen($filename, "r")) return false;
 	}
-	error_debug("<b>file_get</b> filename is " . $filename);
+	error_debug("<b>file_get</b> filename is " . $filename, __file__, __line__);
 	if (!$size = @filesize($filename)) return false;
 	$data = fread($file, $size);
 	fclose($file);
@@ -139,14 +139,14 @@ function file_import_fixedlength($content, $definitions) {
 
 function file_name($filepath) {
 	global $_josh;
-	//error_debug("file_name receiving filepath = $filepath");
+	error_debug("file_name receiving filepath = $filepath", __file__, __line__);
 	$pathparts	= explode("/", $filepath);
 	$file		= array_pop($pathparts);
 	$path		= implode($_josh["folder"], $pathparts);
 	$fileparts	= explode(".", $file);
 	$extension	= array_pop($fileparts);
 	$filename	= implode(".", $fileparts);
-	error_debug("file_name returning file = $file, ext = $extension, path = $path");
+	error_debug("file_name returning file = $file, ext = $extension, path = $path", __file__, __line__);
 	return array($filename, $extension, $path);
 }
 

@@ -2,8 +2,7 @@
 /*
 this section is all formatting functions, usually to format strings into special configurations
 */
-
-error_debug("~ including format.php");
+error_debug("including format.php", __file__, __line__);
 
 function format_accents($string) {
 	$string = str_replace("Õ", "&rsquo;", $string);
@@ -179,7 +178,7 @@ function format_hilite($haystack, $needles, $style="background-color:#FFFFBB;pad
 
 function format_html($text) {
 	//clean up microsoft formatting when pasted into TinyMCE
-	error_debug("<b>format_html</b> about to clean up " . format_string($text, 300));
+	error_debug("<b>format_html</b> about to clean up " . format_string($text, 300), __file__, __line__);
 	$text = htmLawed($text, array('comment'=>1, 'cdata'=>1));
 	$text = str_replace("<p>&nbsp;</p>", "", $text);
 	$text = str_replace(">&nbsp;</", "></", $text);
@@ -256,10 +255,10 @@ function format_numeric($value, $integer=false) {
 	$newval = "";
 	for ($i = 0; $i < strlen($value); $i++) if (strpos($characters, $value[$i]) !== false) $newval .= $value[$i];
 	if (empty($newval)) {
-		error_debug("<b>format_numeric</b> received $value and is sending back false");
+		error_debug("<b>format_numeric</b> received $value and is sending back false", __file__, __line__);
 		return false;
 	} else {
-		error_debug("<b>format_numeric</b> received $value and is sending back " . $newval);
+		error_debug("<b>format_numeric</b> received $value and is sending back " . $newval, __file__, __line__);
 		return $newval - 0;
 	}
 }
@@ -312,7 +311,7 @@ function format_post_date($str) {
 			if ($hour != 12) $hour +=12;
 		}
 	}
-	error_debug("<b>format_post_date</b> for $str into mdyhms: $month, $day, $year, $hour, $minute, $second");
+	error_debug("<b>format_post_date</b> for $str into mdyhms: $month, $day, $year, $hour, $minute, $second", __file__, __line__);
 	return format_date_sql($month, $day, $year, $hour, $minute, $second);
 }
 
@@ -339,11 +338,11 @@ function format_post_html($fieldnames) {
 function format_post_nulls($fieldnames) {
 	//takes a comma-separated list of POST keys and replaces them with NULLs if they're empty
 	global $_POST;
-	error_debug("<b>format_post_nulls</b> for " . $fieldnames);
+	error_debug("<b>format_post_nulls</b> for " . $fieldnames, __file__, __line__);
 	$fields = array_post_fields($fieldnames);
 	foreach ($fields as $field) {
 		if (!isset($_POST[$field]) || !strlen($_POST[$field])) {
-			error_debug("<b>format_post_nulls</b> nullifying " . $field);
+			error_debug("<b>format_post_nulls</b> nullifying " . $field, __file__, __line__);
 			$_POST[$field] = "NULL";
 		}
 	}
@@ -352,7 +351,7 @@ function format_post_nulls($fieldnames) {
 function format_post_urls($fieldnames) {
 	//takes a comma-separated list of POST keys and formats them as NULLs or urls
 	global $_POST;
-	error_debug("<b>format_post_urls</b> for " . $fieldnames);
+	error_debug("<b>format_post_urls</b> for " . $fieldnames, __file__, __line__);
 	$fields = array_post_fields($fieldnames);
 	foreach ($fields as $field) $_POST[$field] = format_null(format_url($_POST[$field]));
 }
@@ -551,7 +550,7 @@ function format_times($num) {
 }
 
 function format_title($str) {
-	error_debug("<b>format_title</b> starting with " . $str);
+	error_debug("<b>format_title</b> starting with " . $str, __file__, __line__);
 	$return = array();
 	$lower = array("a", "an", "and", "but", "for", "from", "if", "in", "nor", "of", "on", "or", "so", "the", "to", "via", "with");
 	$mixed = array("DBs", "CBOs", "iPhone", "iPhones", "IDs", "IPs", "LLCs", "MySQL", "SSNs", "TinyMCE", "URLs", "WordPress");
@@ -584,7 +583,7 @@ function format_url($str="") {
 }
 
 function format_verify($variable, $type="int") {
-	error_debug("<b>format_verify</b> for " . $variable);
+	//error_debug("<b>format_verify</b> for " . $variable, __file__, __line__);
 	if ($type == "int") {
 		if (!is_numeric($variable)) return false;
 		return ((string) $variable) === ((string)(int) $variable);

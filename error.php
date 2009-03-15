@@ -1,23 +1,24 @@
 <?php
-error_debug("~ including error.php");
+error_debug("including error.php", __file__, __line__);
 
 function error_break() {
+	
 	global $_josh;
 	unset($_josh["ignored_words"]); //too long. gets in the way!
 	echo draw_array($_josh);
 	exit;
 }
 
-function error_debug($message) {
+function error_debug($message, $file=false, $line=false) {
 	global $_josh;
-	$backtrace = debug_backtrace();
-	$level = 1;
-	if (isset($backtrace[$level]["file"]) && isset($backtrace[$level]["line"])) {
-		$message = "<b>" . str_replace($_josh["root"], "", $backtrace[$level]["file"]) . ", line " . $backtrace[$level]["line"] . "</b> " . $message;
-	}
 	$_josh["debug_log"][] = $message;
+	if ($file && $line) {
+		if (isset($_josh["root"]) && stristr($file, $_josh["root"])) $file = str_replace($_josh["root"], "", $file);
+		if (isset($_josh["joshlib_folder"]) && stristr($file, $_josh["joshlib_folder"])) $file = "joshlib " . str_replace($_josh["joshlib_folder"], "", $file);
+		$message = '<div style="font-weight:bold;">' . $file . ", line " . $line . "</div>" . $message;
+	}
 	if ($_josh["debug"]) {
-		echo $message . "<br/><hr noshade color='#cccccc' size='1'/>";
+		echo '<div style="width:400px; padding-bottom:10px; border-bottom:2px solid #999; font-family:verdana; font-size:12px;">' . $message . '</div>';
 	}
 }
 
@@ -40,8 +41,10 @@ function error_handle($type, $message) {
 	global $_josh, $_SESSION, $_SERVER;
 	error_debug("ERROR! type is:" . $type . " and message is: " . $message);
 	
+	//this might theoretically not have been set yet.
 	if (!isset($_josh["mode"])) $_josh["mode"] = "dev";
 	
+	//get backtrace
 	$backtrace = debug_backtrace();
 	$level = 1;
 	if (isset($backtrace[$level]["line"]) && isset($backtrace[$level]["file"])) {
@@ -52,9 +55,7 @@ function error_handle($type, $message) {
 
 	//take out full path -- security hazard and decreases readability
 	$message = str_replace($_josh["root"], "", $message);
-	
-	//display error to user if it's a dev situation
-	if ($_josh["mode"] == "dev") echo error_draw($type, $message, true);
+	$message = str_replace($_josh["joshlib_folder"], "", $message);
 	
 	//add more stuff to admin message, set from and subject
 	$from		 = $_josh["email_default"];
@@ -68,7 +69,7 @@ function error_handle($type, $message) {
 	//backtrace
 	$message .= "<p>Backtrace:";
 	foreach ($backtrace as $b) {
-		unset($b["args"]);
+		if (isset($b["args"])) unset($b["args"]);
 		if (isset($b["file"])) $b["file"] = str_replace($_josh["root"], "", $b["file"]);
 		$message .= draw_array($b, true) . "<br>";
 	}
@@ -78,8 +79,15 @@ function error_handle($type, $message) {
 	$subject = "Error: " . $type;
 	$message .= "</p>";
 	
+	//render
 	$message = error_draw($type, $message);
 
+	//quit if it's dev
+	if ($_josh["mode"] == "dev") {
+		echo $message;	
+		db_close();
+	}
+	
 	//try to post to work website
 	//i don't like to squash variables, but need to here because an error could occur between setting error handler and getting the config vars
 	if (!isset($_SESSION["email"]) || ($_SESSION["email"] != $_josh["email_admin"])) {
@@ -90,10 +98,6 @@ function error_handle($type, $message) {
 			email($_josh["email_admin"], $message, $subject, $from);
 		}
 	}
-	
-	//quit if it's dev
-	if ($_josh["mode"] == "dev") db_close();
-
 }
 
 function error_handle_exception($exception) {
@@ -124,6 +128,7 @@ function error_handle_php($number, $message, $file, $line) {
 		default:					$title .= "Unknown error ($number)";	break;
 	}
 	
+	//debug();
 	error_handle($title, format_code($message));
 }
 ?>
