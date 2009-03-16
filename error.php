@@ -54,11 +54,11 @@ function error_handle($type, $message) {
 	}
 
 	//take out full path -- security hazard and decreases readability
-	$message = str_replace($_josh["root"], "", $message);
-	$message = str_replace($_josh["joshlib_folder"], "", $message);
+	if (isset($_josh["root"])) $message = str_replace($_josh["root"], "", $message);
+	if (isset($_josh["joshlib_folder"])) $message = str_replace($_josh["joshlib_folder"], "", $message);
 	
 	//add more stuff to admin message, set from and subject
-	$from		 = $_josh["email_default"];
+	$from		 = (isset($_josh["email_default"])) ? $_josh["email_default"] : $_josh["email_admin"];
 	$message  	.= "<p>Page: <a href='" . $_josh["request"]["url"] . "'>" . $_josh["request"]["url"] . "</a></p>";
 	if (isset($_SESSION["email"]) && isset($_SESSION["full_name"])) {
 		$message .= "<p>User: <a href='mailto:" . $_SESSION["email"] . "'>" . $_SESSION["full_name"] . "</a></p>";
