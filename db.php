@@ -289,7 +289,7 @@ function db_save($table, $id=false) {
 	
 	if (!isset($_SESSION["user_id"])) error_handle("session not set", "db_save needs a session user_id variable");
 	$columns	= db_columns($table);
-	$required	= array("id", "created_on", "created_by", "updated_on", "updated_by", "deleted_on", "deleted_by", "is_active");
+	$required	= array("id", "created_date", "created_user", "updated_date", "updated_user", "deleted_date", "deleted_user", "is_active");
 	$query1		= array();
 	$query2		= array();
 	//debug();
@@ -341,13 +341,13 @@ function db_save($table, $id=false) {
 		error_handle("required fields missing", "the table $table needs columns for " . implode(", ", $required));
 	}
 	if ($id) {
-		$query1[] = "updated_on = '" .  db_date() . "'";
-		$query1[] = "updated_by = " . $_SESSION["user_id"];
+		$query1[] = "updated_date = '" .  db_date() . "'";
+		$query1[] = "updated_user = " . $_SESSION["user_id"];
 		$query = "UPDATE $table SET " . implode(", ", $query1) . " WHERE id = " . $id;
 	} else {
-		$query1[] = "created_on";
+		$query1[] = "created_date";
 		$query2[] = db_date();
-		$query1[] = "created_by";
+		$query1[] = "created_user";
 		$query2[] = $_SESSION["user_id"];
 		$query1[] = "is_active";
 		$query2[] = 1;

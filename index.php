@@ -348,7 +348,7 @@ class form {
 		if (!$name)	$name	= format_text_code($label);
 		if (!$label) $label	= format_text_human($name);
 		if (!$value) $value	= (isset($this->values[$name])) ? $this->values[$name] : false;
-		if (!$class) $class	= $type;
+		if (!$class) $class	= "";
 		
 		if ($additional) $additional = "<span class='additional'>" . $additional . "</span>";
 		
