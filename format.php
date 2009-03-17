@@ -177,6 +177,13 @@ function format_hilite($haystack, $needles, $style="background-color:#FFFFBB;pad
 }
 
 function format_html($text) {
+	$text = htmLawed($text, array('comment'=>1, 'cdata'=>1));
+	$text = str_replace("<p>&nbsp;</p>", "", $text);
+	$text = str_replace(">&nbsp;</", "></", $text);
+	return $text;
+}
+
+function format_html2($text) {
 	//clean up microsoft formatting when pasted into TinyMCE
 	error_debug("<b>format_html</b> about to clean up " . format_string($text, 300), __file__, __line__);
 	
@@ -195,9 +202,9 @@ function format_html($text) {
 		error_handle("uh...", "format_html found more than one &gt;body&lt; tag!", __file__, __line__);
 	}
 	
-	$html->set_callback('format_html_callback');
-		
-	function format_html_callback($e) {
+	$html->set_callback('format_html_cleanup');
+	
+	function format_html_cleanup($e) {
 		//this callback is used to clear out bad tags and attributes
 		
 		//never want these tags, or anything inside them
@@ -235,24 +242,34 @@ function format_html($text) {
 			//personal preference: replace <strong> with <b>
 			$e->outertext = "<b>" . $e->innertext . "</b>";
 		}
-		
-		//clean up inside tag
-		//$e->innertext = trim($e->innertext);
 	}
 	
+	//reset html to get rid of artifacts and compress
+	$text = trim($html->save());
+	$html->clear();
+	unset($html);
+	$html = str_get_html($text);
+
+	//find largest html element
+	$html->set_callback('set_lengths');
+	$max = 0;
+	function set_lengths($e) {
+		global $max;
+		$len = strlen(trim($e->plaintext));
+		$e->id = $len;
+		if ($e->parent) {
+			if ($e->parent->id == $max) $max -= $len;
+			$e->parent->id -= $len;
+		}
+		if ($len > $max) $max = $len;
+	}
+	echo $max . "<hr>";
+	
+	//reset again for memory leaks
 	$text = $html->save();
 	$html->clear();
 	unset($html);
-
-		
 	return $text;
-	/* //htmlawed way
-	$text = htmLawed($text, array('comment'=>1, 'cdata'=>1));
-	$text = str_replace("<p>&nbsp;</p>", "", $text);
-	$text = str_replace(">&nbsp;</", "></", $text);
-	return $text;
-	*/
-
 }
 
 function format_html_text($str) {
