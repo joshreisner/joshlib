@@ -92,6 +92,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	require($_josh["joshlib_folder"] . "/file.php");
 	require($_josh["joshlib_folder"] . "/format.php");
 	require($_josh["joshlib_folder"] . "/htmlawed.php");
+	require($_josh["joshlib_folder"] . "/simple_html_dom.php");
 	require($_josh["joshlib_folder"] . "/url.php");
 
 //parse environment variables

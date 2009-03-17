@@ -179,10 +179,79 @@ function format_hilite($haystack, $needles, $style="background-color:#FFFFBB;pad
 function format_html($text) {
 	//clean up microsoft formatting when pasted into TinyMCE
 	error_debug("<b>format_html</b> about to clean up " . format_string($text, 300), __file__, __line__);
+	
+	//simpledom way
+	$html = str_get_html($text);
+	$text = "";
+	
+	//get body contents, don't need anything in the head (or elsewhere)
+	$bodies = $html->find("body");
+	if (count($bodies) == 1) {
+		$text = $bodies[0]->innertext;
+		$html->clear();
+		unset($html);
+		$html = str_get_html($text);
+	} elseif (count($bodies) > 1) {
+		error_handle("uh...", "format_html found more than one &gt;body&lt; tag!", __file__, __line__);
+	}
+	
+	$html->set_callback('format_html_callback');
+		
+	function format_html_callback($e) {
+		//this callback is used to clear out bad tags and attributes
+		
+		//never want these tags, or anything inside them
+		$bad_tags = array("comment", "form", "iframe", "label", "noscript", "script");
+		if (in_array($e->tag, $bad_tags)) $e->outertext = "";
+
+		//never want these attributes
+		$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title");
+		foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
+		
+		//certain tags we are wary of
+		if ($e->tag == "a") {
+			if (!$e->href || (substr($e->href, 0, 1) == "#")) { //no in-page links or anchors
+				$e->outertext = "";
+			}
+		} elseif ($e->tag == "div") {
+			if (!$e->children && !strlen(trim($e->plaintext))) {
+				//no DIVs for DIVs sake
+				$e->outertext = "";
+			}
+		} elseif ($e->tag == "img") {
+			if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) {
+				$e->outertext = "";
+			}
+		} elseif ($e->tag == "span") {
+			if ($e->src) {
+				//nytimes has this -- i'm not sure yet if it's good or not
+			} elseif ($e->children || $e->plaintext) {
+				//ditch the span, keep the contents
+				$e->outertext = $e->innertext;
+			} else {
+				$e->outertext = "";
+			}
+		} elseif ($e->tag == "strong") {
+			//personal preference: replace <strong> with <b>
+			$e->outertext = "<b>" . $e->innertext . "</b>";
+		}
+		
+		//clean up inside tag
+		//$e->innertext = trim($e->innertext);
+	}
+	
+	$text = $html->save();
+	$html->clear();
+	unset($html);
+
+		
+	return $text;
+	/* //htmlawed way
 	$text = htmLawed($text, array('comment'=>1, 'cdata'=>1));
 	$text = str_replace("<p>&nbsp;</p>", "", $text);
 	$text = str_replace(">&nbsp;</", "></", $text);
 	return $text;
+	*/
 
 }
 
