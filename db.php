@@ -1,12 +1,12 @@
 <?php
 error_debug("including db.php", __file__, __line__);
 
-function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false) {
+function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $limit=false) {
 	//exec a sql query and return an associate array of the results
 	//need more description of purpose for prepend_id, prepend_value
 	//do we still need db_table?
 	global $_josh;
-	$result = db_query($sql);
+	$result = db_query($sql, $limit);
 	if (!$array) $array = array();
 	$key = false;
 	while ($r = db_fetch($result)) {
