@@ -187,48 +187,49 @@ function format_html2($text) {
 	//clean up microsoft formatting when pasted into TinyMCE
 	error_debug("<b>format_html</b> about to clean up " . format_string($text, 300), __file__, __line__);
 	
-	//simpledom way
+	$text = format_html2_get_text($text);	
+	$text = format_html2_cleanup($text);
+	
+	
+	return $text;
+}
+
+function format_html2_cleanup($text) {
 	$html = str_get_html($text);
-	$text = "";
+
+	$html->set_callback('cleanup');
 	
-	//get body contents, don't need anything in the head (or elsewhere)
-	$bodies = $html->find("body");
-	if (count($bodies) == 1) {
-		$text = $bodies[0]->innertext;
-		$html->clear();
-		unset($html);
-		$html = str_get_html($text);
-	} elseif (count($bodies) > 1) {
-		error_handle("uh...", "format_html found more than one &gt;body&lt; tag!", __file__, __line__);
-	}
-	
-	$html->set_callback('format_html_cleanup');
-	
-	function format_html_cleanup($e) {
+	function cleanup($e) {
 		//this callback is used to clear out bad tags and attributes
 		
 		//never want these tags, or anything inside them
 		$bad_tags = array("comment", "form", "iframe", "label", "noscript", "script");
-		if (in_array($e->tag, $bad_tags)) $e->outertext = "";
-
+		if (in_array($e->tag, $bad_tags)) {
+			$e->innertext = "";
+			$e->outertext = "";
+		}
+		
+		//these are the tags we want	
+		$good_tags1	= array("a", "b", "blockquote", "br", "dir", "div", "h1", "h2", "h3", "h4", "h5", "i", "img");
+		$good_tags2	= array("p", "span", "strong", "text", "table", "tr", "td", "th", "ol", "ul", "li");
+		$good_tags = array_merge($good_tags1, $good_tags2);
+		
+		if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : "";
+				
 		//never want these attributes
 		$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title");
 		foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
 		
 		//certain tags we are wary of
 		if ($e->tag == "a") {
-			if (!$e->href || (substr($e->href, 0, 1) == "#")) { //no in-page links or anchors
-				$e->outertext = "";
-			}
+			//no in-page links or anchors
+			if (!$e->href || (substr($e->href, 0, 1) == "#")) $e->outertext = "";
 		} elseif ($e->tag == "div") {
-			if (!$e->children && !strlen(trim($e->plaintext))) {
-				//no DIVs for DIVs sake
-				$e->outertext = "";
-			}
+			//no empty divs
+			if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = "";
 		} elseif ($e->tag == "img") {
-			if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) {
-				$e->outertext = "";
-			}
+			//no small, narrow or flat images
+			if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) $e->outertext = "";
 		} elseif ($e->tag == "span") {
 			if ($e->src) {
 				//nytimes has this -- i'm not sure yet if it's good or not
@@ -236,40 +237,71 @@ function format_html2($text) {
 				//ditch the span, keep the contents
 				$e->outertext = $e->innertext;
 			} else {
+				//ditch the empty span
 				$e->outertext = "";
 			}
 		} elseif ($e->tag == "strong") {
 			//personal preference: replace <strong> with <b>
 			$e->outertext = "<b>" . $e->innertext . "</b>";
+		} elseif ($e->tag == "em") {
+			//personal preference: replace <strong> with <b>
+			$e->outertext = "<i>" . $e->innertext . "</i>";
 		}
+		//this could be a time to trim text
+		//if (@$e->outertext && !strlen(trim($e->outertext))) $e->outertext = "";
 	}
 	
 	//reset html to get rid of artifacts and compress
 	$text = trim($html->save());
 	$html->clear();
+	return $text;
+}
+
+function format_html2_get_text($text) {
+	global $_josh;
+	//find td, div or body with longest text block
+	$html = str_get_html($text);
+	$blocks = $html->find("text");
+	foreach ($blocks as $b) {
+		$len = strlen(trim($b));
+		if ($b->parent->tag != "script") format_html2_set_max($len);
+	}
+	
+	function get_parent($e) {
+		$options = array("td", "div", "body");
+		return (in_array($e->tag, $options)) ? $e : get_parent($e->parent);
+	}
+
+	foreach ($blocks as $b) {
+		$len = strlen(trim($b));
+		if ($len == $_josh["max_text_len"]) {
+			$e = get_parent($b->parent);
+			$text = $e->innertext;
+		}
+	}
+	
+	$html->clear();
 	unset($html);
 	$html = str_get_html($text);
 
-	//find largest html element
-	$html->set_callback('set_lengths');
-	$max = 0;
-	function set_lengths($e) {
-		global $max;
-		$len = strlen(trim($e->plaintext));
-		$e->id = $len;
-		if ($e->parent) {
-			if ($e->parent->id == $max) $max -= $len;
-			$e->parent->id -= $len;
-		}
-		if ($len > $max) $max = $len;
-	}
-	echo $max . "<hr>";
+	//get rid of any sub-divs
+	$blocks = $html->find("div");
+	foreach ($blocks as $b) $b->outertext = "";
 	
-	//reset again for memory leaks
-	$text = $html->save();
+	//reset html to get rid of artifacts and compress
+	$text = trim($html->save());
 	$html->clear();
-	unset($html);
 	return $text;
+}
+
+function format_html2_set_max($len) {
+	//helper function for above, due to weird scope reason i don't fully comprehend
+	global $_josh;
+	if (!isset($_josh["max_text_len"])) $_josh["max_text_len"] = 0;
+	if ($len > $_josh["max_text_len"]) {
+		//echo $len . "<br>";
+		$_josh["max_text_len"] = $len;
+	}
 }
 
 function format_html_text($str) {
