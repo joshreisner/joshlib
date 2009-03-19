@@ -187,11 +187,18 @@ function format_html2($text) {
 	//clean up microsoft formatting when pasted into TinyMCE
 	error_debug("<b>format_html</b> about to clean up " . format_string($text, 300), __file__, __line__);
 	
-	$text = format_html2_get_text($text);	
 	$text = format_html2_cleanup($text);
+	//echo $text . "<hr>";
+	$text = format_html2_get_text($text);	
 	
 	
 	return $text;
+}
+
+function format_html2_unset($e) {
+	if (@$e->innertext) $e->innertext = "";
+	if (@$e->outertext) $e->outertext = "";
+	if (@$e->children) foreach($e->children as $f) format_html2_unset($f);
 }
 
 function format_html2_cleanup($text) {
@@ -201,13 +208,9 @@ function format_html2_cleanup($text) {
 	
 	function cleanup($e) {
 		//this callback is used to clear out bad tags and attributes
-		
 		//never want these tags, or anything inside them
-		$bad_tags = array("comment", "form", "iframe", "label", "noscript", "script");
-		if (in_array($e->tag, $bad_tags)) {
-			$e->innertext = "";
-			$e->outertext = "";
-		}
+		$bad_tags = array("comment", "form", "iframe", "label", "noscript", "script", "unknown");
+		if (in_array($e->tag, $bad_tags)) format_html2_unset($e);
 		
 		//these are the tags we want	
 		$good_tags1	= array("a", "b", "blockquote", "br", "dir", "div", "h1", "h2", "h3", "h4", "h5", "i", "img");
@@ -262,13 +265,11 @@ function format_html2_get_text($text) {
 	//find td, div or body with longest text block
 	$html = str_get_html($text);
 	$blocks = $html->find("text");
-	foreach ($blocks as $b) {
-		$len = strlen(trim($b));
-		if ($b->parent->tag != "script") format_html2_set_max($len);
-	}
+	foreach ($blocks as $b) format_html2_set_max(strlen(trim($b)));
 	
 	function get_parent($e) {
 		$options = array("td", "div", "body");
+		if (!is_object($e)) die($e);
 		return (in_array($e->tag, $options)) ? $e : get_parent($e->parent);
 	}
 
