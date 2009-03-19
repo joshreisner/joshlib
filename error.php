@@ -41,8 +41,11 @@ function error_handle($type, $message) {
 	global $_josh, $_SESSION, $_SERVER;
 	error_debug("ERROR! type is:" . $type . " and message is: " . $message);
 	
-	//this might theoretically not have been set yet.
-	if (!isset($_josh["mode"])) $_josh["mode"] = "dev";
+	//small possiblity these vars aren't set yet
+	if (!isset($_josh["mode"]))  $_josh["mode"] = "dev";
+	if (!isset($_josh["debug"])) $_josh["debug"] = false;
+	
+	if (($_josh["mode"] == "dev") && $_josh["debug"]) exit;
 	
 	//get backtrace
 	$backtrace = debug_backtrace();

@@ -36,19 +36,25 @@ function file_download($content, $filename, $extension) {
 	db_close();
 }
 
-function file_folder($folder, $types=false) {
+function file_folder($folder, $endfilter=false) {
 	global $_josh;
 	error_debug("<b>file folder</b> running with $folder", __file__, __line__);
+	
+	//check to make sure folder exists
 	if (!is_dir($folder)) {
 		error_debug("<b>file folder</b> $folder is not a directory", __file__, __line__);
 		$folder = $_josh["root"] . $folder;
-		if (!is_dir(!$folder)) {
+		if (!is_dir($folder)) {
 			error_debug("<b>file folder</b> $folder is not a directory either, exiting", __file__, __line__);
 			return false;
 		}
 	}
 	error_debug("<b>file folder</b> $folder is a directory!", __file__, __line__);
-	if ($types) $types = explode(",", $types);
+
+	//set up filter
+	if ($endfilter) $endfilter = explode(",", $endfilter);
+
+	//open it
 	if ($handle = opendir($folder)) {
 		error_debug("<b>file folder</b> $folder opened", __file__, __line__);
 		$return = array();
@@ -65,9 +71,9 @@ function file_folder($folder, $types=false) {
 			);
 			if ($thisfile["type"] == "dir") $thisfile["path_name"] .= "/";
 			error_debug("<b>file folder</b> found " . $thisfile["name"] . " of type " . $thisfile["type"], __file__, __line__);
-			if ($types) {
+			if ($endfilter) {
 				$oneFound = false;
-				foreach ($types as $type) if (($thisfile["ext"] == trim($type)) || (($type == "dir") && ($thisfile["type"] == "dir"))) $oneFound = true;
+				foreach ($endfilter as $e) if (format_text_ends(trim($e), $thisfile["path_name"]) || (($e == "dir") && ($thisfile["type"] == "dir"))) $oneFound = true;
 				if ($oneFound) $return[] = $thisfile;
 			} else {
 				$return[] = $thisfile;
