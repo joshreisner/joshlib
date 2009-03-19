@@ -96,7 +96,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	require($_josh["joshlib_folder"] . "/url.php");
 
 //parse environment variables
-	if (isset($_SERVER)) { //this could not be set if this were running from the command line (eg by a cron)
+	if (isset($_SERVER) && isset($_SERVER["HTTP_HOST"]) && isset($_SERVER["SCRIPT_NAME"])) { //this could not be set if this were running from the command line (eg by a cron)
 		//build request as string, then set it to array with url_parse
 		$_josh["request"] = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) ? "https" : "http";
 		$_josh["request"] .= "://" . $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"];
