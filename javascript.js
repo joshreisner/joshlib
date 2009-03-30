@@ -91,6 +91,18 @@ function form_text_empty(text) {
 	return !text.value.length;
 }
 
+function form_text_complex(text) {
+	var complex = true;
+	if (text == text.toLowerCase()) complex = false;	//can't be all lowercase
+	if (text == text.toUpperCase()) complex = false;	//can't be all uppercase either
+	if (text.length < 8) complex = false;				//must be 8 chars
+	var specialchars = Array("!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "-", "+", "=");
+	var onefound = false;
+	for (var i = 0; i < specialchars.length; i++) if (text.indexOf(specialchars[i]) != -1) onefound = true;
+	if (!onefound) complex = false;
+	return complex;
+}
+
 /* format */
 function format_title(string) {
 	string = string.replace(/_/g, " ");
