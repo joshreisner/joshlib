@@ -79,6 +79,15 @@ function form_field_default(which, clear, str) {
 	}
 }
 
+function form_file_suggest(str, target) {
+	//var types = new Array('xls','gif','jpg','nrl','pdf','png','ppt','pub','doc');
+	var fileParts   = str.split('.');
+	var extension	= fileParts.pop();
+	var filename	= fileParts.join(' ');
+
+	if (form_text_empty(target)) target.value = format_title(filename);
+}
+
 function form_radio_empty(radio) {
 	var oneFound = false;
 	for (var i = 0; i < radio.length; i++) {

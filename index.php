@@ -177,10 +177,19 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 
 
 //escape quotes if necessary
-	$_josh["getting"] = !empty($_GET);
+	$_josh["getting"]	= !empty($_GET);
 	if ($_josh["getting"]) foreach($_GET as $key=>$value) $_GET[$key] = format_quotes($value);
 	
-	$_josh["posting"] = !empty($_POST);
+	$_josh["editing"]	= url_id();
+	
+	/* not working yet
+	$_josh["uploading"]	= !empty($_FILES);
+	if ($_josh["uploading"]) {
+		foreach($_FILES as $file) $_FILES[$file]["name"] = format_quotes($_FILES[$file]["name"]);
+	} */
+
+	
+	$_josh["posting"]	= !empty($_POST);
 	if ($_josh["posting"]) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes($value);
 	
 	
@@ -244,7 +253,7 @@ class table {
 			$this->return .= '<th class="' . $c["name"];
 			if ($c["class"]) $this->return .= " " . $c["class"];
 			$this->return .= '"';
-			if ($c["width"]) $this->return .= " width='" . $c["width"] . "'";
+			if ($c["width"]) $this->return .= " style='width:" . $c["width"] . "px; min-width:" . $c["width"] . "px'";
 			$this->return .= '>';
 			$this->return .= ($c["title"]) ? $c["title"] : format_text_human($c["name"]);
 			$this->return .= '</th>';
@@ -293,12 +302,12 @@ class table {
 					$this->return .= ' onmouseover="css_add(this, \'hover\');"';
 					$this->return .= ' onmouseout="css_remove(this, \'hover\');"';
 				}
-				$this->return .= '>';
+				$this->return .= '>' . $_josh["newline"];
 				foreach ($this->columns as $c) {
-					//if (!strlen($v[$c["name"]])) $v[$c["name"]] = "&nbsp;";
+					if (!strlen(trim($v[$c["name"]]))) $v[$c["name"]] = "&nbsp;";
 					$this->return .= '<td class="' . $c["name"];
 					if ($c["class"]) $this->return .= " " . $c["class"];
-					$this->return .= '">' . $v[$c["name"]] . '</td>';
+					$this->return .= '">' . $v[$c["name"]] . '</td>' . $_josh["newline"];
 				}
 				$this->return .= '</tr>' . $_josh["newline"];
 				$row = ($row == "even") ? "odd" : "even";
@@ -315,9 +324,9 @@ class table {
 				} else {
 					$this->return .= "&nbsp;";
 				}
-				$this->return .= '</td>';
+				$this->return .= '</td>' . $_josh["newline"];
 			}
-			$this->return .= "</tr>";
+			$this->return .= "</tr>" . $_josh["newline"];
 		}
 		$this->return .= '</table>';
 		return $this->return;
@@ -334,7 +343,7 @@ class form {
 		
 	function addField($array) {
 		//defaults
-		$type = $value = $class = $name = $label = $required = $append = $sql = $action = $additional = $maxlength = $options_table = $options = $linking_table = false;
+		$type = $value = $class = $name = $label = $required = $append = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $object_id = $options = $linking_table = false;
 		
 		//load inputs
 		if (!is_array($array)) return error_handle("array not set");
@@ -351,6 +360,8 @@ class form {
 		if (!$label) $label	= format_text_human($name);
 		if (!$value) $value	= (isset($this->values[$name])) ? $this->values[$name] : false;
 		if (!$class) $class	= "";
+		if (!$option_id) $option_id	= "option_id";
+		if (!$object_id) $object_id	= "object_id";
 		
 		if ($additional) $additional = "<span class='additional'>" . $additional . "</span>";
 		
@@ -360,7 +371,7 @@ class form {
 		}
 		
 		//package and save
-		$this->fields[] = compact("name", "type", "label", "value", "append", "required", "sql", "class", "action", "additional", "options_table", "options", "linking_table", "maxlength");
+		$this->fields[] = compact("name", "type", "label", "value", "append", "required", "sql", "class", "action", "onchange", "additional", "options_table", "option_id", "object_id", "options", "linking_table", "maxlength");
 	}
 	
 	function addRow($field) {
@@ -380,18 +391,20 @@ class form {
 				$return .= '<div class="checkbox_option">' . draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span></div>';
 			} elseif ($type == "checkboxes") {
 				if ($value) {
-					$options = db_query("SELECT o.id, o.name, (SELECT COUNT(*) FROM $linking_table l WHERE l.option_id = o.id AND l.object_id = $value) checked FROM $options_table o ORDER BY o.name");
+					$options = db_query("SELECT o.id, o.title, (SELECT COUNT(*) FROM $linking_table l WHERE l.$option_id = o.id AND l.$object_id = $value) checked FROM $options_table o ORDER BY o.title");
 				} else {
-					$options = db_query("SELECT id, name, 0 checked FROM $options_table ORDER BY name");
+					$options = db_query("SELECT id, title, 0 checked FROM $options_table ORDER BY title");
 				}
 				while ($o = db_fetch($options)) {
 					$name = "chk_" . str_replace("_", "-", $options_table) . "_" . $o["id"];
-					$return .= '<div class="checkbox_option">' . draw_form_checkbox($name, $o["checked"]) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o["name"] . '</span></div>';
+					$return .= '<div class="checkbox_option">' . draw_form_checkbox($name, $o["checked"]) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o["title"] . '</span></div>';
 				}
 			} elseif ($type == "date") {
 				$return .= draw_form_date($name, $value, false) . $additional;
 			} elseif ($type == "datetime") {
 				$return .= draw_form_date($name, $value, true) . $additional;
+			} elseif ($type == "file") {
+				$return .= draw_form_file($name, $class, $onchange) . $additional;
 			} elseif ($type == "note") {
 				$return .= "<div class='note'>" . $additional . "</div>";
 			} elseif ($type == "password") {
@@ -426,8 +439,9 @@ class form {
 		return $return;
 	}
 	
-	function draw($validate=false) {
+	function draw($validate=false, $values=false) {
 		global $_josh, $_GET;
+		
 		//sometimes you can get to a form from multiple places.  you might want to return the way you came.
 		if (isset($_josh["referrer"]["path_query"])) {
 			$this->addField(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["path_query"]));
@@ -435,13 +449,17 @@ class form {
 			$this->addField(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
 		}
 		
-		$return = '<form method="post" action="' . $_josh["request"]["path_query"] . '"';
+		$return = '<form method="post" enctype="multipart/form-data" action="' . $_josh["request"]["path_query"] . '"';
 		if ($validate) $return .= ' name="' . $validate . '" onsubmit="javascript:return validate_' . $validate . '(this);"';
 		$return .= '>
 			<dl class="' . $validate . '">';
 
 		//add fields
-		foreach ($this->fields as $field) $return .= $this->addRow($field);
+		foreach ($this->fields as $field) {
+			//values needs to be an associative array
+			if ($values && isset($values[$field["name"]])) $field["value"] = $values[$field["name"]];
+			$return .= $this->addRow($field);
+		}
 		
 		$return .= '</dl></form>';
 		return $return;

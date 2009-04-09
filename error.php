@@ -2,7 +2,6 @@
 error_debug("including error.php", __file__, __line__);
 
 function error_break() {
-	
 	global $_josh;
 	unset($_josh["ignored_words"]); //too long. gets in the way!
 	echo draw_array($_josh);
@@ -37,7 +36,7 @@ function error_draw($title, $html) {
 		</html>";
 }
 
-function error_handle($type, $message) {
+function error_handle($type, $message="") {
 	global $_josh, $_SESSION, $_SERVER;
 	error_debug("ERROR! type is:" . $type . " and message is: " . $message);
 	

@@ -66,7 +66,7 @@ function url_drop($deletes=false, $go=true) {
 function url_id($index="id") {
 	global $_GET;
 	//check to see whether there's an id and if so, if it's an integer
-	if (isset($_GET[$index]) && format_check($_GET[$index])) return true;
+	if (isset($_GET[$index]) && format_check($_GET[$index])) return $_GET[$index];
 	unset($_GET[$index]);
 	return false;
 }

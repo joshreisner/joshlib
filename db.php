@@ -283,16 +283,17 @@ function db_query($query, $limit=false, $suppress_error=false) {
 	}
 }
 
-function db_save($table, $id=false) {
+function db_save($table, $index="id") {
 	global $_SESSION;
-	if (!$id && url_id()) $id = $_GET["id"];
-	
+	$id = url_id($index);
 	if (!isset($_SESSION["user_id"])) error_handle("session not set", "db_save needs a session user_id variable");
 	$columns	= db_columns($table);
 	$required	= array("id", "created_date", "created_user", "updated_date", "updated_user", "deleted_date", "deleted_user", "is_active");
 	$query1		= array();
 	$query2		= array();
+	
 	//debug();
+	
 	foreach ($columns as $c) {
 		error_debug("<b>db_save</b> looking at column " . $c["name"]);
 		if ($indexes = array_keys($required, $c["name"])) {
@@ -323,7 +324,10 @@ function db_save($table, $id=false) {
 				$query1[] = $c["name"];
 				$query2[] = $value;
 			}
-		} elseif (!$id && ($c["default"] != "")) {
+		} elseif ($id) {
+			//we're ok, because we should already have it
+			//echo $c["name"];
+		} elseif ($c["default"] != "") {
 			if ($id) {
 				$query1[] = $c["name"] . " = " . $c["default"];
 			} else {
@@ -333,15 +337,25 @@ function db_save($table, $id=false) {
 		} elseif (!$id && $c["required"]) {
 			//fill values with admin defaults?  eg 0s for numeric and NOW()s for datetimes?
 			//if ($type == "tinyint") $value = 0;
-			echo $c["default"];
-			error_handle("required value missing", "db_save is expecting a value for " . $c["name"]);
+			if ($c["name"] == "secret_key") {
+				if ($id) {
+					//keep existing keys
+					//$query1[] = $c["name"] . " = " . $c["default"];
+				} else {
+					$query1[] = $c["name"];
+					$query2[] = db_key();
+				}
+			} else {
+				//echo $c["default"];
+				error_handle("required value missing", "db_save is expecting a value for " . $c["name"]);
+			}
 		}
 	}
 	if (count($required)) {
 		error_handle("required fields missing", "the table $table needs columns for " . implode(", ", $required));
 	}
 	if ($id) {
-		$query1[] = "updated_date = '" .  db_date() . "'";
+		$query1[] = "updated_date = " .  db_date();
 		$query1[] = "updated_user = " . $_SESSION["user_id"];
 		$query = "UPDATE $table SET " . implode(", ", $query1) . " WHERE id = " . $id;
 	} else {
