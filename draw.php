@@ -4,7 +4,7 @@ error_debug("including draw.php", __file__, __line__);
 function draw_array($array, $nice=false) {
 	global $_josh;
 	if (!is_array($array)) return false;
-	$return = '<table width="100%" cellpadding="3" cellspacing="1" border="0" bgcolor="#eee">';
+	$return = '<table width="100%" cellpadding="3" cellspacing="1" border="0" style="background-color:#eee;">';
 	//if (!$nice) ksort($array);
 	while(list($key, $value) = each($array)) {
 		if ($nice && (strToLower($key) == "j")) continue;
@@ -18,9 +18,9 @@ function draw_array($array, $nice=false) {
 			$value = $return2;
 		}
 		$return  .= '
-			<tr bgcolor="#fff" style="font-family: verdana; font-size:11px; padding:6px; line-height:16px; width:100%;" valign="top"';
+			<tr style="background-color:#fff; font-family: verdana; font-size:11px; padding:6px; line-height:16px; width:100%;" valign="top"';
 		if (strToLower($key) == "message") $return .= ' height="160"';
-		$return .= '><td bgcolor="#eee" width="21%"><nobr>';
+		$return .= '><td style="background-color:#eee;" width="21%"><nobr>';
 		$return .= ($nice) ? format_text_human($key)  : $key;
 		$return .= '&nbsp;</nobr></td><td width="79%">';
 		$return .= is_object($value) ? "object value" : nl2br($value);

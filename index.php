@@ -265,7 +265,7 @@ class table {
 		global $_josh;
 		$colspan = count($this->columns);
 		$totals = array();
-		$this->return = $_josh["newline"] . '<!--table start-->' . $_josh["newline"] . '<table cellspacing="0">' . $_josh["newline"];
+		$this->return = $_josh["newline"] . '<!--table start-->' . $_josh["newline"] . '<table cellspacing="0" class="table">' . $_josh["newline"];
 		if (!$colspan) {
 			$this->return .= '<tr><td class="empty">Sorry, no columns defined!</td></tr>' . $_josh["newline"];
 		} elseif (!count($values)) {
@@ -367,7 +367,7 @@ class form {
 		
 		if ($type == "checkbox") {
 			$additional = $label;
-			$label = false;
+			$label = "&nbsp;";
 		}
 		
 		//package and save

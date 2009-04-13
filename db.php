@@ -118,7 +118,13 @@ function db_delete($table, $id=false) {
 			error_handle("expecting \$_GET[\"id\"]", "db_delete is expecting an id variable");
 		}
 	}
-	db_query("UPDATE $table SET deleted_on = " . db_date() . ", deleted_by = {$_SESSION["user_id"]}, is_active = 0 WHERE id = " . $id);
+	db_query("UPDATE $table SET 
+		updated_date = " . db_date() . ", 
+		updated_user = {$_SESSION["user_id"]}, 
+		deleted_date = " . db_date() . ", 
+		deleted_user = {$_SESSION["user_id"]}, 
+		is_active = 0 
+		WHERE id = " . $id);
 }
 
 function db_fetch($result) {
@@ -295,12 +301,14 @@ function db_save($table, $index="id") {
 	//debug();
 	
 	foreach ($columns as $c) {
-		error_debug("<b>db_save</b> looking at column " . $c["name"]);
+		error_debug("<b>db_save</b> looking at column " . $c["name"] . ", of type " . $c["type"]);
 		if ($indexes = array_keys($required, $c["name"])) {
 			error_debug("<b>db_save</b> unsetting " . $c["name"] . " from post query because it's a system field and handled specially");
 			foreach ($indexes as $i) unset($required[$i]);
 		} elseif (isset($_POST[$c["name"]])) {
-			if ($c["type"] == "int") { //integer
+			if ($c["type"] == "decimal") {
+				$value = format_null(format_numeric($_POST[$c["name"]], false));
+			} elseif ($c["type"] == "int") { //integer
 				$value = format_null(format_numeric($_POST[$c["name"]], true));
 			} elseif ($c["type"] == "mediumblob") { //password (what about file)
 				$value = format_binary($_POST[$c["name"]]);
@@ -310,10 +318,6 @@ function db_save($table, $index="id") {
 				$value = "'" . format_html($_POST[$c["name"]] . "'");
 			} elseif ($c["type"] == "tinyint") { //bit
 				$value = format_boolean($_POST[$c["name"]], "1|0");
-			} elseif ($c["type"] == "datetime") {
-				$value = format_post_date($c["name"]);
-			} elseif ($c["type"] == "decimal") {
-				$value = format_null(format_numeric($_POST[$c["name"]], false));
 			} else {
 				error_handle("unhandled data type", "db_save hasn't been programmed yet to handle" . $c["type"]);
 			}
@@ -324,6 +328,30 @@ function db_save($table, $index="id") {
 				$query1[] = $c["name"];
 				$query2[] = $value;
 			}
+		} elseif (isset($_POST[$c["name"] . "Month"])) {
+			//this could be a date or datetime
+			if ($c["type"] == "datetime") {
+				$value = format_post_date($c["name"]);
+			} elseif ($c["type"] == "date") {
+				$value = format_post_date($c["name"]);
+			}
+			if ($id) {
+				$query1[] = $c["name"] . " = " . $value;
+			} else {
+				$query1[] = $c["name"];
+				$query2[] = $value;
+			}
+		} elseif ($c["type"] == "tinyint") { 
+			//checkbox that's not set
+			//if the checkbox field isn't present in the form, we maybe have a problem
+			$value = 0;
+			if ($id) {
+				$query1[] = $c["name"] . " = " . $value;
+			} else {
+				$query1[] = $c["name"];
+				$query2[] = $value;
+			}
+			
 		} elseif ($id) {
 			//we're ok, because we should already have it
 			//echo $c["name"];
@@ -404,4 +432,23 @@ function db_translate($sql, $from, $to) {
 	}
 	return $sql;
 }
+
+function db_undelete($table, $id=false) {
+	global $_SESSION;
+	if (!$id) {
+		if (isset($_GET["id"])) {
+			$id = $_GET["id"];
+		} else {
+			error_handle("expecting \$_GET[\"id\"]", "db_delete is expecting an id variable");
+		}
+	}
+	db_query("UPDATE $table SET 
+		updated_date = " . db_date() . ", 
+		updated_user = {$_SESSION["user_id"]}, 
+		deleted_date = NULL, 
+		deleted_user = NULL, 
+		is_active = 1
+		WHERE id = " . $id);
+}
+
 ?>
