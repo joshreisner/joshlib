@@ -214,6 +214,7 @@ function draw_form_password($name, $value="", $class=false, $maxlength=255, $aut
 
 function draw_form_radio($name, $value="", $checked=false, $class=false) {
 	global $_josh;
+	$class = ($class) ? $class . " radio" : "radio";
 	$return  = '<input type="radio" name="' . $name . '" value="' . $value . '"';
 	if ($class) $return .= ' class="' . $class . '"';
 	if ($checked) $return .= ' checked';
@@ -385,7 +386,7 @@ function draw_img($path, $link=false, $alt=false, $name=false) {
 	
 	$return = '<img src="' . url_base() . $path . '" width="' . $width . '" height="' . $height . '" border="0"';
 	if ($alt)	$return .= ' alt="' . $alt . '"';
-	if ($name)	$return .= ' name="' . $name . '" id="' . $name . '"';
+	if ($name)	$return .= ' name="' . $name . '" class="' . $name . '" id="' . $name . '"';
 	$return .= '/>';
 	if ($link)	$return = '<a href="' . $link . '">' . $return . '</a>';
 	return $return;

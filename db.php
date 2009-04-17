@@ -110,6 +110,7 @@ function db_datediff($date1=false, $date2=false) {
 }
 
 function db_delete($table, $id=false) {
+	//deleting an object does not update it
 	global $_SESSION;
 	if (!$id) {
 		if (isset($_GET["id"])) {
@@ -119,8 +120,6 @@ function db_delete($table, $id=false) {
 		}
 	}
 	db_query("UPDATE $table SET 
-		updated_date = " . db_date() . ", 
-		updated_user = {$_SESSION["user_id"]}, 
 		deleted_date = " . db_date() . ", 
 		deleted_user = {$_SESSION["user_id"]}, 
 		is_active = 0 
@@ -434,6 +433,7 @@ function db_translate($sql, $from, $to) {
 }
 
 function db_undelete($table, $id=false) {
+	//undeleting an object does not update it
 	global $_SESSION;
 	if (!$id) {
 		if (isset($_GET["id"])) {
@@ -443,8 +443,6 @@ function db_undelete($table, $id=false) {
 		}
 	}
 	db_query("UPDATE $table SET 
-		updated_date = " . db_date() . ", 
-		updated_user = {$_SESSION["user_id"]}, 
 		deleted_date = NULL, 
 		deleted_user = NULL, 
 		is_active = 1

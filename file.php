@@ -20,6 +20,12 @@ function file_array($content, $filename=false) {
 	return $content;
 }
 
+function file_delete($filename) {
+	global $_josh;
+	if (file_exists($_josh["root"] . $filename)) unlink($_josh["root"] . $filename);
+	return true;
+}
+
 function file_download($content, $filename, $extension) {
 	//header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 	//header("Cache-Control: public");
@@ -108,23 +114,80 @@ function file_get_max($pretty=true) {
 	return $max_size;
 }
 
-function file_image_resize($source_name, $target_name, $new_width) {
-	//src is not root because it's probably uploaded
+function file_image_resize($source_name, $target_name, $max_width=false, $max_height=false) {
 	global $_josh;
-	if (!function_exists("imagecreatefromjpeg")) error_handle("library missing", "the GD library needs to be installed to run file_image_resize");
-	if (!file_exists($source_name)) return false; //return if no file source
-	list($width, $height) = getimagesize($source_name);
-	if ($width == $new_width) {
-		copy($source_name, $target_name);
-	} else {
-		if (!$image = @imagecreatefromjpeg($source_name)) error_handle("couldn't create image", "the system could not create an image from " . $src);
-		$new_height = ($height / $width) * $new_width;
+	
+	function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
+		//resize an image and save to the $target_name
 		$tmp = imagecreatetruecolor($new_width, $new_height);
+		if (!$image = @imagecreatefromjpeg($source_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
 		imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-		imagejpeg($tmp, $_josh["root"] . $target_name, 100);
-		imagedestroy($image);
+		imagejpeg($tmp, $target_name, 100);
 		imagedestroy($tmp);
+		imagedestroy($image);
 	}
+	
+	function crop($new_width, $new_height, $target_name) {
+		//crop an image and save to the $target_name
+		list($width, $height) = getimagesize($target_name);
+		$tmp = imagecreatetruecolor($new_width, $new_height);
+		if (!$image = @imagecreatefromjpeg($target_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
+		imagecopyresized($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $new_width, $new_height);
+		imagejpeg($tmp, $target_name, 100);
+		imagedestroy($tmp);
+		imagedestroy($image);
+	}	
+	
+	//$source_name is not rooted because it's likely to be uploaded
+	$target_name = $_josh["root"] . $target_name;
+
+
+	//exit on error
+	if (!function_exists("imagecreatefromjpeg")) error_handle("library missing", "the GD library needs to be installed to run file_image_resize");
+	if (!file_exists($source_name)) error_handle("no source image", "file_image_resize is looking for an image that's not there");
+
+	//get source image dimensions
+	list($width, $height) = getimagesize($source_name);
+	
+	//execute differently depending on target parameters	
+	if ($max_width && $max_height) {
+		//resizing both
+		if (($width == $max_width) && ($height == $max_height)) {
+			//already exact width and height, skip resizing
+			copy($source_name, $target_name);
+		} else {
+			if ($max_width >= $max_height) {
+				//landscape or square.  resize width, then crop height
+				$new_height = ($height / $width) * $max_width;
+				resize($max_width, $new_height, $source_name, $target_name, $width, $height);
+			} else {
+				//portrait.  resize height, then crop width
+				$new_width = ($width / $height) * $max_height;
+				resize($new_width, $max_height, $source_name, $target_name, $width, $height);
+			}
+			crop($max_width, $max_height, $target_name);						
+		}
+	} elseif ($max_width) { 
+		//only resizing width
+		if ($width == $max_width) {
+			//already exact width, skip resizing
+			copy($source_name, $target_name);
+		} else {
+			//resize width
+			$new_height = ($height / $width) * $new_width;
+			resize($max_width, $new_height, $source_name, $target_name, $width, $height);
+		}
+	} elseif ($max_height) { 
+		//only resizing height	
+		if ($height == $max_height) {
+			//already exact height, skip resizing
+			copy($source_name, $target_name, $source_name, $target_name, $width, $height);
+		} else {
+			//resize height
+			
+		}
+	}
+	
 	return true;
 }
 
@@ -170,6 +233,7 @@ function file_pass($filename) {
 
 function file_put($filename, $content) {
 	global $_josh;
+	file_delete($filename);
 	//arguments should be reversed?
 	$file = @fopen($_josh["root"] . $filename, "w");
 	if ($file === false) {
