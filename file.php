@@ -114,6 +114,14 @@ function file_get_max($pretty=true) {
 	return $max_size;
 }
 
+function file_get_type_id($filename, $table="documents_types") {
+	list($filename, $extension) = file_name($_FILES["content"]["name"]);
+	if (!$type_id = db_grab("SELECT id FROM " . $table . " WHERE extension = '" . $extension . "'")) {
+		return db_query("INSERT INTO " . $table . " ( extension ) VALUES ( '" . $extension . "' )");
+	}
+	return $type_id;
+}
+
 function file_image_resize($source_name, $target_name, $max_width=false, $max_height=false) {
 	global $_josh;
 	

@@ -49,6 +49,11 @@ function draw_css_src($location, $media=false) {
 	return $return;
 }
 
+function draw_favicon($location="/images/favicon.png") {
+	global $_josh;
+	return '<link rel="shortcut icon" href="' . $location . '" type="image/png" />';
+}
+
 function draw_focus($form_element) {
 	return draw_javascript('document.getElementById("' . $form_element . '").focus();');
 }
