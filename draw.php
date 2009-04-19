@@ -1,6 +1,17 @@
 <?php
 error_debug("including draw.php", __file__, __line__);
 
+function draw_arg($name, $value=false) {
+	if ($value === false) return;
+	return ' ' . strToLower($name) . '="' . $value . '"';
+}
+
+function draw_args($array) {
+	$return = "";
+	foreach ($array as $key=>$value) $return .= draw_arg($key, $value);
+	return $return;
+}
+
 function draw_array($array, $nice=false) {
 	global $_josh;
 	if (!is_array($array)) return false;
@@ -425,10 +436,30 @@ function draw_javascript_src($filename=false) {
 	return $_josh["newline"] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
+function draw_link($href, $str, $newwindow=false, $other_args=false) {
+	$args = array("href"=>$href);
+	$args["target"] = ($newwindow) ? "_blank" : false;
+	if ($other_args) $args = array_merge($args . $other_args);
+	return '<a' . draw_args($args) . '>' . $str . '</a>';
+}
+
+function draw_list($options, $class=false, $type="ul") {
+	//make a ul or an ol out of a one-dimensional array
+	global $_josh;
+	if (!is_array($options) || (!$count = count($options))) return false;
+	$return = $_josh["newline"] . "<" . $type . draw_arg("class", $class) . ">";
+	for ($i = 0; $i < $count; $i++) {
+		$return .= $_josh["newline"] . "\t<li" . draw_arg("class", ("option" . $i + 1)) . ">" . $options[$i] . "</li>";
+	}
+	$return .= $_josh["newline"] . "</" . $type . ">";
+	return $return;
+}
+
 function draw_navigation($options, $match=false, $type="text", $class="navigation") {
 	//type could be text, images or rollovers
 	global $_josh;
-	$return = $_josh["newline"] . $_josh["newline"] . "<!--start nav-->" . $_josh["newline"] . "<ul class='" . $class . "'>";
+	//$return = $_josh["newline"] . $_josh["newline"] . "<!--start nav-->" . $_josh["newline"] . "<ul class='" . $class . "'>";
+	$return = array();
 	if ($match === false) {
 		$match = $_josh["request"]["path"];
 	} elseif ($match === true) {
@@ -442,19 +473,19 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 	$javascript = $_josh["newline"];
 	foreach ($options as $title=>$url) {
 		$name = 'option' . $counter;
-		$return .= $_josh["newline"] . '<li><a href="' . $url . '" class="' . $name;
+		$thisoption = '<a href="' . $url . '" class="' . $name;
 		if (str_replace(url_base(), "", $url) == $match) {
 			$img_state = "_on";
-			$return .= ' selected';
+			$thisoption .= ' selected';
 		} else {
 			$img_state = "_off";
 			if ($type == "rollovers") {
-				$return .= '" onmouseover="javascript:roll(\'' . $name . '\',\'on\');" onmouseout="javascript:roll(\'' . $name . '\',\'off\');';
+				$thisoption .= '" onmouseover="javascript:roll(\'' . $name . '\',\'on\');" onmouseout="javascript:roll(\'' . $name . '\',\'off\');';
 			}
 		}
-		$return .= '">';
+		$thisoption .= '">';
 		if ($type == "text") {
-			$return .= $title;
+			$thisoption .= $title;
 		} elseif (($type == "images") || ($type == "rollovers")) {
 			$img = str_replace("/", "", $url);
 			if (empty($img)) $img = "home";
@@ -466,12 +497,13 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 				$javascript .= $name . "_off.src = '" . $img . "_off.png';" . $_josh["newline"];
 			}
 			$img .= $img_state . ".png";
-			$return .= draw_img($img, false, false, $name);
+			$thisoption .= draw_img($img, false, false, $name);
 		}
-		$return .= '</a></li>';
+		$thisoption .= '</a>';
+		$return[] = $thisoption;
 		$counter++;
 	}
-	$return .= $_josh["newline"] . "</ul>";
+	$return = draw_list($return, $class);
 	if ($type == "rollovers") $return = draw_javascript('if (document.images) {' . $javascript . '}
 		function roll(what, how) { eval("document." + what + ".src = " + what + "_" + how + ".src;"); }') . $return;
 	return $return;
