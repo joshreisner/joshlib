@@ -466,6 +466,10 @@ function draw_list($options, $class=false, $type="ul") {
 function draw_navigation($options, $match=false, $type="text", $class="navigation") {
 	//type could be text, images or rollovers
 	global $_josh;
+	
+	//skip if empty
+	if (!is_array($options) || !count($options)) return false;
+	
 	//$return = $_josh["newline"] . $_josh["newline"] . "<!--start nav-->" . $_josh["newline"] . "<ul class='" . $class . "'>";
 	$return = array();
 	if ($match === false) {

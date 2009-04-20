@@ -223,15 +223,18 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	//connect to db
 	if (!isset($_josh["db"]["database"]) || !isset($_josh["db"]["username"]) || !isset($_josh["db"]["password"])) {
 		error_handle("database variables error", "joshserver could not find the right database connection variables.  please fix this before proceeding.");
+		exit;
 	} elseif ($_josh["db"]["language"] == "mysql") {
 		error_debug("<b>db_open</b> trying to connect mysql on " . $_josh["db"]["location"]);
 		if (!$_josh["db"]["pointer"] = @mysql_connect($_josh["db"]["location"], $_josh["db"]["username"], $_josh["db"]["password"])) {
 			error_handle("database connection error", "this application is not able to connect its database.  we're sorry for the inconvenience, the administrator is attempting to fix the issue.");
+			exit;
 		}
 	} elseif ($_josh["db"]["language"] == "mssql") {
 		error_debug("<b>db_open</b> trying to connect mssql on " . $_josh["db"]["location"] . " with username " . $_josh["db"]["username"]);
 		if (!$_josh["db"]["pointer"] = @mssql_connect($_josh["db"]["location"], $_josh["db"]["username"], $_josh["db"]["password"])) {
 			error_handle("database connection error", "this application is not able to connect its database.  we're sorry for the inconvenience, the administrator is attempting to fix the issue.");
+			exit;
 		}
 	}
 	
