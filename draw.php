@@ -41,28 +41,38 @@ function draw_array($array, $nice=false) {
 	return $return;
 }
 
-function draw_autorefresh($minutes) {
-	global $_josh;
-	return '<meta http-equiv="refresh" content="' . $minutes * 60 . '">' . $_josh["newline"];
+function draw_autorefresh($minutes=5) {
+	return draw_tag("meta", array("http-equiv"=>"refresh", "content"=>$minutes * 60));
 }
 
 function draw_css($content) {
-	return '<style type="text/css">' . $content . '</style>';
+	return draw_tag("style", array("type"=>"text/css"), $content);
 }
 
 function draw_css_src($location, $media=false) {
+	//special "ie" mode for internet explorer
 	$ie = ($media == "ie");
 	if ($ie) $media = "screen";
-	$return = '<link rel="stylesheet" type="text/css"';
-	if ($media) $return .= ' media="' . $media . '"';
-	$return .= ' href="' . $location . '" />';
+	$return = draw_tag("link", array("rel"=>"stylesheet", "type"=>"text/css", "media"=>$media, "href"=>$location));
 	if ($ie) $return = '<!--[if IE]>' . $return . '<![endif]-->';
 	return $return;
 }
 
+function draw_container($tag, $innerhtml, $args=false) {
+	//convenience function for draw_tag if you're just writing a simple container tag
+	return draw_tag($tag, $args, $innerhtml);
+}
+
+function draw_div($id, $innerhtml="", $args=false) {
+	//convenience function specifically for DIVs, since they're so ubiquitous
+	if (!$args) $args = array();
+	$args["id"] = $id;
+	return draw_tag("div", $args, $innerhtml);
+}
+
 function draw_favicon($location="/images/favicon.png") {
-	global $_josh;
-	return '<link rel="shortcut icon" href="' . $location . '" type="image/png" />';
+	//only accepts PNGs right now
+	return draw_tag("link", array("rel"=>"shortcut icon", "href"=>$location, "type"=>"image/png")); 
 }
 
 function draw_focus($form_element) {
@@ -291,7 +301,8 @@ function draw_form_select_month($name, $start, $default=false, $length=false, $c
 function draw_form_submit($message="Submit Form", $class=false) {
 	global $_josh;
 	$class = ($class) ? $class . " button" : "button";
-	return '<input type="submit" value="   ' . $message . '   " class="' . $class . '">';
+	return draw_tag("input", array("type"=>"submit", "value"=>$message, "class"=>$class));
+	//return '<input type="submit" value="   ' . $message . '   " class="' . $class . '">';
 }
 
 function draw_form_text($name, $value="", $class=false, $maxlength=255, $style=false, $autocomplete=true) {
@@ -308,7 +319,8 @@ function draw_form_textarea($name, $value="", $class=false) {
 	error_debug("drawing textarea");
 	global $_josh;
 	$class = ($class) ? $class . " textarea" : "textarea";
-	return '<textarea name="' . $name . '" id="' . $name . '" class="' . $class . '">' . $value . '</textarea>';
+	return draw_tag("textarea", array("name"=>$name, "id"=>$name, "class"=>$class), $value);
+	//return '<textarea name="' . $name . '" id="' . $name . '" class="' . $class . '">' . $value . '</textarea>';
 }
 
 function draw_google_chart($data, $type="line", $colors=false, $width=250, $height=100) {
@@ -379,6 +391,7 @@ function draw_google_map($markers, $center=false) {
 
 function draw_google_tracker($id) {
 	error_debug("drawing google tracker");
+	//not going to bother doing draw_javascript on this since it's google's code
 	return '
 	<script type="text/javascript">
 	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -393,18 +406,17 @@ function draw_google_tracker($id) {
 
 function draw_img($path, $link=false, $alt=false, $name=false) {
 	global $_josh;
+	
+	//get width and height
 	$image = @getimagesize($path);
 	if (!$image) $image = @getimagesize($_josh["root"] . $path);
 	if (!$image) return false;
 	
-	$width	= $image[0];
-	$height	= $image[1];
-	
-	$return = '<img src="' . url_base() . $path . '" width="' . $width . '" height="' . $height . '" border="0"';
-	if ($alt)	$return .= ' alt="' . $alt . '"';
-	if ($name)	$return .= ' name="' . $name . '" class="' . $name . '" id="' . $name . '"';
-	$return .= '/>';
-	if ($link)	$return = '<a href="' . $link . '">' . $return . '</a>';
+	//assemble tag
+	$args = array("src"=>url_base() . $path, "width"=>$image[0], "height"=>$image[1], "border"=>0, "alt"=>$alt);
+	if ($name) $args["name"] = $args["class"] = $args["id"] = $name;
+	$return = draw_tag("img", $args);
+	if ($link) $return = draw_link($link, $return);
 	return $return;
 }
 
@@ -447,12 +459,8 @@ function draw_list($options, $class=false, $type="ul") {
 	//make a ul or an ol out of a one-dimensional array
 	global $_josh;
 	if (!is_array($options) || (!$count = count($options))) return false;
-	$return = $_josh["newline"] . "<" . $type . draw_arg("class", $class) . ">";
-	for ($i = 0; $i < $count; $i++) {
-		$return .= $_josh["newline"] . "\t<li" . draw_arg("class", ("option" . $i + 1)) . ">" . $options[$i] . "</li>";
-	}
-	$return .= $_josh["newline"] . "</" . $type . ">";
-	return $return;
+	for ($i = 0; $i < $count; $i++) $options[$i] = draw_tag("li", array("class"=>"option" . ($i + 1)), $options[$i]);
+	return draw_tag($type, array("class"=>$class), implode($options,  $_josh["newline"] . "\t"));
 }
 
 function draw_navigation($options, $match=false, $type="text", $class="navigation") {
@@ -510,7 +518,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 }
 
 function draw_rss_link($address) {
-	return '<link rel="alternate" type="application/rss+xml" title="RSS" href="' . $address . '">';
+	return draw_tag("link", array("rel"=>"alternate", "type"=>"application/rss+xml", "title"=>"RSS", "href"=>$address));
 }
 
 function draw_swf($path, $width, $height, $border=0) {
@@ -520,6 +528,17 @@ function draw_swf($path, $width, $height, $border=0) {
 		<embed src="' . $path . '" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="' . $width . '" height="' . $height . '" border="' . $border . '"></embed>
 	  </object>';
 	return $return;
+}
+
+function draw_tag($tag, $args=false, $innerhtml=false) {
+	$tag = strToLower($tag);
+	$return = '<' . $tag;
+	$return .= (is_array($args)) ? draw_args($args) : draw_arg($args);
+	if ($innerhtml === false) {
+		return $return . '/>';
+	} else {
+		return $return . '>' . $innerhtml . '</' . $tag . '>';
+	}
 }
 
 ?>
