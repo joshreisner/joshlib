@@ -14,7 +14,7 @@ function email($to, $message, $subject="Email from Your Website", $from=false) {
 	}
 	$to = format_email($to);
 	if (!mail($to, $subject, $message, $headers)) {
-		error_handle("email not sent", "sorry, an unexpected error occurred while sending your mail.", true);
+		error_handle("email not sent", "sorry, an unexpected error occurred while sending your mail to " . $to, true);
 	}
 	return true;
 }
