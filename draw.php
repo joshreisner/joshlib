@@ -318,8 +318,9 @@ function draw_form_text($name, $value="", $class=false, $maxlength=255, $style=f
 function draw_form_textarea($name, $value="", $class=false) {
 	error_debug("drawing textarea");
 	global $_josh;
+	if (!$value) $value = "";
 	$class = ($class) ? $class . " textarea" : "textarea";
-	return draw_tag("textarea", array("name"=>$name, "id"=>$name, "class"=>$class), $value);
+	return draw_container("textarea", $value, array("name"=>$name, "id"=>$name, "class"=>$class));
 	//return '<textarea name="' . $name . '" id="' . $name . '" class="' . $class . '">' . $value . '</textarea>';
 }
 
