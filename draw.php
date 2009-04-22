@@ -406,6 +406,7 @@ function draw_google_tracker($id) {
 }
 
 function draw_img($path, $link=false, $alt=false, $name=false) {
+	//alt could also be an array of arguments
 	global $_josh;
 	
 	//get width and height
@@ -414,8 +415,14 @@ function draw_img($path, $link=false, $alt=false, $name=false) {
 	if (!$image) return false;
 	
 	//assemble tag
-	$args = array("src"=>url_base() . $path, "width"=>$image[0], "height"=>$image[1], "border"=>0, "alt"=>$alt);
-	if ($name) $args["name"] = $args["class"] = $args["id"] = $name;
+	$args = array("src"=>url_base() . $path, "width"=>$image[0], "height"=>$image[1], "border"=>0);
+	if (is_array($alt)) {
+		//values of alt can overwrite width, height, border, even src but that could get ugly -- maybe i should prevent that?
+		$args = array_merge($args, $alt);
+	} else {
+		$args["alt"] = $alt;
+		$args["name"] = $args["class"] = $args["id"] = $name;
+	}
 	$return = draw_tag("img", $args);
 	if ($link) $return = draw_link($link, $return);
 	return $return;
@@ -456,11 +463,15 @@ function draw_link($href, $str, $newwindow=false, $other_args=false) {
 	return '<a' . draw_args($args) . '>' . $str . '</a>';
 }
 
-function draw_list($options, $class=false, $type="ul") {
+function draw_list($options, $class=false, $type="ul", $selected=false) {
 	//make a ul or an ol out of a one-dimensional array
 	global $_josh;
 	if (!is_array($options) || (!$count = count($options))) return false;
-	for ($i = 0; $i < $count; $i++) $options[$i] = draw_tag("li", array("class"=>"option" . ($i + 1)), $options[$i]);
+	for ($i = 0; $i < $count; $i++) {
+		$liclass = "option" . ($i + 1);
+		if ($selected == ($i + 1)) $liclass .= " selected";
+		$options[$i] = draw_tag("li", array("class"=>$liclass), $options[$i]);
+	}
 	return draw_tag($type, array("class"=>$class), implode($options,  $_josh["newline"] . "\t"));
 }
 
@@ -482,6 +493,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 		$match = "/";
 	}
 	error_debug("<b>draw_navigation</b> match is " . $match);
+	$selected = false;
 	$counter = 1;
 	$javascript = $_josh["newline"];
 	foreach ($options as $title=>$url) {
@@ -490,6 +502,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 		if (str_replace(url_base(), "", $url) == $match) {
 			$img_state = "_on";
 			$thisoption .= ' selected';
+			$selected = $counter;
 		} else {
 			$img_state = "_off";
 			if ($type == "rollovers") {
@@ -516,7 +529,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 		$return[] = $thisoption;
 		$counter++;
 	}
-	$return = draw_list($return, $class);
+	$return = draw_list($return, $class, "ul", $selected);
 	if ($type == "rollovers") $return = draw_javascript('if (document.images) {' . $javascript . '}
 		function roll(what, how) { eval("document." + what + ".src = " + what + "_" + how + ".src;"); }') . $return;
 	return $return;
