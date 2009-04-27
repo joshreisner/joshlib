@@ -42,6 +42,12 @@ function file_download($content, $filename, $extension) {
 	db_close();
 }
 
+function file_dynamic($filename, $lastmod, $query) {
+	global $_josh;
+	if (!file_exists($filename) || (strToTime($lastmod) > filemtime($_josh["root"] . $filename))) file_put($filename, db_grab($query));
+	return true;
+}
+
 function file_folder($folder, $endfilter=false) {
 	global $_josh;
 	error_debug("<b>file folder</b> running with $folder", __file__, __line__);
