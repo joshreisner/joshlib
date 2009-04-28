@@ -439,6 +439,10 @@ function draw_javascript($javascript=false) {
 	';
 }
 
+function draw_javascript_tinymce($path_css="/styles/tinymce.css", $path_script="/_site/tinymce/jscripts/tiny_mce/tiny_mce.js") {
+	return draw_javascript() . draw_javascript_src($path_script) . draw_javascript("form_tinymce_init('" . $path_css . "');");
+}
+
 function draw_javascript_src($filename=false) {
 	global $_josh;
 	if (!$filename && isset($_josh["write_folder"])) {
