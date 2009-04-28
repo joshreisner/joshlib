@@ -440,7 +440,7 @@ function draw_javascript($javascript=false) {
 }
 
 function draw_javascript_tinymce($path_css="/styles/tinymce.css", $path_script="/_site/tinymce/jscripts/tiny_mce/tiny_mce.js") {
-	return draw_javascript() . draw_javascript_src($path_script) . draw_javascript("form_tinymce_init('" . $path_css . "');");
+	return draw_javascript_src() . draw_javascript_src($path_script) . draw_javascript("form_tinymce_init('" . $path_css . "');");
 }
 
 function draw_javascript_src($filename=false) {
@@ -451,12 +451,12 @@ function draw_javascript_src($filename=false) {
 		$content = file_get($_josh["joshlib_folder"] . "/javascript.js");
 		if (!file_exists($_josh["root"] . $filename) || (file_get($filename) != $content)) {
 			file_put($filename, $content);
-			$_josh["drawn"]["javascript"] = true;
 		}
 	} elseif (!$filename) {
 		return error_handle(__FUNCTION__ . " needs the variable _josh[\"write_folder\"] to be set.", __file__, __line__);
 	}
 	//$src = "http://joshlib.joshreisner.com/javascript.js";
+	$_josh["drawn"]["javascript"] = true;
 	return $_josh["newline"] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
