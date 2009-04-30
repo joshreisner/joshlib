@@ -285,11 +285,8 @@ class table {
 					//must be array
 					foreach ($total as $t) {
 						if (isset($v[$t])) {
-							if (isset($totals[$t])) {
-								$totals[$t] += $v[$t];
-							} else {
-								$totals[$t] = $v[$t];							
-							}
+							if (!isset($totals[$t])) $totals[$t] = 0;
+							$totals[$t] += format_numeric($v[$t]);
 						}
 					}
 				}
