@@ -68,7 +68,7 @@ function error_handle($type, $message="") {
 	}
 	if (isset($_SESSION["HTTP_USER_AGENT"])) $message .= "<p>Browser: " . $_SESSION["HTTP_USER_AGENT"] . "</p>";
 	
-	//backtrace
+	/*backtrace
 	$message .= "<p>Backtrace:";
 	foreach ($backtrace as $b) {
 		if (isset($b["args"])) unset($b["args"]);
@@ -80,6 +80,7 @@ function error_handle($type, $message="") {
 	if (isset($_SERVER["HTTP_COOKIE"])) $message .= "Cookies: " . draw_array(array_url($_SERVER["HTTP_COOKIE"], false, ";")) . "</p>";
 	$subject = "Error: " . $type;
 	$message .= "</p>";
+	*/
 	
 	//render
 	$message = error_draw($type, $message);
