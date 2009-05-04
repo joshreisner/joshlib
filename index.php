@@ -283,7 +283,6 @@ class table {
 				}
 				if ($total) {
 					//must be array
-					if (!is_array($total)) error_handle("invalid table call", "\$total must be an array");
 					foreach ($total as $t) {
 						if (isset($v[$t])) {
 							if (!isset($totals[$t])) $totals[$t] = 0;
