@@ -7,6 +7,7 @@
 	css
 	form
 	format
+	img
 	map
 	url
 	window
@@ -138,6 +139,12 @@ function format_title(string) {
 		}
 	}
 	return words.join(" ");
+}
+
+
+/*img*/
+function img_roll(what, how) { 
+	eval("document." + what + ".src = " + what + "_" + how + ".src;"); 
 }
 
 

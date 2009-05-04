@@ -447,6 +447,7 @@ function draw_javascript_src($filename=false) {
 	global $_josh;
 	if (!$filename && isset($_josh["write_folder"])) {
 		if ($_josh["drawn"]["javascript"]) return false; //only draw this file once
+		$_josh["drawn"]["javascript"] = true;
 		$filename = $_josh["write_folder"] . "/javascript.js";
 		$content = file_get($_josh["joshlib_folder"] . "/javascript.js");
 		if (!file_exists($_josh["root"] . $filename) || (file_get($filename) != $content)) {
@@ -456,7 +457,6 @@ function draw_javascript_src($filename=false) {
 		return error_handle(__FUNCTION__ . " needs the variable _josh[\"write_folder\"] to be set.", __file__, __line__);
 	}
 	//$src = "http://joshlib.joshreisner.com/javascript.js";
-	$_josh["drawn"]["javascript"] = true;
 	return $_josh["newline"] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
@@ -485,7 +485,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 	
 	//skip if empty
 	if (!is_array($options) || !count($options)) return false;
-	
+		
 	//$return = $_josh["newline"] . $_josh["newline"] . "<!--start nav-->" . $_josh["newline"] . "<ul class='" . $class . "'>";
 	$return = array();
 	if ($match === false) {
@@ -510,7 +510,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 		} else {
 			$img_state = "_off";
 			if ($type == "rollovers") {
-				$thisoption .= '" onmouseover="javascript:roll(\'' . $name . '\',\'on\');" onmouseout="javascript:roll(\'' . $name . '\',\'off\');';
+				$thisoption .= '" onmouseover="javascript:img_roll(\'' . $name . '\',\'on\');" onmouseout="javascript:img_roll(\'' . $name . '\',\'off\');';
 			}
 		}
 		$thisoption .= '">';
@@ -533,9 +533,8 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 		$return[] = $thisoption;
 		$counter++;
 	}
-	$return = draw_list($return, $class, "ul", $selected);
-	if ($type == "rollovers") $return = draw_javascript('if (document.images) {' . $javascript . '}
-		function roll(what, how) { eval("document." + what + ".src = " + what + "_" + how + ".src;"); }') . $return;
+	$return = 	draw_javascript_src() . draw_list($return, $class, "ul", $selected);
+	if ($type == "rollovers") $return = draw_javascript('if (document.images) {' . $javascript . '}') . $return;
 	return $return;
 }
 

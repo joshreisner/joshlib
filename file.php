@@ -130,28 +130,31 @@ function file_get_type_id($filename, $table="documents_types") {
 
 function file_image_resize($source_name, $target_name, $max_width=false, $max_height=false) {
 	global $_josh;
-	
-	function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
-		//resize an image and save to the $target_name
-		$tmp = imagecreatetruecolor($new_width, $new_height);
-		if (!$image = @imagecreatefromjpeg($source_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
-		imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-		imagejpeg($tmp, $target_name, 100);
-		imagedestroy($tmp);
-		imagedestroy($image);
+	if (!function_exists("resize")) {
+		function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
+			//resize an image and save to the $target_name
+			$tmp = imagecreatetruecolor($new_width, $new_height);
+			if (!$image = @imagecreatefromjpeg($source_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
+			imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+			imagejpeg($tmp, $target_name, 100);
+			imagedestroy($tmp);
+			imagedestroy($image);
+		}
 	}
 	
-	function crop($new_width, $new_height, $target_name) {
-		//crop an image and save to the $target_name
-		list($width, $height) = getimagesize($target_name);
-		$tmp = imagecreatetruecolor($new_width, $new_height);
-		if (!$image = @imagecreatefromjpeg($target_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
-		imagecopyresized($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $new_width, $new_height);
-		imagejpeg($tmp, $target_name, 100);
-		imagedestroy($tmp);
-		imagedestroy($image);
-	}	
-	
+	if (!function_exists("crop")) {
+		function crop($new_width, $new_height, $target_name) {
+			//crop an image and save to the $target_name
+			list($width, $height) = getimagesize($target_name);
+			$tmp = imagecreatetruecolor($new_width, $new_height);
+			if (!$image = @imagecreatefromjpeg($target_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
+			imagecopyresized($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $new_width, $new_height);
+			imagejpeg($tmp, $target_name, 100);
+			imagedestroy($tmp);
+			imagedestroy($image);
+		}	
+	}
+		
 	//$source_name is not rooted because it's likely to be uploaded
 	$target_name = $_josh["root"] . $target_name;
 
@@ -188,7 +191,7 @@ function file_image_resize($source_name, $target_name, $max_width=false, $max_he
 			copy($source_name, $target_name);
 		} else {
 			//resize width
-			$new_height = ($height / $width) * $new_width;
+			$new_height = ($height / $width) * $max_width;
 			resize($max_width, $new_height, $source_name, $target_name, $width, $height);
 		}
 	} elseif ($max_height) { 
