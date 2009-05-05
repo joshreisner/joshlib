@@ -401,6 +401,7 @@ function draw_google_tracker($id) {
 	<script type="text/javascript">
 	try {
 	var pageTracker = _gat._getTracker("' . $id . '");
+	pageTracker._setDomainName("none");
 	pageTracker._trackPageview();
 	} catch(err) {}</script>';
 }
