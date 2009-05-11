@@ -464,7 +464,7 @@ function draw_javascript_src($filename=false) {
 function draw_link($href, $str, $newwindow=false, $other_args=false) {
 	$args = array("href"=>$href);
 	$args["target"] = ($newwindow) ? "_blank" : false;
-	if ($other_args) $args = array_merge($args . $other_args);
+	if ($other_args) $args = array_merge($args, $other_args);
 	return '<a' . draw_args($args) . '>' . $str . '</a>';
 }
 

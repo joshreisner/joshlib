@@ -9,19 +9,36 @@
 	format
 	img
 	map
+	scroll
 	url
 	window
 */
 
 /* css */
 function css_add(object, what) {
-	if (!css_check(object, what)) {
-		object.className += (object.className) ? " " + what : what;
-	}
+	if ((object == null) || (typeof(object) != "object")) return false;
+	if (!css_check(object, what)) object.className += (object.className) ? " " + what : what;
 }
 
 function css_check(object, what) {
 	return new RegExp('\\b' + what + '\\b').test(object.className)
+}
+
+function css_objects(searchClass, node, tag) {
+	//adapted from http://www.dustindiaz.com/getelementsbyclass/
+	var classElements = new Array();
+	if (node == null) node = document;
+	if (tag  == null) tag = '*';
+	var els = node.getElementsByTagName(tag);
+	var elsLen = els.length;
+	var pattern = new RegExp("(^|\\s)"+searchClass+"(\\s|$)");
+	for (i = 0, j = 0; i < elsLen; i++) {
+		if ( pattern.test(els[i].className) ) {
+			classElements[j] = els[i];
+			j++;
+		}
+	}
+	return classElements;
 }
 
 function css_remove(object, what) {
@@ -156,6 +173,63 @@ function map_marker(latitude, longitude, html, icon) {
 		marker.openInfoWindowHtml(html);
 	});
 	return marker;
+}
+
+
+/* scroll*/
+function scroll_init(which, count, width) {
+	scroll_element		= document.getElementById(which);
+	scroll_current		= 1;
+	scroll_count		= count;
+	scroll_width		= width;
+	scroll_initialized	= true;
+	scrolling			= false;
+	if (window.location.hash) {
+		if (parseInt(window.location.hash.substr(1)) <= scroll_count) {
+			scroll_to(window.location.hash.substr(1));
+		} else {
+			window.location.hash = "";
+		}
+	}
+}
+
+function scroll_direction(direction) {
+	if (!scroll_initialized || scrolling) return false;
+	if (direction == "left") {
+		newPallet		= (scroll_current == 1) ? scroll_count : scroll_current - 1;
+	} else {
+		newPallet		= (scroll_current == scroll_count) ? 1 : scroll_current + 1;
+	}
+	scroll_to(newPallet);
+}
+
+function scroll_horizontally() {
+	if (scrollvars.time > scrollvars.duration) {
+		clearInterval(scrollvars.timer);
+		scrollvars.timer = null;
+		window.location.hash = scroll_current;
+		if (typeof(scrollFinished) == "function") scrollFinished(scroll_current);
+		scrolling = false;
+	} else {
+		scrollvars.element.scrollLeft = -scrollvars.change / 2 * (Math.cos(Math.PI * scrollvars.time / scrollvars.duration) - 1) + scrollvars.begin;
+		scrollvars.time++;
+	}
+}
+
+function scroll_to(newPallet) {
+	if (!scroll_initialized || scrolling) return false;
+	scrolling = true;
+	if (typeof(scrollStarted) == "function") scrollStarted(newPallet);
+	currentLocation		= ((scroll_current - 1) * scroll_width);
+	scroll_current		= newPallet;
+	newLocation			= ((newPallet - 1) * scroll_width);
+	scrollvars			= new Object();
+	scrollvars.time		= 0;
+	scrollvars.begin	= currentLocation;
+	scrollvars.change	= newLocation - currentLocation;
+	scrollvars.duration	= 25;
+	scrollvars.element	= scroll_element;
+	scrollvars.timer	= setInterval("scroll_horizontally();", 15);
 }
 
 
