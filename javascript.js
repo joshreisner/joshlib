@@ -267,7 +267,11 @@ function url_query_set(key, value) {
 		}
     } 
     if (!found) pairs[i] = key + "=" + encodeURIComponent(value);
-    location.href = location.href.replace(query, pairs.join("&"));
+    if (query) {
+	    location.href = location.href.replace(query, pairs.join("&"));
+    } else {
+	    location.href = location.href + '?' + pairs.join("&");
+    }
 }
 	
 
