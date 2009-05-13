@@ -406,7 +406,7 @@ function draw_google_tracker($id) {
 	} catch(err) {}</script>';
 }
 
-function draw_img($path, $link=false, $alt=false, $name=false) {
+function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=false) {
 	//alt could also be an array of arguments
 	global $_josh;
 	
@@ -425,7 +425,7 @@ function draw_img($path, $link=false, $alt=false, $name=false) {
 		$args["name"] = $args["class"] = $args["id"] = $name;
 	}
 	$return = draw_tag("img", $args);
-	if ($link) $return = draw_link($link, $return);
+	if ($link) $return = draw_link($link, $return, $linknewwindow);
 	return $return;
 }
 
