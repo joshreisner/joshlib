@@ -461,8 +461,9 @@ function draw_javascript_src($filename=false) {
 	return $_josh["newline"] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
-function draw_link($href, $str, $newwindow=false, $other_args=false) {
+function draw_link($href, $str=false, $newwindow=false, $other_args=false) {
 	$args = array("href"=>$href);
+	if (!$str) $str = format_string($href, 60);
 	$args["target"] = ($newwindow) ? "_blank" : false;
 	if ($other_args) $args = array_merge($args, $other_args);
 	return '<a' . draw_args($args) . '>' . $str . '</a>';
