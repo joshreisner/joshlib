@@ -111,7 +111,7 @@ function db_datediff($date1=false, $date2=false) {
 
 function db_delete($table, $id=false) {
 	//deleting an object does not update it
-	global $_SESSION;
+	global $_SESSION, $_GET;
 	if (!$id) {
 		if (isset($_GET["id"])) {
 			$id = $_GET["id"];
