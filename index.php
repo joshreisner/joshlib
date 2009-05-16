@@ -354,7 +354,7 @@ class form {
 		error_debug("adding field " . $label, __file__, __line__);
 		
 		if (!$name)	$name	= format_text_code($label);
-		if (!$label) $label	= format_text_human($name);
+		if (!isset($label)) $label	= format_text_human($name);
 		if (!$value) $value	= (isset($this->values[$name])) ? $this->values[$name] : false;
 		if (!$class) $class	= "";
 		if (!$option_id) $option_id	= "option_id";

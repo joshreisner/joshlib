@@ -53,7 +53,7 @@ function format_date($timestamp=false, $error="", $format="M d, Y", $relativetim
 
 	if ($timestamp === false) $timestamp = time();
 
-	if (strToUpper($format) == "SQL") {
+	if (stristr($format, "sql")) {
 		$format = "Y-m-d H:i:00";
 		$todaytime = $relativetime = false;
 	}
@@ -412,19 +412,21 @@ function format_post_bits($fieldnames) {
 	foreach ($fields as $field) $_POST[$field] = (isset($_POST[$field])) ? 1 : 0;
 }
 
-function format_post_date($str) {
+function format_post_date($str, $array=false) {
 	global $_POST;
 	
-	$month  = $_POST[$str . "Month"];
-	$day    = $_POST[$str . "Day"];
-	$year   = $_POST[$str . "Year"];
+	if (!$array) $array = $_POST;
 	
-	$hour   = isset($_POST[$str . "Hour"])   ? $_POST[$str . "Hour"]   : 0;
-	$minute = isset($_POST[$str . "Minute"]) ? $_POST[$str . "Minute"] : 0;
-	$second = isset($_POST[$str . "Second"]) ? $_POST[$str . "Second"] : 0;
+	$month  = $array[$str . "Month"];
+	$day    = $array[$str . "Day"];
+	$year   = $array[$str . "Year"];
 	
-	if (isset($_POST[$str . "AMPM"])) {
-		if ($_POST[$str . "AMPM"] == "AM") {
+	$hour   = isset($array[$str . "Hour"])   ? $array[$str . "Hour"]   : 0;
+	$minute = isset($array[$str . "Minute"]) ? $array[$str . "Minute"] : 0;
+	$second = isset($array[$str . "Second"]) ? $array[$str . "Second"] : 0;
+	
+	if (isset($array[$str . "AMPM"])) {
+		if ($array[$str . "AMPM"] == "AM") {
 			if ($hour == 12) $hour = 0;
 		} else {
 			if ($hour != 12) $hour +=12;
@@ -542,7 +544,7 @@ function format_string($str, $len=30, $tail="&hellip;") {
 }
 
 function format_text_code($str) {
-	$return = strToLower($str);
+	$return = strToLower(trim($str));
 	$return = str_replace("/",	"_",	$return);
 	$return = str_replace(" ",	"_",	$return);
 	$return = str_replace("&",	"and",	$return);

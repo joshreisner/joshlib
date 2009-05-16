@@ -1,8 +1,38 @@
 <?php
 error_debug("including array.php", __file__, __line__);
 
+function array_csv($content, $delimiter=",") {
+	error_debug("doing an array csv on delimiter " . $delimiter, __file__, __line__);
+	//input function.  pass it a file_get() 'ed CSV and it will give you an array back
+	//if a header row is present, it will return an array of associative arrays
+	//written by josh on 5/15/09 for work mgmt: harvest import
+	//todo == make header optional
+	
+	$rows = explode("\n", $content);
+	
+	//parse header
+	$columns = array();
+	$header = array_shift($rows);
+	$cells = explode($delimiter, trim($header));
+	foreach ($cells as $c) $columns[] = format_text_code($c);
+	$count = count($columns);
+	
+	//do rows
+	$return = array();
+	foreach ($rows as $r) {
+		$cells = explode($delimiter, trim($r));
+		$thisrow = array();
+		for ($i = 0; $i < $count; $i++) $thisrow[$columns[$i]] = trim(@$cells[$i]);
+		$return[] = $thisrow;
+	}
+	
+	return $return;
+}
+
 function array_key_compare_asc($a, $b) {
 	//for use by array_sort() below
+	//can't imagine a situation where you'd use this normally
+	//todo == figure out whether these should be encapsulated in array_sort
 	global $_josh;
 	error_debug("<b>arrayKeyCompare</b> comparing" . $a[$_josh["sort_key"]], __file__, __line__);
 	return strcmp($a[$_josh["sort_key"]], $b[$_josh["sort_key"]]);
@@ -10,6 +40,8 @@ function array_key_compare_asc($a, $b) {
 
 function array_key_compare_desc($a, $b) {
 	//for use by array_sort() below
+	//can't imagine a situation where you'd use this normally
+	//todo == figure out whether these should be encapsulated in array_sort
 	global $_josh;
 	error_debug("<b>arrayKeyCompare</b> comparing" . $a[$_josh["sort_key"]], __file__, __line__);
 	return strcmp($b[$_josh["sort_key"]], $a[$_josh["sort_key"]]);
@@ -18,9 +50,7 @@ function array_key_compare_desc($a, $b) {
 function array_key_filter($array, $key, $value) {
 	//only return array keys of a particular value
 	$return = array();
-	foreach ($array as $element) {
-		if ($element[$key] == $value) $return[] = $element;
-	}
+	foreach ($array as $element) if ($element[$key] == $value) $return[] = $element;
 	return $return;
 }
 

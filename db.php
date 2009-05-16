@@ -291,10 +291,13 @@ function db_query($query, $limit=false, $suppress_error=false) {
 	}
 }
 
-function db_save($table, $index="id") {
-	global $_SESSION;
+function db_save($table, $index="id", $array=false) {
+	global $_SESSION, $_POST;
 	$id = url_id($index);
+	
 	if (!isset($_SESSION["user_id"])) error_handle("session not set", "db_save needs a session user_id variable");
+	if (!$array) $array = $_POST;
+	
 	$columns	= db_columns($table);
 	$required	= array("id", "created_date", "created_user", "updated_date", "updated_user", "deleted_date", "deleted_user", "is_active");
 	$query1		= array();
@@ -305,21 +308,21 @@ function db_save($table, $index="id") {
 	foreach ($columns as $c) {
 		error_debug("<b>db_save</b> looking at column " . $c["name"] . ", of type " . $c["type"]);
 		if ($indexes = array_keys($required, $c["name"])) {
-			error_debug("<b>db_save</b> unsetting " . $c["name"] . " from post query because it's a system field and handled specially");
+			error_debug("<b>db_save</b> unsetting " . $c["name"] . " from array because it's a system field and handled specially");
 			foreach ($indexes as $i) unset($required[$i]);
-		} elseif (isset($_POST[$c["name"]])) {
+		} elseif (isset($array[$c["name"]])) {
 			if ($c["type"] == "decimal") {
-				$value = format_null(format_numeric($_POST[$c["name"]], false));
+				$value = format_null(format_numeric($array[$c["name"]], false));
 			} elseif ($c["type"] == "int") { //integer
-				$value = format_null(format_numeric($_POST[$c["name"]], true));
+				$value = format_null(format_numeric($array[$c["name"]], true));
 			} elseif ($c["type"] == "mediumblob") { //password (what about file)
-				$value = format_binary($_POST[$c["name"]]);
+				$value = format_binary($array[$c["name"]]);
 			} elseif ($c["type"] == "varchar") { //text
-				$value = "'" . $_POST[$c["name"]] . "'";
+				$value = "'" . $array[$c["name"]] . "'";
 			} elseif ($c["type"] == "text") { //textarea
-				$value = "'" . format_html($_POST[$c["name"]] . "'");
+				$value = "'" . format_html($array[$c["name"]] . "'");
 			} elseif ($c["type"] == "tinyint") { //bit
-				$value = format_boolean($_POST[$c["name"]], "1|0");
+				$value = format_boolean($array[$c["name"]], "1|0");
 			} else {
 				error_handle("unhandled data type", "db_save hasn't been programmed yet to handle" . $c["type"]);
 			}
@@ -330,12 +333,12 @@ function db_save($table, $index="id") {
 				$query1[] = $c["name"];
 				$query2[] = $value;
 			}
-		} elseif (isset($_POST[$c["name"] . "Month"])) {
+		} elseif (isset($array[$c["name"] . "Month"])) {
 			//this could be a date or datetime
 			if ($c["type"] == "datetime") {
-				$value = format_post_date($c["name"]);
+				$value = format_post_date($c["name"], $array);
 			} elseif ($c["type"] == "date") {
-				$value = format_post_date($c["name"]);
+				$value = format_post_date($c["name"], $array);
 			}
 			if ($id) {
 				$query1[] = $c["name"] . " = " . $value;
@@ -353,7 +356,6 @@ function db_save($table, $index="id") {
 				$query1[] = $c["name"];
 				$query2[] = $value;
 			}
-			
 		} elseif ($id) {
 			//we're ok, because we should already have it
 			//echo $c["name"];
@@ -381,9 +383,7 @@ function db_save($table, $index="id") {
 			}
 		}
 	}
-	if (count($required)) {
-		error_handle("required fields missing", "the table $table needs columns for " . implode(", ", $required));
-	}
+	if (count($required)) error_handle("required fields missing", "the table $table needs columns for " . implode(", ", $required));
 	if ($id) {
 		$query1[] = "updated_date = " .  db_date();
 		$query1[] = "updated_user = " . $_SESSION["user_id"];

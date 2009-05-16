@@ -2,6 +2,8 @@
 error_debug("including file.php", __file__, __line__);
 
 function file_array($content, $filename=false) {
+	//output function -- creates a html table file which, if file_downloaded as a .xls, will spoof an excel spreadsheet
+	//all you need to do is pass it a two-dimensional array (i think)
 	$header = false;
 	$rows = "";
 	foreach ($content as $line) {
