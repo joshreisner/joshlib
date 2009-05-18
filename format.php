@@ -314,6 +314,103 @@ function format_html_text($str) {
 	return $return;
 }
 
+function format_image_resize($source, $max_width=false, $max_height=false) {
+	global $_josh;
+	if (!function_exists("resize")) {
+		function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
+			global $_josh;
+			//resize an image and save to the $target_name
+			$tmp = imagecreatetruecolor($new_width, $new_height);
+			if (!$image = imagecreatefromjpeg($_josh["root"] . $source_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
+			imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+			imagejpeg($tmp, $_josh["root"] . $target_name, 100);
+			imagedestroy($tmp);
+			imagedestroy($image);
+		}
+	}
+	
+	if (!function_exists("crop")) {
+		function crop($new_width, $new_height, $target_name) {
+			global $_josh;
+			//crop an image and save to the $target_name
+			list($width, $height) = getimagesize($_josh["root"] . $target_name);
+			$tmp = imagecreatetruecolor($new_width, $new_height);
+			if (!$image = @imagecreatefromjpeg($_josh["root"] . $target_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
+			imagecopyresized($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $new_width, $new_height);
+			imagejpeg($tmp, $_josh["root"] . $target_name, 100);
+			imagedestroy($tmp);
+			imagedestroy($image);
+		}	
+	}
+
+	//exit on error
+	if (!function_exists("imagecreatefromjpeg")) error_handle("library missing", "the GD library needs to be installed to run format_image_resize", __file__, __line__);
+	if (empty($source)) return null;
+
+	//save to file, is file-based operation, unfortunately
+	$source_name = $_josh["write_folder"] . "/temp-source.jpg";
+	$target_name = $_josh["write_folder"] . "/temp-target.jpg";
+	file_put($source_name, $source);
+
+	//get source image dimensions
+	list($width, $height) = getimagesize($_josh["root"] . $source_name);
+	
+	//execute differently depending on target parameters	
+	if ($max_width && $max_height) {
+		//resizing both
+		if (($width == $max_width) && ($height == $max_height)) {
+			//already exact width and height, skip resizing
+			copy($_josh["root"] . $source_name, $_josh["root"] . $target_name);
+		} else {
+			//this was for the scenario where your target was a long landscape and you got a squarish image.
+			//this doesn't work if your target is squarish and you get a long landscape
+			//maybe we need a ratio function?  
+			//square to long scenario: input 400 x 300 (actual 1.3 ratio), target 400 x 100 (target 4) need to resize width then crop target > actual
+			//long to square scenario: input 400 x 100 (actual 4 ratio), target 400 x 300 (target 1.3) need to resize height then crop target < actual
+			$target_ratio = $max_width / $max_height;
+			$actual_ratio = $width / $height;
+			//if ($max_width >= $max_height) {
+			if ($target_ratio >= $actual_ratio) {
+				//landscape or square.  resize width, then crop height
+				$new_height = ($height / $width) * $max_width;
+				resize($max_width, $new_height, $source_name, $target_name, $width, $height);
+			} else {
+				//portrait.  resize height, then crop width
+				$new_width = ($width / $height) * $max_height;
+				resize($new_width, $max_height, $source_name, $target_name, $width, $height);
+			}
+			crop($max_width, $max_height, $target_name);						
+		}
+	} elseif ($max_width) { 
+		//only resizing width
+		if ($width == $max_width) {
+			//already exact width, skip resizing
+			copy($source_name, $target_name);
+		} else {
+			//resize width
+			$new_height = ($height / $width) * $max_width;
+			resize($max_width, $new_height, $source_name, $target_name, $width, $height);
+
+		}
+	} elseif ($max_height) { 
+		//only resizing height	
+		if ($height == $max_height) {
+			//already exact height, skip resizing
+			copy($source_name, $target_name, $source_name, $target_name, $width, $height);
+		} else {
+			//resize height
+			//not implemented yet
+		}
+	}
+	$return = file_get($target_name);
+	
+	//clean up
+	file_delete($source_name);
+	file_delete($target_name);
+	
+	return $return;
+}
+
 function format_js_desanitize() {
 	//javascript function for decoding sanitized strings
 	return '

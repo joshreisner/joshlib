@@ -131,6 +131,8 @@ function file_get_type_id($filename, $table="documents_types") {
 }
 
 function file_image_resize($source_name, $target_name, $max_width=false, $max_height=false) {
+	//this function is deprecated -- use format_image_resize instead
+	//todo -- create function for deprecated functions
 	global $_josh;
 	if (!function_exists("resize")) {
 		function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
@@ -175,7 +177,15 @@ function file_image_resize($source_name, $target_name, $max_width=false, $max_he
 			//already exact width and height, skip resizing
 			copy($source_name, $target_name);
 		} else {
-			if ($max_width >= $max_height) {
+			//this was for the scenario where your target was a long landscape and you got a squarish image.
+			//this doesn't work if your target is squarish and you get a long landscape
+			//maybe we need a ratio function?  
+			//square to long scenario: input 400 x 300 (actual 1.3 ratio), target 400 x 100 (target 4) need to resize width then crop target > actual
+			//long to square scenario: input 400 x 100 (actual 4 ratio), target 400 x 300 (target 1.3) need to resize height then crop target < actual
+			$target_ratio = $max_width / $max_height;
+			$actual_ratio = $width / $height;
+			//if ($max_width >= $max_height) {
+			if ($target_ratio >= $actual_ratio) {
 				//landscape or square.  resize width, then crop height
 				$new_height = ($height / $width) * $max_width;
 				resize($max_width, $new_height, $source_name, $target_name, $width, $height);
@@ -195,6 +205,7 @@ function file_image_resize($source_name, $target_name, $max_width=false, $max_he
 			//resize width
 			$new_height = ($height / $width) * $max_width;
 			resize($max_width, $new_height, $source_name, $target_name, $width, $height);
+
 		}
 	} elseif ($max_height) { 
 		//only resizing height	
@@ -203,7 +214,7 @@ function file_image_resize($source_name, $target_name, $max_width=false, $max_he
 			copy($source_name, $target_name, $source_name, $target_name, $width, $height);
 		} else {
 			//resize height
-			
+			//not implemented yet
 		}
 	}
 	
