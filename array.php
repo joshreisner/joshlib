@@ -8,7 +8,7 @@ function array_csv($content, $delimiter=",") {
 	//written by josh on 5/15/09 for work mgmt: harvest import
 	//todo == make header optional
 	
-	$rows = explode("\n", $content);
+	$rows = explode("\n", trim($content));
 	
 	//parse header
 	$columns = array();

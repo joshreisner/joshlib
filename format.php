@@ -53,11 +53,6 @@ function format_date($timestamp=false, $error="", $format="M d, Y", $relativetim
 
 	if ($timestamp === false) $timestamp = time();
 
-	if (stristr($format, "sql")) {
-		$format = "Y-m-d H:i:00";
-		$todaytime = $relativetime = false;
-	}
-	
 	//reject or convert
 	if (empty($timestamp) || ($timestamp == "Jan 1 1900 12:00AM")) return $error;
 	if (!is_int($timestamp)) $timestamp = strToTime($timestamp);
@@ -70,6 +65,12 @@ function format_date($timestamp=false, $error="", $format="M d, Y", $relativetim
 	$returnyear   = date("Y", $timestamp);
 	$returnmonth  = date("n", $timestamp);
 	$returndate   = mktime(0, 0, 1, $returnmonth, $returnday, $returnyear);
+	
+	//special thing to format for sql
+	if (stristr($format, "sql")) {
+		$format = "Y-m-d H:i:00";
+		$todaytime = $relativetime = false;
+	}
 	
 	if ($relativetime) {
 		//setup return date
@@ -370,6 +371,7 @@ format_numeric forces out a number from a string
 function format_numeric($value, $integer=false) {
 	//take possibly string function and reduce it to just the numeric elements
 	$characters = "0123456789";
+	$value = $value . ""; //force it to be a string
 	if (!$integer) $characters .= ".";
 	$newval = "";
 	for ($i = 0; $i < strlen($value); $i++) if (strpos($characters, $value[$i]) !== false) $newval .= $value[$i];

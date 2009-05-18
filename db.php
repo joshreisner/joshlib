@@ -18,6 +18,35 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 	return $array;
 }
 
+function db_backup($path=false) {
+	///usr/bin/mysqldump --S/tmp/mysql5.sock --opt -ujoshreisner -hlocalhost -pcoterie joshreisner_tasks | gzip > /home/joshreisner/www/work/_site/backups/mysqlbackup_`date +%m_%d_%y`.gz
+	
+	//outputs a gzip backup of the current database
+	global $_josh;
+	extract($_josh["db"]);
+	
+	//only works with mysql right now
+	if ($language != "mysql") error_handle("only mysql supported", "db_backup is a mysql-only function right now");
+
+	//default filename is /_site/backups/YYYY-MM-DD.sql
+	//not including -HH-MM-SS is a feature, not a bug (it prevents some wild sudden disk space situation)
+	//if (!$target) 
+	$target = $_josh["write_folder"] . "/backups/" . date("Y-m-d");
+	
+	//socket hack
+	$location = str_replace(":", "' --socket='", $command);
+	
+	//execute
+	$command = "mysqldump --opt --host='$location' --user='$username' --password='$password' $database | gzip > " . $_josh["root"] . $target . ".gz";
+	
+	//don't quite understand this path_to_mysqldump situation -- hardcoding the hack for icd
+	$command = "/usr/bin/" . $command;
+	//$command = db_path() . "bin/" . $command;
+	die($command);
+	system($command, $return);
+	return $return;
+}
+
 function db_check($table, $column=false) {
 	global $_josh;
 	db_switch("information_schema");
@@ -242,6 +271,14 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	db_switch();
 }
 
+function db_path() {
+	//returns the local path to mysql
+	global $_josh;
+	if ($_josh["db"]["language"] != "mysql") error_handle("only mysql supported", "db_path is a mysql-only function right now");
+	$r = db_fetch(db_query("SHOW VARIABLES LIKE 'datadir'"));
+	return str_replace("/data/", "/", $r["Value"]);
+}
+
 function db_pwdcompare($string, $field) {
 	global $_josh;
 	error_debug("<b>db_pwdcompare</b> running");
@@ -311,7 +348,7 @@ function db_save($table, $index="id", $array=false) {
 			error_debug("<b>db_save</b> unsetting " . $c["name"] . " from array because it's a system field and handled specially");
 			foreach ($indexes as $i) unset($required[$i]);
 		} elseif (isset($array[$c["name"]])) {
-			if ($c["type"] == "decimal") {
+			if (($c["type"] == "decimal") || ($c["type"] == "float")) {
 				$value = format_null(format_numeric($array[$c["name"]], false));
 			} elseif ($c["type"] == "int") { //integer
 				$value = format_null(format_numeric($array[$c["name"]], true));
@@ -323,8 +360,10 @@ function db_save($table, $index="id", $array=false) {
 				$value = "'" . format_html($array[$c["name"]] . "'");
 			} elseif ($c["type"] == "tinyint") { //bit
 				$value = format_boolean($array[$c["name"]], "1|0");
+			} elseif ($c["type"] == "datetime") {
+				$value = "'" . format_date($array[$c["name"]], "", "sql") . "'";
 			} else {
-				error_handle("unhandled data type", "db_save hasn't been programmed yet to handle" . $c["type"]);
+				error_handle("unhandled data type", "db_save hasn't been programmed yet to handle " . $c["type"]);
 			}
 			
 			if ($id) {
