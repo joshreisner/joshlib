@@ -119,7 +119,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 		
 		//only checking for iphone right now
 		$_josh["request"]["mobile"]		= (isset($_SERVER["HTTP_USER_AGENT"]) && strstr($_SERVER["HTTP_USER_AGENT"], "iPhone"));
-	 	$_josh["referrer"]				= (isset($_SERVER["HTTP_REFERER"]))	? url_parse(isset($_SERVER["HTTP_REFERER"])) : false;
+	 	$_josh["referrer"]				= (isset($_SERVER["HTTP_REFERER"]))	? url_parse($_SERVER["HTTP_REFERER"]) : false;
 	} else {
 		//set defaults and hope for the best
 		if (!isset($_josh["debug"]))	$_josh["debug"]		= false;
