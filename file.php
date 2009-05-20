@@ -45,8 +45,8 @@ function file_download($content, $filename, $extension) {
 }
 
 function file_dynamic($filename, $lastmod, $query) {
-	global $_josh;
-	if (!file_exists($filename) || (strToTime($lastmod) > filemtime($_josh["root"] . $filename))) file_put($filename, db_grab($query));
+	global $_josh; // mtime = 1242850776, lastmod = 1242682931
+	if (!file_exists($_josh["root"] . $filename) || (strToTime($lastmod) > filemtime($_josh["root"] . $filename))) file_put($filename, db_grab($query));
 	return true;
 }
 
