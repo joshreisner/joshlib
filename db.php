@@ -358,7 +358,7 @@ function db_save($table, $index="id", $array=false) {
 				$value = "'" . $array[$c["name"]] . "'";
 			} elseif ($c["type"] == "text") { //textarea
 				$value = "'" . format_html($array[$c["name"]] . "'");
-			} elseif ($c["type"] == "tinyint") { //bit
+			} elseif (($c["type"] == "tinyint") || ($c["type"] == "bit")) { //bit
 				$value = format_boolean($array[$c["name"]], "1|0");
 			} elseif ($c["type"] == "datetime") {
 				$value = "'" . format_date($array[$c["name"]], "", "sql") . "'";

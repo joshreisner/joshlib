@@ -1,7 +1,13 @@
 <?php
-/* welcome to joshlib
-http://code.google.com/p/joshlib/ (wiki / documentation / tracking)
-http://joshlib.joshreisner.com/ (eventual website)
+/* 
+WELCOME TO JOSHLIB
+	http://code.google.com/p/joshlib/ (wiki / documentation / tracking)
+	http://joshlib.joshreisner.com/ (eventual website)
+
+ACKNOWLEDGEMENTS
+	> simple_html_dom	-- included as html.php.  more info there.  wonderful.  thank you sirs.  format_html() & form class references this.
+	> moxiecode tinymce	-- not included, but frequently used with this library
+	> fpdf				-- you are magic
 
 the purpose of this page (index.php) is to set a bunch of variables that joshlib is going to need, 
 and define some functions that don't fit anywhere else
@@ -37,13 +43,13 @@ so if joshlib is run from the command line, these variables would be good to hav
 	$_josh["slow"]				true or false; whether to use javascript when redirecting (true) or header variables (false)
 	$_josh["mobile"]			true or false
 
-functions defined here:
+misc functions defined here:
 	cookie
 	daysInMonth
 	debug
 	geocode
 	
-classes defined here:
+misc classes defined here:
 	table
 	form
 	
@@ -91,8 +97,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	require($_josh["joshlib_folder"] . "/email.php");
 	require($_josh["joshlib_folder"] . "/file.php");
 	require($_josh["joshlib_folder"] . "/format.php");
-	require($_josh["joshlib_folder"] . "/htmlawed.php");
-	require($_josh["joshlib_folder"] . "/simple_html_dom.php");
+	require($_josh["joshlib_folder"] . "/html.php");
 	require($_josh["joshlib_folder"] . "/url.php");
 
 //parse environment variables
@@ -176,21 +181,17 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	}
 
 
-//escape quotes if necessary
+//set convenience state variables and escape quotes if necessary
 	$_josh["getting"]	= !empty($_GET);
 	if ($_josh["getting"]) foreach($_GET as $key=>$value) $_GET[$key] = format_quotes($value);
 	
-	$_josh["editing"]	= url_id();
-	
-	/* not working yet
 	$_josh["uploading"]	= !empty($_FILES);
-	if ($_josh["uploading"]) {
-		foreach($_FILES as $file) $_FILES[$file]["name"] = format_quotes($_FILES[$file]["name"]);
-	} */
-
+	if ($_josh["uploading"]) foreach($_FILES as $file) $_FILES[$file]["name"] = format_quotes($_FILES[$file]["name"]);
 	
 	$_josh["posting"]	= !empty($_POST);
 	if ($_josh["posting"]) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes($value);
+	
+	$_josh["editing"]	= url_id();
 	
 	
 //special functions that don't yet fit into a category

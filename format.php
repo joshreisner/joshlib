@@ -178,95 +178,78 @@ function format_hilite($haystack, $needles, $style="background-color:#FFFFBB;pad
 }
 
 function format_html($text) {
-	$text = htmLawed($text, array('comment'=>1, 'cdata'=>1));
-	$text = str_replace("<p>&nbsp;</p>", "", $text);
-	$text = str_replace(">&nbsp;</", "></", $text);
-	return $text;
-}
-
-function format_html2($text) {
-	//clean up microsoft formatting when pasted into TinyMCE
-	error_debug("<b>format_html</b> about to clean up " . format_string($text, 300), __file__, __line__);
-	
-	$text = format_html2_cleanup($text);
-	//echo $text . "<hr>";
-	$text = format_html2_get_text($text);	
-	
-	
-	return $text;
-}
-
-function format_html2_unset($e) {
-	if (@$e->innertext) $e->innertext = "";
-	if (@$e->outertext) $e->outertext = "";
-	if (@$e->children) foreach($e->children as $f) format_html2_unset($f);
-}
-
-function format_html2_cleanup($text) {
 	$html = str_get_html($text);
 
 	$html->set_callback('cleanup');
 	
-	function cleanup($e) {
-		//this callback is used to clear out bad tags and attributes
-		//never want these tags, or anything inside them
-		$bad_tags = array("comment", "form", "iframe", "label", "noscript", "script", "unknown");
-		if (in_array($e->tag, $bad_tags)) format_html2_unset($e);
-		
-		//these are the tags we want	
-		$good_tags1	= array("a", "b", "blockquote", "br", "dir", "div", "h1", "h2", "h3", "h4", "h5", "i", "img");
-		$good_tags2	= array("p", "span", "strong", "text", "table", "tr", "td", "th", "ol", "ul", "li");
-		$good_tags = array_merge($good_tags1, $good_tags2);
-		
-		if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : "";
-				
-		//never want these attributes
-		$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title");
-		foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
-		
-		//certain tags we are wary of
-		if ($e->tag == "a") {
-			//no in-page links or anchors
-			if (!$e->href || (substr($e->href, 0, 1) == "#")) $e->outertext = "";
-		} elseif ($e->tag == "div") {
-			//no empty divs
-			if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = "";
-		} elseif ($e->tag == "img") {
-			//no small, narrow or flat images
-			if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) $e->outertext = "";
-		} elseif ($e->tag == "span") {
-			if ($e->src) {
-				//nytimes has this -- i'm not sure yet if it's good or not
-			} elseif ($e->children || $e->plaintext) {
-				//ditch the span, keep the contents
-				$e->outertext = $e->innertext;
-			} else {
-				//ditch the empty span
-				$e->outertext = "";
-			}
-		} elseif ($e->tag == "strong") {
-			//personal preference: replace <strong> with <b>
-			$e->outertext = "<b>" . $e->innertext . "</b>";
-		} elseif ($e->tag == "em") {
-			//personal preference: replace <strong> with <b>
-			$e->outertext = "<i>" . $e->innertext . "</i>";
+	if (!function_exists("tag_unset")) {
+		function tag_unset($e) {
+			if (@$e->innertext) $e->innertext = "";
+			if (@$e->outertext) $e->outertext = "";
+			if (@$e->children) foreach($e->children as $f) tag_unset($f);
 		}
-		//this could be a time to trim text
-		//if (@$e->outertext && !strlen(trim($e->outertext))) $e->outertext = "";
-	}
 	
+		function cleanup($e) {
+			//this callback is used to clear out bad tags and attributes
+			//never want these tags, or anything inside them
+			$bad_tags = array("comment", "form", "iframe", "label", "noscript", "script", "unknown");
+			if (in_array($e->tag, $bad_tags)) tag_unset($e);
+			
+			//these are the tags we want	
+			$good_tags1	= array("a", "b", "blockquote", "br", "dir", "div", "h1", "h2", "h3", "h4", "h5", "i", "img");
+			$good_tags2	= array("p", "span", "strong", "text", "table", "tr", "td", "th", "ol", "ul", "li");
+			$good_tags = array_merge($good_tags1, $good_tags2);
+			
+			if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : "";
+					
+			//never want these attributes
+			$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title");
+			foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
+			
+			//certain tags we are wary of
+			if ($e->tag == "a") {
+				//no in-page links or anchors
+				if (!$e->href || (substr($e->href, 0, 1) == "#")) $e->outertext = "";
+			} elseif ($e->tag == "div") {
+				//no empty divs
+				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = "";
+			} elseif ($e->tag == "img") {
+				//no small, narrow or flat images
+				if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) $e->outertext = "";
+			} elseif ($e->tag == "span") {
+				if ($e->src) {
+					//nytimes has this -- i'm not sure yet if it's good or not
+				} elseif ($e->children || $e->plaintext) {
+					//ditch the span, keep the contents
+					$e->outertext = $e->innertext;
+				} else {
+					//ditch the empty span
+					$e->outertext = "";
+				}
+			} elseif ($e->tag == "strong") {
+				//personal preference: replace <strong> with <b>
+				$e->outertext = "<b>" . $e->innertext . "</b>";
+			} elseif ($e->tag == "em") {
+				//personal preference: replace <strong> with <b>
+				$e->outertext = "<i>" . $e->innertext . "</i>";
+			}
+			//this could be a time to trim text
+			//if (@$e->outertext && !strlen(trim($e->outertext))) $e->outertext = "";
+		}
+	}
+		
 	//reset html to get rid of artifacts and compress
 	$text = trim($html->save());
 	$html->clear();
 	return $text;
 }
 
-function format_html2_get_text($text) {
+function format_html_trim($text) {
 	global $_josh;
 	//find td, div or body with longest text block
 	$html = str_get_html($text);
 	$blocks = $html->find("text");
-	foreach ($blocks as $b) format_html2_set_max(strlen(trim($b)));
+	foreach ($blocks as $b) format_html_set_max(strlen(trim($b)));
 	
 	function get_parent($e) {
 		$options = array("td", "div", "body");
@@ -296,7 +279,7 @@ function format_html2_get_text($text) {
 	return $text;
 }
 
-function format_html2_set_max($len) {
+function format_html_set_max($len) {
 	//helper function for above, due to weird scope reason i don't fully comprehend
 	global $_josh;
 	if (!isset($_josh["max_text_len"])) $_josh["max_text_len"] = 0;
@@ -316,6 +299,11 @@ function format_html_text($str) {
 
 function format_image_resize($source, $max_width=false, $max_height=false) {
 	global $_josh;
+
+	//exit on error
+	if (!function_exists("imagecreatefromjpeg")) error_handle("library missing", "the GD library needs to be installed to run format_image_resize", __file__, __line__);
+	if (empty($source)) return null;
+
 	if (!function_exists("resize")) {
 		function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
 			global $_josh;
@@ -327,9 +315,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 			imagedestroy($tmp);
 			imagedestroy($image);
 		}
-	}
-	
-	if (!function_exists("crop")) {
+
 		function crop($new_width, $new_height, $target_name) {
 			global $_josh;
 			//crop an image and save to the $target_name
@@ -342,10 +328,6 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 			imagedestroy($image);
 		}	
 	}
-
-	//exit on error
-	if (!function_exists("imagecreatefromjpeg")) error_handle("library missing", "the GD library needs to be installed to run format_image_resize", __file__, __line__);
-	if (empty($source)) return null;
 
 	//save to file, is file-based operation, unfortunately
 	$source_name = $_josh["write_folder"] . "/temp-source.jpg";
