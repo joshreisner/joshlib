@@ -29,20 +29,18 @@ function db_backup($path=false) {
 	if ($language != "mysql") error_handle("only mysql supported", "db_backup is a mysql-only function right now");
 
 	//default filename is /_site/backups/YYYY-MM-DD.sql
-	//not including -HH-MM-SS is a feature, not a bug (it prevents some wild sudden disk space situation)
-	//if (!$target) 
-	$target = $_josh["write_folder"] . "/backups/" . date("Y-m-d");
-	
-	//socket hack
-	$location = str_replace(":", "' --socket='", $command);
-	
+	$target = $_josh["root"] . $_josh["write_folder"] . "/backups/" . date("Y-m-d");
+		
 	//execute
-	$command = "mysqldump --opt --host='$location' --user='$username' --password='$password' $database | gzip > " . $_josh["root"] . $target . ".gz";
+	$command = "mysqldump --opt --host='$location' --user='$username' --password='$password' $database | gzip > $target.gz";
+
+	//socket hack
+	$command = str_replace(":", "' --socket='", $command);
 	
 	//don't quite understand this path_to_mysqldump situation -- hardcoding the hack for icd
 	$command = "/usr/bin/" . $command;
 	//$command = db_path() . "bin/" . $command;
-	die($command);
+
 	system($command, $return);
 	return $return;
 }
