@@ -186,7 +186,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	if ($_josh["getting"]) foreach($_GET as $key=>$value) $_GET[$key] = format_quotes($value);
 	
 	$_josh["uploading"]	= !empty($_FILES);
-	if ($_josh["uploading"]) foreach($_FILES as $file) $_FILES[$file]["name"] = format_quotes($_FILES[$file]["name"]);
+	//if ($_josh["uploading"]) foreach($_FILES as $file) $_FILES[$file]["name"] = format_quotes($_FILES[$file]["name"]);
 	
 	$_josh["posting"]	= !empty($_POST);
 	if ($_josh["posting"]) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes($value);

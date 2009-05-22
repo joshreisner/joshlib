@@ -244,6 +244,16 @@ function format_html($text) {
 	return $text;
 }
 
+function format_html_entities($string) {
+	$string = htmlentities($string);
+	$string = str_replace("‘", "&lsquo;", $string); //left single quote
+	$string = str_replace("’", "&rsquo;", $string); //right single quote
+	$string = str_replace("“", "&ldquo;", $string); //left double quote
+	$string = str_replace("”", "&rdquo;", $string); //right double quote
+	$string = str_replace("—", "&mdash;", $string); //em dash
+	return $string;
+}
+
 function format_html_trim($text) {
 	global $_josh;
 	//find td, div or body with longest text block

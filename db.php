@@ -353,7 +353,7 @@ function db_save($table, $index="id", $array=false) {
 			} elseif ($c["type"] == "mediumblob") { //password (what about file)
 				$value = format_binary($array[$c["name"]]);
 			} elseif ($c["type"] == "varchar") { //text
-				$value = "'" . $array[$c["name"]] . "'";
+				$value = "'" . format_html_entities($array[$c["name"]]) . "'";
 			} elseif ($c["type"] == "text") { //textarea
 				$value = "'" . format_html($array[$c["name"]] . "'");
 			} elseif (($c["type"] == "tinyint") || ($c["type"] == "bit")) { //bit
