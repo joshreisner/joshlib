@@ -226,7 +226,7 @@ function draw_form_focus($name) {
 }
 
 function draw_form_hidden($name, $value="") {
-	return '<input type="hidden" name="' . $name . '" value="' . $value . '">';
+	return draw_tag("input", array("type"=>"hidden", "name"=>$name, "id"=>$name, "value"=>$value));
 }
 
 function draw_form_password($name, $value="", $class=false, $maxlength=255, $autocomplete=true) {
