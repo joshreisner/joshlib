@@ -78,9 +78,9 @@ function error_handle($type, $message="") {
 	
 	//cookies
 	if (isset($_SERVER["HTTP_COOKIE"])) $message .= "Cookies: " . draw_array(array_url($_SERVER["HTTP_COOKIE"], false, ";")) . "</p>";
-	$subject = "Error: " . $type;
 	$message .= "</p>";
 	*/
+	$subject = "Error: " . $type;
 	
 	//render
 	$message = error_draw($type, $message);

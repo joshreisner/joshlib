@@ -447,12 +447,13 @@ function draw_javascript_tinymce($path_css="/styles/tinymce.css", $path_script="
 function draw_javascript_src($filename=false) {
 	global $_josh;
 	if (!$filename && isset($_josh["write_folder"])) {
-		if ($_josh["drawn"]["javascript"]) return false; //only draw this file once
+		if ($_josh["drawn"]["javascript"]) return false; //only draw this file once per page
 		$_josh["drawn"]["javascript"] = true;
 		$filename = $_josh["write_folder"] . "/javascript.js";
-		$content = file_get($_josh["joshlib_folder"] . "/javascript.js");
-		if (!file_exists($_josh["root"] . $filename) || (file_get($filename) != $content)) {
-			file_put($filename, $content);
+		$joshlibf = $_josh["joshlib_folder"] . "/javascript.js";
+		if (!file_is($filename) || (filemtime($joshlibf) > filemtime($filename))) {
+			//either doesn't exist or is out-of-date
+			if (!file_put($filename, file_get($joshlibf))) return error_handle(__FUNCTION__ . " can't write the js file.", __file__, __line__);
 		}
 	} elseif (!$filename) {
 		return error_handle(__FUNCTION__ . " needs the variable _josh[\"write_folder\"] to be set.", __file__, __line__);

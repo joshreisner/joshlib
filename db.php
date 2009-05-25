@@ -113,7 +113,22 @@ function db_columns($tablename) {
 			$return[] = compact("name","type","required","default");
 		}
 	} else {
-		error_handle("mssql not supported yet", "mssql is not yet supported for db_columns");
+		$return = db_table("SELECT 
+				c.name, 
+				t.name type, 
+				CASE WHEN c.isnullable = 0 THEN 1 ELSE 0 END required, 
+				m.text [default]
+			FROM syscolumns c
+			JOIN sysobjects o ON o.id = c.id
+			JOIN systypes t on c.xtype = t.xtype
+			LEFT JOIN syscomments m on c.cdefault = m.id
+			WHERE o.name = '$tablename'
+			ORDER BY c.colorder
+			");
+		foreach ($return as &$c) {
+			//remove parens from default
+			if ($c["default"]) $c["default"] = substr($c["default"], 1, strlen($c["default"]) - 2);
+		}
 	}
 	return $return;
 }
