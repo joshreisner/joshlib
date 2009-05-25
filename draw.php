@@ -451,7 +451,7 @@ function draw_javascript_src($filename=false) {
 		$_josh["drawn"]["javascript"] = true;
 		$filename = $_josh["write_folder"] . "/javascript.js";
 		$joshlibf = $_josh["joshlib_folder"] . "/javascript.js";
-		if (!file_is($filename) || (filemtime($joshlibf) > filemtime($filename))) {
+		if (!file_is($filename) || (filemtime($joshlibf) > filemtime($_josh["root"] . $filename))) {
 			//either doesn't exist or is out-of-date
 			if (!file_put($filename, file_get($joshlibf))) return error_handle(__FUNCTION__ . " can't write the js file.", __file__, __line__);
 		}
