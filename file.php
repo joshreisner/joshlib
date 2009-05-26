@@ -124,11 +124,20 @@ function file_get_max($pretty=true) {
 }
 
 function file_get_type_id($filename, $table="documents_types") {
-	list($filename, $extension) = file_name($_FILES["content"]["name"]);
+	list($filename, $extension) = file_name($filename);
 	if (!$type_id = db_grab("SELECT id FROM " . $table . " WHERE extension = '" . $extension . "'")) {
 		return db_query("INSERT INTO " . $table . " ( extension ) VALUES ( '" . $extension . "' )");
 	}
 	return $type_id;
+}
+
+function file_get_uploaded($fieldname, $table=false) {
+	global $_FILES;
+	error_debug("<b>file_get_uploaded</b> running ~ user is uploading a file");
+	$content = file_get($_FILES[$fieldname]["tmp_name"]);
+	@unlink($_FILES[$fieldname]["tmp_name"]);
+	if ($table) return array($content, file_get_type_id($_FILES[$fieldname]["name"], $table));
+	return $content;
 }
 
 function file_import_fixedlength($content, $definitions) {

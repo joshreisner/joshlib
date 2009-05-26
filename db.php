@@ -250,11 +250,12 @@ function db_num_fields($result) {
 
 function db_open($location=false, $username=false, $password=false, $database=false, $language=false) {
 	global $_josh;
-	error_debug("<b>db_open</b> running");
-
+	
 	//skip if already connected
 	if (isset($_josh["db"]["pointer"])) return;
 	
+	error_debug("<b>db_open</b> running");
+
 	//reset variables if you're specifying which ones to use
 	if ($location) $_josh["db"]["location"] = $location;
 	if ($username) $_josh["db"]["username"] = $username;
@@ -341,9 +342,11 @@ function db_query($query, $limit=false, $suppress_error=false) {
 	}
 }
 
-function db_save($table, $index="id", $array=false) {
+function db_save($table, $id="get", $array=false) {
 	global $_SESSION, $_POST;
-	$id = url_id($index);
+	
+	//default behavior is to use $_GET["id"] as the id number to deal with
+	if ($id == "get") $id = url_id();
 	
 	if (!isset($_SESSION["user_id"])) error_handle("session not set", "db_save needs a session user_id variable");
 	if (!$array) $array = $_POST;
@@ -439,7 +442,8 @@ function db_save($table, $index="id", $array=false) {
 	if ($id) {
 		$query1[] = "updated_date = " .  db_date();
 		$query1[] = "updated_user = " . $_SESSION["user_id"];
-		$query = "UPDATE $table SET " . implode(", ", $query1) . " WHERE id = " . $id;
+		if (db_query("UPDATE $table SET " . implode(", ", $query1) . " WHERE id = " . $id)) return $id;
+		return false;
 	} else {
 		$query1[] = "created_date";
 		$query2[] = db_date();
@@ -448,9 +452,9 @@ function db_save($table, $index="id", $array=false) {
 		$query1[] = "is_active";
 		$query2[] = 1;
 		$query = "INSERT INTO $table ( " . implode(", ", $query1) . " ) VALUES ( " . implode(", ", $query2) . " )";
+		return db_query($query);
 	}
 	//die($query);
-	return db_query($query);
 }
 
 function db_switch($target=false) {
