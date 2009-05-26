@@ -368,10 +368,11 @@ function db_save($table, $id="get", $array=false) {
 				$value = format_null(format_numeric($array[$c["name"]], false));
 			} elseif ($c["type"] == "int") { //integer
 				$value = format_null(format_numeric($array[$c["name"]], true));
-			} elseif ($c["type"] == "mediumblob") { //password (what about file)
+			} elseif (($c["type"] == "mediumblob") || ($c["type"] == "image")) { //document
 				$value = format_binary($array[$c["name"]]);
 			} elseif ($c["type"] == "varchar") { //text
 				$value = "'" . format_html_entities($array[$c["name"]]) . "'";
+				if (($value == "''") && (!$c["required"])) $value = "NULL"; //special null
 			} elseif ($c["type"] == "text") { //textarea
 				$value = "'" . format_html($array[$c["name"]] . "'");
 			} elseif (($c["type"] == "tinyint") || ($c["type"] == "bit")) { //bit

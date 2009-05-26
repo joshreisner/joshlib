@@ -13,7 +13,7 @@ function email($to, $message, $subject="Email from Your Website", $from=false) {
 		$headers .= "From: " . $_josh["email_default"] . $_josh["newline"];
 	}
 	$to = format_email($to);
-	if (!mail($to, $subject, $message, $headers)) {
+	if (!@mail($to, $subject, $message, $headers)) {
 		error_handle("email not sent", "sorry, an unexpected error occurred while sending your mail to " . $to, true);
 	}
 	return true;

@@ -44,6 +44,10 @@ function error_handle($type, $message="") {
 	if (!isset($_josh["mode"]))  $_josh["mode"] = "dev";
 	if (!isset($_josh["debug"])) $_josh["debug"] = false;
 	
+	//don't let this happen recursively
+	if (isset($_josh["emailing_error"]) && $_josh["emailing_error"]) return false;
+	$_josh["emailing_error"] = true;
+	
 	if (($_josh["mode"] == "dev") && $_josh["debug"]) exit;
 	
 	//get backtrace
