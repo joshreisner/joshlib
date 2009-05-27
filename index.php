@@ -104,8 +104,14 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	if (isset($_SERVER) && isset($_SERVER["HTTP_HOST"]) && isset($_SERVER["SCRIPT_NAME"])) { //this could not be set if this were running from the command line (eg by a cron)
 		//build request as string, then set it to array with url_parse
 		$_josh["request"] = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) ? "https" : "http";
-		$_josh["request"] .= "://" . $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"];
-		if (isset($_SERVER["QUERY_STRING"])) $_josh["request"] .= "?" . $_SERVER["QUERY_STRING"];
+		$_josh["request"] .= "://" . $_SERVER["HTTP_HOST"];
+		if (isset($_SERVER["REDIRECT_URL"])) { //we are using mod_rewrite
+			$_josh["request"] .= $_SERVER["REDIRECT_URL"];
+			if (isset($_SERVER["REDIRECT_QUERY_STRING"])) $_josh["request"] .= "?" . $_SERVER["REDIRECT_QUERY_STRING"];
+		} else {
+			$_josh["request"] .= $_SERVER["SCRIPT_NAME"];
+			if (isset($_SERVER["QUERY_STRING"])) $_josh["request"] .= "?" . $_SERVER["QUERY_STRING"];
+		}
 		$_josh["request"] = url_parse($_josh["request"]);
 			
 		//platform-specific info

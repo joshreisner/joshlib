@@ -58,6 +58,23 @@ function url_change_post($target="") {
 	url_change($target);
 }
 
+function url_cms_decode($str, $host=false) {
+	global $_josh;
+	if (!$host) $host = $_josh["request"]["host"];
+	//a properly-formed cms url has no host, no leading or trailing slashes, and periods instead of internal slashes, for caches and db storage
+	$str = str_replace(".", "/", $str);
+	return "http://" . $host . "/" . $str . "/";
+}
+
+function url_cms_encode($str) {
+	$url = url_parse($str);
+	if (format_text_starts("/", $url["path"])) $url["path"] = substr($url["path"], 1);
+	if (format_text_ends("/", $url["path"])) $url["path"] = substr($url["path"], 0, strlen($url["path"]) - 1);
+	$url["path"] = str_replace("/", ".", $url["path"]);
+	//die($url["path"]);
+	return $url["path"];
+}
+
 function url_drop($deletes=false, $go=true) {
 	//alias for url_query_drop
 	return url_query_drop($deletes, $go);
@@ -121,6 +138,7 @@ function url_parse($url) {
 
 	if (!isset($return["path"])) $return["path"] = "";
 	$return["domainname"]	= $domainname;
+	$return["tld"]			= str_replace(".", "", $tld);
 	$return["domain"]		= $domainname . $tld;
 	$return["usingwww"]		= (substr($return["host"], 0, 4) == "www.") ? 1 : 0;
 	$return["sanswww"]		= ($return["usingwww"]) ? substr($return["host"], 4) : $return["host"];
