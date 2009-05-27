@@ -22,6 +22,11 @@ function file_array($content, $filename=false) {
 	return $content;
 }
 
+function file_check($filename) {
+	global $_josh;
+	return @filesize($_josh["root"] . $filename);
+}
+
 function file_delete($filename) {
 	global $_josh;
 	if (file_exists($_josh["root"] . $filename)) unlink($_josh["root"] . $filename);
@@ -55,13 +60,9 @@ function file_folder($folder, $endfilter=false) {
 	error_debug("<b>file folder</b> running with $folder", __file__, __line__);
 	
 	//check to make sure folder exists
-	if (!is_dir($folder)) {
-		error_debug("<b>file folder</b> $folder is not a directory", __file__, __line__);
-		$folder = $_josh["root"] . $folder;
-		if (!is_dir($folder)) {
-			error_debug("<b>file folder</b> $folder is not a directory either, exiting", __file__, __line__);
-			return false;
-		}
+	if (!is_dir($_josh["root"] . $folder)) {
+		error_debug("<b>file folder</b> $folder is not a directory, exiting", __file__, __line__);
+		return false;
 	}
 	error_debug("<b>file folder</b> $folder is a directory!", __file__, __line__);
 
@@ -69,8 +70,7 @@ function file_folder($folder, $endfilter=false) {
 	if ($endfilter) $endfilter = explode(",", $endfilter);
 
 	//open it
-	if ($handle = opendir($folder)) {
-		error_debug("<b>file folder</b> $folder opened", __file__, __line__);
+	if ($handle = opendir($_josh["root"] . $folder)) {
 		$return = array();
 		while (($name = readdir($handle)) !== false) {
 			if (($name == ".") || ($name == "..") || ($name == ".DS_Store")) continue;
@@ -80,9 +80,9 @@ function file_folder($folder, $endfilter=false) {
 				"ext"=>array_pop($nameparts),
 				"human"=>format_text_human(implode(" ", $nameparts)), 
 				"path_name"=>$folder . $name,
-				"type"=>filetype($folder . $name),
-				"fmod"=>filemtime($folder . $name),
-				"size"=>filesize($folder . $name)
+				"type"=>filetype($_josh["root"] . $folder . $name),
+				"fmod"=>filemtime($_josh["root"] . $folder . $name),
+				"size"=>filesize($_josh["root"] . $folder . $name)
 			);
 			if ($thisfile["type"] == "dir") $thisfile["path_name"] .= "/";
 			error_debug("<b>file folder</b> found " . $thisfile["name"] . " of type " . $thisfile["type"], __file__, __line__);
@@ -97,8 +97,8 @@ function file_folder($folder, $endfilter=false) {
 		error_debug("<b>file folder</b> closing handle", __file__, __line__);
 		closedir($handle);
 		if (count($return)) return array_sort($return);
-		error_debug("<b>file folder</b> no return count", __file__, __line__);
 	}
+	error_debug("<b>file folder</b> no return count", __file__, __line__);
 	return false;
 }
 
@@ -156,6 +156,7 @@ function file_import_fixedlength($content, $definitions) {
 }
 
 function file_is($filename) {
+	//deprecated, use file_check
 	global $_josh;
 	return file_exists($_josh["root"] . $filename);
 }

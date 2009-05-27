@@ -18,31 +18,41 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 	return $array;
 }
 
-function db_backup($path=false) {
-	///usr/bin/mysqldump --S/tmp/mysql5.sock --opt -ujoshreisner -hlocalhost -pcoterie joshreisner_tasks | gzip > /home/joshreisner/www/work/_site/backups/mysqlbackup_`date +%m_%d_%y`.gz
-	
+function db_backup($limit=false) {
 	//outputs a gzip backup of the current database
 	global $_josh;
-	extract($_josh["db"]);
+	
+	//default filename is /_site/backups/YYYY-MM-DD.sql -- delete any existing file of that name
+	$folder = $_josh["write_folder"] . "/backups/";
+	$target = $folder . date("Y-m-d") . ".gz";
+	file_delete($target);
+	
+	if ($limit) {
+		//limit the number of backup files that live in this directory
+		if ($files = file_folder($folder, ".gz")) {
+			$delete = count($files) - $limit + 1;
+			for ($i = 0; $i < $delete; $i++) file_delete($files[$i]["path_name"]);
+		}
+	}
 	
 	//only works with mysql right now
+	extract($_josh["db"]);
 	if ($language != "mysql") error_handle("only mysql supported", "db_backup is a mysql-only function right now");
 
-	//default filename is /_site/backups/YYYY-MM-DD.sql
-	$target = $_josh["root"] . $_josh["write_folder"] . "/backups/" . date("Y-m-d");
-		
-	//execute
-	$command = "mysqldump --opt --host='$location' --user='$username' --password='$password' $database | gzip > $target.gz";
-
-	//socket hack
+	//build command, socket hack, execute
+	$command = "mysqldump --opt --host='$location' --user='$username' --password='$password' $database | gzip > " . $_josh["root"] . $target;
+	if (isset($_josh["mysqldump_path"])) $command = $_josh["mysqldump_path"] . $command;
 	$command = str_replace(":", "' --socket='", $command);
+	system($command);
 	
-	//don't quite understand this path_to_mysqldump situation -- hardcoding the hack for icd
-	$command = "/usr/bin/" . $command;
-	//$command = db_path() . "bin/" . $command;
-
-	system($command, $return);
-	return $return;
+	if (file_check($target) > 200) { //sometimes when it fails, mysqldump creates a file that's 20B
+		//export was a success.  return the path for linking.
+		return $target;
+	} else {
+		//export failed
+		file_delete($target);
+		return false;
+	}
 }
 
 function db_check($table, $column=false) {
@@ -283,14 +293,6 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	
 	//select db
 	db_switch();
-}
-
-function db_path() {
-	//returns the local path to mysql
-	global $_josh;
-	if ($_josh["db"]["language"] != "mysql") error_handle("only mysql supported", "db_path is a mysql-only function right now");
-	$r = db_fetch(db_query("SHOW VARIABLES LIKE 'datadir'"));
-	return str_replace("/data/", "/", $r["Value"]);
 }
 
 function db_pwdcompare($string, $field) {
