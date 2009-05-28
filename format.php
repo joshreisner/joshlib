@@ -203,7 +203,7 @@ function format_html($text) {
 			if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : "";
 					
 			//never want these attributes
-			$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title");
+			$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title", "width");
 			foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
 			
 			//certain tags we are wary of
@@ -213,6 +213,9 @@ function format_html($text) {
 			} elseif ($e->tag == "div") {
 				//no empty divs
 				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = "";
+			} elseif ($e->tag == "em") {
+				//personal preference: replace <strong> with <b>
+				$e->outertext = "<i>" . $e->innertext . "</i>";
 			} elseif ($e->tag == "img") {
 				//no small, narrow or flat images
 				if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) $e->outertext = "";
@@ -229,9 +232,9 @@ function format_html($text) {
 			} elseif ($e->tag == "strong") {
 				//personal preference: replace <strong> with <b>
 				$e->outertext = "<b>" . $e->innertext . "</b>";
-			} elseif ($e->tag == "em") {
-				//personal preference: replace <strong> with <b>
-				$e->outertext = "<i>" . $e->innertext . "</i>";
+			} elseif ($e->tag == "td") {
+				//kill table cell alignment?  not sure if this is good
+				if (isset($e->align)) unset($e->align);
 			}
 			//this could be a time to trim text
 			//if (@$e->outertext && !strlen(trim($e->outertext))) $e->outertext = "";
