@@ -219,6 +219,9 @@ function format_html($text) {
 			} elseif ($e->tag == "img") {
 				//no small, narrow or flat images
 				if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) $e->outertext = "";
+			} elseif (($e->tag == "p") && (!$e->innertext || ($e->innertext == "&nbsp;"))) {
+				//kill empty p tags -- don't know where these are coming from!
+				$e->outertext = "";
 			} elseif ($e->tag == "span") {
 				if ($e->src) {
 					//nytimes has this -- i'm not sure yet if it's good or not
