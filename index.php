@@ -448,7 +448,7 @@ class form {
 		
 		//sometimes you can get to a form from multiple places.  you might want to return the way you came.
 		if (isset($_josh["referrer"]["path_query"])) {
-			$this->addField(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["path_query"]));
+			$this->addField(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["url"]));
 		} elseif (isset($_GET["return_to"])) {
 			$this->addField(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
 		}

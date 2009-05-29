@@ -203,7 +203,7 @@ function format_html($text) {
 			if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : "";
 					
 			//never want these attributes
-			$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title", "width");
+			$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title");
 			foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
 			
 			//certain tags we are wary of
@@ -235,9 +235,14 @@ function format_html($text) {
 			} elseif ($e->tag == "strong") {
 				//personal preference: replace <strong> with <b>
 				$e->outertext = "<b>" . $e->innertext . "</b>";
+			} elseif ($e->tag == "table") {
+				//kill table cell alignment?  not sure if this is good
+				if (isset($e->align)) unset($e->align);
+				if (isset($e->width)) unset($e->width);
 			} elseif ($e->tag == "td") {
 				//kill table cell alignment?  not sure if this is good
 				if (isset($e->align)) unset($e->align);
+				if (isset($e->width)) unset($e->width);
 			}
 			//this could be a time to trim text
 			//if (@$e->outertext && !strlen(trim($e->outertext))) $e->outertext = "";
