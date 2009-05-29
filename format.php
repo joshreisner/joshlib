@@ -251,7 +251,7 @@ function format_html($text) {
 }
 
 function format_html_entities($string) {
-	$string = htmlentities($string);
+	//$string = htmlentities($string);
 	$string = str_replace("‘", "&lsquo;", $string); //left single quote
 	$string = str_replace("’", "&rsquo;", $string); //right single quote
 	$string = str_replace("“", "&ldquo;", $string); //left double quote
@@ -645,6 +645,7 @@ function format_text_code($str) {
 	$return = str_replace("/",	"_",	$return);
 	$return = str_replace(" ",	"_",	$return);
 	$return = str_replace("&",	"and",	$return);
+	$return = str_replace(",",	"",	$return);
 	return $return;
 }
 
