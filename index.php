@@ -170,7 +170,8 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_SERVER["HTTP_HOST"]) && (format_text_starts("dev-", $_SERVER["HTTP_HOST"]) || format_text_starts("beta.", $_SERVER["HTTP_HOST"]) || format_text_ends(".site", $_SERVER["HTTP_HOST"]))) {
-		//do nothing, just don't want to reflow the logic
+		$_josh["mode"] = "dev";
+		//error reporting already set above
 	} else {
 		$_josh["mode"] = "live";
 		error_reporting(0);
@@ -191,8 +192,16 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	$_josh["getting"]	= !empty($_GET);
 	if ($_josh["getting"]) foreach($_GET as $key=>$value) $_GET[$key] = format_quotes($value);
 	
-	$_josh["uploading"]	= !empty($_FILES);
-	//if ($_josh["uploading"]) foreach($_FILES as $file) $_FILES[$file]["name"] = format_quotes($_FILES[$file]["name"]);
+	$_josh["uploading"] = false;
+	if (!empty($_FILES)) {
+		foreach($_FILES as &$file) {
+			if (!empty($file["name"])) {
+				$file["name"] = format_quotes($file["name"]);
+				$_josh["uploading"] = true;
+			}
+		}
+	}
+	
 	
 	$_josh["posting"]	= !empty($_POST);
 	if ($_josh["posting"]) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes($value);

@@ -773,14 +773,21 @@ function format_times($num) {
 	}
 }
 
-function format_title($str) {
+function format_title($str, $force_upper=false) {
 	error_debug("<b>format_title</b> starting with " . $str, __file__, __line__);
 	$return = array();
 	$lower = array("a", "an", "and", "but", "for", "from", "if", "in", "nor", "of", "on", "or", "so", "the", "to", "via", "with");
 	$mixed = array("DBs", "CBOs", "iPhone", "iPhones", "IDs", "IPs", "LLCs", "MySQL", "SSNs", "TinyMCE", "URLs", "WordPress");
 	$upper = array("ADA", "ASAP", "BIF", "CCT", "CMS", "CSS", "DB", "EBO", "FSS", "FTP", "HTML", "I", "II", "III", "IP", "IV", 
-		"LLC", "NHP", "NVN", "OMG", "ONYC", "OS", "PC", "PHP", "PLC", "RSS", "SF", "SFS", "SQL", "SSN", "SVN", "URL", 
+		"LLC", "NHP", "NVN", "OMG", "ONYC", "OS", "PC", "PHP", "PLC", "RSS", "SF", "SFS", "SQL", "SSN", "SVN", "URL", "U.S.", 
 		"V", "VI", "VII", "VIII", "WTF", "X", "XML");
+		
+	if ($force_upper) {
+		$upper2 = explode(",", strToUpper($force_upper));
+		foreach ($upper2 as &$u) $u = trim($u);
+		$upper = array_merge($upper, $upper2);
+	}
+	
 	$words = explode(" ", ucwords(strToLower(trim($str))));
 	$counter = 1;
 	$max = count($words);

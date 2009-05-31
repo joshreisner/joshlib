@@ -21,7 +21,7 @@ function url_base() {
 }
 
 function url_change($target="") {
-	global $_josh, $_POST;
+	global $_josh;
 	
 	if ($target === false) { //if redirect is really set to FALSE, send to site home
 		$target = "/";
