@@ -192,7 +192,7 @@ function format_html($text) {
 		function cleanup($e) {
 			//this callback is used to clear out bad tags and attributes
 			//never want these tags, or anything inside them
-			$bad_tags = array("comment", "form", "iframe", "label", "noscript", "script", "unknown");
+			$bad_tags = array("comment", "form", "iframe", "label", "link", "noscript", "script", "unknown");
 			if (in_array($e->tag, $bad_tags)) tag_unset($e);
 			
 			//these are the tags we want	
@@ -203,7 +203,7 @@ function format_html($text) {
 			if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : "";
 					
 			//never want these attributes
-			$bad_attributes = array("alt", "class", "id", "onclick", "onmouseout", "onmouseover", "style", "title");
+			$bad_attributes = array("alt", "onclick", "onmouseout", "onmouseover", "style", "title");
 			foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
 			
 			//certain tags we are wary of
