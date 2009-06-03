@@ -245,11 +245,14 @@ function url_query_require($target="./", $index="id") {
 }
 
 function url_query_parse($querystring) {
-	$pairs = explode("&", $querystring);
+	if (strstr($querystring, "?")) $querystring = substr($querystring, strpos($querystring, "?") + 1);
 	$return = array();
-	foreach ($pairs as $pair) {
-		list($key, $value) = explode("=", $pair);
-		$return[$key] = urldecode($value);
+	if (strstr($querystring, "=")) {
+		$pairs = explode("&", $querystring);
+		foreach ($pairs as $pair) {
+			list($key, $value) = explode("=", $pair);
+			$return[$key] = urldecode($value);
+		}
 	}
 	return $return;
 }

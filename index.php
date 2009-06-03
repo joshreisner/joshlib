@@ -106,8 +106,8 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 		$_josh["request"] = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) ? "https" : "http";
 		$_josh["request"] .= "://" . $_SERVER["HTTP_HOST"];
 		if (isset($_SERVER["REDIRECT_URL"])) { //we are using mod_rewrite
-			$_josh["request"] .= $_SERVER["REDIRECT_URL"];
-			if (isset($_SERVER["REDIRECT_QUERY_STRING"])) $_josh["request"] .= "?" . $_SERVER["REDIRECT_QUERY_STRING"];
+			$_josh["request"] .= $_SERVER["REQUEST_URI"];
+			$_GET = array_merge($_GET, url_query_parse($_josh["request"]));
 		} else {
 			$_josh["request"] .= $_SERVER["SCRIPT_NAME"];
 			if (isset($_SERVER["QUERY_STRING"])) $_josh["request"] .= "?" . $_SERVER["QUERY_STRING"];
@@ -211,7 +211,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	
 //special functions that don't yet fit into a category
 
-function cookie($name=false, $value=false) {
+function cookie($name=false, $value=false, $session=false) {
 	global $_josh, $_COOKIE, $_SERVER;
 
 	if ($_josh["debug"]) {
@@ -221,6 +221,7 @@ function cookie($name=false, $value=false) {
 
 	if ($name) {
 		$time = ($value) ? mktime(0, 0, 0, 1, 1, 2030) : time()-3600;
+		if ($session) $time = 0; //expire at the end of the session
 		if (!$value) $value = "";
 		$_COOKIE[$name] = $value;
 		setcookie($name, $value, $time, "/", "." . $_josh["request"]["domain"]);
