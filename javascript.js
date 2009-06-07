@@ -46,6 +46,13 @@ function css_remove(object, what) {
 	object.className = object.className.replace(str, "");
 }
 
+function css_set(object, what) {
+	//overwrite existing values, set as what
+	alert('hi');
+	if (typeof(object) != "object")) object = getElementById(object);
+	object.className = what;
+}
+
 
 /* form */
 function form_checkbox_toggle(which) {

@@ -454,7 +454,7 @@ function format_null($value="") {
 	return $value;
 }
 
-function format_num($value, $decimals=false, $comma=true, $error="n/a") {
+function format_num($value, $decimals=false, $comma=true, $error="") {
 	//output function
 	if (empty($value)) return $error;
 	if (!format_verify($value, "num")) return $error;

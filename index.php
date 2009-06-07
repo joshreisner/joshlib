@@ -257,40 +257,53 @@ function geocode($address, $zip) {
 
 //table class
 class table {
-	var $columns = array();
-	var $return  = "";
+	var $columns	= array();
+	var $return		= "";
+	var $draggable	= false;
+
+	public function __construct($name="table") {
+		$this->name = $name;
+	}
 	
 	function col($name, $class=false, $title=false, $width=false) {
 		$this->columns[] = compact("name", "class", "title", "width");
 	}
 
+	function draggable($target, $draghandle=false) {
+		$this->draggable = true;
+		$this->target = $target;
+		$this->draghandle = $draghandle;
+	}
+	
 	function drawHeader() {
-		$this->return .= '<tr>';
+		$this->return .= '<thead><tr>';
 		foreach ($this->columns as $c) {
 			$this->return .= '<th class="' . $c["name"];
 			if ($c["class"]) $this->return .= " " . $c["class"];
 			$this->return .= '"';
-			if ($c["width"]) $this->return .= " style='width:" . $c["width"] . "px; min-width:" . $c["width"] . "px'";
+			if ($c["width"]) $this->return .= " style='width:" . $c["width"] . "; min-width:" . $c["width"] . "px'";
 			$this->return .= '>';
 			$this->return .= ($c["title"]) ? $c["title"] : format_text_human($c["name"]);
 			$this->return .= '</th>';
 		}
-		$this->return .= '</tr>';
+		$this->return .= '</tr></thead>';
 	}
 	
 	function draw($values, $errmsg="Sorry, no results!", $hover=false, $total=false) {
 		global $_josh;
 		$colspan = count($this->columns);
 		$totals = array();
-		$this->return = $_josh["newline"] . '<!--table start-->' . $_josh["newline"] . '<table cellspacing="0" class="table">' . $_josh["newline"];
+		$this->return = $_josh["newline"] . '<!--table start-->' . $_josh["newline"] . '<table cellspacing="0" class="' . $this->name . '">' . $_josh["newline"];
 		if (!$colspan) {
+			//there were no columns defined.  no columns, no table
 			$this->return .= '<tr><td class="empty">Sorry, no columns defined!</td></tr>' . $_josh["newline"];
 		} elseif (!count($values)) {
+			//no rows, return errmsg
 			$this->return .= '<tr><td class="empty">' . $errmsg . '</td></tr>' . $_josh["newline"];
 		} else {
 			$row	= "odd";
 			$group	= "";
-			$this->return .= $this->drawHeader();
+			$this->return .= $this->drawHeader() . '<tbody id="' . $this->name . '">';
 			
 			foreach ($values as $v) {
 				if (isset($v["group"]) && ($group != $v["group"])) {
@@ -316,6 +329,10 @@ class table {
 					$this->return .= ' onmouseover="css_add(this, \'hover\');"';
 					$this->return .= ' onmouseout="css_remove(this, \'hover\');"';
 				}
+				if ($this->draggable) {
+					//draggable forces an id to be set
+					$this->return .= ' id="item_' . $v["id"] . '"';
+				}
 				$this->return .= '>' . $_josh["newline"];
 				foreach ($this->columns as $c) {
 					if (!strlen(trim($v[$c["name"]]))) $v[$c["name"]] = "&nbsp;";
@@ -326,9 +343,10 @@ class table {
 				$this->return .= '</tr>' . $_josh["newline"];
 				$row = ($row == "even") ? "odd" : "even";
 			}
+			$this->return .= '</tbody>';
 		}
 		if ($total) {
-			$this->return .= "<tr class='total'>";
+			$this->return .= "<tr class='total'><tfoot>";
 			foreach ($this->columns as $c) {
 				$this->return .= '<td class="' . $c["name"];
 				if ($c["class"]) $this->return .= " " . $c["class"];
@@ -340,9 +358,29 @@ class table {
 				}
 				$this->return .= '</td>' . $_josh["newline"];
 			}
-			$this->return .= "</tr>" . $_josh["newline"];
+			$this->return .= "</tr></tfoot>" . $_josh["newline"];
 		}
 		$this->return .= '</table>';
+		
+		//drag and drop table
+		if ($this->draggable) {
+		$this->return .= draw_javascript("
+			function reorder() {
+				var ampcharcode= '%26';
+				var serializeOpts = Sortable.serialize('" . $this->name . "') + unescape(ampcharcode) + 'key=" . $this->name . "' + unescape(ampcharcode) + 'update=" . $this->name . "';
+				var options = { method:'post', parameters:serializeOpts };
+				//alert(options.parameters);
+				new Ajax.Request('" . $this->target . "', options);
+				newOrder = Sortable.sequence('" . $this->name . "');
+				var state = 'odd';
+				for (var i = 0; i < newOrder.length; i++) {
+					document.getElementById('item_' + newOrder[i]).className = state;
+					state = (state == 'odd') ? 'even' : 'odd';
+				}
+			}
+			Sortable.create('" . $this->name . "', { tag:'tr', " . (($this->draghandle) ? "handle:'" . $this->draghandle . "', " : "") . "ghosting:true, constraint:'vertical', onUpdate:reorder, tree:true });
+			");
+		}
 		return $this->return;
 	}
 

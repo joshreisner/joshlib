@@ -70,6 +70,14 @@ function draw_div($id, $innerhtml="", $args=false) {
 	return draw_tag("div", $args, $innerhtml);
 }
 
+function draw_dl($array, $class=false) {
+	$return = "";
+	foreach ($array as $key=>$value) {
+		$return .= draw_container("dt", $key) . draw_container("dd", $value);
+	}
+	return draw_container("dl", $return, array("class"=>$class));
+}
+
 function draw_favicon($location="/images/favicon.png") {
 	//only accepts PNGs right now
 	return draw_tag("link", array("rel"=>"shortcut icon", "href"=>$location, "type"=>"image/png")); 
