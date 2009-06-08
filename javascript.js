@@ -49,7 +49,7 @@ function css_remove(object, what) {
 function css_set(object, what) {
 	//overwrite existing values, set as what
 	alert('hi');
-	if (typeof(object) != "object")) object = getElementById(object);
+	if (typeof(object) != "object") object = getElementById(object);
 	object.className = what;
 }
 
