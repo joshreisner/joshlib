@@ -490,9 +490,13 @@ function draw_list($options, $class=false, $type="ul", $selected=false) {
 	return draw_tag($type, array("class"=>$class), implode($options,  $_josh["newline"] . "\t"));
 }
 
-function draw_navigation($options, $match=false, $type="text", $class="navigation") {
+function draw_navigation($options, $match=false, $type="text", $class="navigation", $folder="/images/navigation/") {
 	//type could be text, images or rollovers
 	global $_josh;
+	
+	//this is so you can have several sets of rollovers in the same page
+	if (!isset($_josh["drawn_navigation"])) $_josh["drawn_navigation"] = 0;
+	$_josh["drawn_navigation"]++;
 	
 	//skip if empty
 	if (!is_array($options) || !count($options)) return false;
@@ -512,7 +516,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 	$counter = 1;
 	$javascript = $_josh["newline"];
 	foreach ($options as $title=>$url) {
-		$name = 'option' . $counter;
+		$name = 'option_' . $_josh["drawn_navigation"] . '_' . $counter;
 		$thisoption = '<a href="' . $url . '" class="' . $name;
 		if (str_replace(url_base(), "", $url) == $match) {
 			$img_state = "_on";
@@ -530,7 +534,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 		} elseif (($type == "images") || ($type == "rollovers")) {
 			$img = str_replace("/", "", $url);
 			if (empty($img)) $img = "home";
-			$img = "/images/navigation/" . $img;
+			$img = $folder . $img;
 			if ($type == "rollovers") {
 				$javascript .= $name . "_on		 = new Image;" . $_josh["newline"];
 				$javascript .= $name . "_off	 = new Image;" . $_josh["newline"];
