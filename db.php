@@ -457,14 +457,14 @@ function db_save($table, $id="get", $array=false) {
 	if (count($required)) error_handle("required fields missing", "the table $table needs columns for " . implode(", ", $required));
 	if ($id) {
 		$query1[] = "updated_date = " .  db_date();
-		$query1[] = "updated_user = " . $_SESSION["user_id"];
+		$query1[] = "updated_user = " . ((isset($array["updated_user"])) ? $array["updated_user"] : $_SESSION["user_id"]);
 		if (db_query("UPDATE $table SET " . implode(", ", $query1) . " WHERE id = " . $id)) return $id;
 		return false;
 	} else {
 		$query1[] = "created_date";
 		$query2[] = db_date();
 		$query1[] = "created_user";
-		$query2[] = $_SESSION["user_id"];
+		$query2[] = ((isset($array["created_user"])) ? $array["created_user"] : $_SESSION["user_id"]);
 		$query1[] = "is_active";
 		$query2[] = 1;
 		$query = "INSERT INTO $table ( " . implode(", ", $query1) . " ) VALUES ( " . implode(", ", $query2) . " )";
