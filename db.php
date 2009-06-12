@@ -362,6 +362,11 @@ function db_save($table, $id="get", $array=false) {
 	
 	//default behavior is to use $_GET["id"] as the id number to deal with
 	if ($id == "get") $id = url_id();
+	if ($id == "id") {
+		//this happened once
+		error_handle("db_save can't process", "a value of 'id' was set for the ID");
+		exit;
+	}
 	
 	if (!isset($_SESSION["user_id"])) error_handle("session not set", "db_save needs a session user_id variable");
 	if (!$array) $array = $_POST;
@@ -455,6 +460,7 @@ function db_save($table, $id="get", $array=false) {
 		}
 	}
 	if (count($required)) error_handle("required fields missing", "the table $table needs columns for " . implode(", ", $required));
+	//serious fucking vulnerability: UPDATE tasks SET client_id = 16, status_id = 3, hours = NULL, rate = 75, closed_date = '2009-05-18 00:00:00', closed_user = 15, is_urgent = 0, updated_date = NOW(), updated_user = 15 WHERE id = id
 	if ($id) {
 		$query1[] = "updated_date = " .  db_date();
 		$query1[] = "updated_user = " . ((isset($array["updated_user"])) ? $array["updated_user"] : $_SESSION["user_id"]);
@@ -470,7 +476,6 @@ function db_save($table, $id="get", $array=false) {
 		$query = "INSERT INTO $table ( " . implode(", ", $query1) . " ) VALUES ( " . implode(", ", $query2) . " )";
 		return db_query($query);
 	}
-	//die($query);
 }
 
 function db_switch($target=false) {
