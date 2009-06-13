@@ -126,6 +126,11 @@ function form_checkboxes_empty(form, name) {
 	return !oneFound;
 }
 
+function form_field_email(obj) {
+   var regExp = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+   return regExp.test(obj.value);
+}
+
 function form_field_default(which, clear, str) {
 	if (clear && (which.value == str)) {
 		which.value = "";
