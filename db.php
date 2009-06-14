@@ -296,6 +296,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 			error_handle("database connection error", "this application is not able to connect its database.  we're sorry for the inconvenience, the administrator is attempting to fix the issue.");
 			exit;
 		}
+		mysql_set_charset("utf8", $_josh["db"]["pointer"]);
 	} elseif ($_josh["db"]["language"] == "mssql") {
 		error_debug("<b>db_open</b> trying to connect mssql on " . $_josh["db"]["location"] . " with username " . $_josh["db"]["username"]);
 		if (!$_josh["db"]["pointer"] = @mssql_connect($_josh["db"]["location"], $_josh["db"]["username"], $_josh["db"]["password"])) {

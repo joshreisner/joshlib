@@ -288,22 +288,21 @@ function url_query(key) {
 }
 
 function url_query_set(key, value) {
-	var query = window.location.search.substring(1);
-	var pairs = query.split("&");
-	var found = false;
+	//sets a query string value.  leaves other query elements alone
+	var query	= window.location.search.substring(1);
+	var pairs	= query.split("&");
+	var found	= false;
+	var ret		= Array();
 	for (var i = 0; i < pairs.length; i++) {
 		var pair = pairs[i].split("=");
-		if (pair[0] == key) {
-			pairs[i] = pair[0] + "=" + encodeURIComponent(value);
-			found = true;
-		}
-    } 
-    if (!found) pairs[i] = key + "=" + encodeURIComponent(value);
-    if (query) {
-	    location.href = location.href.replace(query, pairs.join("&"));
-    } else {
-	    location.href = location.href + '?' + pairs.join("&");
+		if (pair[0] == key) found = true;
+		if (pair[0]) ret.push(pair[0] + "=" + encodeURIComponent(pair[1]));
     }
+    if (!found) ret.push(key + "=" + encodeURIComponent(value));
+    ret.sort();
+    var target = (query) ? location.href.replace(query, ret.join("&")) : location.href + '?' + ret.join("&");
+    //alert(target);
+    location.href = target;
 }
 	
 
