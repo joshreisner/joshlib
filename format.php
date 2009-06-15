@@ -23,6 +23,14 @@ function format_array_text($array) {
 	}
 }
 
+function format_ascii($string) {
+	//used by draw_link() for email obfuscation
+	$len = strlen($string);
+	$return = "";
+	for ($i = 0; $i < $len; $i++) $return .= "&#" . ord($string[$i]);
+	return $return;
+}
+
 function format_binary($blob) {
 	global $_josh;
 	if ($_josh["db"]["language"] == "mssql") {

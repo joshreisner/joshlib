@@ -477,7 +477,7 @@ class form {
 					$options = db_array($sql);
 				}
 				if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
-				$return .= draw_form_select($name, $options, $value, $required, $class, $action);
+				$return .= draw_form_select($name, $options, $value, $required, $class, $action) . $additional;
 			} elseif ($type == "submit") {
 				$return .= draw_form_submit($value, $class) . $additional;
 			} elseif ($type == "text") {
@@ -500,7 +500,7 @@ class form {
 			$this->addField(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
 		}
 		
-		$return = '<form method="post" enctype="multipart/form-data" action="' . $_josh["request"]["path_query"] . '"';
+		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh["request"]["path_query"] . '"';
 		if ($validate) $return .= ' name="' . $validate . '" onsubmit="javascript:return validate_' . $validate . '(this);"';
 		$return .= '>
 			<dl class="' . $validate . '">';

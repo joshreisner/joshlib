@@ -3,7 +3,7 @@ error_debug("including draw.php", __file__, __line__);
 
 function draw_arg($name, $value=false) {
 	if ($value === false) return;
-	return ' ' . strToLower($name) . '="' . $value . '"';
+	return ' ' . strToLower($name) . '="' . str_replace('"', '&quot;', $value) . '"';
 }
 
 function draw_args($array) {
@@ -314,13 +314,11 @@ function draw_form_submit($message="Submit Form", $class=false) {
 }
 
 function draw_form_text($name, $value="", $class=false, $maxlength=255, $style=false, $autocomplete=true) {
-	global $_josh;
-	$class = ($class) ? $class . " text" : "text";
-	$return  = '<input type="text" name="' . $name . '" id="' . $name . '" value="' . $value . '" class="' . $class . '" maxlength="' . $maxlength . '"';
-	if ($style) $return .= ' style="' . $style . '"';
-	if (!$autocomplete) $return .= ' autocomplete="off"';
-	$return .= '>';
-	return $return;
+	$class			= ($class) ? $class . " text" : "text";
+	$autocomplete	= format_boolean($autocomplete, "on|off");
+	$type			= "text";
+	$id				= $name;
+	return draw_tag("input", compact("type", "name", "id", "value", "class", "maxlength", "style", "autocomplete"));
 }
 
 function draw_form_textarea($name, $value="", $class=false) {
@@ -470,12 +468,21 @@ function draw_javascript_src($filename=false) {
 	return $_josh["newline"] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
-function draw_link($href, $str=false, $newwindow=false, $other_args=false) {
-	$args = array("href"=>$href);
-	if (!$str) $str = format_string($href, 60);
-	$args["target"] = ($newwindow) ? "_blank" : false;
-	if ($other_args) $args = array_merge($args, $other_args);
-	return '<a' . draw_args($args) . '>' . $str . '</a>';
+function draw_link($href, $str=false, $newwindow=false, $args=false) {
+	if (!$args)	$args = array();
+	
+	//obfuscate email
+	if (format_text_starts("mailto:", $href)) {
+		if (!$str)	$str = format_ascii(format_string(str_replace("mailto:", "", $href), 60));
+		$href = format_ascii($href);
+	} elseif (!$str) {
+		if (!$str)	$str = format_string($href, 60);
+	}
+	
+	$args["href"]	= $href;	
+	if ($newwindow) $args["target"] = "_blank";
+
+	return draw_container("a", $str, $args);
 }
 
 function draw_list($options, $class=false, $type="ul", $selected=false) {
@@ -490,11 +497,15 @@ function draw_list($options, $class=false, $type="ul", $selected=false) {
 	return draw_tag($type, array("class"=>$class), implode($options,  $_josh["newline"] . "\t"));
 }
 
+function draw_meta_utf8() {
+	return '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+}
+
 function draw_navigation($options, $match=false, $type="text", $class="navigation", $folder="/images/navigation/") {
 	//type could be text, images or rollovers
 	global $_josh;
 	
-	//this is so you can have several sets of rollovers in the same page
+	//this is so you can have several sets of rollovers in the same page eg the smarter toddler site
 	if (!isset($_josh["drawn_navigation"])) $_josh["drawn_navigation"] = 0;
 	$_josh["drawn_navigation"]++;
 	

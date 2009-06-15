@@ -392,7 +392,8 @@ function db_save($table, $id="get", $array=false) {
 			} elseif (($c["type"] == "mediumblob") || ($c["type"] == "image")) { //document
 				$value = format_binary($array[$c["name"]]);
 			} elseif ($c["type"] == "varchar") { //text
-				$value = "'" . format_html_entities($array[$c["name"]]) . "'";
+				$value = "'" . $array[$c["name"]] . "'";
+				//$value = "'" . format_html_entities($array[$c["name"]]) . "'";
 				if (($value == "''") && (!$c["required"])) $value = "NULL"; //special null
 			} elseif ($c["type"] == "text") { //textarea
 				$value = "'" . format_html($array[$c["name"]] . "'");
