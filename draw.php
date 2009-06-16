@@ -497,8 +497,14 @@ function draw_list($options, $class=false, $type="ul", $selected=false) {
 	return draw_tag($type, array("class"=>$class), implode($options,  $_josh["newline"] . "\t"));
 }
 
+function draw_meta_description($string) {
+	global $_josh;
+	return draw_tag("meta", array("name"=>"description", "content"=>$string)) . $_josh["newline"];
+}
+
 function draw_meta_utf8() {
-	return '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+	global $_josh;
+	return draw_tag("meta", array("http-equiv"=>"Content-Type", "content"=>"text/html; charset=utf-8")) . $_josh["newline"];
 }
 
 function draw_navigation($options, $match=false, $type="text", $class="navigation", $folder="/images/navigation/") {

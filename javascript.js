@@ -209,14 +209,16 @@ function map_marker(latitude, longitude, html, icon) {
 
 
 /* scroll*/
-function scroll_init(which, count, width) {
+function scroll_init(which, count, width, hashes) {
 	scroll_element		= document.getElementById(which);
 	scroll_current		= 1;
 	scroll_count		= count;
 	scroll_width		= width;
 	scroll_initialized	= true;
 	scrolling			= false;
-	if (window.location.hash) {
+	leave_hashes		= (typeof(hashes) == 'undefined');
+	
+	if (leave_hashes && window.location.hash) {
 		if (parseInt(window.location.hash.substr(1)) <= scroll_count) {
 			scroll_to(window.location.hash.substr(1));
 		} else {
@@ -239,7 +241,7 @@ function scroll_horizontally() {
 	if (scrollvars.time > scrollvars.duration) {
 		clearInterval(scrollvars.timer);
 		scrollvars.timer = null;
-		window.location.hash = scroll_current;
+		if (leave_hashes) window.location.hash = scroll_current;
 		if (typeof(scrollFinished) == "function") scrollFinished(scroll_current);
 		scrolling = false;
 	} else {
