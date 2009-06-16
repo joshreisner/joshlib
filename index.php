@@ -425,11 +425,17 @@ class form {
 		$this->fields[] = compact("name", "type", "label", "value", "append", "required", "sql", "class", "action", "onchange", "additional", "options_table", "option_id", "object_id", "options", "linking_table", "maxlength");
 	}
 	
+	function addGroup($string="") {
+		$this->addField(array("name"=>"group", "type"=>"group", "value"=>$string));
+	}
+	
 	function addRow($field) {
 		global $_josh;
 		extract($field);
 		$return = "";
-		if ($type == "hidden") {
+		if ($type == "group") {
+			$return .= '<dt class="group">' . $value . '</dt>';
+		} elseif ($type == "hidden") {
 			$return .= draw_form_hidden($name, $value);
 		} else {
 			if ($label) {

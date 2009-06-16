@@ -359,7 +359,7 @@ function db_query($query, $limit=false, $suppress_error=false) {
 }
 
 function db_save($table, $id="get", $array=false) {
-	global $_SESSION, $_POST;
+	global $_SESSION, $_POST, $_josh;
 	
 	//default behavior is to use $_GET["id"] as the id number to deal with
 	if ($id == "get") $id = url_id();
@@ -392,10 +392,12 @@ function db_save($table, $id="get", $array=false) {
 			} elseif (($c["type"] == "mediumblob") || ($c["type"] == "image")) { //document
 				$value = format_binary($array[$c["name"]]);
 			} elseif ($c["type"] == "varchar") { //text
+				if ($_josh["db"]["language"] == "mssql") $array[$c["name"]] = format_accents_encode($array[$c["name"]]);
 				$value = "'" . $array[$c["name"]] . "'";
 				//$value = "'" . format_html_entities($array[$c["name"]]) . "'";
 				if (($value == "''") && (!$c["required"])) $value = "NULL"; //special null
 			} elseif ($c["type"] == "text") { //textarea
+				if ($_josh["db"]["language"] == "mssql") $array[$c["name"]] = format_accents_encode($array[$c["name"]]);
 				$value = "'" . format_html($array[$c["name"]] . "'");
 			} elseif (($c["type"] == "tinyint") || ($c["type"] == "bit")) { //bit
 				$value = format_boolean($array[$c["name"]], "1|0");

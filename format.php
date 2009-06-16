@@ -4,13 +4,17 @@ this section is all formatting functions, usually to format strings into special
 */
 error_debug("including format.php", __file__, __line__);
 
-function format_accents($string) {
-	$string = str_replace("’", "&rsquo;", $string);
-	$string = str_replace("—", "&mdash;", $string);
-	$string = str_replace("“", "&ldquo;", $string);
-	$string = str_replace("”", "&rdquo;", $string);
-	$string = str_replace("ü", "&uuml;",  $string);
-	$string = str_replace("Á", "&ccedil;", $string);
+function format_accents_encode($string) {
+	$string = str_replace("‚Äú", "&ldquo;",	$string);
+	$string = str_replace("‚Äù", "&rdquo;",	$string);
+	$string = str_replace("‚Äò", "&lsquo;",	$string);
+	$string = str_replace("‚Äô", "&rsquo;",	$string);
+	$string = str_replace("‚Äì", "&mdash;",	$string);
+	$string = str_replace("√§", "&auml;",	$string);
+	$string = str_replace("√ß", "&ccedil;",	$string);
+	$string = str_replace("√©", "&eacute;",	$string);
+	$string = str_replace("√±", "&ntilde;",	$string);
+	$string = str_replace("√º", "&uuml;",	$string);
 	return $string;
 }
 
@@ -265,11 +269,11 @@ function format_html($text) {
 
 function format_html_entities($string) {
 	//$string = htmlentities($string);
-	$string = str_replace("ë", "&lsquo;", $string); //left single quote
-	$string = str_replace("í", "&rsquo;", $string); //right single quote
-	$string = str_replace("ì", "&ldquo;", $string); //left double quote
-	$string = str_replace("î", "&rdquo;", $string); //right double quote
-	$string = str_replace("ó", "&mdash;", $string); //em dash
+	$string = str_replace("‚Äò", "&lsquo;", $string); //left single quote
+	$string = str_replace("‚Äô", "&rsquo;", $string); //right single quote
+	$string = str_replace("‚Äú", "&ldquo;", $string); //left double quote
+	$string = str_replace("‚Äù", "&rdquo;", $string); //right double quote
+	$string = str_replace("‚Äî", "&mdash;", $string); //em dash
 	return $string;
 }
 
@@ -786,8 +790,8 @@ function format_title($str, $force_upper=false) {
 	$return = array();
 	$lower = array("a", "an", "and", "but", "for", "from", "if", "in", "nor", "of", "on", "or", "so", "the", "to", "via", "with");
 	$mixed = array("DBs", "CBOs", "iPhone", "iPhones", "IDs", "IPs", "LLCs", "MySQL", "SSNs", "TinyMCE", "URLs", "WordPress");
-	$upper = array("ADA", "ASAP", "BIF", "CCT", "CMS", "CSS", "DB", "EBO", "FSS", "FTP", "HTML", "I", "II", "III", "IP", "IV", 
-		"LLC", "NHP", "NVN", "OMG", "ONYC", "OS", "PC", "PHP", "PLC", "RSS", "SF", "SFS", "SQL", "SSN", "SVN", "URL", "U.S.", 
+	$upper = array("ADA", "ASAP", "BIF", "CCT", "CMS", "CSS", "DB", "EBO", "FSS", "FTP", "HR", "HTML", "I", "II", "III", "IP", "IV", 
+		"LLC", "NHP", "NVN", "OMG", "ONYC", "OS", "PC", "PHP", "PLC", "RSS", "SF", "SFS", "SQL", "SSI", "SSN", "SVN", "TANF", "URL", "U.S.", 
 		"V", "VI", "VII", "VIII", "WTF", "X", "XML");
 		
 	if ($force_upper) {
