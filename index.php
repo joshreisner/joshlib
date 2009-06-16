@@ -87,6 +87,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	$_josh["mos"]					= array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 	$_josh["numbers"]				= array("zero","one","two","three","four","five","six","seven","eight","nine");
 	$_josh["queries"]				= array();	//for counting trips to the database
+	$_josh["system_columns"]		= array("id", "created_date", "created_user", "updated_date", "updated_user", "deleted_date", "deleted_user", "is_active");
 	$_josh["today"]					= date("j");
 	$_josh["year"]					= date("Y");
 
@@ -391,7 +392,15 @@ class form {
 	var $table = false;
 	var $fields = array();
 	var $values = array();
-		
+	
+	function __construct($table=false) {
+		$this->table = $table;
+		if ($table) {
+			$cols = db_columns($table, true);
+			echo draw_array($cols);
+		}
+	}
+	
 	function addField($array) {
 		//defaults
 		$type = $value = $class = $name = $label = $required = $append = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $object_id = $options = $linking_table = false;

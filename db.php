@@ -122,13 +122,15 @@ function db_close($keepalive=false) { //close connection and quit
 	if (!$keepalive) exit;
 }
 
-function db_columns($tablename) {
+function db_columns($tablename, $omitSystemFields=false) {
 	global $_josh;
 	error_debug("<b>db_columns</b> running");
 	$return = array();
 	if ($_josh["db"]["language"] == "mysql") {
 		$result = db_query("DESCRIBE " . $tablename);
 		while ($r = db_fetch($result)) {
+			if ($omitSystemFields && (in_array($r["Field"], $_josh["system_columns"]))) continue;
+			
 			$name = $r["Field"];
 			@list($type, $length) = explode("(", str_replace(")", "", $r["Type"]));
 			$required = ($r["Null"] == "YES") ? false : true;
@@ -148,9 +150,11 @@ function db_columns($tablename) {
 			WHERE o.name = '$tablename'
 			ORDER BY c.colorder
 			");
-		foreach ($return as &$c) {
+		$count = db_found($return);
+		for ($i = 0; $i < $count; $i++) {
+			if ($omitSystemFields && (in_array($return[$i]["name"], $_josh["system_columns"]))) unset($return[$i]);
 			//remove parens from default
-			if ($c["default"]) $c["default"] = substr($c["default"], 1, strlen($c["default"]) - 2);
+			if ($return[$i]["default"]) $return[$i]["default"] = substr($return[$i]["default"], 1, strlen($return[$i]["default"]) - 2);
 		}
 	}
 	return $return;
@@ -373,10 +377,9 @@ function db_save($table, $id="get", $array=false) {
 	if (!$array) $array = $_POST;
 	
 	$columns	= db_columns($table);
-	$required	= array("id", "created_date", "created_user", "updated_date", "updated_user", "deleted_date", "deleted_user", "is_active");
 	$query1		= array();
 	$query2		= array();
-	
+	$required	= $_josh["system_columns"];
 	//debug();
 	
 	foreach ($columns as $c) {
