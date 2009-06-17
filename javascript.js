@@ -232,7 +232,7 @@ function scroll_direction(direction) {
 	if (direction == "left") {
 		newPallet		= (scroll_current == 1) ? scroll_count : scroll_current - 1;
 	} else {
-		newPallet		= (scroll_current == scroll_count) ? 1 : scroll_current + 1;
+		newPallet		= (scroll_current == scroll_count) ? 1 : (scroll_current - 0) + 1;
 	}
 	scroll_to(newPallet);
 }

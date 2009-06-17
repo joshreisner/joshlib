@@ -393,15 +393,30 @@ class form {
 	var $fields = array();
 	var $values = array();
 	
-	function __construct($table=false) {
+	function __construct($table=false, $id=false, $draw=true) {
 		$this->table = $table;
-		if ($table) {
-			$cols = db_columns($table, true);
-			echo draw_array($cols);
-		}
+		if ($table) $this->table($table);
+		if ($draw) return $this->draw();
 	}
 	
-	function addField($array) {
+	function table($table) {
+		$cols = db_columns($table, true);
+		foreach ($cols as $c) {
+			if ($c["type"] == "varchar") {
+				$this->field(array("type"=>"text", "name"=>format_text_human($c["name"])));
+			} elseif ($c["type"] == "text") {
+				$this->field(array("type"=>"textarea", "name"=>format_text_human($c["name"]), "class"=>"mceEditor"));
+			}
+		}	
+	}
+	
+	function values($values) {
+		$this->values = $values;
+		//must be associative array
+		if (isset($values[$field["name"]])) $field["value"] = $values[$field["name"]];
+	}
+
+	function field($array) {
 		//defaults
 		$type = $value = $class = $name = $label = $required = $append = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $object_id = $options = $linking_table = false;
 		
@@ -434,11 +449,11 @@ class form {
 		$this->fields[] = compact("name", "type", "label", "value", "append", "required", "sql", "class", "action", "onchange", "additional", "options_table", "option_id", "object_id", "options", "linking_table", "maxlength");
 	}
 	
-	function addGroup($string="") {
-		$this->addField(array("name"=>"group", "type"=>"group", "value"=>$string));
+	function group($string="") {
+		$this->field(array("name"=>"group", "type"=>"group", "value"=>$string));
 	}
 	
-	function addRow($field) {
+	function row($field) {
 		global $_josh;
 		extract($field);
 		$return = "";
@@ -510,9 +525,9 @@ class form {
 		
 		//sometimes you can get to a form from multiple places.  you might want to return the way you came.
 		if (isset($_josh["referrer"]["path_query"])) {
-			$this->addField(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["url"]));
+			$this->field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["url"]));
 		} elseif (isset($_GET["return_to"])) {
-			$this->addField(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
+			$this->field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
 		}
 		
 		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh["request"]["path_query"] . '"';
@@ -520,12 +535,11 @@ class form {
 		$return .= '>
 			<dl class="' . $validate . '">';
 
+		//add values?
+		if ($values) values($values);
+
 		//add fields
-		foreach ($this->fields as $field) {
-			//values needs to be an associative array
-			if ($values && isset($values[$field["name"]])) $field["value"] = $values[$field["name"]];
-			$return .= $this->addRow($field);
-		}
+		foreach ($this->fields as $field) $return .= $this->row($field);
 		
 		$return .= '</dl></form>';
 		return $return;
