@@ -138,7 +138,7 @@ function db_columns($tablename, $omitSystemFields=false) {
 			$return[] = compact("name","type","required","default");
 		}
 	} else {
-		$return = db_table("SELECT 
+		$result = db_table("SELECT 
 				c.name, 
 				t.name type, 
 				CASE WHEN c.isnullable = 0 THEN 1 ELSE 0 END required, 
@@ -150,11 +150,11 @@ function db_columns($tablename, $omitSystemFields=false) {
 			WHERE o.name = '$tablename'
 			ORDER BY c.colorder
 			");
-		$count = db_found($return);
+		$count = count($result);
 		for ($i = 0; $i < $count; $i++) {
-			if ($omitSystemFields && (in_array($return[$i]["name"], $_josh["system_columns"]))) unset($return[$i]);
-			//remove parens from default
-			if ($return[$i]["default"]) $return[$i]["default"] = substr($return[$i]["default"], 1, strlen($return[$i]["default"]) - 2);
+			if ($omitSystemFields && (in_array($result[$i]["name"], $_josh["system_columns"]))) continue;
+			if ($result[$i]["default"]) $result[$i]["default"] = substr($result[$i]["default"], 1, strlen($result[$i]["default"]) - 2);
+			array_push($return, $result[$i]);
 		}
 	}
 	return $return;
@@ -376,7 +376,7 @@ function db_save($table, $id="get", $array=false) {
 	if (!isset($_SESSION["user_id"])) error_handle("session not set", "db_save needs a session user_id variable");
 	if (!$array) $array = $_POST;
 	
-	$columns	= db_columns($table);
+	$columns	= db_columns($table, true);
 	$query1		= array();
 	$query2		= array();
 	$required	= $_josh["system_columns"];
@@ -384,10 +384,7 @@ function db_save($table, $id="get", $array=false) {
 	
 	foreach ($columns as $c) {
 		error_debug("<b>db_save</b> looking at column " . $c["name"] . ", of type " . $c["type"]);
-		if ($indexes = array_keys($required, $c["name"])) {
-			error_debug("<b>db_save</b> unsetting " . $c["name"] . " from array because it's a system field and handled specially");
-			foreach ($indexes as $i) unset($required[$i]);
-		} elseif (isset($array[$c["name"]])) {
+		if (isset($array[$c["name"]])) {
 			if (($c["type"] == "decimal") || ($c["type"] == "float")) {
 				$value = format_null(format_numeric($array[$c["name"]], false));
 			} elseif ($c["type"] == "int") { //integer
@@ -466,8 +463,7 @@ function db_save($table, $id="get", $array=false) {
 			}
 		}
 	}
-	if (count($required)) error_handle("required fields missing", "the table $table needs columns for " . implode(", ", $required));
-	//serious fucking vulnerability: UPDATE tasks SET client_id = 16, status_id = 3, hours = NULL, rate = 75, closed_date = '2009-05-18 00:00:00', closed_user = 15, is_urgent = 0, updated_date = NOW(), updated_user = 15 WHERE id = id
+
 	if ($id) {
 		$query1[] = "updated_date = " .  db_date();
 		$query1[] = "updated_user = " . ((isset($array["updated_user"])) ? $array["updated_user"] : $_SESSION["user_id"]);

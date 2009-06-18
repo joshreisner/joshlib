@@ -611,9 +611,17 @@ function format_quantitize($quantity, $entity, $capitalize=true) {
 	return $return;
 }
 
-function format_quotes($value) {
-	if (format_verify($value, "string")) $value = trim(str_replace("'", "''", stripslashes($value)));
-	return $value;
+function format_quotes($string) {
+	if (format_verify($string, "string")) $string = trim(str_replace("'", "''", stripslashes($string)));
+	return $string;
+}
+
+function format_singular($string) {
+	if (format_text_ends("ies", $string)) {
+		return substr($string, 0, $string-3) . "y";
+	} elseif (format_text_ends("s", $string)) {
+		return substr($string, 0, $string-1);
+	}
 }
 
 function format_size($size) {

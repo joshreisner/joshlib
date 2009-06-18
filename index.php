@@ -261,9 +261,15 @@ class table {
 	var $columns	= array();
 	var $return		= "";
 	var $draggable	= false;
+	var $name		= false;
+	var $title		= false;
 
 	public function __construct($name="table") {
-		$this->name = $name;
+		$this->name = format_text_code($name);
+	}
+	
+	function title($html) {
+		$this->title = $html;
 	}
 	
 	function col($name, $class=false, $title=false, $width=false) {
@@ -278,6 +284,12 @@ class table {
 	
 	function drawHeader() {
 		$this->return .= '<thead><tr>';
+		$colspan = count($this->columns);
+		
+		if ($this->title) {
+			$this->return .= '<th class="heading" colspan="' . $colspan . '">' . $this->title . '</th></tr><tr>';
+		}
+		
 		foreach ($this->columns as $c) {
 			$this->return .= '<th class="' . $c["name"];
 			if ($c["class"]) $this->return .= " " . $c["class"];
@@ -294,7 +306,9 @@ class table {
 		global $_josh;
 		$colspan = count($this->columns);
 		$totals = array();
-		$this->return = $_josh["newline"] . '<!--table start-->' . $_josh["newline"] . '<table cellspacing="0" class="' . $this->name . '">' . $_josh["newline"];
+		$class = "table";
+		if ($this->name) $class .= " " . $this->name;
+		$this->return = $_josh["newline"] . '<!--table start-->' . $_josh["newline"] . '<table cellspacing="0" class="' . $class . '">' . $_josh["newline"];
 		if (!$colspan) {
 			//there were no columns defined.  no columns, no table
 			$this->return .= '<tr><td class="empty">Sorry, no columns defined!</td></tr>' . $_josh["newline"];
@@ -389,23 +403,38 @@ class table {
 
 //form class
 class form { 
-	var $table = false;
 	var $fields = array();
+	var $title	= false;
+	var $table	= false;
 	var $values = array();
 	
-	function __construct($table=false, $id=false, $draw=true) {
+	function __construct($table=false, $submit=false, $id=false) {
+		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
+		//$submit is a boolean, and indicates whether you should auto-add a submit button at the bottom
+		//if you pass $submit as a string, it will title use the text you passed, and title the form that
+		//$id is the id column of the table -- you can add values to the form (say if you are editing)
+		
 		$this->table = $table;
 		if ($table) $this->table($table);
-		if ($draw) return $this->draw();
+		if ($submit === true) $this->title = (($id) ? "Edit " : "Add New ") . format_singular(format_text_human($table));
+		if ($submit) $this->field(array("type"=>"submit", "value"=>$this->title));
+		if ($id) $this->values(db_array("SELECT * FROM $table WHERE id = " . $id));
+	}
+	
+	function title($title=false) {
+		//title should be a string, and indicates you want a title dd at the top of your form
+		//if you don't pass a $title, there had better be a title already set via the constructor
+		if ($title) $this->title = $title;
+		array_unshift($this->fields, array("type"=>"title", "class"=>"title", "value"=>$this->title, "label"=>false));
 	}
 	
 	function table($table) {
 		$cols = db_columns($table, true);
 		foreach ($cols as $c) {
 			if ($c["type"] == "varchar") {
-				$this->field(array("type"=>"text", "name"=>format_text_human($c["name"])));
+				$this->field(array("type"=>"text", "name"=>$c["name"]));
 			} elseif ($c["type"] == "text") {
-				$this->field(array("type"=>"textarea", "name"=>format_text_human($c["name"]), "class"=>"mceEditor"));
+				$this->field(array("type"=>"textarea", "name"=>$c["name"], "class"=>"mceEditor"));
 			}
 		}	
 	}
@@ -461,6 +490,8 @@ class form {
 			$return .= '<dt class="group">' . $value . '</dt>';
 		} elseif ($type == "hidden") {
 			$return .= draw_form_hidden($name, $value);
+		} elseif ($type == "title") {
+			$return .= draw_container("dd", $value, array("class"=>"title"));
 		} else {
 			if ($label) {
 				$return .= '<dt class="' . $type . '">' . $label;
@@ -532,11 +563,14 @@ class form {
 		
 		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh["request"]["path_query"] . '"';
 		if ($validate) $return .= ' name="' . $validate . '" onsubmit="javascript:return validate_' . $validate . '(this);"';
+		
+		$class = "form";
+		if ($validate) $class .= " " . $validate;
 		$return .= '>
-			<dl class="' . $validate . '">';
+			<dl class="' . $class . '">';
 
 		//add values?
-		if ($values) values($values);
+		if ($values) $this->values($values);
 
 		//add fields
 		foreach ($this->fields as $field) $return .= $this->row($field);
