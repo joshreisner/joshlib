@@ -5,36 +5,28 @@ WELCOME TO JOSHLIB
 	http://joshlib.joshreisner.com/ (eventual website)
 
 ACKNOWLEDGEMENTS
-	> simple_html_dom	-- included as html.php.  more info there.  wonderful.  thank you sirs.  format_html() & form class references this.
-	> moxiecode tinymce	-- not included, but frequently used with this library
-	> fpdf				-- you are magic
+	> fpdf				(php)	not included but frequently used
+	> prototype			(js)	not included, but frequently used.  maybe in the future there might be dependencies.
+	> scriptaculous		(js)	not included, but frequently used
+	> simple_html_dom	(php)	included as html.php.  more info there.  wonderful.  thank you sirs.  format_html() & form class references this.
+	> tinymce			(js)	not included, but frequently used
 
-the purpose of this page (index.php) is to set a bunch of variables that joshlib is going to need, 
-and define some functions that don't fit anywhere else
-
-variables you can pass joshlib that it won't overwrite are:
-
+VARIABLES YOU CAN PASS THAT IT WON'T OVERWRITE
 	$_josh["config"]			the file location of the configuration file
-
-	$_josh["debug"]				true / false.  turn this on to get detailed error logging output to the browser
-	
 	$_josh["db"]["location"]	the server location of the configuration file
 	$_josh["db"]["username"]
 	$_josh["db"]["password"]
 	$_josh["db"]["language"]	the lanugage to use -- currently mssql or mysql
 	$_josh["db"]["database"]	the database it should connect to
-	
+	$_josh["debug"]				true / false.  turn this on to get detailed error logging output to the browser
 	$_josh["email_default"]		the address general message should come from
 	$_josh["email_admin"]		the address of the site administrator, for error reporting
-	
 	$_josh["javascript"]		the location of where to put javascript.js, if you're going to use the javascript functions
 	$_josh["basedblanguage"]	mysql or mssql -- if it doesn't match db language, will try to translate
 	$_josh["is_secure"]			true (use https) or false (don't)
 	$_josh["error_log_api"]		post hook -- should be full urL, eg http://work.joshreisner.com/api/hook.php
 
-in addition, there are some variables you can pass that will be overwritten if there is $_SERVER info to be had.  
-so if joshlib is run from the command line, these variables would be good to have
-
+VARIABLES THAT IT GETS FROM THE SERVER -- IF YOU'RE RUNNING AS ROOT YOU SHOULD PASS SOME OF THESE
 	$_josh["request"]			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)
 	$_josh["referrer"]			same as request
 	$_josh["folder"]			/ or \
@@ -43,15 +35,15 @@ so if joshlib is run from the command line, these variables would be good to hav
 	$_josh["slow"]				true or false; whether to use javascript when redirecting (true) or header variables (false)
 	$_josh["mobile"]			true or false
 
-misc functions defined here:
+MISC FUNCTIONS DEFINED ON THIS PAGE
 	cookie
 	daysInMonth
 	debug
 	geocode
 	
-misc classes defined here:
-	table
+MISC CLASSES DEFINED HERE
 	form
+	table
 	
 */
 $_josh["time_start"] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
@@ -256,151 +248,6 @@ function geocode($address, $zip) {
 	return false;
 }
 
-//table class
-class table {
-	var $columns	= array();
-	var $return		= "";
-	var $draggable	= false;
-	var $name		= false;
-	var $title		= false;
-
-	public function __construct($name="table") {
-		$this->name = format_text_code($name);
-	}
-	
-	function title($html) {
-		$this->title = $html;
-	}
-	
-	function col($name, $class=false, $title=false, $width=false) {
-		$this->columns[] = compact("name", "class", "title", "width");
-	}
-
-	function draggable($target, $draghandle=false) {
-		$this->draggable = true;
-		$this->target = $target;
-		$this->draghandle = $draghandle;
-	}
-	
-	function drawHeader() {
-		$this->return .= '<thead><tr>';
-		$colspan = count($this->columns);
-		
-		if ($this->title) {
-			$this->return .= '<th class="heading" colspan="' . $colspan . '">' . $this->title . '</th></tr><tr>';
-		}
-		
-		foreach ($this->columns as $c) {
-			$this->return .= '<th class="' . $c["name"];
-			if ($c["class"]) $this->return .= " " . $c["class"];
-			$this->return .= '"';
-			if ($c["width"]) $this->return .= " style='width:" . $c["width"] . "; min-width:" . $c["width"] . "px'";
-			$this->return .= '>';
-			$this->return .= ($c["title"]) ? $c["title"] : format_text_human($c["name"]);
-			$this->return .= '</th>';
-		}
-		$this->return .= '</tr></thead>';
-	}
-	
-	function draw($values, $errmsg="Sorry, no results!", $hover=false, $total=false) {
-		global $_josh;
-		$colspan = count($this->columns);
-		$totals = array();
-		$class = "table";
-		if ($this->name) $class .= " " . $this->name;
-		$this->return = $_josh["newline"] . '<!--table start-->' . $_josh["newline"] . '<table cellspacing="0" class="' . $class . '">' . $_josh["newline"];
-		if (!$colspan) {
-			//there were no columns defined.  no columns, no table
-			$this->return .= '<tr><td class="empty">Sorry, no columns defined!</td></tr>' . $_josh["newline"];
-		} elseif (!count($values)) {
-			//no rows, return errmsg
-			$this->return .= '<tr><td class="empty">' . $errmsg . '</td></tr>' . $_josh["newline"];
-		} else {
-			$row	= "odd";
-			$group	= "";
-			$this->return .= $this->drawHeader() . '<tbody id="' . $this->name . '">';
-			
-			foreach ($values as $v) {
-				if (isset($v["group"]) && ($group != $v["group"])) {
-					$this->return .= '<tr><td colspan="' . $colspan . '" class="group">' . $v["group"] . '</td></tr>' . $_josh["newline"];
-					$row = "odd";
-					$group = $v["group"];
-				}
-				if ($total) {
-					//must be array
-					foreach ($total as $t) {
-						if (isset($v[$t])) {
-							if (!isset($totals[$t])) $totals[$t] = 0;
-							$totals[$t] += format_numeric($v[$t]);
-						}
-					}
-				}
-				$this->return .= '<tr class="' . $row;
-				if (isset($v["class"]) && !empty($v["class"])) $this->return .= " " . $v["class"] . " " . $row . "-" . $v["class"];
-				$this->return .= '"';
-				if ($hover) {
-					if (isset($v["link"])) $this->return .= ' onclick="location.href=\'' . $v["link"] . '\';"';
-					//hover class must exist
-					$this->return .= ' onmouseover="css_add(this, \'hover\');"';
-					$this->return .= ' onmouseout="css_remove(this, \'hover\');"';
-				}
-				if ($this->draggable) {
-					//draggable forces an id to be set
-					$this->return .= ' id="item_' . $v["id"] . '"';
-				}
-				$this->return .= '>' . $_josh["newline"];
-				foreach ($this->columns as $c) {
-					if (!strlen(trim($v[$c["name"]]))) $v[$c["name"]] = "&nbsp;";
-					$this->return .= '<td class="' . $c["name"];
-					if ($c["class"]) $this->return .= " " . $c["class"];
-					$this->return .= '">' . $v[$c["name"]] . '</td>' . $_josh["newline"];
-				}
-				$this->return .= '</tr>' . $_josh["newline"];
-				$row = ($row == "even") ? "odd" : "even";
-			}
-			$this->return .= '</tbody>';
-		}
-		if ($total) {
-			$this->return .= "<tr class='total'><tfoot>";
-			foreach ($this->columns as $c) {
-				$this->return .= '<td class="' . $c["name"];
-				if ($c["class"]) $this->return .= " " . $c["class"];
-				$this->return .= '">';
-				if (isset($totals[$c["name"]])) {
-					$this->return .= $totals[$c["name"]];
-				} else {
-					$this->return .= "&nbsp;";
-				}
-				$this->return .= '</td>' . $_josh["newline"];
-			}
-			$this->return .= "</tr></tfoot>" . $_josh["newline"];
-		}
-		$this->return .= '</table>';
-		
-		//drag and drop table
-		if ($this->draggable) {
-		$this->return .= draw_javascript("
-			function reorder() {
-				var ampcharcode= '%26';
-				var serializeOpts = Sortable.serialize('" . $this->name . "') + unescape(ampcharcode) + 'key=" . $this->name . "' + unescape(ampcharcode) + 'update=" . $this->name . "';
-				var options = { method:'post', parameters:serializeOpts };
-				new Ajax.Request('" . $this->target . "', options);
-				newOrder = Sortable.sequence('" . $this->name . "');
-				var state = 'odd';
-				for (var i = 0; i < newOrder.length; i++) {
-					document.getElementById('item_' + newOrder[i]).className = state;
-					state = (state == 'odd') ? 'even' : 'odd';
-				}
-			}
-			Sortable.create('" . $this->name . "', { tag:'tr', " . (($this->draghandle) ? "handle:'" . $this->draghandle . "', " : "") . "ghosting:true, constraint:'vertical', onUpdate:reorder, tree:true });
-			");
-		}
-		return $this->return;
-	}
-
-}
-
-
 //form class
 class form { 
 	var $fields = array();
@@ -580,4 +427,152 @@ class form {
 	}
 }
 
+//table class
+class table {
+	var $columns	= array();
+	var $draggable	= false;
+	var $name		= false;
+	var $title		= false;
+
+	public function __construct($name="table") {
+		$this->name = format_text_code($name);
+	}
+	
+	function draw($values, $errmsg="Sorry, no results!", $hover=false, $total=false) {
+		global $_josh;
+		$return		= "";
+		$colspan	= count($this->columns);
+		$totals		= array();
+		$class		= "table";
+		if ($this->name) $class .= " " . $this->name;
+		
+		if (!$colspan) {
+			//there were no columns defined.  no columns, no table
+			$return .= $this->draw_header(false) . $this->draw_empty("Sorry, no columns defined!");
+		} elseif (!count($values)) {
+			//no rows, return errmsg
+			$return .= $this->draw_header(false) . $this->draw_empty($errmsg);
+		} else {
+			$row	= "odd";
+			$group	= "";
+			$return .= $this->draw_header() . '<tbody id="' . $this->name . '">';
+			
+			foreach ($values as $v) {
+				if (isset($v["group"]) && ($group != $v["group"])) {
+					$return .= draw_container("tr", draw_container("td", $v["group"], array("colspan"=>$colspan, "class"=>"group")));
+					$row = "odd";
+					$group = $v["group"];
+				}
+				if ($total) {
+					//must be array
+					foreach ($total as $t) {
+						if (isset($v[$t])) {
+							if (!isset($totals[$t])) $totals[$t] = 0;
+							$totals[$t] += format_numeric($v[$t]);
+						}
+					}
+				}
+				$return .= '<tr class="' . $row;
+				if (isset($v["class"]) && !empty($v["class"])) $return .= " " . $v["class"] . " " . $row . "_" . $v["class"];
+				$return .= '"';
+				if ($hover) {
+					if (isset($v["link"])) $this->return .= ' onclick="location.href=\'' . $v["link"] . '\';"';
+					//hover class must exist
+					$return .= ' onmouseover="css_add(this, \'hover\');"';
+					$return .= ' onmouseout="css_remove(this, \'hover\');"';
+				}
+				if ($this->draggable) $return .= ' id="item_' . $v["id"] . '"';
+				$return .= '>' . $_josh["newline"];
+				foreach ($this->columns as $c) $return .= draw_container("td", $v[$c["name"]]);
+				$return .= '</tr>' . $_josh["newline"];
+				$row = ($row == "even") ? "odd" : "even";
+			}
+			$return .= '</tbody>';
+		}
+		if ($total) {
+			$return .= "<tr class='total'><tfoot>";
+			foreach ($this->columns as $c) {
+				$return .= '<td class="' . $c["name"];
+				if ($c["class"]) $this->return .= " " . $c["class"];
+				$return .= '">';
+				if (isset($totals[$c["name"]])) {
+					$return .= $totals[$c["name"]];
+				} else {
+					$return .= "&nbsp;";
+				}
+				$return .= '</td>' . $_josh["newline"];
+			}
+			$return .= "</tr></tfoot>" . $_josh["newline"];
+		}
+		$return = draw_container("table", $return, array("cellspacing"=>0, "class"=>$class));
+		
+		//drag and drop table
+		if ($this->draggable) {
+		$return .= draw_javascript("
+			function reorder() {
+				var ampcharcode= '%26';
+				var serializeOpts = Sortable.serialize('" . $this->name . "') + unescape(ampcharcode) + 'key=" . $this->name . "' + unescape(ampcharcode) + 'update=" . $this->name . "';
+				var options = { method:'post', parameters:serializeOpts };
+				new Ajax.Request('" . $this->target . "', options);
+				newOrder = Sortable.sequence('" . $this->name . "');
+				var state = 'odd';
+				for (var i = 0; i < newOrder.length; i++) {
+					document.getElementById('item_' + newOrder[i]).className = state;
+					state = (state == 'odd') ? 'even' : 'odd';
+				}
+			}
+			Sortable.create('" . $this->name . "', { tag:'tr', " . (($this->draghandle) ? "handle:'" . $this->draghandle . "', " : "") . "ghosting:true, constraint:'vertical', onUpdate:reorder, tree:true });
+			");
+		}
+		return $return;
+	}
+
+	function draw_column($c) {
+		$class = $c["name"];
+		if ($c["class"]) $class .= " " . $c["class"];
+		$style = ($c["width"]) ? "width:" . $c["width"] . "px;min-width:" . $c["width"] . "px;": false;
+		$content = ($c["title"]) ? $c["title"] : format_text_human($c["name"]);
+		return draw_container("th", $content, array("style"=>$style));
+	}
+
+	function draw_columns() {
+		$return = "";
+		foreach ($this->columns as $c) $return .= $this->draw_column($c);
+		return draw_container("tr", $return);
+	}
+	
+	function draw_empty($string) {
+		return draw_container("tr", draw_container("td", $string, array("class"=>"empty")));
+	}
+	
+	
+	function draw_header($show_columns=true) {
+		return draw_container("thead", $this->draw_title() . (($show_columns) ? $this->draw_columns() : ""));
+	}
+	
+	function draw_title() {
+		$colspan = count($this->columns);
+		if ($this->title) return draw_container("tr", draw_container("th", $this->title, array("class"=>"title", "colspan"=>$colspan)));
+		return "";
+	}
+	
+	function col($name, $class=false, $title=false, $width=false) {
+		//legacy alias, todo ~ deprecate
+		$this->set_column($name, $class, $title, $width);
+	}
+	
+	function set_column($name, $class=false, $title=false, $width=false) {
+		$this->columns[] = compact("name", "class", "title", "width");
+	}
+	
+	function set_draggable($target, $draghandle=false) {
+		$this->draggable = true;
+		$this->target = $target;
+		$this->draghandle = $draghandle;
+	}
+	
+	function set_title($html) {
+		$this->title = $html;
+	}
+}
 ?>

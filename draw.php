@@ -570,6 +570,15 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 	return $return;
 }
 
+function draw_newline($count=1) {
+	global $_josh;
+	$return = "";
+	for ($i = 0; $i < $count; $i++) {
+		$return .= $_josh["newline"];
+	}
+	return $return;
+}
+
 function draw_rss_link($address) {
 	return draw_tag("link", array("rel"=>"alternate", "type"=>"application/rss+xml", "title"=>"RSS", "href"=>$address));
 }
@@ -588,10 +597,15 @@ function draw_tag($tag, $args=false, $innerhtml=false) {
 	$return = '<' . $tag;
 	$return .= (is_array($args)) ? draw_args($args) : draw_arg($args);
 	if ($innerhtml === false) {
-		return $return . '/>';
+		$return .= '/>';
 	} else {
-		return $return . '>' . $innerhtml . '</' . $tag . '>';
+		if (($tag == "td") && empty($innerhtml)) $innerhtml = "&nbsp;";
+		$return .= '>' . $innerhtml . '</' . $tag . '>';
 	}
+	if ($tag == "td") $return .= draw_newline();
+	if ($tag == "tr") $return .= draw_newline();
+	if ($tag == "table") $return .= draw_newline(2);
+	return $return;
 }
 
 ?>
