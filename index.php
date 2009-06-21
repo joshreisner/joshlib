@@ -262,37 +262,40 @@ class form {
 		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		
 		$this->table = $table;
-		if ($table) $this->table($table);
+		if ($table) $this->set_table($table);
 		if ($submit === true) $this->title = (($id) ? "Edit " : "Add New ") . format_singular(format_text_human($table));
-		if ($submit) $this->field(array("type"=>"submit", "value"=>$this->title));
-		if ($id) $this->values(db_array("SELECT * FROM $table WHERE id = " . $id));
+		if ($submit) $this->set_field(array("type"=>"submit", "label"=>"&nbsp;", "value"=>$this->title));
+		//echo draw_array(die("SELECT * FROM $table WHERE id = " . $id));
+		if ($id) $this->set_values(db_array("SELECT * FROM $table WHERE id = " . $id));
 	}
 	
-	function title($title=false) {
+	function set_title($title=false) {
 		//title should be a string, and indicates you want a title dd at the top of your form
 		//if you don't pass a $title, there had better be a title already set via the constructor
 		if ($title) $this->title = $title;
 		array_unshift($this->fields, array("type"=>"title", "class"=>"title", "value"=>$this->title, "label"=>false));
 	}
 	
-	function table($table) {
+	function set_table($table) {
 		$cols = db_columns($table, true);
 		foreach ($cols as $c) {
 			if ($c["type"] == "varchar") {
-				$this->field(array("type"=>"text", "name"=>$c["name"]));
+				$this->set_field(array("type"=>"text", "name"=>$c["name"]));
 			} elseif ($c["type"] == "text") {
-				$this->field(array("type"=>"textarea", "name"=>$c["name"], "class"=>"mceEditor"));
+				$this->set_field(array("type"=>"textarea", "name"=>$c["name"], "class"=>"mceEditor"));
+			} elseif (($c["type"] == "bit") || ($c["type"] == "tinyint")) {
+				$this->set_field(array("type"=>"checkbox", "name"=>$c["name"]));
+			} elseif ($c["type"] == "datetime") {
+				$this->set_field(array("type"=>"datetime", "name"=>$c["name"]));
 			}
 		}	
 	}
 	
-	function values($values) {
+	function set_values($values) {
 		$this->values = $values;
-		//must be associative array
-		if (isset($values[$field["name"]])) $field["value"] = $values[$field["name"]];
 	}
 
-	function field($array) {
+	function set_field($array) {
 		//defaults
 		$type = $value = $class = $name = $label = $required = $append = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $object_id = $options = $linking_table = false;
 		
@@ -325,14 +328,15 @@ class form {
 		$this->fields[] = compact("name", "type", "label", "value", "append", "required", "sql", "class", "action", "onchange", "additional", "options_table", "option_id", "object_id", "options", "linking_table", "maxlength");
 	}
 	
-	function group($string="") {
-		$this->field(array("name"=>"group", "type"=>"group", "value"=>$string));
+	function set_group($string="") {
+		$this->set_field(array("name"=>"group", "type"=>"group", "value"=>$string));
 	}
 	
-	function row($field) {
+	function draw_row($field) {
 		global $_josh;
 		extract($field);
 		$return = "";
+		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
 		if ($type == "group") {
 			$return .= '<dt class="group">' . $value . '</dt>';
 		} elseif ($type == "hidden") {
@@ -403,9 +407,9 @@ class form {
 		
 		//sometimes you can get to a form from multiple places.  you might want to return the way you came.
 		if (isset($_josh["referrer"]["path_query"])) {
-			$this->field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["url"]));
+			$this->set_field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["url"]));
 		} elseif (isset($_GET["return_to"])) {
-			$this->field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
+			$this->set_field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
 		}
 		
 		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh["request"]["path_query"] . '"';
@@ -417,12 +421,15 @@ class form {
 			<dl class="' . $class . '">';
 
 		//add values?
-		if ($values) $this->values($values);
+		if ($values) $this->set_values($values);
 
 		//add fields
-		foreach ($this->fields as $field) $return .= $this->row($field);
+		foreach ($this->fields as $field) $return .= $this->draw_row($field);
 		
 		$return .= '</dl></form>';
+		
+		//focus on first element
+		$return .= draw_form_focus($this->fields[0]["name"]);
 		return $return;
 	}
 }
@@ -483,7 +490,7 @@ class table {
 				}
 				if ($this->draggable) $return .= ' id="item_' . $v["id"] . '"';
 				$return .= '>' . $_josh["newline"];
-				foreach ($this->columns as $c) $return .= draw_container("td", $v[$c["name"]]);
+				foreach ($this->columns as $c) $return .= draw_container("td", $v[$c["name"]], array("class"=>$c["class"]));
 				$return .= '</tr>' . $_josh["newline"];
 				$row = ($row == "even") ? "odd" : "even";
 			}
@@ -530,9 +537,9 @@ class table {
 	function draw_column($c) {
 		$class = $c["name"];
 		if ($c["class"]) $class .= " " . $c["class"];
-		$style = ($c["width"]) ? "width:" . $c["width"] . "px;min-width:" . $c["width"] . "px;": false;
+		$style = ($c["width"]) ? "width:" . $c["width"] . "px;": false;
 		$content = ($c["title"]) ? $c["title"] : format_text_human($c["name"]);
-		return draw_container("th", $content, array("style"=>$style));
+		return draw_container("th", $content, array("style"=>$style, "class"=>$c["class"]));
 	}
 
 	function draw_columns() {

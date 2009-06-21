@@ -1,6 +1,13 @@
 <?php
 error_debug("including array.php", __file__, __line__);
 
+function array_2d($array) {
+	//to take a scalar array and convert it to a 2d array by doubling the keys / values
+	$return = array();
+	foreach ($array as $a) $return[$a] = $a;
+	return $return;
+}
+
 function array_csv($content, $delimiter=",") {
 	error_debug("doing an array csv on delimiter " . $delimiter, __file__, __line__);
 	//input function.  pass it a file_get() 'ed CSV and it will give you an array back
@@ -49,6 +56,7 @@ function array_key_compare_desc($a, $b) {
 
 function array_key_filter($array, $key, $value) {
 	//only return array keys of a particular value
+	//todo ~~ what's this used for?  something tells me jeffrey or coddington?
 	$return = array();
 	foreach ($array as $element) if ($element[$key] == $value) $return[] = $element;
 	return $return;
@@ -60,6 +68,20 @@ function array_post_fields($fieldnames, $delimiter=",") {
 	$return = array();
 	$fields = explode($delimiter, $fieldnames);
 	foreach ($fields as $f) $return[] = trim($f);
+	return $return;
+}
+
+function array_post_filter($control, $delimiter="_") {
+	//this was started for livingcities, but applicable for db_checkboxes
+	global $_POST;
+	$return = array();
+	$trim_length = strlen($control) + strlen($delimiter);
+	foreach ($_POST as $key=>$value) {
+		$array = explode($delimiter, $key);
+		if ($array[0] == $control) {
+			$return[substr($key, $trim_length)] = $value;
+		}
+	}
 	return $return;
 }
 

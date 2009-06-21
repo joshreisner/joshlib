@@ -10,22 +10,31 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 	if (!$array) $array = array();
 	$key = false;
 	
-	if (stristr($sql, ",")) {
-		//todo ~ need more elegant way of determining multi-column results
-		//selecting more than one column, return associative array (no point in selecting more than two columns)
-		while ($r = db_fetch($result)) {
-			if (!$key) $key = array_keys($r);
-			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
-			if ($prepend_value) $r[$key[1]] = $prepend_value . $r[$key[1]];
-			$array[$r[$key[0]]] = $r[$key[1]];
-		}		
+	if (db_found($result) == 1) {
+		//single row
+		if (db_num_fields($result) == 1) {
+			return db_fetch($result);
+		} else {
+			return db_fetch($result);
+		}
 	} else {
-		while ($r = db_fetch($result)) {
-			if (!$key) $key = array_keys($r);
-			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
-			//if ($prepend_value) $r[$key[1]] = $prepend_value . $r[$key[1]];
-			$array[] = $r[$key[0]];
-		}		
+		//multiple rows
+		if (db_num_fields($result) == 1) {
+			//single d array
+			while ($r = db_fetch($result)) {
+				if (!$key) $key = array_keys($r);
+				if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
+				$array[] = $r[$key[0]];
+			}		
+		} else {
+			//multidimensional array
+			while ($r = db_fetch($result)) {
+				if (!$key) $key = array_keys($r);
+				if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
+				if ($prepend_value) $r[$key[1]] = $prepend_value . $r[$key[1]];
+				$array[$r[$key[0]]] = $r[$key[1]];
+			}		
+		}
 	}
 	
 	return $array;

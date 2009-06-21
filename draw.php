@@ -45,6 +45,52 @@ function draw_autorefresh($minutes=5) {
 	return draw_tag("meta", array("http-equiv"=>"refresh", "content"=>$minutes * 60));
 }
 
+function draw_calendar($month, $year, $events=false) {
+	//for livingcities roundup
+	//$events is an optional 2d array that you can pass in (from db via db_table) that's looking for the following values
+	//title -- required -- the event title
+	//day -- required (1, 2, 3 ... 31)
+	//link -- if the event should be linked
+	//color -- if there should be a background color to its div
+	
+	global $_josh;
+	
+	//reprocess the events into a different kind of array
+	$cal_events = array();
+	if ($events) {
+		foreach ($events as $e)	{
+			if (!isset($cal_events[$e["day"]])) $cal_events[$e["day"]] = "";
+			$style = (isset($e["color"])) ? "background-color:#" . $e["color"] : false;
+			$cal_events[$e["day"]] .= draw_container("div", $e["title"], array("class"=>"event", "style"=>$style));
+		}
+	}
+	
+	$firstday = date("w", mktime(0, 0, 0, $month, 1, $year));
+	$lastday  = date("d", mktime(0, 0, 0, ($month + 1), 0, $year));
+	
+	$days_short = array("sun", "mon", "tue", "wed", "thu", "fri", "sat");
+	$days_long = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+	
+	$return = "";
+	for ($i = 0; $i < 7; $i++) $return .= '<div class="header ' . $days_short[$i] . '">' . $days_long[$i] . '</div>';
+	for ($week = 1, $thisday = 1; ($thisday < $lastday); $week++) {
+		for ($day = 1; $day <= 7; $day++) {
+			$thisday = (((7 * ($week - 1)) + $day) - $firstday);
+			if ($thisday > 0 && $thisday <= $lastday) {
+				$class = "day";
+				if (($year == $_josh["year"]) && ($month == $_josh["month"]) && ($thisday == $_josh["today"])) $class .= " today";
+				$return .= '<div class="' . $class . ' ' . $days_short[$day-1] . '"><div class="number">' . $thisday . '</div>';
+				$return .= @$cal_events[$thisday];
+				$return .= '</div>';
+			} else {
+				$return .= '<div class="blank ' . $days_short[$day-1] . '"></div>';
+			}
+		}
+	}
+	
+	return draw_container("div", $return, array("class"=>"calendar weeks" . ($week - 1)));
+}
+
 function draw_css($content) {
 	return draw_tag("style", array("type"=>"text/css"), $content);
 }
@@ -84,6 +130,10 @@ function draw_favicon($location="/images/favicon.png") {
 }
 
 function draw_focus($form_element) {
+	global $_josh;
+	die("hi");
+	if ($_josh["drawn"]["focus"]) return false;
+	$_josh["drawn"]["focus"] = $form_element;
 	return draw_javascript('document.getElementById("' . $form_element . '").focus();');
 }
 
@@ -144,82 +194,18 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 	$ampm   = date("A", $timestamp);
 
 	//assemble date fields
-	$return  = '<nobr><select name="' . $namePrefix . 'Month" class="' . $class . '">';
-	if (!$required) {
-		$return .= "<option";
-		if ($nulled) $return .= " selected";
-		$return .= "></option>";
-	}
-	for ($i = 1; $i < 13; $i++) {
-		$return .= '<option value="' . $i . '"';
-		if (!$nulled && ($i == $month)) $return .= ' selected';
-		$return .= '>' . $_josh["months"][$i-1] . '</option>';
-	}
-	$return .= '</select>';
-	$return .= '&nbsp;<select name="' . $namePrefix . 'Day" class="' . $class . '">';
-	if (!$required) {
-		$return .= "<option";
-		if ($nulled) $return .= " selected";
-		$return .= "></option>";
-	}
-	for ($i = 1; $i < 32; $i++) {
-		$return .= '<option value="' . $i . '"';
-		if (!$nulled && ($i == $day)) $return .= ' selected';
-		$return .= '>' . $i . '</option>';
-	}
-	$return .= '</select>';
-	$return .= '&nbsp;<select name="' . $namePrefix . 'Year" class="' . $class . '">';
-	if (!$required) {
-		$return .= "<option";
-		if ($nulled) $return .= " selected";
-		$return .= "></option>";
-	}
-	for ($i = 1910; $i < 2030; $i++) {
-		$return .= '<option value="' . $i . '"';
-		if (!$nulled && ($i == $year)) $return .= ' selected';
-		$return .='>' . $i . '</option>';
-	}
-	$return .= '</select></nobr>';
-	
+	$months = array();
+	foreach ($_josh["months"] as $key=>$value) $months[$key + 1] = $value;
+	$return = draw_form_select($namePrefix . "Month", $months, $month, $required, $class) .
+	draw_form_select($namePrefix . "Day", array_2d(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)), $day, $required, $class) .
+	draw_form_select($namePrefix . "Year", array_2d(array(2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010)), $year, $required, $class);
 	if ($withTime) {
-		//todo -- make time nullable (!$required)
-		$return .= '&nbsp;&nbsp;<select name="' . $namePrefix . 'Hour" class="' . $class . '">';
-		$return .= '<option value="12"';
-		if ($hour == 12) $return .= ' selected';
-		$return .= '>12</option>';
-		for ($i = 1; $i < 12; $i++) {
-			$return .= '<option value="' . $i . '"';
-			if ($hour == $i) $return .= ' selected';
-			$return .= '>' . $i . '</option>';
-		}
-		$return .= '</select>&nbsp;<select name="' . $namePrefix . 'Minute" class="' . $class . '">';
-			$return .= '<option value="00"';
-			if ($minute == 0) $return .= ' selected';
-			$return .='>00</option>';
-			for ($i = 1; $i < 60; $i++) {
-				$return .= '<option value="' . $i . '"';
-				if ($minute == $i) $return .= ' selected';
-				$return .= '>' . sprintf("%02d", $i) . '</option>';
-			}
-			/*$return .= '<option value="15"';
-			if ($minute == 15) $return .= ' selected';
-			$return .='>15</option>';
-			$return .= '<option value="30"';
-			if ($minute == 30) $return .= ' selected';
-			$return .='>30</option>';
-			$return .= '<option value="45"';
-			if ($minute == 45) $return .= ' selected';
-			$return .='>45</option>';*/
-		$return .= '</select>&nbsp;<select name="' . $namePrefix . 'AMPM" class="' . $class . '">';
-			$return .= '<option value="AM"';
-			if ($ampm == "AM") $return .= ' selected';
-			$return .='>AM</option><option value="PM"';
-			if ($ampm == "PM") $return .= ' selected';
-			$return .='>PM</option></select>';
+		$return .= "&nbsp;" . 
+		draw_form_select($namePrefix . "Hour", array_2d(array(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)), $hour, $required, $class) .
+		draw_form_select($namePrefix . "Minute", array_2d(array("00", 15, 30, 45)), $minute, $required, $class) .
+		draw_form_select($namePrefix . "AMPM", array_2d(array("AM", "PM")), $ampm, $required, $class);
 	}
-	
-	//return string
-	return $return;
+	return draw_container("nobr", $return);
 }
 
 function draw_form_file($name, $class="file", $onchange=false) {

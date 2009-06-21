@@ -297,8 +297,12 @@ function url_query_set(key, value) {
 	var ret		= Array();
 	for (var i = 0; i < pairs.length; i++) {
 		var pair = pairs[i].split("=");
-		if (pair[0] == key) found = true;
-		if (pair[0]) ret.push(pair[0] + "=" + encodeURIComponent(pair[1]));
+		if (pair[0] == key) {
+			found = true;
+			if (value) ret.push(pair[0] + "=" + encodeURIComponent(value));
+		} else if (pair[0]) {
+			ret.push(pair[0] + "=" + encodeURIComponent(pair[1]));
+		}
     }
     if (!found) ret.push(key + "=" + encodeURIComponent(value));
     ret.sort();
