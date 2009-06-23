@@ -483,7 +483,7 @@ class table {
 				if (isset($v["class"]) && !empty($v["class"])) $return .= " " . $v["class"] . " " . $row . "_" . $v["class"];
 				$return .= '"';
 				if ($hover) {
-					if (isset($v["link"])) $this->return .= ' onclick="location.href=\'' . $v["link"] . '\';"';
+					if (isset($v["link"])) $return .= ' onclick="location.href=\'' . $v["link"] . '\';"';
 					//hover class must exist
 					$return .= ' onmouseover="css_add(this, \'hover\');"';
 					$return .= ' onmouseout="css_remove(this, \'hover\');"';

@@ -131,7 +131,6 @@ function draw_favicon($location="/images/favicon.png") {
 
 function draw_focus($form_element) {
 	global $_josh;
-	die("hi");
 	if ($_josh["drawn"]["focus"]) return false;
 	$_josh["drawn"]["focus"] = $form_element;
 	return draw_javascript('document.getElementById("' . $form_element . '").focus();');
