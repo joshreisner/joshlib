@@ -5,10 +5,10 @@ WELCOME TO JOSHLIB
 	http://joshlib.joshreisner.com/ (eventual website)
 
 ACKNOWLEDGEMENTS
-	> fpdf				(php)	not included but frequently used
-	> prototype			(js)	not included, but frequently used.  maybe in the future there might be dependencies.
+	> fpdf				(php)	not included, but frequently used
+	> prototype			(js)	not included, but frequently used
 	> scriptaculous		(js)	not included, but frequently used
-	> simple_html_dom	(php)	included as html.php.  more info there.  wonderful.  thank you sirs.  format_html() & form class references this.
+	> simple_html_dom	(php)	included as html.php.  more info there.  wonderful.  thank you sirs.  format_html() & class form references this.
 	> tinymce			(js)	not included, but frequently used
 
 VARIABLES YOU CAN PASS THAT IT WON'T OVERWRITE
@@ -254,6 +254,7 @@ class form {
 	var $title	= false;
 	var $table	= false;
 	var $values = array();
+	var $submit = false;
 	
 	function __construct($table=false, $submit=false, $id=false) {
 		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
@@ -262,10 +263,9 @@ class form {
 		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		
 		$this->table = $table;
+		$this->submit = $submit;
 		if ($table) $this->set_table($table);
-		if ($submit === true) $this->title = (($id) ? "Edit " : "Add New ") . format_singular(format_text_human($table));
-		if ($submit) $this->set_field(array("type"=>"submit", "label"=>"&nbsp;", "value"=>$this->title));
-		//echo draw_array(die("SELECT * FROM $table WHERE id = " . $id));
+		$this->title = (($id) ? "Edit " : "Add New ") . format_singular(format_text_human($table));
 		if ($id) $this->set_values(db_array("SELECT * FROM $table WHERE id = " . $id));
 	}
 	
@@ -273,7 +273,7 @@ class form {
 		//title should be a string, and indicates you want a title dd at the top of your form
 		//if you don't pass a $title, there had better be a title already set via the constructor
 		if ($title) $this->title = $title;
-		array_unshift($this->fields, array("type"=>"title", "class"=>"title", "value"=>$this->title, "label"=>false));
+		array_unshift($this->fields, array("type"=>"title", "name"=>"","class"=>"title", "value"=>$this->title, "label"=>false));
 	}
 	
 	function set_table($table) {
@@ -287,6 +287,8 @@ class form {
 				$this->set_field(array("type"=>"checkbox", "name"=>$c["name"]));
 			} elseif ($c["type"] == "datetime") {
 				$this->set_field(array("type"=>"datetime", "name"=>$c["name"]));
+			} elseif (($c["type"] == "image") || ($c["type"] == "mediumblob")) {
+				$this->set_field(array("type"=>"file", "name"=>$c["name"]));
 			}
 		}	
 	}
@@ -354,14 +356,15 @@ class form {
 				$return .= '<div class="checkbox_option">' . draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span></div>';
 			} elseif ($type == "checkboxes") {
 				if ($value) {
-					$options = db_query("SELECT o.id, o.title, (SELECT COUNT(*) FROM $linking_table l WHERE l.$option_id = o.id AND l.$object_id = $value) checked FROM $options_table o ORDER BY o.title");
+					$options = db_table("SELECT o.id, o.title, (SELECT COUNT(*) FROM $linking_table l WHERE l.$option_id = o.id AND l.$object_id = $value) checked FROM $options_table o ORDER BY o.title");
 				} else {
-					$options = db_query("SELECT id, title, 0 checked FROM $options_table ORDER BY title");
+					$options = db_table("SELECT id, title, 0 checked FROM $options_table ORDER BY title");
 				}
-				while ($o = db_fetch($options)) {
+				foreach ($options as &$o) {
 					$name = "chk_" . str_replace("_", "-", $options_table) . "_" . $o["id"];
-					$return .= '<div class="checkbox_option">' . draw_form_checkbox($name, $o["checked"]) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o["title"] . '</span></div>';
+					$o = draw_form_checkbox($name, $o["checked"]) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o["title"] . '</span>';
 				}
+				$return .= draw_list($options);
 			} elseif ($type == "date") {
 				$return .= draw_form_date($name, $value, false) . $additional;
 			} elseif ($type == "datetime") {
@@ -423,6 +426,9 @@ class form {
 		//add values?
 		if ($values) $this->set_values($values);
 
+		//submit button
+		if ($this->submit) $return .= $this->set_field(array("type"=>"submit", "value"=>strip_tags($this->title)));
+		
 		//add fields
 		foreach ($this->fields as $field) $return .= $this->draw_row($field);
 		

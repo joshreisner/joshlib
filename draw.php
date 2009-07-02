@@ -207,7 +207,8 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 	return draw_container("nobr", $return);
 }
 
-function draw_form_file($name, $class="file", $onchange=false) {
+function draw_form_file($name, $class=false, $onchange=false) {
+	if (!$class) $class="file";
 	$return  = '<input type="file" name="' . $name . '" class="' . $class . '"';
 	if ($onchange) $return .= ' onchange="javascript:' . $onchange . '"';
 	$return .= '>';
