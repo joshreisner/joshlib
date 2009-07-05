@@ -306,7 +306,7 @@ class form {
 		
 		//focus on first element
 		reset($this->fields);
-		$return .= draw_form_focus($this->fields[key($this->fields)]["name"]);
+		if ($this->fields[key($this->fields)]["name"]) $return .= draw_form_focus($this->fields[key($this->fields)]["name"]);
 		return $return;
 	}
 
