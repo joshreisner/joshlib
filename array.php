@@ -3,6 +3,7 @@ error_debug("including array.php", __file__, __line__);
 
 function array_2d($array) {
 	//to take a scalar array and convert it to a 2d array by doubling the keys / values
+	//what's it used for??
 	$return = array();
 	foreach ($array as $a) $return[$a] = $a;
 	return $return;
@@ -36,6 +37,14 @@ function array_csv($content, $delimiter=",") {
 	return $return;
 }
 
+function array_insert($array, $position, $value) {
+	//insert an arbitrary $value into a flat $array at a particular $position
+    $array_clip = array_splice($array, $position);
+    $array[] = $value;
+    $array = array_merge($array, $array_clip);
+    return $array;
+}
+
 function array_key_compare_asc($a, $b) {
 	//for use by array_sort() below
 	//can't imagine a situation where you'd use this normally
@@ -65,6 +74,7 @@ function array_key_filter($array, $key, $value) {
 function array_post_fields($fieldnames, $delimiter=",") {
 	//this function is used by format_post_nulls() etc to format $_POST variables
 	//array is a comma-delimited string, spaces are ok
+	//this should be renamed to be more generic, and/or combined with array_csv
 	$return = array();
 	$fields = explode($delimiter, $fieldnames);
 	foreach ($fields as $f) $return[] = trim($f);

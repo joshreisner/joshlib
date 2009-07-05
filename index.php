@@ -256,84 +256,60 @@ class form {
 	var $values = array();
 	var $submit = false;
 	
-	function __construct($table=false, $submit=false, $id=false) {
+	function __construct($table=false, $id=false, $submit=true) {
 		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
+		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		//$submit is a boolean, and indicates whether you should auto-add a submit button at the bottom
 		//if you pass $submit as a string, it will title use the text you passed, and title the form that
-		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		
 		$this->table = $table;
 		$this->submit = $submit;
 		if ($table) $this->set_table($table);
 		$this->title = (($id) ? "Edit " : "Add New ") . format_singular(format_text_human($table));
-		if ($id) $this->set_values(db_array("SELECT * FROM $table WHERE id = " . $id));
+		if ($id) $this->set_values(db_grab("SELECT * FROM $table WHERE id = " . $id));
 	}
 	
-	function set_title($title=false) {
-		//title should be a string, and indicates you want a title dd at the top of your form
-		//if you don't pass a $title, there had better be a title already set via the constructor
-		if ($title) $this->title = $title;
-		array_unshift($this->fields, array("type"=>"title", "name"=>"","class"=>"title", "value"=>$this->title, "label"=>false));
-	}
+	function draw($validate=false, $values=false) {
+		//todo ~ remove arguments.  validate should happen automatically, but be extensible somehow.  values i think is obsolete now.
 	
-	function set_table($table) {
-		$cols = db_columns($table, true);
-		foreach ($cols as $c) {
-			if ($c["type"] == "varchar") {
-				$this->set_field(array("type"=>"text", "name"=>$c["name"]));
-			} elseif ($c["type"] == "text") {
-				$this->set_field(array("type"=>"textarea", "name"=>$c["name"], "class"=>"mceEditor"));
-			} elseif (($c["type"] == "bit") || ($c["type"] == "tinyint")) {
-				$this->set_field(array("type"=>"checkbox", "name"=>$c["name"]));
-			} elseif ($c["type"] == "datetime") {
-				$this->set_field(array("type"=>"datetime", "name"=>$c["name"]));
-			} elseif (($c["type"] == "image") || ($c["type"] == "mediumblob")) {
-				$this->set_field(array("type"=>"file", "name"=>$c["name"]));
-			}
-		}	
-	}
-	
-	function set_values($values) {
-		$this->values = $values;
-	}
-
-	function set_field($array) {
-		//defaults
-		$type = $value = $class = $name = $label = $required = $append = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $object_id = $options = $linking_table = false;
+		global $_josh, $_GET;
 		
-		//load inputs
-		if (!is_array($array)) return error_handle("array not set");
-		extract($array);
-		
-		//type is required
-		if (!$type) return error_handle("type not set");
-		
-		if ((($type == "text") || ($type == "password")) && !isset($array["additional"]) && $required) $additional = "(required)";
-
-		error_debug("adding field " . $label, __file__, __line__);
-		
-		if (!$name)	$name	= format_text_code($label);
-		if (!$label) $label = format_text_human($name);
-		if (!$value) $value	= (isset($this->values[$name])) ? $this->values[$name] : false;
-		if (!$class) $class	= "";
-		if (!$option_id) $option_id	= "option_id";
-		if (!$object_id) $object_id	= "object_id";
-		
-		if ($additional) $additional = "<span class='additional'>" . $additional . "</span>";
-		
-		if ($type == "checkbox") {
-			$additional = $label;
-			$label = "&nbsp;";
+		//sometimes you can get to a form from multiple places.  you might want to return the way you came.
+		if (isset($_GET["return_to"])) {
+			$additional = "or " . draw_link($_GET["return_to"], "cancel");
+			$this->set_field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
+		} elseif (isset($_josh["referrer"]["url"])) {
+			$additional = "or " . draw_link($_josh["referrer"]["url"], "cancel");
+			$this->set_field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["url"]));
+		} else {
+			$additional = "";
 		}
 		
-		//package and save
-		$this->fields[] = compact("name", "type", "label", "value", "append", "required", "sql", "class", "action", "onchange", "additional", "options_table", "option_id", "object_id", "options", "linking_table", "maxlength");
+		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh["request"]["path_query"] . '"';
+		if ($validate) $return .= ' name="' . $validate . '" onsubmit="javascript:return validate_' . $validate . '(this);"';
+		
+		$class = "form";
+		if ($validate) $class .= " " . $validate;
+		$return .= '>
+			<dl class="' . $class . '">';
+
+		//add values?
+		if ($values) $this->set_values($values);
+
+		//submit button
+		if ($this->submit) $return .= $this->set_field(array("type"=>"submit", "value"=>strip_tags($this->title), "additional"=>$additional));
+		
+		//add fields
+		foreach ($this->fields as $field) $return .= $this->draw_row($field);
+		
+		$return .= '</dl></form>';
+		
+		//focus on first element
+		reset($this->fields);
+		$return .= draw_form_focus($this->fields[key($this->fields)]["name"]);
+		return $return;
 	}
-	
-	function set_group($string="") {
-		$this->set_field(array("name"=>"group", "type"=>"group", "value"=>$string));
-	}
-	
+
 	function draw_row($field) {
 		global $_josh;
 		extract($field);
@@ -405,38 +381,83 @@ class form {
 		return $return;
 	}
 	
-	function draw($validate=false, $values=false) {
-		global $_josh, $_GET;
+	function set_field($array) {
+		//defaults
+		$type = $value = $class = $name = $label = $required = $append = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $object_id = $options = $linking_table = false;
 		
-		//sometimes you can get to a form from multiple places.  you might want to return the way you came.
-		if (isset($_josh["referrer"]["path_query"])) {
-			$this->set_field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_josh["referrer"]["url"]));
-		} elseif (isset($_GET["return_to"])) {
-			$this->set_field(array("type"=>"hidden", "name"=>"return_to", "value"=>$_GET["return_to"]));
+		//load inputs
+		if (!is_array($array)) return error_handle("array not set");
+		extract($array);
+		
+		//type is required
+		if (!$type) return error_handle("type not set");
+		
+		if ((($type == "text") || ($type == "password")) && !isset($array["additional"]) && $required) $additional = "(required)";
+
+		error_debug("adding field " . $label, __file__, __line__);
+		
+		if (!$name)	$name	= format_text_code($label);
+		if (!$label) $label = format_text_human($name);
+		if (!$value) $value	= (isset($this->values[$name])) ? $this->values[$name] : false;
+		if (!$class) $class	= "";
+		if (!$option_id) $option_id	= "option_id";
+		if (!$object_id) $object_id	= "object_id";
+		
+		if ($additional) $additional = "<span class='additional'>" . $additional . "</span>";
+		
+		if ($type == "checkbox") {
+			$additional = $label;
+			$label = "&nbsp;";
 		}
 		
-		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh["request"]["path_query"] . '"';
-		if ($validate) $return .= ' name="' . $validate . '" onsubmit="javascript:return validate_' . $validate . '(this);"';
-		
-		$class = "form";
-		if ($validate) $class .= " " . $validate;
-		$return .= '>
-			<dl class="' . $class . '">';
-
-		//add values?
-		if ($values) $this->set_values($values);
-
-		//submit button
-		if ($this->submit) $return .= $this->set_field(array("type"=>"submit", "value"=>strip_tags($this->title)));
-		
-		//add fields
-		foreach ($this->fields as $field) $return .= $this->draw_row($field);
-		
-		$return .= '</dl></form>';
-		
-		//focus on first element
-		$return .= draw_form_focus($this->fields[0]["name"]);
-		return $return;
+		//package and save
+		$this->fields[$name] = compact("name", "type", "label", "value", "append", "required", "sql", "class", "action", "onchange", "additional", "options_table", "option_id", "object_id", "options", "linking_table", "maxlength");
+	}
+	
+	function set_group($string="") {
+		$this->set_field(array("name"=>"group", "type"=>"group", "value"=>$string));
+	}
+	
+	function set_table($table) {
+		$cols = db_columns($table, true);
+		foreach ($cols as $c) {
+			if ($c["type"] == "varchar") {
+				if ($c["name"] == "password") {
+					$this->set_field(array("type"=>"password", "name"=>$c["name"], "additional"=>$c["comments"], "required"=>$c["required"]));
+				} else {
+					$this->set_field(array("type"=>"text", "name"=>$c["name"], "additional"=>$c["comments"], "required"=>$c["required"]));
+				}
+			} elseif ($c["type"] == "text") {
+				$this->set_field(array("type"=>"textarea", "name"=>$c["name"], "class"=>"mceEditor"));
+			} elseif (($c["type"] == "bit") || ($c["type"] == "tinyint")) {
+				$this->set_field(array("type"=>"checkbox", "name"=>$c["name"]));
+			} elseif ($c["type"] == "date") {
+				$this->set_field(array("type"=>"date", "name"=>$c["name"], "additional"=>$c["comments"]));
+			} elseif ($c["type"] == "datetime") {
+				$this->set_field(array("type"=>"datetime", "name"=>$c["name"], "additional"=>$c["comments"]));
+			} elseif (($c["type"] == "image") || ($c["type"] == "mediumblob")) {
+				$this->set_field(array("type"=>"file", "name"=>$c["name"], "additional"=>$c["comments"]));
+			}
+		}	
+	}
+	
+	function set_title($title=false) {
+		//title should be a string, and indicates you want a title dd at the top of your form
+		//if you don't pass a $title, there had better be a title already set via the constructor
+		if ($title) $this->title = $title;
+		array_unshift($this->fields, array("type"=>"title", "name"=>"","class"=>"title", "value"=>$this->title, "label"=>false));
+	}
+	
+	function set_values($values) {
+		//if you want to do a custom select and pass in the associative array
+		foreach ($values as $key=>$value) {
+			$this->values[$key] =  $value;
+		}
+	}
+	
+	function unset_fields($fieldnames) {
+		$fields = array_post_fields($fieldnames);
+		foreach ($fields as $f) unset($this->fields[$f]);
 	}
 }
 

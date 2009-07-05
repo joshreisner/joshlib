@@ -10,31 +10,22 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 	if (!$array) $array = array();
 	$key = false;
 	
-	if (db_found($result) == 1) {
-		//single row
-		if (db_num_fields($result) == 1) {
-			return db_fetch($result);
-		} else {
-			return db_fetch($result);
-		}
+	//multiple rows
+	if (db_num_fields($result) == 1) {
+		//single d array
+		while ($r = db_fetch($result)) {
+			if (!$key) $key = array_keys($r);
+			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
+			$array[] = $r[$key[0]];
+		}		
 	} else {
-		//multiple rows
-		if (db_num_fields($result) == 1) {
-			//single d array
-			while ($r = db_fetch($result)) {
-				if (!$key) $key = array_keys($r);
-				if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
-				$array[] = $r[$key[0]];
-			}		
-		} else {
-			//multidimensional array
-			while ($r = db_fetch($result)) {
-				if (!$key) $key = array_keys($r);
-				if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
-				if ($prepend_value) $r[$key[1]] = $prepend_value . $r[$key[1]];
-				$array[$r[$key[0]]] = $r[$key[1]];
-			}		
-		}
+		//multidimensional array
+		while ($r = db_fetch($result)) {
+			if (!$key) $key = array_keys($r);
+			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
+			if ($prepend_value) $r[$key[1]] = $prepend_value . $r[$key[1]];
+			$array[$r[$key[0]]] = $r[$key[1]];
+		}		
 	}
 	
 	return $array;
@@ -136,7 +127,7 @@ function db_columns($tablename, $omitSystemFields=false) {
 	error_debug("<b>db_columns</b> running");
 	$return = array();
 	if ($_josh["db"]["language"] == "mysql") {
-		$result = db_query("DESCRIBE " . $tablename);
+		$result = db_query("SHOW FULL COLUMNS FROM " . $tablename);
 		while ($r = db_fetch($result)) {
 			if ($omitSystemFields && (in_array($r["Field"], $_josh["system_columns"]))) continue;
 			
@@ -144,7 +135,8 @@ function db_columns($tablename, $omitSystemFields=false) {
 			@list($type, $length) = explode("(", str_replace(")", "", $r["Type"]));
 			$required = ($r["Null"] == "YES") ? false : true;
 			$default = $r["Default"];
-			$return[] = compact("name","type","required","default");
+			$comments = $r["Comment"];
+			$return[] = compact("name","type","required","default","comments");
 		}
 	} else {
 		$result = db_table("SELECT 

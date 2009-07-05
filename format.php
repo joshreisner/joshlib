@@ -1,10 +1,13 @@
 <?php
 /*
 this section is all formatting functions, usually to format strings into special configurations
+
+todo ~ deprecate this entire library and start a string library?
 */
 error_debug("including format.php", __file__, __line__);
 
 function format_accents_encode($string) {
+	//not sure if this is necessary anymore with the conversion to utf8
 	$string = str_replace("“", "&ldquo;",	$string);
 	$string = str_replace("”", "&rdquo;",	$string);
 	$string = str_replace("‘", "&lsquo;",	$string);
@@ -19,6 +22,7 @@ function format_accents_encode($string) {
 }
 
 function format_array_text($array) {
+	//string_array?
 	if (count($array) > 1) {
 		$last = array_pop($array);
 		return implode(", ", $array) . " and " . $last;
@@ -36,6 +40,7 @@ function format_ascii($string) {
 }
 
 function format_binary($blob) {
+	//todo -- db_binary?
 	global $_josh;
 	if ($_josh["db"]["language"] == "mssql") {
 		$return = unpack("H*hex", $blob);
@@ -52,11 +57,13 @@ function format_boolean($value, $options="Yes|No") {
 }
 
 function format_check($variable, $type="int") {
+	//todo compile a set of cases where we use format_check, format_num, format_numeric, format_verify.  i think this can be simplifed
 	//alias
 	return format_verify($variable, $type);
 }
 
 function format_code($code) {
+	//afaik this is just for formatting error messages.  
 	return "<p style='font-family:courier; font-size:13px;'>" . nl2br(str_replace("\t", "&nbsp;", htmlentities($code))) . "</p>";
 }
 
@@ -103,7 +110,7 @@ function format_date($timestamp=false, $error="", $format="M d, Y", $relativetim
 	}
 	
 	if ($return === 1) return $error;
-	return $return;
+	return draw_container("nobr", $return);
 }
 
 function format_date_iso8601($timestamp=false) {
@@ -115,13 +122,14 @@ function format_date_iso8601($timestamp=false) {
 }
 
 function format_date_rss($timestamp=false) {
+	//todo ~ define difference between this and format_date_iso8601 above?
 	if (!$timestamp) $timestamp = time();
 	if (!is_int($timestamp)) $timestamp = strToTime($timestamp);
 	return date(DATE_RSS, $timestamp);
 }
 
 function format_date_sql($month, $day, $year, $hour=0, $minute=0, $second=1) {
-	global $_POST, $_josh;
+	//db_date?  db_date_format?
 	if (!empty($month) && !empty($day) && !empty($year)) {
 		return "'" . date("Y-m-d H:i:00", mktime($hour, $minute, $second, $month, $day, $year)) . "'";
 	} else {
@@ -130,6 +138,7 @@ function format_date_sql($month, $day, $year, $hour=0, $minute=0, $second=1) {
 }
 
 function format_date_time($timestamp=false, $error="", $separator="&nbsp;", $suppressMidnight=true, $relativetime=true) {
+	//string_datetime?
 	if ($timestamp === false) $timestamp = time();
 	$return = format_date($timestamp, $error, "M d, Y", $relativetime);
 	//if (($return == "Today") || ($return == "Yesterday") || ($return == "Tomorrow")) 
@@ -143,6 +152,7 @@ function format_date_excel($timestamp) {
 }
 
 function format_date_xml($timestamp=false) {
+	//difference between this and format_date_rss and format_date_iso8601?
 	if (!$timestamp) $timestamp = "now";
 	if (!empty($timestamp) && $timestamp) return @date("Y-m-d", strToTime($timestamp)) . "T00:00:00.000";
 }
@@ -596,7 +606,7 @@ function format_q($quantity, $entity, $capitalize=true) {
 	return format_quantitize($quantity, $entity, $capitalize);
 }
 
-function format_quantitize($quantity, $entity, $capitalize=true) {
+function format_quantitize($quantity, $entity, $title_case=true) {
 	global $_josh;
 	if ($quantity == 0) {
 		$return = "no " . format_pluralize($entity);
@@ -607,7 +617,7 @@ function format_quantitize($quantity, $entity, $capitalize=true) {
 	} else {
 		$return = $quantity . " " . format_pluralize($entity);
 	}
-	if ($capitalize) $return = format_title($return);
+	if ($title_case) $return = format_title($return);
 	return $return;
 }
 
@@ -657,12 +667,27 @@ function format_ssn($str) {
 	return substr($str, 0, 3) . "-" . substr($str, 3, 2) . "-" . substr($str, 5, 4);
 }
 
-function format_string($str, $len=30, $tail="&hellip;") {
-	if (strlen($str) > $len) {
-		return substr($str, 0, ($len - 3)) . $tail;
-	} else {
-		return $str;
+function format_string($string, $target=30, $append="&hellip;") {
+	//shorten a $string to $target length
+	//difference between this and format_text_shorten?
+	//modifying to only break on words for harvard and livingcities
+	if (strlen($string) < $target) return $string;
+	$words = explode(" ", $string);
+	$length = 0;
+	$return = "";
+	foreach ($words as $w) {
+		if ($length == 0) {
+			//first word -- add it no matter what.
+			$return .= $w;
+			$length += strlen($w);
+		} else {
+			$wordlength = strlen($w) + 1; //add one for the space
+			if ($length + $wordlength > $target) break;
+			$return .= " " . $w;
+			$length += $wordlength;
+		}
 	}
+	return $return . $append;
 }
 
 function format_text_code($str) {
@@ -675,7 +700,8 @@ function format_text_code($str) {
 }
 
 function format_text_ends($needle, $haystack) {
-	if (strToLower(substr($haystack, (0 - strlen($needle)))) == strToLower($needle)) return true;
+	$needle_length = strlen($needle);
+	if (strToLower(substr($haystack, (0 - $needle_length))) == strToLower($needle)) return substr($haystack, 0, strlen($haystack) - $needle_length);
 	return false;
 }
 
@@ -692,7 +718,10 @@ function format_text_shorten($text, $length=30, $append="&#8230;", $appendlength
 }
 
 function format_text_starts($needle, $haystack) {
-	if (strToLower(substr($haystack, 0, strlen($needle))) == strToLower($needle)) return true;
+	//function to see if a $haystack starts with $needle
+	//now returns $haystack sans needle for harvard: trimming news clip publication titles
+	$needle_len = strlen($needle);
+	if (strToLower(substr($haystack, 0, $needle_len)) == strToLower($needle)) return substr($haystack, $needle_len);
 	return false;
 }
 
