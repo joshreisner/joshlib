@@ -205,11 +205,15 @@ function file_rss($title, $link, $items, $filename=false) {
 	global $_josh;
 	//$items should be an array with title, description, link and date
 	//dtfmt Wed, 12 Nov 2008 09:13:11 -0500
-	$return = "";
-	$lastBuildDate = false;
 	
+	//w3c feed validator wants this, if possible
+	$return = ($filename) ? '<atom:link href="' . url_base() . $filename . '" rel="self" type="application/rss+xml" />' : "";
+	
+	$lastBuildDate = false;
+
 	foreach ($items as $i) {
 		if (!$lastBuildDate) $lastBuildDate = format_date_rss($i["date"]);
+		$i["link"] = str_replace("&", "&amp;", $i["link"]);
 		$return .= '
 		<item>
 			<title>' . htmlspecialchars($i["title"]) . '</title>
@@ -223,9 +227,9 @@ function file_rss($title, $link, $items, $filename=false) {
 	}
 	
 	$description = "";
-	
+		
 	$return = '<?xml version="1.0" encoding="utf-8"?>
-		<rss version="2.0">
+		<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 		<channel>
 		<title>' . $title . '</title>
 		<link>' . $link . '</link>
@@ -237,7 +241,7 @@ function file_rss($title, $link, $items, $filename=false) {
 		<generator>http://joshreisner.com/joshlib/</generator>
 		<webMaster>' . $_josh["email_admin"] . '</webMaster>
 		<ttl>15</ttl>
-		' . $return . '		
+		' . $return . '
 		</channel>
 		</rss>';
 	if (!$filename) return $return;

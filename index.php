@@ -445,8 +445,9 @@ class form {
 		array_unshift($this->fields, array("type"=>"title", "name"=>"","class"=>"title", "value"=>$this->title, "label"=>false));
 	}
 	
-	function set_values($values) {
+	function set_values($values=false) {
 		//if you want to do a custom select and pass in the associative array
+		if (!is_array($values)) return false;
 		foreach ($values as $key=>$value) {
 			$this->values[$key] =  $value;
 		}
