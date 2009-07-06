@@ -471,16 +471,17 @@ function draw_link($href, $str=false, $newwindow=false, $args=false) {
 	return draw_container("a", $str, $args);
 }
 
-function draw_list($options, $class=false, $type="ul", $selected=false) {
+function draw_list($options, $args=false, $type="ul", $selected=false) {
 	//make a ul or an ol out of a one-dimensional array
 	global $_josh;
 	if (!is_array($options) || (!$count = count($options))) return false;
+	if (!is_array($args)) $args = array("class"=>$args); //if args is a string, it's legacy class
 	for ($i = 0; $i < $count; $i++) {
 		$liclass = "option" . ($i + 1);
 		if ($selected == ($i + 1)) $liclass .= " selected";
 		$options[$i] = draw_tag("li", array("class"=>$liclass), $options[$i]);
 	}
-	return draw_tag($type, array("class"=>$class), implode($options,  $_josh["newline"] . "\t"));
+	return draw_tag($type, $args, implode($options,  $_josh["newline"] . "\t"));
 }
 
 function draw_meta_description($string) {

@@ -59,6 +59,29 @@ function form_checkbox_toggle(which) {
 	document.getElementById(which).checked = !document.getElementById(which).checked;
 }
 
+function form_checkbox_add(options_table, target) {
+	//var which is the options_table
+	var new_value = prompt("Please enter a name for the new checkbox", "");
+	if (new_value) {
+		//get checkbox states
+		var checkboxes = document.getElementsByTagName("input");
+		var needle = "chk_" + options_table;
+		var checked = new Array();
+		for (var i = 0; i < checkboxes.length; i++) {
+			if ((checkboxes[i].name.substr(0, needle.length) == needle) && checkboxes[i].checked) checked.push(checkboxes[i].name);
+		}
+		
+		//send request		
+		new Ajax.Request(target, {
+			method: 'post',
+			parameters: { 'new_value':new_value, 'options_table':options_table, 'checked':checked.join(",") },
+			onSuccess: function(transport) {
+				document.getElementById(options_table).innerHTML = transport.responseText;
+			}
+		});
+	}
+}
+
 function form_errors(errors) {
 	var error;
 	if (errors.length == 0) return true;

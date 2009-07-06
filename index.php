@@ -324,23 +324,20 @@ class form {
 		} else {
 			if ($label) {
 				$return .= '<dt class="' . $type . '">' . $label;
-				if ($additional && ($type == "checkboxes")) $return .= $additional;
+				if ($additional && (($type == "checkboxes") || ($type == "textarea"))) $return .= "<br>" . $additional;
 				$return .= '</dt>' . $_josh["newline"];
 			}
 			$return .= '<dd class="' . $type . '">';
 			if ($type == "checkbox") {
 				$return .= '<div class="checkbox_option">' . draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span></div>';
 			} elseif ($type == "checkboxes") {
-				if ($value) {
-					$options = db_table("SELECT o.id, o.title, (SELECT COUNT(*) FROM $linking_table l WHERE l.$option_id = o.id AND l.$object_id = $value) checked FROM $options_table o ORDER BY o.title");
-				} else {
-					$options = db_table("SELECT id, title, 0 checked FROM $options_table ORDER BY title");
-				}
+				$options = ($value) ? db_table("SELECT o.id, o.title, (SELECT COUNT(*) FROM $linking_table l WHERE l.$option_id = o.id AND l.$object_id = $value) checked FROM $options_table o ORDER BY o.title") : db_table("SELECT id, title, 0 checked FROM $options_table ORDER BY title");
 				foreach ($options as &$o) {
 					$name = "chk_" . str_replace("_", "-", $options_table) . "_" . $o["id"];
 					$o = draw_form_checkbox($name, $o["checked"]) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o["title"] . '</span>';
 				}
-				$return .= draw_list($options);
+				if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
+				$return .= draw_list($options, array("id"=>$options_table));
 			} elseif ($type == "date") {
 				$return .= draw_form_date($name, $value, false) . $additional;
 			} elseif ($type == "datetime") {
@@ -383,7 +380,7 @@ class form {
 	
 	function set_field($array) {
 		//defaults
-		$type = $value = $class = $name = $label = $required = $append = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $object_id = $options = $linking_table = false;
+		$type = $value = $class = $name = $label = $required = $append = $allow_changes = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $object_id = $options = $linking_table = false;
 		
 		//load inputs
 		if (!is_array($array)) return error_handle("array not set");
@@ -411,7 +408,7 @@ class form {
 		}
 		
 		//package and save
-		$this->fields[$name] = compact("name", "type", "label", "value", "append", "required", "sql", "class", "action", "onchange", "additional", "options_table", "option_id", "object_id", "options", "linking_table", "maxlength");
+		$this->fields[$name] = compact("name", "type", "label", "value", "append", "required", "allow_changes", "sql", "class", "action", "onchange", "additional", "options_table", "option_id", "object_id", "options", "linking_table", "maxlength");
 	}
 	
 	function set_group($string="") {
