@@ -544,7 +544,9 @@ class table {
 			function reorder() {
 				var ampcharcode= '%26';
 				var serializeOpts = Sortable.serialize('" . $this->name . "') + unescape(ampcharcode) + 'key=" . $this->name . "' + unescape(ampcharcode) + 'update=" . $this->name . "';
-				var options = { method:'post', parameters:serializeOpts };
+				var options = { method:'post', parameters:serializeOpts, onSuccess: function(transport) {
+					//alert(transport.responseText);
+				} };
 				new Ajax.Request('" . $this->target . "', options);
 				newOrder = Sortable.sequence('" . $this->name . "');
 				var state = 'odd';
