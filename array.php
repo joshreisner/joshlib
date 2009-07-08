@@ -9,6 +9,12 @@ function array_2d($array) {
 	return $return;
 }
 
+function array_ajax($source=false) {
+	//returns an array of ajax-posted content
+	if (!$source) $source = file_get_contents("php://input");
+	return url_query_parse(urldecode($source));
+}
+
 function array_csv($content, $delimiter=",") {
 	error_debug("doing an array csv on delimiter " . $delimiter, __file__, __line__);
 	//input function.  pass it a file_get() 'ed CSV and it will give you an array back
