@@ -101,6 +101,23 @@ function array_post_filter($control, $delimiter="_") {
 	return $return;
 }
 
+function array_range($start, $end, $increment=1) {
+	//numeric, sequential arrays for draw_form_date
+	$return = array();
+	if (($increment > 0) && ($start < $end)) {
+		while ($start <= $end) {
+			$return[] = $start;
+			$start += $increment;
+		}
+	} elseif (($increment < 0) && ($start > $end)) {
+		while ($start >= $end) {
+			$return[] = $start;
+			$start -= $increment;
+		}
+	}
+	return $return;
+}
+
 function array_remove($needle, $haystack) {
 	//remove an array element with a specific key.  arguments should probably be reversed?
 	$return = array();

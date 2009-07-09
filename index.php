@@ -434,6 +434,8 @@ class form {
 				$this->set_field(array("type"=>"datetime", "name"=>$c["name"], "additional"=>$c["comments"]));
 			} elseif (($c["type"] == "image") || ($c["type"] == "mediumblob")) {
 				$this->set_field(array("type"=>"file", "name"=>$c["name"], "additional"=>$c["comments"]));
+			} elseif ($c["type"] == "int") {
+				$this->set_field(array("type"=>"hidden", "name"=>$c["name"]));
 			}
 		}	
 	}

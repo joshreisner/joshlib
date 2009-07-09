@@ -18,7 +18,7 @@ function file_array($content, $filename=false) {
 		$rows .= "</tr>";
 	}
 	$content = '<table border="1" style="font-family:Verdana; font-size:9px;">' . $header . $rows . '</table>';
-	if ($filename) return file_download($content, $filename, "xls");
+	if ($filename) file_download($content, $filename, "xls");
 	return $content;
 }
 
