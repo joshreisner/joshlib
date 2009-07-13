@@ -179,8 +179,13 @@ function form_radio_empty(radio) {
 	return !oneFound;
 }
 
-function form_text_empty(text) {
-	return !text.value.length;
+function form_text_empty(field) {
+	return !field.value.length;
+}
+
+function form_tinymce_empty(field) {
+	tinyMCE.triggerSave();
+	return !field.value.length;
 }
 
 function form_text_complex(text) {
