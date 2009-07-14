@@ -143,14 +143,15 @@ function db_columns($tablename, $omitSystemFields=false) {
 				c.name, 
 				t.name type, 
 				CASE WHEN c.isnullable = 0 THEN 1 ELSE 0 END required, 
-				m.text [default]
+				m.text [default],
+				s.value comments
 			FROM syscolumns c
 			JOIN sysobjects o ON o.id = c.id
 			JOIN systypes t on c.xtype = t.xtype
 			LEFT JOIN syscomments m on c.cdefault = m.id
+			LEFT JOIN sysproperties s ON c.colid = s.smallid
 			WHERE o.name = '$tablename'
-			ORDER BY c.colorder
-			");
+			ORDER BY c.colorder");
 		$count = count($result);
 		for ($i = 0; $i < $count; $i++) {
 			if ($omitSystemFields && (in_array($result[$i]["name"], $_josh["system_columns"]))) continue;
@@ -369,7 +370,7 @@ function db_save($table, $id="get", $array=false) {
 	//default behavior is to use $_GET["id"] as the id number to deal with
 	if ($id == "get") $id = url_id();
 	if ($id == "id") {
-		//this happened once
+		//this happened once, and was problematic because it evaluates to all records
 		error_handle("db_save can't process", "a value of 'id' was set for the ID");
 		exit;
 	}
