@@ -241,7 +241,7 @@ function url_query_parse($querystring) {
 	if (strstr($querystring, "=")) {
 		$pairs = explode("&", $querystring);
 		foreach ($pairs as $pair) {
-			list($key, $value) = explode("=", $pair);
+			@list($key, $value) = explode("=", $pair);
 			$return[$key] = urldecode($value);
 		}
 	}

@@ -101,6 +101,10 @@ function form_errors(errors) {
 	return false;
 }
 
+function form_tinymce_clear(field_id) {
+	tinyMCE.getInstanceById(field_id).getBody().innerHTML='';
+}
+
 function form_tinymce_init(cssLocation, imageManager) {
 	if (imageManager) {
 		tinyMCE.init({
@@ -179,13 +183,13 @@ function form_radio_empty(radio) {
 	return !oneFound;
 }
 
-function form_text_empty(field) {
-	return !field.value.length;
+function form_text_empty(obj) {
+	return !obj.value.length;
 }
 
-function form_tinymce_empty(field) {
+function form_tinymce_empty(obj) {
 	tinyMCE.triggerSave();
-	return !field.value.length;
+	return !obj.value.length;
 }
 
 function form_text_complex(text) {

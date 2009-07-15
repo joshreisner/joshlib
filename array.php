@@ -12,7 +12,9 @@ function array_2d($array) {
 function array_ajax($source=false) {
 	//returns an array of ajax-posted content
 	if (!$source) $source = file_get_contents("php://input");
-	return url_query_parse(urldecode($source));
+	$array = url_query_parse(urldecode($source));
+	foreach ($array as $key=>$value) $array[$key] = format_quotes($value);
+	return $array;
 }
 
 function array_csv($content, $delimiter=",") {

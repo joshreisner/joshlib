@@ -454,8 +454,9 @@ function draw_javascript_src($filename=false) {
 	return $_josh["newline"] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
-function draw_link($href, $str=false, $newwindow=false, $args=false) {
+function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
 	if (!$args)	$args = array();
+	if (!$href) return $str;
 	
 	//obfuscate email
 	if (format_text_starts("mailto:", $href)) {

@@ -375,7 +375,9 @@ function db_save($table, $id="get", $array=false) {
 		exit;
 	}
 	
-	if (!isset($_SESSION["user_id"])) error_handle("session not set", "db_save needs a session user_id variable");
+	//if (!isset($_SESSION["user_id"])) error_handle("session not set", "db_save needs a session user_id variable");
+	$userID = (isset($_SESSION["user_id"])) ? $_SESSION["user_id"] : "NULL";
+	
 	if (!$array) $array = $_POST;
 	
 	$columns	= db_columns($table, true);
@@ -468,14 +470,14 @@ function db_save($table, $id="get", $array=false) {
 
 	if ($id) {
 		$query1[] = "updated_date = " .  db_date();
-		$query1[] = "updated_user = " . ((isset($array["updated_user"])) ? $array["updated_user"] : $_SESSION["user_id"]);
+		$query1[] = "updated_user = " . ((isset($array["updated_user"])) ? $array["updated_user"] : $userID);
 		if (db_query("UPDATE $table SET " . implode(", ", $query1) . " WHERE id = " . $id)) return $id;
 		return false;
 	} else {
 		$query1[] = "created_date";
 		$query2[] = db_date();
 		$query1[] = "created_user";
-		$query2[] = ((isset($array["created_user"])) ? $array["created_user"] : $_SESSION["user_id"]);
+		$query2[] = ((isset($array["created_user"])) ? $array["created_user"] : $userID);
 		$query1[] = "is_active";
 		$query2[] = 1;
 		$query = "INSERT INTO $table ( " . implode(", ", $query1) . " ) VALUES ( " . implode(", ", $query2) . " )";
