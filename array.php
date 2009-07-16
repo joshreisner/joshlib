@@ -18,13 +18,14 @@ function array_ajax($source=false) {
 }
 
 function array_csv($content, $delimiter=",") {
+	global $_josh;
 	error_debug("doing an array csv on delimiter " . $delimiter, __file__, __line__);
 	//input function.  pass it a file_get() 'ed CSV and it will give you an array back
 	//if a header row is present, it will return an array of associative arrays
 	//written by josh on 5/15/09 for work mgmt: harvest import
 	//todo == make header optional
 	
-	$rows = explode("\n", trim($content));
+	$rows = explode($_josh["newline"], trim($content));
 	
 	//parse header
 	$columns = array();
