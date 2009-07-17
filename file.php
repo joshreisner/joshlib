@@ -196,6 +196,7 @@ function file_put($filename, $content) {
 	} else {
 		if (is_array($content)) $content = implode($content);
 		$bytes = fwrite($file, $content);
+		error_debug("<b>file_put</b> writing $bytes bytes to $filename", __file__, __line__);	
 		fclose($file);
 		return $bytes;
 	}

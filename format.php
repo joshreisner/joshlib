@@ -343,6 +343,8 @@ function format_html_text($str) {
 function format_image_resize($source, $max_width=false, $max_height=false) {
 	global $_josh;
 
+	error_debug("<b>file_image_resize</b> running width = $max_width and height = $max_height", __file__, __line__);
+	
 	//exit on error
 	if (!function_exists("imagecreatefromjpeg")) error_handle("library missing", "the GD library needs to be installed to run format_image_resize", __file__, __line__);
 	if (empty($source)) return null;
@@ -350,6 +352,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 	if (!function_exists("resize")) {
 		function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
 			global $_josh;
+			error_debug("<b>format_image_resize > resize</b> running", __file__, __line__);	
 			//resize an image and save to the $target_name
 			$tmp = imagecreatetruecolor($new_width, $new_height);
 			if (!$image = imagecreatefromjpeg($_josh["root"] . $source_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
@@ -361,6 +364,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 
 		function crop($new_width, $new_height, $target_name) {
 			global $_josh;
+			error_debug("<b>format_image_resize > crop</b> running", __file__, __line__);	
 			//crop an image and save to the $target_name
 			list($width, $height) = getimagesize($_josh["root"] . $target_name);
 			$tmp = imagecreatetruecolor($new_width, $new_height);
@@ -377,8 +381,10 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 	$target_name = $_josh["write_folder"] . "/temp-target.jpg";
 	file_put($source_name, $source);
 
+
 	//get source image dimensions
 	list($width, $height) = getimagesize($_josh["root"] . $source_name);
+	error_debug("<b>format_image_resize </b> got the existing width ($width) and height ($height) of the temp image", __file__, __line__);	
 	
 	//execute differently depending on target parameters	
 	if ($max_width && $max_height) {
@@ -386,6 +392,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		if (($width == $max_width) && ($height == $max_height)) {
 			//already exact width and height, skip resizing
 			copy($_josh["root"] . $source_name, $_josh["root"] . $target_name);
+			//file_put($target_name, $source);
 		} else {
 			//this was for the scenario where your target was a long landscape and you got a squarish image.
 			//this doesn't work if your target is squarish and you get a long landscape
