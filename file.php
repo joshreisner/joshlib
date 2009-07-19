@@ -250,12 +250,14 @@ function file_rss($title, $link, $items, $filename=false) {
 }
 
 function file_sister($filename, $ext) {
-	global $_josh;
 	//this will tell you if there's a 'sister file' in the same directory, eg picture.jpg && picture.html
-	if (file_exists($_josh["root"] . $filename)) {
+	//todo - rename to file_sibling
+	//developed for jeffrey monteiro
+	global $_josh;
+	if (file_is($filename)) {
 		list ($file, $extension, $path) = file_name($filename);
-		$sister = $_josh["root"] . $path . $_josh["folder"] . $file . "." . $ext;
-		if (file_exists($sister)) {
+		$sister = $path . $_josh["folder"] . $file . "." . $ext;
+		if (file_is($sister)) {
 			error_debug("file sister file exists");
 			return $sister;
 		} else {
