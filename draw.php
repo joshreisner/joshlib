@@ -111,6 +111,20 @@ function draw_container($tag, $innerhtml, $args=false) {
 
 function draw_div($id, $innerhtml="", $args=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
+	//todo deprecate this in favor of draw_div_id
+	return draw_div_id($id, $innerhtml, $args);
+}
+
+function draw_div_class($class, $innerhtml="", $args=false) {
+	//convenience function specifically for DIVs, since they're so ubiquitous
+	if (!$args) $args = array();
+	$args["class"] = $class;
+	if (empty($innerhtml)) $args["class"] .= " empty";
+	return draw_tag("div", $args, $innerhtml);
+}
+
+function draw_div_id($id, $innerhtml="", $args=false) {
+	//convenience function specifically for DIVs, since they're so ubiquitous
 	if (!$args) $args = array();
 	$args["id"] = $id;
 	return draw_tag("div", $args, $innerhtml);
@@ -405,7 +419,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	//get width and height
 	$image = @getimagesize($path);
 	if (!$image) $image = @getimagesize($_josh["root"] . $path);
-	if (!$image) return false;
+	if (!$image) return "";
 	
 	//assemble tag
 	$args = array("src"=>url_base() . $path, "width"=>$image[0], "height"=>$image[1], "border"=>0);
@@ -520,7 +534,7 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 	$selected = false;
 	$counter = 1;
 	$javascript = $_josh["newline"];
-	foreach ($options as $title=>$url) {
+	foreach ($options as $url=>$title) {
 		$name = 'option_' . $_josh["drawn_navigation"] . '_' . $counter;
 		$thisoption = '<a href="' . $url . '" class="' . $name;
 		if (str_replace(url_base(), "", $url) == $match) {
