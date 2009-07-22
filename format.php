@@ -692,10 +692,11 @@ function format_string($string, $target=30, $append="&hellip;") {
 
 function format_text_code($str) {
 	$return = strToLower(trim($str));
+	$return = str_replace("'",	"",	$return);
+	$return = str_replace(",",	"",	$return);
 	$return = str_replace("/",	"_",	$return);
 	$return = str_replace(" ",	"_",	$return);
 	$return = str_replace("&",	"and",	$return);
-	$return = str_replace(",",	"",	$return);
 	return $return;
 }
 

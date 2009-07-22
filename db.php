@@ -190,9 +190,10 @@ function db_delete($table, $id=false) {
 			error_handle("expecting \$_GET[\"id\"]", "db_delete is expecting an id variable");
 		}
 	}
+	$user = (isset($_SESSION["user_id"]) && !empty($_SESSION["user_id"])) ? $_SESSION["user_id"] : "NULL";
 	db_query("UPDATE $table SET 
 		deleted_date = " . db_date() . ", 
-		deleted_user = {$_SESSION["user_id"]}, 
+		deleted_user = " . $user . ", 
 		is_active = 0 
 		WHERE id = " . $id);
 }
