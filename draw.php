@@ -446,7 +446,18 @@ function draw_javascript($javascript=false) {
 	';
 }
 
+function draw_javascript_lib() {
+	global $_josh;
+	return 
+	draw_javascript_src() .
+	draw_javascript_src($_josh["write_folder"] . "/lib/prototype.js") .
+	draw_javascript_src($_josh["write_folder"] . "/lib/scriptaculous/scriptaculous.js") .
+	draw_javascript_src($_josh["write_folder"] . "/lib/tiny_mce/tiny_mce.js") .
+	draw_javascript("form_tinymce_init('/styles/tinymce.css')");
+}
+
 function draw_javascript_tinymce($path_css="/styles/tinymce.css", $path_script="/_site/tiny_mce/tiny_mce.js") {
+	//todo deprecated
 	return draw_javascript_src() . draw_javascript_src($path_script) . draw_javascript("form_tinymce_init('" . $path_css . "');");
 }
 

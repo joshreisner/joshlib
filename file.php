@@ -202,6 +202,35 @@ function file_put($filename, $content) {
 	}
 }
 
+function file_put_config() {
+	global $_josh;
+	
+	$return	 = '<?php' . $_josh["newline"];
+	
+	//db variables
+	$return .= '$_josh["db"]["location"]        = "localhost"; //server' . $_josh["newline"];
+	$return .= '$_josh["db"]["language"]        = "mysql"; //mysql or mssql' . $_josh["newline"];
+	$return .= '$_josh["db"]["database"]        = "";' . $_josh["newline"];
+	$return .= '$_josh["db"]["username"]        = "";' . $_josh["newline"];
+	$return .= '$_josh["db"]["password"]        = "";' . $_josh["newline"];
+	$return .= '$_josh["basedblanguage"]        = ""; //mysql or mssql (not necessary unless you want it translated)' . $_josh["newline"];
+	$return .= $_josh["newline"];
+	
+	//error variables
+	$return .= '$_josh["error_log_api"]         = false; //error logging url, eg http://tasks.joshreisner.com/errorapi.php' . $_josh["newline"];
+	$return .= '$_josh["email_default"]         = "josh@joshreisner.com"; //regular site emails come from this address' . $_josh["newline"];
+	$return .= '$_josh["email_admin"]           = "josh@joshreisner.com"; //error emails go to this address' . $_josh["newline"];
+	$return .= $_josh["newline"];
+	
+	//url variables
+	$return .= '$_josh["is_secure"]         	= false; //indicates whether it should use https (true) or not (false)' . $_josh["newline"];
+	$return .= $_josh["newline"];
+
+	$return .= '?>';
+	
+	return file_put($_josh["config"], $return);
+}
+
 function file_rss($title, $link, $items, $filename=false) {
 	global $_josh;
 	//$items should be an array with title, description, link and date
@@ -239,7 +268,7 @@ function file_rss($title, $link, $items, $filename=false) {
 		<managingEditor>' . $_josh["email_admin"] . '</managingEditor>
 		<copyright>' . '</copyright>
 		<lastBuildDate>' . $lastBuildDate . '</lastBuildDate>
-		<generator>http://joshreisner.com/joshlib/</generator>
+		<generator>http://joshlib.joshreisner.com/</generator>
 		<webMaster>' . $_josh["email_admin"] . '</webMaster>
 		<ttl>15</ttl>
 		' . $return . '
@@ -266,4 +295,62 @@ function file_sister($filename, $ext) {
 	}
 	return false;
 }
+
+function file_unzip($source, $target) {
+	global $_josh;
+    $zip = zip_open($source);
+
+    if (is_resource($zip)) {
+		while ($zip_entry = zip_read($zip)) {
+			$folder = dirname(zip_entry_name($zip_entry));
+			if (format_text_starts(".", $folder)) continue;
+			if (format_text_starts("__MACOSX", $folder)) continue;
+
+	        $completePath = $_josh["root"] . $target . $_josh["folder"] . $folder;
+	        $completeName = $_josh["root"] . $target . $_josh["folder"] . zip_entry_name($zip_entry);
+	        if (!file_exists($completeName)) {
+	            $tmp = "";
+	            foreach(explode($_josh["folder"], $folder) AS $k) {
+	                $tmp .= $k . $_josh["folder"];
+	                if(!is_dir($_josh["root"] . $target . $_josh["folder"] . $tmp)) mkdir($_josh["root"] . $target . $_josh["folder"] . $tmp, 0777);
+	            }
+	        }
+	        
+	        if (zip_entry_open($zip, $zip_entry, "r")) {
+                if ($fd = @fopen($completeName, 'w+')) {
+                    fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
+                    fclose($fd);
+                } else {
+                    // We think this was an empty directory
+                    if(!is_dir($tmp)) mkdir($completeName, 0777);
+                }
+                zip_entry_close($zip_entry);
+	        }
+	    }
+	    zip_close($zip);
+	} else {
+		error_handle("ZIP not found", "couldn't find a source archive at " . $source);
+	}
+	return true;
+}
+
+function file_write_folder($folder=false) {
+	//make sure there's a writable folder where you said.  defaults to write_folder
+	global $_josh;
+	
+	if (!$folder) $folder = $_josh["write_folder"];
+	$folder = $_josh["root"] . $folder;
+	
+	//make folder
+	if (!is_dir($folder) && !@mkdir($folder)) error_handle("couldn't create folder", "file_write_folder tried to create a folder at " . $folder . " but could not.  please create a folder there and make it writable.");
+
+	//set permissions
+	if (!is_writable($folder)) {
+		@chmod($folder, 0777); //might only need 755?
+		return is_writable($folder);
+	} else {
+		return true;
+	}
+}
+
 ?>

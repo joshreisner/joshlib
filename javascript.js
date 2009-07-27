@@ -119,10 +119,11 @@ function form_tinymce_init(cssLocation) {
 		theme_advanced_toolbar_align : "center",
 		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[align|style],p[align]",
 		content_css : cssLocation + "?" + new Date().getTime(),
-		plugins : "imagemanager",
+		plugins : "imagemanager,filemanager",
 		editor_selector : "mceEditor",
 		editor_deselector : "mceNoEditor",
-		relative_urls : false
+		relative_urls : false,
+		remove_script_host : false
 	});
 }
 

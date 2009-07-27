@@ -722,6 +722,8 @@ function format_text_starts($needle, $haystack) {
 	//function to see if a $haystack starts with $needle
 	//now returns $haystack sans needle for harvard: trimming news clip publication titles
 	$needle_len = strlen($needle);
+	//echo "~" . substr($haystack, 0, $needle_len) . "~vs~" . $needle . "~<br>";
+	if ($needle == $haystack) return true;
 	if (strToLower(substr($haystack, 0, $needle_len)) == strToLower($needle)) return substr($haystack, $needle_len);
 	return false;
 }

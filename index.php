@@ -5,7 +5,7 @@ WELCOME TO JOSHLIB
 	http://joshlib.joshreisner.com/ (eventual website)
 
 THIRD PARTY SOFTWARE
-	[new] included in lib.zip.  
+	[new!] included in lib.zip.  
 	> fpdf				(php)	version 1.6		http://www.fpdf.org/
 	> prototype			(js)	version 1.5		http://prototypejs.org/
 	> scriptaculous		(js)	version 1.8.2	http://script.aculo.us/
@@ -14,7 +14,6 @@ THIRD PARTY SOFTWARE
 
 VARIABLES YOU CAN PASS THAT IT WON'T OVERWRITE
 	$_josh["basedblanguage"]	mysql or mssql -- if it doesn't match db language, will try to translate
-	$_josh["config"]			the file location of the configuration file [deprecated]
 	$_josh["db"]["location"]	the server location of the configuration file
 	$_josh["db"]["username"]
 	$_josh["db"]["password"]
@@ -25,7 +24,6 @@ VARIABLES YOU CAN PASS THAT IT WON'T OVERWRITE
 	$_josh["email_admin"]		the address of the site administrator, for error reporting
 	$_josh["error_log_api"]		post hook -- should be full urL, eg http://work.joshreisner.com/api/hook.php
 	$_josh["is_secure"]			true (use https) or false (don't)
-	$_josh["javascript"]		the location of where to put javascript.js, if you're going to use the javascript functions [deprecated]
 	$_josh["write_folder"]		the location of where to write stuff to (current default is /_site)
 
 VARIABLES THAT IT GETS FROM THE SERVER -- IF YOU'RE RUNNING AS ROOT YOU MIGHT NEED TO PASS SOME OF THESE
@@ -140,20 +138,21 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	
 	
 //get configuration variables
-	if (!isset($_josh["write_folder"])) $_josh["write_folder"] = "/_site";
-	if (!isset($_josh["config"])) $_josh["config"] = $_josh["write_folder"] . "/config-" . $_josh["request"]["sanswww"] . ".php";
-	if (file_exists($_josh["config"])) {
-		error_debug("<b>configure</b> found file", __file__, __line__);
-		require($_josh["config"]);
-	} elseif (file_exists($_josh["root"] . $_josh["config"])) {
+	if (!isset($_josh["write_folder"])) $_josh["write_folder"] = "/_" . $_josh["request"]["sanswww"]; //eg /_example.com
+	if (!isset($_josh["config"])) $_josh["config"] = $_josh["write_folder"] . $_josh["folder"] . "config.php"; //eg /_example.com/config.php
+	if (file_is($_josh["config"])) {
 		error_debug("<b>configure</b> found file", __file__, __line__);
 		require($_josh["root"] . $_josh["config"]);
 	} else {
-		error_debug("<b>configure</b> couldn't find config file", __file__, __line__);
+		//if it doesn't exist, create one
+		error_debug("couldn't find config file, attempting to create one", __file__, __line__);
+		file_write_folder();
+		file_put_config();
+		require($_josh["root"] . $_josh["config"]);
 	}
 
 
-//set defaults for configuration for variables it didn't find
+//set defaults for configuration for variables it didn't find (this could happen if you roll your own)
 	if (!isset($_josh["db"]["location"]))	$_josh["db"]["location"]	= "localhost";
 	if (!isset($_josh["db"]["language"]))	$_josh["db"]["language"]	= "mysql";
 	if (!isset($_josh["basedblanguage"]))	$_josh["basedblanguage"]	= $_josh["db"]["language"];
@@ -162,7 +161,14 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	if (!isset($_josh["email_default"]))	$_josh["email_default"]		= "josh@joshreisner.com";
 	if (!isset($_josh["error_log_api"]))	$_josh["error_log_api"]		= false;
 		
-	
+
+//ensure lib exists
+	if (!is_dir($_josh["root"] . $_josh["write_folder"] . "/lib")) {
+		file_unzip($_josh["joshlib_folder"] . $_josh["folder"] . "lib.zip", $_josh["write_folder"]);
+		file_write_folder($_josh["write_folder"] . $_josh["folder"] . "files");
+		file_write_folder($_josh["write_folder"] . $_josh["folder"] . "images");
+	}		
+
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_SERVER["HTTP_HOST"]) && (format_text_starts("dev-", $_SERVER["HTTP_HOST"]) || format_text_starts("beta.", $_SERVER["HTTP_HOST"]) || format_text_ends(".site", $_SERVER["HTTP_HOST"]))) {
 		$_josh["mode"] = "dev";
@@ -182,16 +188,6 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 		}
 	}
 
-
-//deploy lib.zip library if not found
-	if (!is_dir($_josh["root"] . $_josh["write_folder"] . "/lib")) {
-		if (!is_writable($_josh["root"] . $_josh["write_folder"])) {
-			error_handle("write_folder not writable", "");
-		} else {
-			$zip = zip_open($_josh["joshlib_folder"] . "/lib.zip");
-			
-		}
-	}
 
 //set convenience state variables and escape quotes if necessary
 	$_josh["getting"]	= !empty($_GET);
