@@ -4,15 +4,17 @@ WELCOME TO JOSHLIB
 	http://code.google.com/p/joshlib/ (wiki / documentation / tracking)
 	http://joshlib.joshreisner.com/ (eventual website)
 
-ACKNOWLEDGEMENTS
-	> fpdf				(php)	not included, but frequently used
-	> prototype			(js)	not included, but frequently used
-	> scriptaculous		(js)	not included, but frequently used
-	> simple_html_dom	(php)	included as html.php.  more info there.  wonderful.  thank you sirs.  format_html() & class form references this.
-	> tinymce			(js)	not included, but frequently used
+THIRD PARTY SOFTWARE
+	[new] included in lib.zip.  
+	> fpdf				(php)	version 1.6		http://www.fpdf.org/
+	> prototype			(js)	version 1.5		http://prototypejs.org/
+	> scriptaculous		(js)	version 1.8.2	http://script.aculo.us/
+	> simple_html_dom	(php)	version 1.11	http://sourceforge.net/projects/simplehtmldom/
+	> tinymce			(js)	version 3.2.5	http://tinymce.moxiecode.com/
 
 VARIABLES YOU CAN PASS THAT IT WON'T OVERWRITE
-	$_josh["config"]			the file location of the configuration file
+	$_josh["basedblanguage"]	mysql or mssql -- if it doesn't match db language, will try to translate
+	$_josh["config"]			the file location of the configuration file [deprecated]
 	$_josh["db"]["location"]	the server location of the configuration file
 	$_josh["db"]["username"]
 	$_josh["db"]["password"]
@@ -21,12 +23,12 @@ VARIABLES YOU CAN PASS THAT IT WON'T OVERWRITE
 	$_josh["debug"]				true / false.  turn this on to get detailed error logging output to the browser
 	$_josh["email_default"]		the address general message should come from
 	$_josh["email_admin"]		the address of the site administrator, for error reporting
-	$_josh["javascript"]		the location of where to put javascript.js, if you're going to use the javascript functions
-	$_josh["basedblanguage"]	mysql or mssql -- if it doesn't match db language, will try to translate
-	$_josh["is_secure"]			true (use https) or false (don't)
 	$_josh["error_log_api"]		post hook -- should be full urL, eg http://work.joshreisner.com/api/hook.php
+	$_josh["is_secure"]			true (use https) or false (don't)
+	$_josh["javascript"]		the location of where to put javascript.js, if you're going to use the javascript functions [deprecated]
+	$_josh["write_folder"]		the location of where to write stuff to (current default is /_site)
 
-VARIABLES THAT IT GETS FROM THE SERVER -- IF YOU'RE RUNNING AS ROOT YOU SHOULD PASS SOME OF THESE
+VARIABLES THAT IT GETS FROM THE SERVER -- IF YOU'RE RUNNING AS ROOT YOU MIGHT NEED TO PASS SOME OF THESE
 	$_josh["request"]			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)
 	$_josh["referrer"]			same as request
 	$_josh["folder"]			/ or \
@@ -90,7 +92,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	require($_josh["joshlib_folder"] . "/email.php");
 	require($_josh["joshlib_folder"] . "/file.php");
 	require($_josh["joshlib_folder"] . "/format.php");
-	require($_josh["joshlib_folder"] . "/html.php");
+	require($_josh["joshlib_folder"] . "/html.php"); //todo deprecated
 	require($_josh["joshlib_folder"] . "/url.php");
 
 //parse environment variables
@@ -181,6 +183,16 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	}
 
 
+//deploy lib.zip library if not found
+	if (!is_dir($_josh["root"] . $_josh["write_folder"] . "/lib")) {
+		if (!is_writable($_josh["root"] . $_josh["write_folder"])) {
+			error_handle("write_folder not writable", "");
+		} else {
+			$zip = zip_open($_josh["joshlib_folder"] . "/lib.zip");
+			
+		}
+	}
+
 //set convenience state variables and escape quotes if necessary
 	$_josh["getting"]	= !empty($_GET);
 	if ($_josh["getting"]) foreach($_GET as $key=>$value) $_GET[$key] = format_quotes($value);
@@ -201,7 +213,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 	
 	$_josh["editing"]	= url_id();
 	
-	
+
 //special functions that don't yet fit into a category
 
 function cookie($name=false, $value=false, $session=false) {
