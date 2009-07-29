@@ -147,6 +147,19 @@ function format_date_time($timestamp=false, $error="", $separator="&nbsp;", $sup
 	return $return . $separator . $time;;
 }
 
+function format_date_time_range($start, $end) {
+	//under dev
+	$start	= strtotime($start);
+	$end	= strtotime($end);
+	
+	if (format_date($start) == format_date($end)) {
+		//occur on same day
+		return format_date_time($start) . " to " . format_time($end);
+	} else {
+		return format_date_time($start, "", " at ") . " to " . format_date_time($end, "", " at ");
+	}
+}
+
 function format_date_excel($timestamp) {
 	if (!empty($timestamp)) return @date("n/j/Y", strToTime($timestamp));
 }
@@ -238,9 +251,9 @@ function format_html($text) {
 			} elseif ($e->tag == "em") {
 				//personal preference: replace <strong> with <b>
 				$e->outertext = "<i>" . $e->innertext . "</i>";
-			} elseif ($e->tag == "img") {
+			//} elseif ($e->tag == "img") {
 				//no small, narrow or flat images
-				if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) $e->outertext = "";
+			//	if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) $e->outertext = "";
 			} elseif (($e->tag == "p") && (!$e->innertext || ($e->innertext == "&nbsp;"))) {
 				//kill empty p tags -- don't know where these are coming from!
 				$e->outertext = "";
@@ -692,8 +705,9 @@ function format_string($string, $target=30, $append="&hellip;") {
 
 function format_text_code($str) {
 	$return = strToLower(trim($str));
-	$return = str_replace("'",	"",	$return);
-	$return = str_replace(",",	"",	$return);
+	$return = str_replace("'",	"",		$return);
+	$return = str_replace(",",	"",		$return);
+	$return = str_replace(".",	"",		$return);
 	$return = str_replace("/",	"_",	$return);
 	$return = str_replace(" ",	"_",	$return);
 	$return = str_replace("&",	"and",	$return);

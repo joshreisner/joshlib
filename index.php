@@ -523,7 +523,7 @@ class table {
 					$return .= ' onmouseover="css_add(this, \'hover\');"';
 					$return .= ' onmouseout="css_remove(this, \'hover\');"';
 				}
-				if ($this->draggable) $return .= ' id="item_' . $v["id"] . '"';
+				$return .= ' id="item_' . $v["id"] . '"';
 				$return .= '>' . $_josh["newline"];
 				foreach ($this->columns as $c) $return .= draw_container("td", $v[$c["name"]], array("class"=>$c["class"]));
 				$return .= '</tr>' . $_josh["newline"];
