@@ -1,32 +1,22 @@
 <?php
 /* 
 WELCOME TO JOSHLIB
-	http://code.google.com/p/joshlib/ (wiki / documentation / tracking)
+	http://code.google.com/p/joshlib/ (wiki / documentation / report issues here)
 	http://joshlib.joshreisner.com/ (eventual website)
 
 THIRD PARTY SOFTWARE
-	[new!] included in lib.zip.  
+	[new!] included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	> fpdf				(php)	version 1.6		http://www.fpdf.org/
 	> prototype			(js)	version 1.5		http://prototypejs.org/
 	> scriptaculous		(js)	version 1.8.2	http://script.aculo.us/
 	> simple_html_dom	(php)	version 1.11	http://sourceforge.net/projects/simplehtmldom/
 	> tinymce			(js)	version 3.2.5	http://tinymce.moxiecode.com/
 
-VARIABLES YOU CAN PASS THAT IT WON'T OVERWRITE
-	$_josh["basedblanguage"]	mysql or mssql -- if it doesn't match db language, will try to translate
-	$_josh["db"]["location"]	the server location of the configuration file
-	$_josh["db"]["username"]
-	$_josh["db"]["password"]
-	$_josh["db"]["language"]	the lanugage to use -- currently mssql or mysql
-	$_josh["db"]["database"]	the database it should connect to
+VARIABLES YOU CAN PASS THAT JOSHLIB WON'T OVERWRITE
 	$_josh["debug"]				true / false.  turn this on to get detailed error logging output to the browser
-	$_josh["email_default"]		the address general message should come from
-	$_josh["email_admin"]		the address of the site administrator, for error reporting
-	$_josh["error_log_api"]		post hook -- should be full urL, eg http://work.joshreisner.com/api/hook.php
-	$_josh["is_secure"]			true (use https) or false (don't)
 	$_josh["write_folder"]		the location of where to write stuff to (current default is /_site)
 
-VARIABLES THAT IT GETS FROM THE SERVER -- IF YOU'RE RUNNING AS ROOT YOU MIGHT NEED TO PASS SOME OF THESE
+VARIABLES THAT JOSHLIB TRIES TO GET FROM THE WEBSERVER -- IF YOU'RE RUNNING FROM THE COMMAND LINE YOU MIGHT NEED TO PASS THEM
 	$_josh["request"]			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)
 	$_josh["referrer"]			same as request
 	$_josh["folder"]			/ or \
@@ -125,7 +115,7 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 		$_josh["request"]["mobile"]		= (isset($_SERVER["HTTP_USER_AGENT"]) && strstr($_SERVER["HTTP_USER_AGENT"], "iPhone"));
 	 	$_josh["referrer"]				= (isset($_SERVER["HTTP_REFERER"]))	? url_parse($_SERVER["HTTP_REFERER"]) : false;
 	} else {
-		//set defaults and hope for the best
+		//probably running from command line -- set defaults
 		if (!isset($_josh["debug"]))	$_josh["debug"]		= false;
 		if (!isset($_josh["request"]))	$_josh["request"]	= false;
 		if (!isset($_josh["folder"]))	$_josh["folder"]	= "/";
@@ -165,9 +155,11 @@ $_josh["time_start"] = microtime(true);	//start the processing time stopwatch --
 //ensure lib exists
 	if (!is_dir($_josh["root"] . $_josh["write_folder"] . "/lib")) {
 		file_unzip($_josh["joshlib_folder"] . $_josh["folder"] . "lib.zip", $_josh["write_folder"]);
-		file_write_folder($_josh["write_folder"] . $_josh["folder"] . "files");
-		file_write_folder($_josh["write_folder"] . $_josh["folder"] . "images");
+		file_write_folder($_josh["write_folder"] . $_josh["folder"] . "dynamic"); //used by file_dynamic
+		file_write_folder($_josh["write_folder"] . $_josh["folder"] . "files"); //used by tinymce
+		file_write_folder($_josh["write_folder"] . $_josh["folder"] . "images"); //used my tinymce
 	}		
+
 
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_SERVER["HTTP_HOST"]) && (format_text_starts("dev-", $_SERVER["HTTP_HOST"]) || format_text_starts("beta.", $_SERVER["HTTP_HOST"]) || format_text_ends(".site", $_SERVER["HTTP_HOST"]))) {
