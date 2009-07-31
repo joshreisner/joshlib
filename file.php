@@ -302,37 +302,70 @@ function file_unzip($source, $target) {
 	global $_josh;
     $zip = zip_open($source);
 
-    if (is_resource($zip)) {
-		while ($zip_entry = zip_read($zip)) {
-			$folder = dirname(zip_entry_name($zip_entry));
-			if (format_text_starts(".", $folder)) continue;
-			if (format_text_starts("__MACOSX", $folder)) continue;
+    if (!is_resource($zip)) {
+		$zipFileFunctionsErrors = array(
+		'ZIPARCHIVE::ER_MULTIDISK' => 'Multi-disk zip archives not supported.',
+		'ZIPARCHIVE::ER_RENAME' => 'Renaming temporary file failed.',
+		'ZIPARCHIVE::ER_CLOSE' => 'Closing zip archive failed', 
+		'ZIPARCHIVE::ER_SEEK' => 'Seek error',
+		'ZIPARCHIVE::ER_READ' => 'Read error',
+		'ZIPARCHIVE::ER_WRITE' => 'Write error',
+		'ZIPARCHIVE::ER_CRC' => 'CRC error',
+		'ZIPARCHIVE::ER_ZIPCLOSED' => 'Containing zip archive was closed',
+		'ZIPARCHIVE::ER_NOENT' => 'No such file.',
+		'ZIPARCHIVE::ER_EXISTS' => 'File already exists',
+		'ZIPARCHIVE::ER_OPEN' => 'Can\'t open file', 
+		'ZIPARCHIVE::ER_TMPOPEN' => 'Failure to create temporary file.', 
+		'ZIPARCHIVE::ER_ZLIB' => 'Zlib error',
+		'ZIPARCHIVE::ER_MEMORY' => 'Memory allocation failure', 
+		'ZIPARCHIVE::ER_CHANGED' => 'Entry has been changed',
+		'ZIPARCHIVE::ER_COMPNOTSUPP' => 'Compression method not supported.', 
+		'ZIPARCHIVE::ER_EOF' => 'Premature EOF',
+		'ZIPARCHIVE::ER_INVAL' => 'Invalid argument',
+		'ZIPARCHIVE::ER_NOZIP' => 'Not a zip archive',
+		'ZIPARCHIVE::ER_INTERNAL' => 'Internal error',
+		'ZIPARCHIVE::ER_INCONS' => 'Zip archive inconsistent', 
+		'ZIPARCHIVE::ER_REMOVE' => 'Can\'t remove file',
+		'ZIPARCHIVE::ER_DELETED' => 'Entry has been deleted'
+		);
+		foreach ($zipFileFunctionsErrors as $constName => $errorMessage) {
+			if (defined($constName) and constant($constName) === $zip) {
+				error_handle("ZIP won't open", "zip_open failed with $errorMessage for " . $source);
 
-	        $completePath = $_josh["root"] . $target . $_josh["folder"] . $folder;
-	        $completeName = $_josh["root"] . $target . $_josh["folder"] . zip_entry_name($zip_entry);
-	        if (!file_exists($completeName)) {
-	            $tmp = "";
-	            foreach(explode($_josh["folder"], $folder) AS $k) {
-	                $tmp .= $k . $_josh["folder"];
-	                if(!is_dir($_josh["root"] . $target . $_josh["folder"] . $tmp)) mkdir($_josh["root"] . $target . $_josh["folder"] . $tmp, 0777);
-	            }
-	        }
-	        
-	        if (zip_entry_open($zip, $zip_entry, "r")) {
-                if ($fd = @fopen($completeName, 'w+')) {
-                    fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
-                    fclose($fd);
-                } else {
-                    // We think this was an empty directory
-                    if(!is_dir($tmp)) mkdir($completeName, 0777);
-                }
-                zip_entry_close($zip_entry);
-	        }
-	    }
-	    zip_close($zip);
-	} else {
-		error_handle("ZIP not found", "couldn't find a source archive at " . $source);
-	}
+				//return 'Zip File Function error: '.$errorMessage;
+			}
+		}
+		error_handle("ZIP won't open", "error code {$zipFileFunctionsErrors[$zip]} for " . $source);
+    }
+
+	while ($zip_entry = zip_read($zip)) {
+		$folder = dirname(zip_entry_name($zip_entry));
+		if (format_text_starts(".", $folder)) continue;
+		if (format_text_starts("__MACOSX", $folder)) continue;
+
+        $completePath = $_josh["root"] . $target . $_josh["folder"] . $folder;
+        $completeName = $_josh["root"] . $target . $_josh["folder"] . zip_entry_name($zip_entry);
+        if (!file_exists($completeName)) {
+            $tmp = "";
+            foreach(explode($_josh["folder"], $folder) AS $k) {
+                $tmp .= $k . $_josh["folder"];
+                if(!is_dir($_josh["root"] . $target . $_josh["folder"] . $tmp)) mkdir($_josh["root"] . $target . $_josh["folder"] . $tmp, 0777);
+            }
+        }
+        
+        if (zip_entry_open($zip, $zip_entry, "r")) {
+            if ($fd = @fopen($completeName, 'w+')) {
+                fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
+                fclose($fd);
+            } else {
+                // We think this was an empty directory
+                if(!is_dir($tmp)) mkdir($completeName, 0777);
+            }
+            zip_entry_close($zip_entry);
+        }
+    }
+    zip_close($zip);
+
 	return true;
 }
 
