@@ -6,7 +6,7 @@ should this be called http instead of url?  i could include cookie, and url_head
 error_debug("including url.php");
 
 function url_action($matches, $key="action") {
-	//don't know whether this is any good.  matches possible $_GET["action"] values
+	//don't know whether this is any good.  matches possible $_GET['action'] values
 	global $_GET;
 	if (isset($_GET[$key])) {
 		$matches = explode(",", $matches);
@@ -21,7 +21,7 @@ function url_action_add($action=false, $go=false) {
 
 function url_base() {
 	global $_josh;
-	return $_josh["request"]["protocol"] . "://" . $_josh["request"]["host"];
+	return $_josh['request']['protocol'] . "://" . $_josh['request']['host'];
 }
 
 function url_change($target="") {
@@ -30,11 +30,11 @@ function url_change($target="") {
 	if ($target === false) { //if redirect is really set to FALSE, send to site home
 		$target = "/";
 	} elseif (empty($target)) { //if redirect is an empty string, refresh the page by sending back to same URL
-		$target = $_josh["request"]["path_query"];
+		$target = $_josh['request']['path_query'];
 	}
-	if ($_josh["slow"]) {
+	if ($_josh['slow']) {
 		error_debug("<b>url_change</b> (slow) to " . $target);
-		if ($_josh["debug"]) db_close(); //exit early so you can see log
+		if ($_josh['debug']) db_close(); //exit early so you can see log
 		echo "<html><head>
 				<script language='javascript'>
 					<!--
@@ -44,7 +44,7 @@ function url_change($target="") {
 			</head><body></body></html>";
 	} else {
 		error_debug("<b>url_change</b> (fast) to " . $target);
-		if ($_josh["debug"]) db_close(); //exit early so you can see log
+		if ($_josh['debug']) db_close(); //exit early so you can see log
 		header("Location: " . $target);
 	}
 	db_close();
@@ -52,13 +52,13 @@ function url_change($target="") {
 
 function url_change_get($target="") {
 	global $_GET;
-	if (isset($_GET["return_to"]) && !empty($_GET["return_to"])) $target = $_GET["return_to"];
+	if (isset($_GET['return_to']) && !empty($_GET['return_to'])) $target = $_GET['return_to'];
 	url_change($target);
 }
 
 function url_change_post($target="") {
 	global $_POST;
-	if (isset($_POST["return_to"]) && !empty($_POST["return_to"])) $target = $_POST["return_to"];
+	if (isset($_POST['return_to']) && !empty($_POST['return_to'])) $target = $_POST['return_to'];
 	url_change($target);
 }
 
@@ -110,7 +110,7 @@ function url_parse($url) {
 	$tldarray		= array_merge($gtlds, $ctlds); 
 	$tld_isReady	= false;
 	$return			= parse_url(trim($url));
-	$domainarray	= explode('.', $return["host"]);
+	$domainarray	= explode('.', $return['host']);
 	$top			= count($domainarray);
 	
 	for ($i = 0; $i < $top; $i++) {
@@ -127,65 +127,65 @@ function url_parse($url) {
 		}
 	}
 
-	if (!isset($return["path"])) $return["path"] = "";
-	$return["domainname"]	= $domainname;
-	$return["tld"]			= str_replace(".", "", $tld);
-	$return["domain"]		= $domainname . $tld;
-	$return["usingwww"]		= (substr($return["host"], 0, 4) == "www.") ? 1 : 0;
-	$return["sanswww"]		= ($return["usingwww"]) ? substr($return["host"], 4) : $return["host"];
-	$return["subdomain"]	= substr($subs, 1);
-	$return["path"]			= str_replace("index.php", "", $return["path"]);
-	$return["path_query"]	= $return["path"];
+	if (!isset($return['path'])) $return['path'] = "";
+	$return['domainname']	= $domainname;
+	$return['tld']			= str_replace(".", "", $tld);
+	$return['domain']		= $domainname . $tld;
+	$return['usingwww']		= (substr($return['host'], 0, 4) == "www.") ? 1 : 0;
+	$return['sanswww']		= ($return['usingwww']) ? substr($return['host'], 4) : $return['host'];
+	$return['subdomain']	= substr($subs, 1);
+	$return['path']			= str_replace("index.php", "", $return['path']);
+	$return['path_query']	= $return['path'];
 	
 	//get folder, subfolder
-	$urlparts = explode("/", $return["path_query"]);
+	$urlparts = explode("/", $return['path_query']);
 	$urlcount = count($urlparts);
 
 	if ($urlcount < 3) {
-		$return["folder"]		= false;
-		$return["subfolder"]	= false;
-		$return["subsubfolder"]	= false;
+		$return['folder']		= false;
+		$return['subfolder']	= false;
+		$return['subsubfolder']	= false;
 	} elseif ($urlcount == 3) {
-		$return["folder"]		= $urlparts[1];
-		$return["subfolder"]	= false;
-		$return["subsubfolder"]	= false;
+		$return['folder']		= $urlparts[1];
+		$return['subfolder']	= false;
+		$return['subsubfolder']	= false;
 	} elseif ($urlcount == 4) {
-		$return["folder"]		= $urlparts[1];
-		$return["subfolder"]	= $urlparts[2];
-		$return["subsubfolder"]	= false;
+		$return['folder']		= $urlparts[1];
+		$return['subfolder']	= $urlparts[2];
+		$return['subsubfolder']	= false;
 	} else {
-		$return["folder"]		= $urlparts[1];
-		$return["subfolder"]	= $urlparts[2];
-		$return["subsubfolder"]	= $urlparts[3];
+		$return['folder']		= $urlparts[1];
+		$return['subfolder']	= $urlparts[2];
+		$return['subsubfolder']	= $urlparts[3];
 	}
 	
 	//add query string to path_query
 	//don't use $_GET because we might be parsing a different address
-	if (isset($return["query"])) {
-		$return["path_query"] .= "?" . $return["query"];
+	if (isset($return['query'])) {
+		$return['path_query'] .= "?" . $return['query'];
 	} else {
-		$return["query"] = false;
+		$return['query'] = false;
 	}
 	
 	//protocol is a better word than scheme
-	$return["protocol"] = $return["scheme"];
+	$return['protocol'] = $return['scheme'];
 	
 	//get full browser address
-	$return["url"]			= $return["protocol"] . "://" . $return["host"] . $return["path_query"];
+	$return['url']			= $return['protocol'] . "://" . $return['host'] . $return['path_query'];
 	
 	//handle possible mod_rewrite slots
-	if (isset($_GET["slot1"])) {
-		$return["folder"] = $_GET["slot1"];
-		$return["path"] = "/" . $_GET["slot1"] . "/";
-		if (isset($_GET["slot2"])) {
-			$return["subfolder"] = $_GET["slot2"];
-			$return["path"] .= $_GET["slot2"] . "/";
-			if (isset($_GET["slot3"])) {
-				$return["subsubfolder"] = $_GET["slot3"];
-				$return["path"] .= $_GET["slot3"] . "/";
+	if (isset($_GET['slot1'])) {
+		$return['folder'] = $_GET['slot1'];
+		$return['path'] = "/" . $_GET['slot1'] . "/";
+		if (isset($_GET['slot2'])) {
+			$return['subfolder'] = $_GET['slot2'];
+			$return['path'] .= $_GET['slot2'] . "/";
+			if (isset($_GET['slot3'])) {
+				$return['subsubfolder'] = $_GET['slot3'];
+				$return['path'] .= $_GET['slot3'] . "/";
 			}
 		}
-		$return["path_query"] = $return["path"];
+		$return['path_query'] = $return['path'];
 	}
 
 
@@ -196,7 +196,7 @@ function url_parse($url) {
 
 function url_query_add($adds, $go=true, $path=false) { //add specified query arguments
 	global $_josh, $_GET;
-	$target = url_base() . (($path) ? $path : $_josh["request"]["path"]);
+	$target = url_base() . (($path) ? $path : $_josh['request']['path']);
 	//$adds = array_unique(array_merge($_GET, $adds));
 	$adds = array_merge($_GET, $adds);
 	if (count($adds)) foreach ($adds as $key=>$value) if ($value) $pairs[] = $key . "=" . urlencode($value);
@@ -213,7 +213,7 @@ function url_query_drop($deletes=false, $go=true) {
 	//deletes could also be a comma-separated list
 	global $_josh, $_GET;
 	$get = $_GET;
-	$target = url_base() . $_josh["request"]["path"];
+	$target = url_base() . $_josh['request']['path'];
 	if ($deletes) {
 		if (!is_array($deletes)) $deletes = explode(",", $deletes);
 		foreach ($deletes as $key) {

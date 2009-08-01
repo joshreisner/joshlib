@@ -59,9 +59,9 @@ function draw_calendar($month, $year, $events=false) {
 	$cal_events = array();
 	if ($events) {
 		foreach ($events as $e)	{
-			if (!isset($cal_events[$e["day"]])) $cal_events[$e["day"]] = "";
-			$style = (isset($e["color"])) ? "background-color:#" . $e["color"] : false;
-			$cal_events[$e["day"]] .= draw_container("div", $e["title"], array("class"=>"event", "style"=>$style));
+			if (!isset($cal_events[$e['day']])) $cal_events[$e['day']] = "";
+			$style = (isset($e['color'])) ? "background-color:#" . $e['color'] : false;
+			$cal_events[$e['day']] .= draw_container("div", $e['title'], array("class"=>"event", "style"=>$style));
 		}
 	}
 	
@@ -78,7 +78,7 @@ function draw_calendar($month, $year, $events=false) {
 			$thisday = (((7 * ($week - 1)) + $day) - $firstday);
 			if ($thisday > 0 && $thisday <= $lastday) {
 				$class = "day";
-				if (($year == $_josh["year"]) && ($month == $_josh["month"]) && ($thisday == $_josh["today"])) $class .= " today";
+				if (($year == $_josh['year']) && ($month == $_josh['month']) && ($thisday == $_josh['today'])) $class .= " today";
 				$return .= '<div class="' . $class . ' ' . $days_short[$day-1] . '"><div class="number">' . $thisday . '</div>';
 				$return .= @$cal_events[$thisday];
 				$return .= '</div>';
@@ -118,15 +118,15 @@ function draw_div($id, $innerhtml="", $args=false) {
 function draw_div_class($class, $innerhtml="", $args=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	if (!$args) $args = array();
-	$args["class"] = $class;
-	if (empty($innerhtml)) $args["class"] .= " empty";
+	$args['class'] = $class;
+	if (empty($innerhtml)) $args['class'] .= " empty";
 	return draw_tag("div", $args, $innerhtml);
 }
 
 function draw_div_id($id, $innerhtml="", $args=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	if (!$args) $args = array();
-	$args["id"] = $id;
+	$args['id'] = $id;
 	return draw_tag("div", $args, $innerhtml);
 }
 
@@ -145,8 +145,8 @@ function draw_favicon($location="/images/favicon.png") {
 
 function draw_focus($form_element) {
 	global $_josh;
-	if ($_josh["drawn"]["focus"]) return false;
-	$_josh["drawn"]["focus"] = $form_element;
+	if ($_josh['drawn']['focus']) return false;
+	$_josh['drawn']['focus'] = $form_element;
 	return draw_javascript('document.getElementById("' . $form_element . '").focus();');
 }
 
@@ -184,8 +184,8 @@ function draw_form_checkboxes($name, $linking_table=false, $object_col=false, $o
 	}
 	$return = '<table cellspacing="0" class="checkboxes">';
 	while ($r = db_fetch($result)) {
-		$return .= '<tr><td>' . draw_form_checkbox("chk_" . $name . "_" . $r["id"], $r["checked"]) . '</td>';
-		$return .= '<td>&nbsp;' . $r["value"] . '</td></tr>';
+		$return .= '<tr><td>' . draw_form_checkbox("chk_" . $name . "_" . $r['id'], $r['checked']) . '</td>';
+		$return .= '<td>&nbsp;' . $r['value'] . '</td></tr>';
 	}
 	$return .= '</table>';
 	return $return;
@@ -208,7 +208,7 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 
 	//assemble date fields
 	$months = array();
-	foreach ($_josh["months"] as $key=>$value) $months[$key + 1] = $value;
+	foreach ($_josh['months'] as $key=>$value) $months[$key + 1] = $value;
 	$return = draw_form_select($namePrefix . "Month", $months, $month, $required, $class) .
 	draw_form_select($namePrefix . "Day", array_2d(array_range(1, 31)), $day, $required, $class) .
 	draw_form_select($namePrefix . "Year", array_2d(array_range(1920, 2015)), $year, $required, $class);
@@ -293,8 +293,8 @@ function draw_form_select_month($name, $start, $default=false, $length=false, $c
 	$array = array();
 	$break = false;
 	while ($break == false) {
-		$array[$startMonth . "/" . $startYear] = $_josh["months"][$startMonth - 1] . " " . $startYear;
-		if (($startMonth == $_josh["month"]) && ($startYear == $_josh["year"])) {
+		$array[$startMonth . "/" . $startYear] = $_josh['months'][$startMonth - 1] . " " . $startYear;
+		if (($startMonth == $_josh['month']) && ($startYear == $_josh['year'])) {
 			$break = true;
 		} elseif ($startMonth == 12) {
 			$startMonth = 1;
@@ -337,17 +337,17 @@ function draw_google_chart($data, $type="line", $colors=false, $width=250, $heig
 		"line"=>"ls",
 		"bar"=>"bhs"
 	);
-	$parameters["cht"]	= $types[$type];
-	$parameters["chd"]	= "t:" . implode(",", $data);
-	$parameters["chs"]	= $width . "x" . $height;
-	//$parameters["chl"]	= implode("|", array_keys($data));
-	$parameters["chco"] = $colors;
-	$parameters["chm"]	= "B,efefef,0,0,0";
-	$parameters["chls"]	= "3";
-	//$parameters["chxt"]	= "x,y";
-	//$parameters["chxr"]	= "0,0,30|1,0,4";
-	$parameters["chds"] = "-1,11";
-	$parameters["chma"] = "0,0,0,0";
+	$parameters['cht']	= $types[$type];
+	$parameters['chd']	= "t:" . implode(",", $data);
+	$parameters['chs']	= $width . "x" . $height;
+	//$parameters['chl']	= implode("|", array_keys($data));
+	$parameters['chco'] = $colors;
+	$parameters['chm']	= "B,efefef,0,0,0";
+	$parameters['chls']	= "3";
+	//$parameters['chxt']	= "x,y";
+	//$parameters['chxr']	= "0,0,30|1,0,4";
+	$parameters['chds'] = "-1,11";
+	$parameters['chma'] = "0,0,0,0";
 	$pairs = array();
 	foreach ($parameters as $key=>$value) $pairs[] = $key . "=" . $value;
 
@@ -369,10 +369,10 @@ function draw_google_map($markers, $center=false) {
 	$lat = 0;
 	$lon = 0;
 	foreach ($markers as $m) {
-		$lat += $m["latitude"];
-		$lon += $m["longitude"];
-		$markerstr .= $_josh["newline"] . '
-			var marker = draw_marker(' . $m["latitude"] . ', ' . $m["longitude"] . ', "' . $m["title"] . '", "' . $m["description"] . '", "' . $m["color"] . '");
+		$lat += $m['latitude'];
+		$lon += $m['longitude'];
+		$markerstr .= $_josh['newline'] . '
+			var marker = draw_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "' . $m['title'] . '", "' . $m['description'] . '", "' . $m['color'] . '");
 			map.addOverlay(marker);
 			';
 	}
@@ -393,7 +393,7 @@ function draw_google_map($markers, $center=false) {
 	window.onload = map_load;
 	';
 	
-	return draw_javascript_src("http://maps.google.com/maps?file=api&amp;v=2&amp;key=" . $_josh["google"]["mapkey"]) . draw_javascript($return) . '<div id="map"></div>';
+	return draw_javascript_src("http://maps.google.com/maps?file=api&amp;v=2&amp;key=" . $_josh['google']['mapkey']) . draw_javascript($return) . '<div id="map"></div>';
 }
 
 function draw_google_tracker($id) {
@@ -418,7 +418,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	
 	//get width and height
 	$image = @getimagesize($path);
-	if (!$image) $image = @getimagesize($_josh["root"] . $path);
+	if (!$image) $image = @getimagesize($_josh['root'] . $path);
 	if (!$image) return "";
 	
 	//assemble tag
@@ -427,8 +427,8 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 		//values of alt can overwrite width, height, border, even src but that could get ugly -- maybe i should prevent that?
 		$args = array_merge($args, $alt);
 	} else {
-		$args["alt"] = $alt;
-		$args["name"] = $args["class"] = $args["id"] = $name;
+		$args['alt'] = $alt;
+		$args['name'] = $args['class'] = $args['id'] = $name;
 	}
 	$return = draw_tag("img", $args);
 	if ($link) $return = draw_link($link, $return, $linknewwindow);
@@ -450,9 +450,9 @@ function draw_javascript_lib() {
 	global $_josh;
 	return 
 	draw_javascript_src() .
-	draw_javascript_src($_josh["write_folder"] . "/lib/prototype.js") .
-	draw_javascript_src($_josh["write_folder"] . "/lib/scriptaculous/scriptaculous.js") .
-	draw_javascript_src($_josh["write_folder"] . "/lib/tiny_mce/tiny_mce.js") .
+	draw_javascript_src($_josh['write_folder'] . "/lib/prototype.js") .
+	draw_javascript_src($_josh['write_folder'] . "/lib/scriptaculous/scriptaculous.js") .
+	draw_javascript_src($_josh['write_folder'] . "/lib/tiny_mce/tiny_mce.js") .
 	draw_javascript("form_tinymce_init('/styles/tinymce.css')");
 }
 
@@ -463,20 +463,20 @@ function draw_javascript_tinymce($path_css="/styles/tinymce.css", $path_script="
 
 function draw_javascript_src($filename=false) {
 	global $_josh;
-	if (!$filename && isset($_josh["write_folder"])) {
-		if ($_josh["drawn"]["javascript"]) return false; //only draw this file once per page
-		$_josh["drawn"]["javascript"] = true;
-		$filename = $_josh["write_folder"] . "/javascript.js";
-		$joshlibf = $_josh["joshlib_folder"] . "/javascript.js";
-		if (!file_is($filename) || (filemtime($joshlibf) > filemtime($_josh["root"] . $filename))) {
+	if (!$filename && isset($_josh['write_folder'])) {
+		if ($_josh['drawn']['javascript']) return false; //only draw this file once per page
+		$_josh['drawn']['javascript'] = true;
+		$filename = $_josh['write_folder'] . "/javascript.js";
+		$joshlibf = $_josh['joshlib_folder'] . "/javascript.js";
+		if (!file_is($filename) || (filemtime($joshlibf) > filemtime($_josh['root'] . $filename))) {
 			//either doesn't exist or is out-of-date
 			if (!file_put($filename, file_get($joshlibf))) return error_handle(__FUNCTION__ . " can't write the js file.", __file__, __line__);
 		}
 	} elseif (!$filename) {
-		return error_handle(__FUNCTION__ . " needs the variable _josh[\"write_folder\"] to be set.", __file__, __line__);
+		return error_handle(__FUNCTION__ . " needs the variable _josh[\"write_folder\'] to be set.", __file__, __line__);
 	}
 	//$src = "http://joshlib.joshreisner.com/javascript.js";
-	return $_josh["newline"] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
+	return $_josh['newline'] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
 function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
@@ -491,8 +491,8 @@ function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
 		if (!$str)	$str = format_string($href, 60);
 	}
 	
-	$args["href"]	= $href;	
-	if ($newwindow) $args["target"] = "_blank";
+	$args['href']	= $href;	
+	if ($newwindow) $args['target'] = "_blank";
 
 	return draw_container("a", $str, $args);
 }
@@ -507,17 +507,17 @@ function draw_list($options, $args=false, $type="ul", $selected=false) {
 		if ($selected == ($i + 1)) $liclass .= " selected";
 		$options[$i] = draw_tag("li", array("class"=>$liclass), $options[$i]);
 	}
-	return draw_tag($type, $args, implode($options,  $_josh["newline"] . "\t"));
+	return draw_tag($type, $args, implode($options,  $_josh['newline'] . "\t"));
 }
 
 function draw_meta_description($string) {
 	global $_josh;
-	return draw_tag("meta", array("name"=>"description", "content"=>$string)) . $_josh["newline"];
+	return draw_tag("meta", array("name"=>"description", "content"=>$string)) . $_josh['newline'];
 }
 
 function draw_meta_utf8() {
 	global $_josh;
-	return draw_tag("meta", array("http-equiv"=>"Content-Type", "content"=>"text/html; charset=utf-8")) . $_josh["newline"];
+	return draw_tag("meta", array("http-equiv"=>"Content-Type", "content"=>"text/html; charset=utf-8")) . $_josh['newline'];
 }
 
 function draw_navigation($options, $match=false, $type="text", $class="navigation", $folder="/images/navigation/") {
@@ -525,18 +525,18 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 	global $_josh;
 	
 	//this is so you can have several sets of rollovers in the same page eg the smarter toddler site
-	if (!isset($_josh["drawn_navigation"])) $_josh["drawn_navigation"] = 0;
-	$_josh["drawn_navigation"]++;
+	if (!isset($_josh['drawn_navigation'])) $_josh['drawn_navigation'] = 0;
+	$_josh['drawn_navigation']++;
 	
 	//skip if empty
 	if (!is_array($options) || !count($options)) return false;
 	
-	//$return = $_josh["newline"] . $_josh["newline"] . "<!--start nav-->" . $_josh["newline"] . "<ul class='" . $class . "'>";
+	//$return = $_josh['newline'] . $_josh['newline'] . "<!--start nav-->" . $_josh['newline'] . "<ul class='" . $class . "'>";
 	$return = array();
 	if ($match === false) {
-		$match = $_josh["request"]["path"];
+		$match = $_josh['request']['path'];
 	} elseif ($match === true) {
-		$match = $_josh["request"]["path_query"];
+		$match = $_josh['request']['path_query'];
 	} elseif ($match == "//") {
 		//to take care of a common / . folder . / scenario
 		$match = "/";
@@ -544,9 +544,9 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 	error_debug("<b>draw_navigation</b> match is " . $match);
 	$selected = false;
 	$counter = 1;
-	$javascript = $_josh["newline"];
+	$javascript = $_josh['newline'];
 	foreach ($options as $url=>$title) {
-		$name = 'option_' . $_josh["drawn_navigation"] . '_' . $counter;
+		$name = 'option_' . $_josh['drawn_navigation'] . '_' . $counter;
 		$thisoption = '<a href="' . $url . '" class="' . $name;
 		if (str_replace(url_base(), "", $url) == $match) {
 			$img_state = "_on";
@@ -566,10 +566,10 @@ function draw_navigation($options, $match=false, $type="text", $class="navigatio
 			if (empty($img)) $img = "home";
 			$img = $folder . $img;
 			if ($type == "rollovers") {
-				$javascript .= $name . "_on		 = new Image;" . $_josh["newline"];
-				$javascript .= $name . "_off	 = new Image;" . $_josh["newline"];
-				$javascript .= $name . "_on.src	 = '" . $img . "_on.png';" . $_josh["newline"];
-				$javascript .= $name . "_off.src = '" . $img . "_off.png';" . $_josh["newline"];
+				$javascript .= $name . "_on		 = new Image;" . $_josh['newline'];
+				$javascript .= $name . "_off	 = new Image;" . $_josh['newline'];
+				$javascript .= $name . "_on.src	 = '" . $img . "_on.png';" . $_josh['newline'];
+				$javascript .= $name . "_off.src = '" . $img . "_off.png';" . $_josh['newline'];
 			}
 			$img .= $img_state . ".png";
 			$thisoption .= draw_img($img, false, false, $name);
@@ -587,7 +587,7 @@ function draw_newline($count=1) {
 	global $_josh;
 	$return = "";
 	for ($i = 0; $i < $count; $i++) {
-		$return .= $_josh["newline"];
+		$return .= $_josh['newline'];
 	}
 	return $return;
 }

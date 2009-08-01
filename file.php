@@ -24,12 +24,12 @@ function file_array($content, $filename=false) {
 
 function file_check($filename) {
 	global $_josh;
-	return @filesize($_josh["root"] . $filename);
+	return @filesize($_josh['root'] . $filename);
 }
 
 function file_delete($filename) {
 	global $_josh;
-	if (file_exists($_josh["root"] . $filename)) unlink($_josh["root"] . $filename);
+	if (file_exists($_josh['root'] . $filename)) unlink($_josh['root'] . $filename);
 	return true;
 }
 
@@ -52,8 +52,8 @@ function file_download($content, $filename, $extension) {
 function file_dynamic($table, $column, $id, $extension, $lastmod) {
 	//function file_dynamic($filename, $lastmod, $query) {
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
-	$filename = $_josh["write_folder"] . "/dynamic/" . $table . "-" . $column . "-" . $id . "." . $extension;
-	if (!file_exists($_josh["root"] . $filename) || (strToTime($lastmod) > filemtime($_josh["root"] . $filename))) file_put($filename, db_grab("SELECT $column FROM $table WHERE id = $id"));
+	$filename = $_josh['write_folder'] . "/dynamic/" . $table . "-" . $column . "-" . $id . "." . $extension;
+	if (!file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) file_put($filename, db_grab("SELECT $column FROM $table WHERE id = $id"));
 	return $filename;
 }
 
@@ -62,7 +62,7 @@ function file_folder($folder, $endfilter=false) {
 	error_debug("<b>file folder</b> running with $folder", __file__, __line__);
 	
 	//check to make sure folder exists
-	if (!is_dir($_josh["root"] . $folder)) {
+	if (!is_dir($_josh['root'] . $folder)) {
 		error_debug("<b>file folder</b> $folder is not a directory, exiting", __file__, __line__);
 		return false;
 	}
@@ -72,7 +72,7 @@ function file_folder($folder, $endfilter=false) {
 	if ($endfilter) $endfilter = explode(",", $endfilter);
 
 	//open it
-	if ($handle = opendir($_josh["root"] . $folder)) {
+	if ($handle = opendir($_josh['root'] . $folder)) {
 		$return = array();
 		while (($name = readdir($handle)) !== false) {
 			if (($name == ".") || ($name == "..") || ($name == ".DS_Store")) continue;
@@ -82,15 +82,15 @@ function file_folder($folder, $endfilter=false) {
 				"ext"=>array_pop($nameparts),
 				"human"=>format_text_human(implode(" ", $nameparts)), 
 				"path_name"=>$folder . $name,
-				"type"=>filetype($_josh["root"] . $folder . $name),
-				"fmod"=>filemtime($_josh["root"] . $folder . $name),
-				"size"=>filesize($_josh["root"] . $folder . $name)
+				"type"=>filetype($_josh['root'] . $folder . $name),
+				"fmod"=>filemtime($_josh['root'] . $folder . $name),
+				"size"=>filesize($_josh['root'] . $folder . $name)
 			);
-			if ($thisfile["type"] == "dir") $thisfile["path_name"] .= "/";
-			error_debug("<b>file folder</b> found " . $thisfile["name"] . " of type " . $thisfile["type"], __file__, __line__);
+			if ($thisfile['type'] == "dir") $thisfile['path_name'] .= "/";
+			error_debug("<b>file folder</b> found " . $thisfile['name'] . " of type " . $thisfile['type'], __file__, __line__);
 			if ($endfilter) {
 				$oneFound = false;
-				foreach ($endfilter as $e) if (format_text_ends(trim($e), $thisfile["path_name"]) || (($e == "dir") && ($thisfile["type"] == "dir"))) $oneFound = true;
+				foreach ($endfilter as $e) if (format_text_ends(trim($e), $thisfile['path_name']) || (($e == "dir") && ($thisfile['type'] == "dir"))) $oneFound = true;
 				if ($oneFound) $return[] = $thisfile;
 			} else {
 				$return[] = $thisfile;
@@ -107,7 +107,7 @@ function file_folder($folder, $endfilter=false) {
 function file_get($filename) {
 	global $_josh;
 	if (!$file = @fopen($filename, "r")) {
-		$filename = $_josh["root"] . $filename;
+		$filename = $_josh['root'] . $filename;
 		if (!$file = @fopen($filename, "r")) return false;
 	}
 	error_debug("<b>file_get</b> filename is " . $filename, __file__, __line__);
@@ -136,9 +136,9 @@ function file_get_type_id($filename, $table="documents_types") {
 function file_get_uploaded($fieldname, $table=false) {
 	global $_FILES;
 	error_debug("<b>file_get_uploaded</b> running ~ user is uploading a file");
-	$content = file_get($_FILES[$fieldname]["tmp_name"]);
-	@unlink($_FILES[$fieldname]["tmp_name"]);
-	if ($table) return array($content, file_get_type_id($_FILES[$fieldname]["name"], $table));
+	$content = file_get($_FILES[$fieldname]['tmp_name']);
+	@unlink($_FILES[$fieldname]['tmp_name']);
+	if ($table) return array($content, file_get_type_id($_FILES[$fieldname]['name'], $table));
 	return $content;
 }
 
@@ -160,7 +160,7 @@ function file_import_fixedlength($content, $definitions) {
 function file_is($filename) {
 	//deprecated, use file_check
 	global $_josh;
-	return file_exists($_josh["root"] . $filename);
+	return file_exists($_josh['root'] . $filename);
 }
 
 function file_name($filepath) {
@@ -168,7 +168,7 @@ function file_name($filepath) {
 	error_debug("file_name receiving filepath = $filepath", __file__, __line__);
 	$pathparts	= explode("/", $filepath);
 	$file		= array_pop($pathparts);
-	$path		= implode($_josh["folder"], $pathparts);
+	$path		= implode($_josh['folder'], $pathparts);
 	$fileparts	= explode(".", $file);
 	$extension	= array_pop($fileparts);
 	$filename	= implode(".", $fileparts);
@@ -181,7 +181,7 @@ function file_pass($filename) {
 	global $_josh;
 	$content		= file_get($filename);
 	//die($filename);
-	$nameparts		= explode($_josh["folder"], $filename);
+	$nameparts		= explode($_josh['folder'], $filename);
 	$filenameparts	= explode(".", $nameparts[count($nameparts) - 1]);
 	$extension		= array_pop($filenameparts);
 	$filename		= implode(".", $filenameparts);
@@ -192,9 +192,9 @@ function file_put($filename, $content) {
 	global $_josh;
 	file_delete($filename);
 	//arguments should be reversed?
-	$file = @fopen($_josh["root"] . $filename, "w");
+	$file = @fopen($_josh['root'] . $filename, "w");
 	if ($file === false) {
-		error_handle("could not open file", "the file " . $_josh["root"] . $filename . " could not be opened for writing.  perhaps it is a permissions problem.");
+		error_handle("could not open file", "the file " . $_josh['root'] . $filename . " could not be opened for writing.  perhaps it is a permissions problem.");
 	} else {
 		if (is_array($content)) $content = implode($content);
 		$bytes = fwrite($file, $content);
@@ -207,30 +207,30 @@ function file_put($filename, $content) {
 function file_put_config() {
 	global $_josh;
 	
-	$return	 = '<?php' . $_josh["newline"];
+	$return	 = '<?php' . $_josh['newline'];
 	
 	//db variables
-	$return .= '$_josh["db"]["location"]        = "localhost"; //server' . $_josh["newline"];
-	$return .= '$_josh["db"]["language"]        = "mysql"; //mysql or mssql' . $_josh["newline"];
-	$return .= '$_josh["db"]["database"]        = "";' . $_josh["newline"];
-	$return .= '$_josh["db"]["username"]        = "";' . $_josh["newline"];
-	$return .= '$_josh["db"]["password"]        = "";' . $_josh["newline"];
-	$return .= '$_josh["basedblanguage"]        = ""; //mysql or mssql (not necessary unless you want it translated)' . $_josh["newline"];
-	$return .= $_josh["newline"];
+	$return .= '$_josh[\'db\'][\'location\']        = "localhost"; //server' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'language\']        = "mysql"; //mysql or mssql' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'database\']        = "";' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'username\']        = "";' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'password\']        = "";' . $_josh['newline'];
+	$return .= '$_josh[\'basedblanguage\']        = ""; //mysql or mssql (not necessary unless you want it translated)' . $_josh['newline'];
+	$return .= $_josh['newline'];
 	
 	//error variables
-	$return .= '$_josh["error_log_api"]         = false; //error logging url, eg http://tasks.joshreisner.com/errorapi.php' . $_josh["newline"];
-	$return .= '$_josh["email_default"]         = "josh@joshreisner.com"; //regular site emails come from this address' . $_josh["newline"];
-	$return .= '$_josh["email_admin"]           = "josh@joshreisner.com"; //error emails go to this address' . $_josh["newline"];
-	$return .= $_josh["newline"];
+	$return .= '$_josh[\'error_log_api\']         = false; //error logging url, eg http://tasks.joshreisner.com/errorapi.php' . $_josh['newline'];
+	$return .= '$_josh[\'email_default\']         = "josh@joshreisner.com"; //regular site emails come from this address' . $_josh['newline'];
+	$return .= '$_josh[\'email_admin\']           = "josh@joshreisner.com"; //error emails go to this address' . $_josh['newline'];
+	$return .= $_josh['newline'];
 	
 	//url variables
-	$return .= '$_josh["is_secure"]         	= false; //indicates whether it should use https (true) or not (false)' . $_josh["newline"];
-	$return .= $_josh["newline"];
+	$return .= '$_josh[\'is_secure\']         	= false; //indicates whether it should use https (true) or not (false)' . $_josh['newline'];
+	$return .= $_josh['newline'];
 
 	$return .= '?>';
 	
-	return file_put($_josh["config"], $return);
+	return file_put($_josh['config'], $return);
 }
 
 function file_rss($title, $link, $items, $filename=false) {
@@ -244,16 +244,16 @@ function file_rss($title, $link, $items, $filename=false) {
 	$lastBuildDate = false;
 
 	foreach ($items as $i) {
-		if (!$lastBuildDate) $lastBuildDate = format_date_rss($i["date"]);
-		$i["link"] = str_replace("&", "&amp;", $i["link"]);
+		if (!$lastBuildDate) $lastBuildDate = format_date_rss($i['date']);
+		$i['link'] = str_replace("&", "&amp;", $i['link']);
 		$return .= '
 		<item>
-			<title>' . htmlspecialchars($i["title"]) . '</title>
-			<description><![CDATA[' . $i["description"] . ']]></description>
-			<link>' . $i["link"] . '</link>
-			<guid isPermaLink="true">' . $i["link"] . '</guid>
-			<pubDate>' . format_date_rss($i["date"]) . '</pubDate>
-			<author>' . $i["author"] . '</author>
+			<title>' . htmlspecialchars($i['title']) . '</title>
+			<description><![CDATA[' . $i['description'] . ']]></description>
+			<link>' . $i['link'] . '</link>
+			<guid isPermaLink="true">' . $i['link'] . '</guid>
+			<pubDate>' . format_date_rss($i['date']) . '</pubDate>
+			<author>' . $i['author'] . '</author>
 		</item>
 		';
 	}
@@ -267,11 +267,11 @@ function file_rss($title, $link, $items, $filename=false) {
 		<link>' . $link . '</link>
 		<description>' . $description . '</description>
 		<language>en-us</language>
-		<managingEditor>' . $_josh["email_admin"] . '</managingEditor>
+		<managingEditor>' . $_josh['email_admin'] . '</managingEditor>
 		<copyright>' . '</copyright>
 		<lastBuildDate>' . $lastBuildDate . '</lastBuildDate>
 		<generator>http://joshlib.joshreisner.com/</generator>
-		<webMaster>' . $_josh["email_admin"] . '</webMaster>
+		<webMaster>' . $_josh['email_admin'] . '</webMaster>
 		<ttl>15</ttl>
 		' . $return . '
 		</channel>
@@ -287,7 +287,7 @@ function file_sister($filename, $ext) {
 	global $_josh;
 	if (file_is($filename)) {
 		list ($file, $extension, $path) = file_name($filename);
-		$sister = $path . $_josh["folder"] . $file . "." . $ext;
+		$sister = $path . $_josh['folder'] . $file . "." . $ext;
 		if (file_is($sister)) {
 			error_debug("file sister file exists");
 			return $sister;
@@ -343,13 +343,13 @@ function file_unzip($source, $target) {
 		if (format_text_starts(".", $folder)) continue;
 		if (format_text_starts("__MACOSX", $folder)) continue;
 
-        $completePath = $_josh["root"] . $target . $_josh["folder"] . $folder;
-        $completeName = $_josh["root"] . $target . $_josh["folder"] . zip_entry_name($zip_entry);
+        $completePath = $_josh['root'] . $target . $_josh['folder'] . $folder;
+        $completeName = $_josh['root'] . $target . $_josh['folder'] . zip_entry_name($zip_entry);
         if (!file_exists($completeName)) {
             $tmp = "";
-            foreach(explode($_josh["folder"], $folder) AS $k) {
-                $tmp .= $k . $_josh["folder"];
-                if(!is_dir($_josh["root"] . $target . $_josh["folder"] . $tmp)) mkdir($_josh["root"] . $target . $_josh["folder"] . $tmp, 0777);
+            foreach(explode($_josh['folder'], $folder) AS $k) {
+                $tmp .= $k . $_josh['folder'];
+                if(!is_dir($_josh['root'] . $target . $_josh['folder'] . $tmp)) mkdir($_josh['root'] . $target . $_josh['folder'] . $tmp, 0777);
             }
         }
         
@@ -373,8 +373,8 @@ function file_write_folder($folder=false) {
 	//make sure there's a writable folder where you said.  defaults to write_folder
 	global $_josh;
 	
-	if (!$folder) $folder = $_josh["write_folder"];
-	$folder = $_josh["root"] . $folder;
+	if (!$folder) $folder = $_josh['write_folder'];
+	$folder = $_josh['root'] . $folder;
 	
 	//make folder
 	if (!is_dir($folder) && !@mkdir($folder)) error_handle("couldn't create folder", "file_write_folder tried to create a folder at " . $folder . " but could not.  please create a folder there and make it writable.");

@@ -42,10 +42,10 @@ function format_ascii($string) {
 function format_binary($blob) {
 	//todo -- db_binary?
 	global $_josh;
-	if ($_josh["db"]["language"] == "mssql") {
+	if ($_josh['db']['language'] == "mssql") {
 		$return = unpack("H*hex", $blob);
-		return "0x" . $return["hex"];
-	} elseif ($_josh["db"]["language"] == "mysql") {
+		return "0x" . $return['hex'];
+	} elseif ($_josh['db']['language'] == "mysql") {
 		return "'" . addslashes($blob) . "'";
 	}
 }
@@ -77,7 +77,7 @@ function format_date($timestamp=false, $error="", $format="M d, Y", $relativetim
 	if (!is_int($timestamp)) $timestamp = strToTime($timestamp);
 	
 	//get timestamp for today
-	$todaysdate = mktime(0, 0, 1, $_josh["month"], $_josh["today"], $_josh["year"]);
+	$todaysdate = mktime(0, 0, 1, $_josh['month'], $_josh['today'], $_josh['year']);
 
 	//get timestamp for argument, without time
 	$returnday    = date("d", $timestamp);
@@ -315,7 +315,7 @@ function format_html_trim($text) {
 
 	foreach ($blocks as $b) {
 		$len = strlen(trim($b));
-		if ($len == $_josh["max_text_len"]) {
+		if ($len == $_josh['max_text_len']) {
 			$e = get_parent($b->parent);
 			$text = $e->innertext;
 		}
@@ -338,10 +338,10 @@ function format_html_trim($text) {
 function format_html_set_max($len) {
 	//helper function for above, due to weird scope reason i don't fully comprehend
 	global $_josh;
-	if (!isset($_josh["max_text_len"])) $_josh["max_text_len"] = 0;
-	if ($len > $_josh["max_text_len"]) {
+	if (!isset($_josh['max_text_len'])) $_josh['max_text_len'] = 0;
+	if ($len > $_josh['max_text_len']) {
 		//echo $len . "<br>";
-		$_josh["max_text_len"] = $len;
+		$_josh['max_text_len'] = $len;
 	}
 }
 
@@ -365,9 +365,9 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 			global $_josh;
 			//resize an image and save to the $target_name
 			$tmp = imagecreatetruecolor($new_width, $new_height);
-			if (!$image = imagecreatefromjpeg($_josh["root"] . $source_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
+			if (!$image = imagecreatefromjpeg($_josh['root'] . $source_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
 			imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-			imagejpeg($tmp, $_josh["root"] . $target_name, 100);
+			imagejpeg($tmp, $_josh['root'] . $target_name, 100);
 			imagedestroy($tmp);
 			imagedestroy($image);
 		}
@@ -375,30 +375,30 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		function crop($new_width, $new_height, $target_name) {
 			global $_josh;
 			//crop an image and save to the $target_name
-			list($width, $height) = getimagesize($_josh["root"] . $target_name);
+			list($width, $height) = getimagesize($_josh['root'] . $target_name);
 			$tmp = imagecreatetruecolor($new_width, $new_height);
-			if (!$image = @imagecreatefromjpeg($_josh["root"] . $target_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
+			if (!$image = @imagecreatefromjpeg($_josh['root'] . $target_name)) error_handle("couldn't create image", "the system could not create an image from " . $source_name);
 			imagecopyresized($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $new_width, $new_height);
-			imagejpeg($tmp, $_josh["root"] . $target_name, 100);
+			imagejpeg($tmp, $_josh['root'] . $target_name, 100);
 			imagedestroy($tmp);
 			imagedestroy($image);
 		}	
 	}
 
 	//save to file, is file-based operation, unfortunately
-	$source_name = $_josh["write_folder"] . "/temp-source.jpg";
-	$target_name = $_josh["write_folder"] . "/temp-target.jpg";
+	$source_name = $_josh['write_folder'] . "/temp-source.jpg";
+	$target_name = $_josh['write_folder'] . "/temp-target.jpg";
 	file_put($source_name, $source);
 
 	//get source image dimensions
-	list($width, $height) = getimagesize($_josh["root"] . $source_name);
+	list($width, $height) = getimagesize($_josh['root'] . $source_name);
 	
 	//execute differently depending on target parameters	
 	if ($max_width && $max_height) {
 		//resizing both
 		if (($width == $max_width) && ($height == $max_height)) {
 			//already exact width and height, skip resizing
-			copy($_josh["root"] . $source_name, $_josh["root"] . $target_name);
+			copy($_josh['root'] . $source_name, $_josh['root'] . $target_name);
 		} else {
 			//this was for the scenario where your target was a long landscape and you got a squarish image.
 			//this doesn't work if your target is squarish and you get a long landscape
@@ -554,16 +554,16 @@ function format_post_date($str, $array=false) {
 	
 	if (!$array) $array = $_POST;
 	
-	$month  = $array[$str . "Month"];
-	$day    = $array[$str . "Day"];
-	$year   = $array[$str . "Year"];
+	$month  = $array[$str . 'Month'];
+	$day    = $array[$str . 'Day'];
+	$year   = $array[$str . 'Year'];
 	
-	$hour   = isset($array[$str . "Hour"])   ? $array[$str . "Hour"]   : 0;
-	$minute = isset($array[$str . "Minute"]) ? $array[$str . "Minute"] : 0;
-	$second = isset($array[$str . "Second"]) ? $array[$str . "Second"] : 0;
+	$hour   = isset($array[$str . 'Hour'])   ? $array[$str . 'Hour']   : 0;
+	$minute = isset($array[$str . 'Minute']) ? $array[$str . 'Minute'] : 0;
+	$second = isset($array[$str . 'Second']) ? $array[$str . 'Second'] : 0;
 	
-	if (isset($array[$str . "AMPM"])) {
-		if ($array[$str . "AMPM"] == "AM") {
+	if (isset($array[$str . 'AMPM'])) {
+		if ($array[$str . 'AMPM'] == "AM") {
 			if ($hour == 12) $hour = 0;
 		} else {
 			if ($hour != 12) $hour +=12;
@@ -626,7 +626,7 @@ function format_quantitize($quantity, $entity, $title_case=true) {
 	} elseif ($quantity == 1) {
 		$return = "one " . $entity;
 	} elseif (format_verify($quantity) && ($quantity < 10)) {
-		$return = $_josh["numbers"][$quantity] . " " . format_pluralize($entity);
+		$return = $_josh['numbers'][$quantity] . " " . format_pluralize($entity);
 	} else {
 		$return = $quantity . " " . format_pluralize($entity);
 	}
@@ -821,7 +821,7 @@ function isWeekDay($udate) {
 function format_time_exec($start_time=false, $descriptor=" seconds") {
 	if (!$start_time) {
 		global $_josh;
-		if (isset($_josh["time_start"])) $start_time = $_josh["time_start"];
+		if (isset($_josh['time_start'])) $start_time = $_josh['time_start'];
 	}
 	return round(microtime(true) - $start_time, 2) . $descriptor;
 }
@@ -833,7 +833,7 @@ function format_times($num) {
 	} elseif ($num == 2) {
 		return "twice";
 	} elseif ($num < 10) {
-		return $_josh["numbers"][$num] . " times";
+		return $_josh['numbers'][$num] . " times";
 	} else {
 		return number_format($num) . " times";
 	}
