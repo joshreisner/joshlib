@@ -3,60 +3,54 @@
 should this be called http instead of url?  i could include cookie, and url_header would make more sense.
 */
 
-error_debug("including url.php");
+error_debug('including url.php');
 
-function url_action($matches, $key="action") {
+function url_action($matches, $key='action') {
 	//don't know whether this is any good.  matches possible $_GET['action'] values
 	global $_GET;
 	if (isset($_GET[$key])) {
-		$matches = explode(",", $matches);
+		$matches = explode(',', $matches);
 		foreach ($matches as $m) if ($_GET[$key] == trim($m)) return true;
 	}
 	return false;
 }
 
 function url_action_add($action=false, $go=false) {
-	return url_query_add(array("action"=>$action), $go);
+	return url_query_add(array('action'=>$action), $go);
 }
 
 function url_base() {
 	global $_josh;
-	return $_josh['request']['protocol'] . "://" . $_josh['request']['host'];
+	return $_josh['request']['protocol'] . '://' . $_josh['request']['host'];
 }
 
-function url_change($target="") {
+function url_change($target='') {
 	global $_josh;
 	
 	if ($target === false) { //if redirect is really set to FALSE, send to site home
-		$target = "/";
+		$target = '/';
 	} elseif (empty($target)) { //if redirect is an empty string, refresh the page by sending back to same URL
 		$target = $_josh['request']['path_query'];
 	}
 	if ($_josh['slow']) {
-		error_debug("<b>url_change</b> (slow) to " . $target);
+		error_debug('<b>url_change</b> (slow) to ' . $target);
 		if ($_josh['debug']) db_close(); //exit early so you can see log
-		echo "<html><head>
-				<script language='javascript'>
-					<!--
-					location.href='" . $target . "';
-					//-->
-				</script>
-			</head><body></body></html>";
+		echo draw_javascript('location.href="' . $target . '"');
 	} else {
-		error_debug("<b>url_change</b> (fast) to " . $target);
+		error_debug('<b>url_change</b> (fast) to ' . $target);
 		if ($_josh['debug']) db_close(); //exit early so you can see log
-		header("Location: " . $target);
+		header('Location: ' . $target);
 	}
 	db_close();
 }
 
-function url_change_get($target="") {
+function url_change_get($target='') {
 	global $_GET;
 	if (isset($_GET['return_to']) && !empty($_GET['return_to'])) $target = $_GET['return_to'];
 	url_change($target);
 }
 
-function url_change_post($target="") {
+function url_change_post($target='') {
 	global $_POST;
 	if (isset($_POST['return_to']) && !empty($_POST['return_to'])) $target = $_POST['return_to'];
 	url_change($target);
@@ -71,7 +65,7 @@ function url_header_utf8() {
 	header('Content-Type: text/html; charset=utf-8');
 }
 
-function url_id($index="id") {
+function url_id($index='id') {
 	global $_GET;
 	//check to see whether there's an id and if so, if it's an integer
 	if (isset($_GET[$index]) && format_check($_GET[$index])) return $_GET[$index];
@@ -80,12 +74,12 @@ function url_id($index="id") {
 }
 
 function url_parse($url) {
-	error_debug("<b>url_parse</b> running for  " . $url);
+	error_debug('<b>url_parse</b> running for  ' . $url);
 	global $_GET;
-	$gtlds = explode(',', str_replace(' ', '', "aero, biz, com, coop, info,
-	jobs, museum, name, net, org, pro, travel, gov, edu, mil, int, site"));
+	$gtlds = explode(',', str_replace(' ', '', 'aero, biz, com, coop, info,
+	jobs, museum, name, net, org, pro, travel, gov, edu, mil, int, site'));
 
-	$ctlds = explode(',', str_replace(' ', '', "ac, ad, ae, af, ag, ai, al,
+	$ctlds = explode(',', str_replace(' ', '', 'ac, ad, ae, af, ag, ai, al,
 	am, an, ao, aq, ar, as, at, au, aw, az, ax, ba, bb, bd, be, bf, bg, bh,
 	bi, bj, bm, bn, bo, br, bs, bt, bv, bw, by, bz, ca, cc, cd, cf, cg, ch,
 	ci, ck, cl, cm, cn, co, cr, cs, cu, cv, cx, cy, cz, de, dj, dk, dm, do,
@@ -99,10 +93,10 @@ function url_parse($url) {
 	ro, ru, rw, sa, sb, sc, sd, se, sg, sh, si, sj, sk, sl, sm, sn, so, sr,
 	st, sv, sy, sz, tc, td, tf, tg, th, tj, tk, tl, tm, tn, to, tp, tr, tt,
 	tv, tw, tz, ua, ug, uk, um, us, uy, uz, va, vc, ve, vg, vi, vn, vu, wf,
-	ws, ye, yt, yu, za, zm, zw"));
+	ws, ye, yt, yu, za, zm, zw'));
 
 	//add protocol if missing.  when would this be missing?
-	if (!strstr($url, 'http://') && !strstr($url, 'https://')) $url = "http://" . $url; 
+	if (!strstr($url, 'http://') && !strstr($url, 'https://')) $url = 'http://' . $url; 
 
 	$subs			= ''; 
 	$domainname		= ''; 
@@ -117,28 +111,28 @@ function url_parse($url) {
 		$_domainPart = array_pop($domainarray);
 		if (!$tld_isReady) {
 			if (in_array($_domainPart, $tldarray)) {
-				$tld = ".$_domainPart" . $tld;
+				$tld = '.$_domainPart' . $tld;
 			} else {
 				$domainname = $_domainPart;
 				$tld_isReady = 1;
 			}
 		} else {
-			$subs = ".$_domainPart" . $subs;
+			$subs = '.$_domainPart' . $subs;
 		}
 	}
 
-	if (!isset($return['path'])) $return['path'] = "";
+	if (!isset($return['path'])) $return['path'] = '';
 	$return['domainname']	= $domainname;
-	$return['tld']			= str_replace(".", "", $tld);
+	$return['tld']			= str_replace('.', '', $tld);
 	$return['domain']		= $domainname . $tld;
-	$return['usingwww']		= (substr($return['host'], 0, 4) == "www.") ? 1 : 0;
+	$return['usingwww']		= (substr($return['host'], 0, 4) == 'www.') ? 1 : 0;
 	$return['sanswww']		= ($return['usingwww']) ? substr($return['host'], 4) : $return['host'];
 	$return['subdomain']	= substr($subs, 1);
-	$return['path']			= str_replace("index.php", "", $return['path']);
+	$return['path']			= str_replace('index.php', '', $return['path']);
 	$return['path_query']	= $return['path'];
 	
 	//get folder, subfolder
-	$urlparts = explode("/", $return['path_query']);
+	$urlparts = explode('/', $return['path_query']);
 	$urlcount = count($urlparts);
 
 	if ($urlcount < 3) {
@@ -162,7 +156,7 @@ function url_parse($url) {
 	//add query string to path_query
 	//don't use $_GET because we might be parsing a different address
 	if (isset($return['query'])) {
-		$return['path_query'] .= "?" . $return['query'];
+		$return['path_query'] .= '?' . $return['query'];
 	} else {
 		$return['query'] = false;
 	}
@@ -171,18 +165,18 @@ function url_parse($url) {
 	$return['protocol'] = $return['scheme'];
 	
 	//get full browser address
-	$return['url']			= $return['protocol'] . "://" . $return['host'] . $return['path_query'];
+	$return['url']			= $return['protocol'] . '://' . $return['host'] . $return['path_query'];
 	
 	//handle possible mod_rewrite slots
 	if (isset($_GET['slot1'])) {
 		$return['folder'] = $_GET['slot1'];
-		$return['path'] = "/" . $_GET['slot1'] . "/";
+		$return['path'] = '/' . $_GET['slot1'] . '/';
 		if (isset($_GET['slot2'])) {
 			$return['subfolder'] = $_GET['slot2'];
-			$return['path'] .= $_GET['slot2'] . "/";
+			$return['path'] .= $_GET['slot2'] . '/';
 			if (isset($_GET['slot3'])) {
 				$return['subsubfolder'] = $_GET['slot3'];
-				$return['path'] .= $_GET['slot3'] . "/";
+				$return['path'] .= $_GET['slot3'] . '/';
 			}
 		}
 		$return['path_query'] = $return['path'];
@@ -199,9 +193,9 @@ function url_query_add($adds, $go=true, $path=false) { //add specified query arg
 	$target = url_base() . (($path) ? $path : $_josh['request']['path']);
 	//$adds = array_unique(array_merge($_GET, $adds));
 	$adds = array_merge($_GET, $adds);
-	if (count($adds)) foreach ($adds as $key=>$value) if ($value) $pairs[] = $key . "=" . urlencode($value);
+	if (count($adds)) foreach ($adds as $key=>$value) if ($value) $pairs[] = $key . '=' . urlencode($value);
 	sort($pairs);
-	if (count($pairs)) $target .= "?" . implode("&", $pairs);
+	if (count($pairs)) $target .= '?' . implode('&', $pairs);
 	if ($go) url_change($target);
 	return $target;
 }
@@ -209,39 +203,39 @@ function url_query_add($adds, $go=true, $path=false) { //add specified query arg
 function url_query_drop($deletes=false, $go=true) {
 	//purpose: clear specified query arguments, or clear everything if unspecified
 	//called by: lots of pages on the intranet, eg /staff/view.php
-	//accepts: $deletes is a one-dimensional array of keys, eg array("id", "action", "chicken"), $go is boolean
+	//accepts: $deletes is a one-dimensional array of keys, eg array('id', 'action', 'chicken'), $go is boolean
 	//deletes could also be a comma-separated list
 	global $_josh, $_GET;
 	$get = $_GET;
 	$target = url_base() . $_josh['request']['path'];
 	if ($deletes) {
-		if (!is_array($deletes)) $deletes = explode(",", $deletes);
+		if (!is_array($deletes)) $deletes = explode(',', $deletes);
 		foreach ($deletes as $key) {
 			$key = trim($key);
 			if (array_key_exists($key, $get)) unset($get[$key]);
 		}
 		$pairs = array();
 		reset($get);
-		while (list($key, $value) = each($get)) if ($value) $pairs[] = $key . "=" . $value;
+		while (list($key, $value) = each($get)) if ($value) $pairs[] = $key . '=' . $value;
 		sort($pairs);
-		if (count($pairs)) $target .= "?" . implode("&", $pairs);
+		if (count($pairs)) $target .= '?' . implode('&', $pairs);
 	}
 	if ($go) url_change($target);
 	return $target;
 }
 
-function url_query_require($target="./", $index="id") {
+function url_query_require($target='./', $index='id') {
 	//requires a _GET variable to be defined or eject page
 	if (!url_id($index)) url_change($target);
 }
 
 function url_query_parse($querystring) {
-	if (strstr($querystring, "?")) $querystring = substr($querystring, strpos($querystring, "?") + 1);
+	if (strstr($querystring, '?')) $querystring = substr($querystring, strpos($querystring, '?') + 1);
 	$return = array();
-	if (strstr($querystring, "=")) {
-		$pairs = explode("&", $querystring);
+	if (strstr($querystring, '=')) {
+		$pairs = explode('&', $querystring);
 		foreach ($pairs as $pair) {
-			@list($key, $value) = explode("=", $pair);
+			@list($key, $value) = explode('=', $pair);
 			$return[$key] = urldecode($value);
 		}
 	}

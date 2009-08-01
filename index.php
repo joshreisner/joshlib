@@ -80,7 +80,6 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	require($_josh['joshlib_folder'] . '/email.php');
 	require($_josh['joshlib_folder'] . '/file.php');
 	require($_josh['joshlib_folder'] . '/format.php');
-	require($_josh['joshlib_folder'] . '/html.php'); //todo deprecated
 	require($_josh['joshlib_folder'] . '/url.php');
 
 //parse environment variables

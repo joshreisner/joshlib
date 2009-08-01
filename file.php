@@ -1,24 +1,24 @@
 <?php
-error_debug("including file.php", __file__, __line__);
+error_debug('including file.php', __file__, __line__);
 
 function file_array($content, $filename=false) {
 	//output function -- creates a html table file which, if file_downloaded as a .xls, will spoof an excel spreadsheet
 	//all you need to do is pass it a two-dimensional array (i think)
 	$header = false;
-	$rows = "";
+	$rows = '';
 	foreach ($content as $line) {
-		$rows .= "<tr>";
+		$rows .= '<tr>';
 		if (!$header) $hreturn = array();
 		foreach($line as $key=>$value) {
-			if (!$header) $hreturn[] = "<td>" . format_text_human($key) . "</td>";
-			$rows .= "<td>" . $value . "</td>";
+			if (!$header) $hreturn[] = '<td>' . format_text_human($key) . '</td>';
+			$rows .= '<td>' . $value . '</td>';
 		}
 		
-		if (!$header) $header = '<tr style="background-color:#fafade; font-weight:bold;">' . implode("", $hreturn) . '</tr>';
-		$rows .= "</tr>";
+		if (!$header) $header = '<tr style="background-color:#fafade; font-weight:bold;">' . implode('', $hreturn) . '</tr>';
+		$rows .= '</tr>';
 	}
 	$content = '<table border="1" style="font-family:Verdana; font-size:9px;">' . $header . $rows . '</table>';
-	if ($filename) file_download($content, $filename, "xls");
+	if ($filename) file_download($content, $filename, 'xls');
 	return $content;
 }
 
@@ -34,17 +34,17 @@ function file_delete($filename) {
 }
 
 function file_download($content, $filename, $extension) {
-	//header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	//header("Cache-Control: public");
+	//header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	//header('Cache-Control: public');
 
 	//for IE over SSL
-	header("Cache-Control: maxage=1"); //In seconds
-	header("Pragma: public");
+	header('Cache-Control: maxage=1'); //In seconds
+	header('Pragma: public');
 	
-	header("Content-Description: File Transfer");
-	header("Content-Type: application/octet-stream");
-	header("Content-Length: " . strlen($content));
-	header("Content-Disposition: attachment; filename=" . format_file_name($filename, $extension));
+	header('Content-Description: File Transfer');
+	header('Content-Type: application/octet-stream');
+	header('Content-Length: ' . strlen($content));
+	header('Content-Disposition: attachment; filename=' . format_file_name($filename, $extension));
 	echo $content;
 	db_close();
 }
@@ -52,65 +52,65 @@ function file_download($content, $filename, $extension) {
 function file_dynamic($table, $column, $id, $extension, $lastmod) {
 	//function file_dynamic($filename, $lastmod, $query) {
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
-	$filename = $_josh['write_folder'] . "/dynamic/" . $table . "-" . $column . "-" . $id . "." . $extension;
-	if (!file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) file_put($filename, db_grab("SELECT $column FROM $table WHERE id = $id"));
+	$filename = $_josh['write_folder'] . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
+	if (!file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) file_put($filename, db_grab('SELECT $column FROM $table WHERE id = $id'));
 	return $filename;
 }
 
 function file_folder($folder, $endfilter=false) {
 	global $_josh;
-	error_debug("<b>file folder</b> running with $folder", __file__, __line__);
+	error_debug('<b>file folder</b> running with $folder', __file__, __line__);
 	
 	//check to make sure folder exists
 	if (!is_dir($_josh['root'] . $folder)) {
-		error_debug("<b>file folder</b> $folder is not a directory, exiting", __file__, __line__);
+		error_debug('<b>file folder</b> $folder is not a directory, exiting', __file__, __line__);
 		return false;
 	}
-	error_debug("<b>file folder</b> $folder is a directory!", __file__, __line__);
+	error_debug('<b>file folder</b> $folder is a directory!', __file__, __line__);
 
 	//set up filter
-	if ($endfilter) $endfilter = explode(",", $endfilter);
+	if ($endfilter) $endfilter = explode(',', $endfilter);
 
 	//open it
 	if ($handle = opendir($_josh['root'] . $folder)) {
 		$return = array();
 		while (($name = readdir($handle)) !== false) {
-			if (($name == ".") || ($name == "..") || ($name == ".DS_Store")) continue;
-			$nameparts = explode(".", $name);
+			if (($name == '.') || ($name == '..') || ($name == '.DS_Store')) continue;
+			$nameparts = explode('.', $name);
 			$thisfile = array(
-				"name"=>$name,
-				"ext"=>array_pop($nameparts),
-				"human"=>format_text_human(implode(" ", $nameparts)), 
-				"path_name"=>$folder . $name,
-				"type"=>filetype($_josh['root'] . $folder . $name),
-				"fmod"=>filemtime($_josh['root'] . $folder . $name),
-				"size"=>filesize($_josh['root'] . $folder . $name)
+				'name'=>$name,
+				'ext'=>array_pop($nameparts),
+				'human'=>format_text_human(implode(' ', $nameparts)), 
+				'path_name'=>$folder . $name,
+				'type'=>filetype($_josh['root'] . $folder . $name),
+				'fmod'=>filemtime($_josh['root'] . $folder . $name),
+				'size'=>filesize($_josh['root'] . $folder . $name)
 			);
-			if ($thisfile['type'] == "dir") $thisfile['path_name'] .= "/";
-			error_debug("<b>file folder</b> found " . $thisfile['name'] . " of type " . $thisfile['type'], __file__, __line__);
+			if ($thisfile['type'] == 'dir') $thisfile['path_name'] .= '/';
+			error_debug('<b>file folder</b> found ' . $thisfile['name'] . ' of type ' . $thisfile['type'], __file__, __line__);
 			if ($endfilter) {
 				$oneFound = false;
-				foreach ($endfilter as $e) if (format_text_ends(trim($e), $thisfile['path_name']) || (($e == "dir") && ($thisfile['type'] == "dir"))) $oneFound = true;
+				foreach ($endfilter as $e) if (format_text_ends(trim($e), $thisfile['path_name']) || (($e == 'dir') && ($thisfile['type'] == 'dir'))) $oneFound = true;
 				if ($oneFound) $return[] = $thisfile;
 			} else {
 				$return[] = $thisfile;
 			}
 		}
-		error_debug("<b>file folder</b> closing handle", __file__, __line__);
+		error_debug('<b>file folder</b> closing handle', __file__, __line__);
 		closedir($handle);
 		if (count($return)) return array_sort($return);
 	}
-	error_debug("<b>file folder</b> no return count", __file__, __line__);
+	error_debug('<b>file folder</b> no return count', __file__, __line__);
 	return false;
 }
 
 function file_get($filename) {
 	global $_josh;
-	if (!$file = @fopen($filename, "r")) {
+	if (!$file = @fopen($filename, 'r')) {
 		$filename = $_josh['root'] . $filename;
-		if (!$file = @fopen($filename, "r")) return false;
+		if (!$file = @fopen($filename, 'r')) return false;
 	}
-	error_debug("<b>file_get</b> filename is " . $filename, __file__, __line__);
+	error_debug('<b>file_get</b> filename is ' . $filename, __file__, __line__);
 	if (!$size = @filesize($filename)) return false;
 	$data = fread($file, $size);
 	fclose($file);
@@ -118,24 +118,24 @@ function file_get($filename) {
 }
 
 function file_get_max($pretty=true) {
-	$filesize = format_size_bytes(ini_get("upload_max_filesize"));
-	$postsize = format_size_bytes(ini_get("post_max_size"));
+	$filesize = format_size_bytes(ini_get('upload_max_filesize'));
+	$postsize = format_size_bytes(ini_get('post_max_size'));
 	$max_size = ($filesize > $postsize) ? $postsize : $filesize;
 	if ($pretty) return format_size($max_size);
 	return $max_size;
 }
 
-function file_get_type_id($filename, $table="documents_types") {
+function file_get_type_id($filename, $table='documents_types') {
 	list($filename, $extension) = file_name($filename);
-	if (!$type_id = db_grab("SELECT id FROM " . $table . " WHERE extension = '" . $extension . "'")) {
-		return db_query("INSERT INTO " . $table . " ( extension ) VALUES ( '" . $extension . "' )");
+	if (!$type_id = db_grab('SELECT id FROM ' . $table . ' WHERE extension = "' . $extension . '"')) {
+		return db_query('INSERT INTO ' . $table . ' ( extension ) VALUES ( "' . $extension . '" )');
 	}
 	return $type_id;
 }
 
 function file_get_uploaded($fieldname, $table=false) {
 	global $_FILES;
-	error_debug("<b>file_get_uploaded</b> running ~ user is uploading a file");
+	error_debug('<b>file_get_uploaded</b> running ~ user is uploading a file');
 	$content = file_get($_FILES[$fieldname]['tmp_name']);
 	@unlink($_FILES[$fieldname]['tmp_name']);
 	if ($table) return array($content, file_get_type_id($_FILES[$fieldname]['name'], $table));
@@ -144,7 +144,7 @@ function file_get_uploaded($fieldname, $table=false) {
 
 function file_import_fixedlength($content, $definitions) {
 	$return = array();
-	$lines = explode("\n", $content);
+	$lines = explode('\n', $content);
 	foreach ($lines as $line) {
 		$thisreturn = array();
 		$counter = 0;
@@ -165,14 +165,14 @@ function file_is($filename) {
 
 function file_name($filepath) {
 	global $_josh;
-	error_debug("file_name receiving filepath = $filepath", __file__, __line__);
-	$pathparts	= explode("/", $filepath);
+	error_debug('file_name receiving filepath = $filepath', __file__, __line__);
+	$pathparts	= explode('/', $filepath);
 	$file		= array_pop($pathparts);
 	$path		= implode($_josh['folder'], $pathparts);
-	$fileparts	= explode(".", $file);
+	$fileparts	= explode('.', $file);
 	$extension	= array_pop($fileparts);
-	$filename	= implode(".", $fileparts);
-	error_debug("file_name returning file = $file, ext = $extension, path = $path", __file__, __line__);
+	$filename	= implode('.', $fileparts);
+	error_debug('file_name returning file = $file, ext = $extension, path = $path', __file__, __line__);
 	return array($filename, $extension, $path);
 }
 
@@ -182,9 +182,9 @@ function file_pass($filename) {
 	$content		= file_get($filename);
 	//die($filename);
 	$nameparts		= explode($_josh['folder'], $filename);
-	$filenameparts	= explode(".", $nameparts[count($nameparts) - 1]);
+	$filenameparts	= explode('.', $nameparts[count($nameparts) - 1]);
 	$extension		= array_pop($filenameparts);
-	$filename		= implode(".", $filenameparts);
+	$filename		= implode('.', $filenameparts);
 	return file_download($content, $filename, $extension);
 }
 
@@ -192,13 +192,13 @@ function file_put($filename, $content) {
 	global $_josh;
 	file_delete($filename);
 	//arguments should be reversed?
-	$file = @fopen($_josh['root'] . $filename, "w");
+	$file = @fopen($_josh['root'] . $filename, 'w');
 	if ($file === false) {
-		error_handle("could not open file", "the file " . $_josh['root'] . $filename . " could not be opened for writing.  perhaps it is a permissions problem.");
+		error_handle('could not open file', 'the file ' . $_josh['root'] . $filename . ' could not be opened for writing.  perhaps it is a permissions problem.');
 	} else {
 		if (is_array($content)) $content = implode($content);
 		$bytes = fwrite($file, $content);
-		error_debug("<b>file_put</b> writing $bytes bytes to $filename", __file__, __line__);	
+		error_debug('<b>file_put</b> writing $bytes bytes to $filename', __file__, __line__);	
 		fclose($file);
 		return $bytes;
 	}
@@ -210,22 +210,22 @@ function file_put_config() {
 	$return	 = '<?php' . $_josh['newline'];
 	
 	//db variables
-	$return .= '$_josh[\'db\'][\'location\']        = "localhost"; //server' . $_josh['newline'];
-	$return .= '$_josh[\'db\'][\'language\']        = "mysql"; //mysql or mssql' . $_josh['newline'];
-	$return .= '$_josh[\'db\'][\'database\']        = "";' . $_josh['newline'];
-	$return .= '$_josh[\'db\'][\'username\']        = "";' . $_josh['newline'];
-	$return .= '$_josh[\'db\'][\'password\']        = "";' . $_josh['newline'];
-	$return .= '$_josh[\'basedblanguage\']        = ""; //mysql or mssql (not necessary unless you want it translated)' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'location\']	= \'localhost\'; //server' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'language\']	= \'mysql\'; //mysql or mssql' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'database\']	= \'\';' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'username\']	= \'\';' . $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'password\']	= \'\';' . $_josh['newline'];
+	$return .= '$_josh[\'basedblanguage\']		= \'\'; //mysql or mssql (not necessary unless you want it translated)' . $_josh['newline'];
 	$return .= $_josh['newline'];
 	
 	//error variables
-	$return .= '$_josh[\'error_log_api\']         = false; //error logging url, eg http://tasks.joshreisner.com/errorapi.php' . $_josh['newline'];
-	$return .= '$_josh[\'email_default\']         = "josh@joshreisner.com"; //regular site emails come from this address' . $_josh['newline'];
-	$return .= '$_josh[\'email_admin\']           = "josh@joshreisner.com"; //error emails go to this address' . $_josh['newline'];
+	$return .= '$_josh[\'error_log_api\']		= false; //error logging url, eg http://tasks.joshreisner.com/errorapi.php' . $_josh['newline'];
+	$return .= '$_josh[\'email_default\']		= \'josh@joshreisner.com\'; //regular site emails come from this address' . $_josh['newline'];
+	$return .= '$_josh[\'email_admin\']			= \'josh@joshreisner.com\'; //error emails go to this address' . $_josh['newline'];
 	$return .= $_josh['newline'];
 	
 	//url variables
-	$return .= '$_josh[\'is_secure\']         	= false; //indicates whether it should use https (true) or not (false)' . $_josh['newline'];
+	$return .= '$_josh[\'is_secure\']			= false; //indicates whether it should use https (true) or not (false)' . $_josh['newline'];
 	$return .= $_josh['newline'];
 
 	$return .= '?>';
@@ -239,13 +239,13 @@ function file_rss($title, $link, $items, $filename=false) {
 	//dtfmt Wed, 12 Nov 2008 09:13:11 -0500
 	
 	//w3c feed validator wants this, if possible
-	$return = ($filename) ? '<atom:link href="' . url_base() . $filename . '" rel="self" type="application/rss+xml" />' : "";
+	$return = ($filename) ? '<atom:link href="' . url_base() . $filename . '" rel="self" type="application/rss+xml" />' : '';
 	
 	$lastBuildDate = false;
 
 	foreach ($items as $i) {
 		if (!$lastBuildDate) $lastBuildDate = format_date_rss($i['date']);
-		$i['link'] = str_replace("&", "&amp;", $i['link']);
+		$i['link'] = str_replace('&', '&amp;', $i['link']);
 		$return .= '
 		<item>
 			<title>' . htmlspecialchars($i['title']) . '</title>
@@ -258,7 +258,7 @@ function file_rss($title, $link, $items, $filename=false) {
 		';
 	}
 	
-	$description = "";
+	$description = '';
 		
 	$return = '<?xml version="1.0" encoding="utf-8"?>
 		<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -287,12 +287,12 @@ function file_sister($filename, $ext) {
 	global $_josh;
 	if (file_is($filename)) {
 		list ($file, $extension, $path) = file_name($filename);
-		$sister = $path . $_josh['folder'] . $file . "." . $ext;
+		$sister = $path . $_josh['folder'] . $file . '.' . $ext;
 		if (file_is($sister)) {
-			error_debug("file sister file exists");
+			error_debug('file sister file exists');
 			return $sister;
 		} else {
-			error_debug("file sister $sister does not exist");
+			error_debug('file sister $sister does not exist');
 		}
 	}
 	return false;
@@ -303,7 +303,7 @@ function file_unzip($source, $target) {
     $zip = zip_open($source);
 
     if (!is_resource($zip)) {
-		$zipFileFunctionsErrors = array(
+		$errors = array(
 		'ZIPARCHIVE::ER_MULTIDISK' => 'Multi-disk zip archives not supported.',
 		'ZIPARCHIVE::ER_RENAME' => 'Renaming temporary file failed.',
 		'ZIPARCHIVE::ER_CLOSE' => 'Closing zip archive failed', 
@@ -328,32 +328,28 @@ function file_unzip($source, $target) {
 		'ZIPARCHIVE::ER_REMOVE' => 'Can\'t remove file',
 		'ZIPARCHIVE::ER_DELETED' => 'Entry has been deleted'
 		);
-		foreach ($zipFileFunctionsErrors as $constName => $errorMessage) {
-			if (defined($constName) and constant($constName) === $zip) {
-				error_handle("ZIP won't open", "zip_open failed with $errorMessage for " . $source);
-
-				//return 'Zip File Function error: '.$errorMessage;
-			}
+		foreach ($errors as $constant=>$error) {
+			if (defined($constant) and constant($error) === $zip) error_handle('ZIP won\'t open', 'zip_open failed with ' . $error . ' for ' . $source);
 		}
-		error_handle("ZIP won't open", "error code {$zipFileFunctionsErrors[$zip]} for " . $source);
+		error_handle('ZIP won\'t open', 'error not defined for ' . $source);
     }
 
 	while ($zip_entry = zip_read($zip)) {
 		$folder = dirname(zip_entry_name($zip_entry));
-		if (format_text_starts(".", $folder)) continue;
-		if (format_text_starts("__MACOSX", $folder)) continue;
+		if (format_text_starts('.', $folder)) continue;
+		if (format_text_starts('__MACOSX', $folder)) continue;
 
         $completePath = $_josh['root'] . $target . $_josh['folder'] . $folder;
         $completeName = $_josh['root'] . $target . $_josh['folder'] . zip_entry_name($zip_entry);
         if (!file_exists($completeName)) {
-            $tmp = "";
+            $tmp = '';
             foreach(explode($_josh['folder'], $folder) AS $k) {
                 $tmp .= $k . $_josh['folder'];
                 if(!is_dir($_josh['root'] . $target . $_josh['folder'] . $tmp)) mkdir($_josh['root'] . $target . $_josh['folder'] . $tmp, 0777);
             }
         }
         
-        if (zip_entry_open($zip, $zip_entry, "r")) {
+        if (zip_entry_open($zip, $zip_entry, 'r')) {
             if ($fd = @fopen($completeName, 'w+')) {
                 fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
                 fclose($fd);
@@ -377,7 +373,7 @@ function file_write_folder($folder=false) {
 	$folder = $_josh['root'] . $folder;
 	
 	//make folder
-	if (!is_dir($folder) && !@mkdir($folder)) error_handle("couldn't create folder", "file_write_folder tried to create a folder at " . $folder . " but could not.  please create a folder there and make it writable.");
+	if (!is_dir($folder) && !@mkdir($folder)) error_handle('couldn\'t create folder', 'file_write_folder tried to create a folder at ' . $folder . ' but could not.  please create a folder there and make it writable.');
 
 	//set permissions
 	if (!is_writable($folder)) {
