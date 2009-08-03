@@ -61,7 +61,7 @@ function draw_calendar($month, $year, $events=false) {
 		foreach ($events as $e)	{
 			if (!isset($cal_events[$e['day']])) $cal_events[$e['day']] = '';
 			$style = (isset($e['color'])) ? 'background-color:#' . $e['color'] : false;
-			$cal_events[$e['day']] .= draw_container('div', $e['title'], array('class'=>'event', 'style'=>$style));
+			$cal_events[$e['day']] .= draw_div_class('event', format_string($e['title']), array('style'=>$style));
 		}
 	}
 	
@@ -88,7 +88,7 @@ function draw_calendar($month, $year, $events=false) {
 		}
 	}
 	
-	return draw_div_class('calendar weeks' . ($week - 1), $return);
+	return draw_div_class('calendar', $return);
 }
 
 function draw_css($content) {
