@@ -615,7 +615,8 @@ function draw_tag($tag, $args=false, $innerhtml=false) {
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
 		$return .= '>' . $innerhtml . '</' . $tag . '>';
 	}
-	$return .= draw_newline();
+	$nonbreaking_tags = array('b', 'nobr');
+	if (!in_array($tag, $nonbreaking_tags)) $return .= draw_newline();
 	if ($tag == 'table') $return .= draw_newline(2);
 	return $return;
 }
