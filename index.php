@@ -265,7 +265,7 @@ class form {
 		$this->submit = $submit;
 		if ($table) $this->set_table($table);
 		$this->title = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($table));
-		if ($id) $this->set_values(db_grab('SELECT * FROM $table WHERE id = ' . $id));
+		if ($id) $this->set_values(db_grab('SELECT * FROM ' . $table . ' WHERE id = ' . $id));
 	}
 
 	function draw($validate=false, $values=false) {

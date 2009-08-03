@@ -507,7 +507,7 @@ function draw_list($options, $args=false, $type='ul', $selected=false) {
 		if ($selected == ($i + 1)) $liclass .= ' selected';
 		$options[$i] = draw_tag('li', array('class'=>$liclass), $options[$i]);
 	}
-	return draw_tag($type, $args, implode($options,  $_josh['newline'] . '\t'));
+	return draw_tag($type, $args, implode($options,  $_josh['newline'] . "\t"));
 }
 
 function draw_meta_description($string) {
@@ -615,8 +615,7 @@ function draw_tag($tag, $args=false, $innerhtml=false) {
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
 		$return .= '>' . $innerhtml . '</' . $tag . '>';
 	}
-	if ($tag == 'td') $return .= draw_newline();
-	if ($tag == 'tr') $return .= draw_newline();
+	$return .= draw_newline();
 	if ($tag == 'table') $return .= draw_newline(2);
 	return $return;
 }

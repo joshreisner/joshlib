@@ -84,12 +84,12 @@ function db_check($table, $column=false) {
 
 //db_checkboxes('doc', 'documents_to_categories', 'documentID', 'categoryID', $_GET['id']);
 function db_checkboxes($name, $linking_table, $object_col, $option_col, $id) {
-	db_query('DELETE FROM $linking_table WHERE $object_col = ' . $id);
+	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $id);
 	foreach ($_POST as $key => $value) {
 		error_debug('<b>db_checkboxes</b> checking ' . $key);
 		@list($control, $field_name, $categoryID) = explode('_', $key);
 		if (($control == 'chk') && ($field_name == $name)) {
-			db_query('INSERT INTO $linking_table ( $object_col, $option_col ) VALUES ( $id, $categoryID )');
+			db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $id . ', ' . $categoryID . ' )');
 		}
 	}
 }
@@ -472,7 +472,7 @@ function db_save($table, $id='get', $array=false) {
 	if ($id) {
 		$query1[] = 'updated_date = ' .  db_date();
 		$query1[] = 'updated_user = ' . ((isset($array['updated_user'])) ? $array['updated_user'] : $userID);
-		if (db_query('UPDATE $table SET ' . implode(', ', $query1) . ' WHERE id = ' . $id)) return $id;
+		if (db_query('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id)) return $id;
 		return false;
 	} else {
 		$query1[] = 'created_date';
@@ -481,7 +481,7 @@ function db_save($table, $id='get', $array=false) {
 		$query2[] = ((isset($array['created_user'])) ? $array['created_user'] : $userID);
 		$query1[] = 'is_active';
 		$query2[] = 1;
-		$query = 'INSERT INTO $table ( ' . implode(', ', $query1) . ' ) VALUES ( ' . implode(', ', $query2) . ' )';
+		$query = 'INSERT INTO ' . $table . ' ( ' . implode(', ', $query1) . ' ) VALUES ( ' . implode(', ', $query2) . ' )';
 		return db_query($query);
 	}
 }
