@@ -27,6 +27,7 @@ VARIABLES THAT JOSHLIB TRIES TO GET FROM THE WEBSERVER -- IF YOU'RE RUNNING FROM
 
 MISC FUNCTIONS DEFINED ON THIS PAGE
 	cookie
+	cookie_get
 	daysInMonth
 	debug
 	geocode
@@ -206,8 +207,11 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 function cookie($name=false, $value=false, $session=false) {
 	global $_josh, $_COOKIE, $_SERVER;
 
+	//need to output something to page for cookie to take -- if it's a redirect do it with javascript
+	$_josh['slow'] = true;
+
 	if ($_josh['debug']) {
-		error_debug('not actually setting cookie because buffer is already broken by debugging', __file__, __line__);
+		error_debug('not actually setting cookie (' . $name . ', ' . $value . ') because buffer is already broken by debugger.', __file__, __line__);
 		return false;
 	}
 
@@ -226,7 +230,14 @@ function cookie($name=false, $value=false, $session=false) {
 	        setcookie($name, '', time()-1000, '/');
 	    }
 	}
-	$_josh['slow'] = true;
+}
+
+function cookie_get($key) {
+	//return a cookie value and format its quotes -- important for security!
+	//started for bb cms
+	global $_COOKIE;
+	if (!isset($_COOKIE[$key]) || empty($_COOKIE[$key])) return false;
+	return format_quotes($_COOKIE[$key]);
 }
 
 function daysInMonth($month, $year=false) {
