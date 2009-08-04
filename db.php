@@ -398,12 +398,12 @@ function db_save($table, $id='get', $array=false) {
 				$value = format_binary($array[$c['name']]);
 			} elseif ($c['type'] == 'varchar') { //text
 				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
-				$value = '"' . $array[$c['name']] . '"';
+				$value = "'" . $array[$c['name']] . "'";
 				//$value = ''' . format_html_entities($array[$c['name']]) . ''';
 				if (($value == '""') && (!$c['required'])) $value = 'NULL'; //special null
 			} elseif ($c['type'] == 'text') { //textarea
 				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
-				$value = '"' . format_html($array[$c['name']] . '"');
+				$value = "'" . format_html($array[$c['name']] . "'");
 			} elseif (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
 				$value = format_boolean($array[$c['name']], '1|0');
 			} elseif ($c['type'] == 'datetime') {

@@ -214,7 +214,7 @@ function format_hilite($haystack, $needles, $style='background-color:#FFFFBB;pad
 
 function format_html($text) {
 	global $_josh;
-	include($_josh["root"] . $_josh["write_folder"] . '/lib/simple_html_dom.php');
+	require_once($_josh['root'] . $_josh['write_folder'] . '/lib/simple_html_dom.php');
 	$html = str_get_html($text);
 
 	$html->set_callback('cleanup');
