@@ -191,7 +191,7 @@ function db_delete($table, $id=false) {
 		}
 	}
 	$user = (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) ? $_SESSION['user_id'] : 'NULL';
-	db_query('UPDATE $table SET 
+	db_query('UPDATE ' . $table . ' SET 
 		deleted_date = ' . db_date() . ', 
 		deleted_user = ' . $user . ', 
 		is_active = 0 
@@ -530,7 +530,7 @@ function db_undelete($table, $id=false) {
 			error_handle('expecting \$_GET[\'id\']', 'db_delete is expecting an id variable');
 		}
 	}
-	db_query('UPDATE $table SET 
+	db_query('UPDATE ' . $table . ' SET 
 		deleted_date = NULL, 
 		deleted_user = NULL, 
 		is_active = 1
