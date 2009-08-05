@@ -341,10 +341,7 @@ function format_html_set_max($len) {
 	//helper function for above, due to weird scope reason i don't fully comprehend
 	global $_josh;
 	if (!isset($_josh['max_text_len'])) $_josh['max_text_len'] = 0;
-	if ($len > $_josh['max_text_len']) {
-		//echo $len . '<br>';
-		$_josh['max_text_len'] = $len;
-	}
+	if ($len > $_josh['max_text_len']) $_josh['max_text_len'] = $len;
 }
 
 function format_html_text($str) {
@@ -738,7 +735,6 @@ function format_text_starts($needle, $haystack) {
 	//function to see if a $haystack starts with $needle
 	//now returns $haystack sans needle for harvard: trimming news clip publication titles
 	$needle_len = strlen($needle);
-	//echo '~' . substr($haystack, 0, $needle_len) . '~vs~' . $needle . '~<br>';
 	if ($needle == $haystack) return true;
 	if (strToLower(substr($haystack, 0, $needle_len)) == strToLower($needle)) return substr($haystack, $needle_len);
 	return false;
@@ -810,7 +806,6 @@ function format_time_business($start, $end=false) {
 //don't know how to categorize these - they only belong to the function above
 function isBusinessHours($udate) {
 	$hourOfDay = date('G', $udate);
-	//echo format_date($udate, true, ' ');
 	return (($hourOfDay > 9) && ($hourOfDay < 17)) ? true : false;
 }
 

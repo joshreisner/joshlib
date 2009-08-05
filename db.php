@@ -103,7 +103,7 @@ function db_clear($tables=false) { //cant find where this is called from.  obsol
 
 function db_close($keepalive=false) { //close connection and quit
 	global $_josh;
-	error_debug('<b>db_close</b> there were a total of ' . count($_josh['queries']) . ' queries.');
+	error_debug('<b>db_close</b> there were a total of ' . $_josh['queries'] . ' queries.');
 	if (isset($_josh['db']['pointer'])) {
 		if ($_josh['db']['language'] == 'mysql') {
 			@mysql_close($_josh['db']['pointer']);
@@ -331,7 +331,7 @@ function db_query($query, $limit=false, $suppress_error=false) {
 	db_open();
 	$query = trim($query);
 	if (isset($_josh['basedblanguage']) && ($_josh['basedblanguage'] != $_josh['db']['language'])) $query = db_translate($query, $_josh['basedblanguage'], $_josh['db']['language']);
-	$_josh['queries'][] = $query;
+	$_josh['queries']++;
 	if ($_josh['db']['language'] == 'mysql') {
 		if ($limit) $query .= ' LIMIT ' . $limit;
 		$result = @mysql_query($query, $_josh['db']['pointer']);
@@ -349,7 +349,6 @@ function db_query($query, $limit=false, $suppress_error=false) {
 			//error_handle('mysql error', $error);
 		}
 	} elseif ($_josh['db']['language'] == 'mssql') {
-		//echo $_josh['db']['location']. ' db';
 		if ($limit) $query = 'SELECT TOP ' . $limit . substr($query, 6);
 
 		if ($result = @mssql_query($query, $_josh['db']['pointer'])) {
@@ -443,7 +442,6 @@ function db_save($table, $id='get', $array=false) {
 			}
 		} elseif ($id) {
 			//we're ok, because we should already have it
-			//echo $c['name'];
 		} elseif ($c['default'] != '') {
 			if ($id) {
 				$query1[] = $c['name'] . ' = ' . $c['default'];
@@ -463,7 +461,6 @@ function db_save($table, $id='get', $array=false) {
 					$query2[] = db_key();
 				}
 			} else {
-				//echo $c['default'];
 				error_handle('required value missing', 'db_save is expecting a value for ' . $c['name']);
 			}
 		}

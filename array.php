@@ -108,11 +108,13 @@ function array_range($start, $end, $increment=1) {
 	//numeric, sequential arrays for draw_form_date
 	$return = array();
 	if (($increment > 0) && ($start < $end)) {
+		//ascending increment
 		while ($start <= $end) {
 			$return[] = $start;
 			$start += $increment;
 		}
 	} elseif (($increment < 0) && ($start > $end)) {
+		//descending increment
 		while ($start >= $end) {
 			$return[] = $start;
 			$start -= $increment;
@@ -130,7 +132,7 @@ function array_remove($needle, $haystack) {
 
 function array_send($array, $target) {
 	global $_josh;
-	//'send' an array in the form of a POST request to a remote website.  function name perhaps to poetic.  
+	//'send' an array in the form of a POST request to a remote website.
 	
 	//must have JSON
 	if (!function_exists('json_encode')) return error_handle('JSON Not Installed', 'You need the JSON library for array_send to work.');

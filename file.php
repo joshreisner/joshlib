@@ -300,6 +300,12 @@ function file_sister($filename, $ext) {
 
 function file_unzip($source, $target) {
 	global $_josh;
+	
+	//check to see if the ZIP library is installed
+	if (!function_exists('zip_open')) {
+		return error_handle("ZIP library missing", "trying to unzip a file but the library is not installed");
+	}
+	
     $zip = zip_open($source);
 
     if (!is_resource($zip)) {

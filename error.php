@@ -2,6 +2,7 @@
 error_debug("including error.php", __file__, __line__);
 
 function error_break() {
+	//todo -- what's this for?
 	global $_josh;
 	unset($_josh['ignored_words']); //too long. gets in the way!
 	echo draw_array($_josh);
@@ -17,7 +18,7 @@ function error_debug($message, $file=false, $line=false) {
 		$message = '<div style="font-weight:bold;">' . $file . ', line ' . $line . '</div>' . $message;
 	}
 	if ($_josh['debug']) {
-		echo '<div style="width:400px; padding-bottom:10px; border-bottom:2px solid #999; font-family:verdana; font-size:12px;">' . $message . '</div>';
+		echo '<div style="width:400px; padding-bottom:10px; border-bottom:2px solid #999; font-family:verdana; font-size:12px;">', $message, '</div>';
 	}
 }
 
