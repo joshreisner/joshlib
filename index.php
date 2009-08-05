@@ -484,16 +484,16 @@ class table {
 	
 	function draw($values, $errmsg='Sorry, no results!', $hover=false, $total=false) {
 		global $_josh;
-		$return		= '';
-		$colspan	= count($this->columns);
-		$totals		= array();
-		$class		= 'table';
-		if ($this->name) $class .= ' ' . $this->name;
-		
-		if (!$colspan) {
+		$class			= $this->name;
+		$count_columns	= count($this->columns);
+		$count_rows		= count($values);
+		$counter		= 1; //to determine first_row and last_row
+		$totals			= array(); //var to hold totals, if applicable
+		$return			= ''; //hold the output
+		if (!$count_columns) {
 			//there were no columns defined.  no columns, no table
 			$return .= $this->draw_header(false) . $this->draw_empty('Sorry, no columns defined!');
-		} elseif (!count($values)) {
+		} elseif (!$count_rows) {
 			//no rows, return errmsg
 			$return .= $this->draw_header(false) . $this->draw_empty($errmsg);
 		} else {
@@ -503,8 +503,8 @@ class table {
 			
 			foreach ($values as $v) {
 				if (isset($v['group']) && ($group != $v['group'])) {
-					$return .= draw_container('tr', draw_container('td', $v['group'], array('colspan'=>$colspan, 'class'=>'group')));
-					$row = 'odd';
+					$return .= draw_container('tr', draw_container('td', $v['group'], array('colspan'=>$count_columns, 'class'=>'group')));
+					$row = 'odd'; //reset even/odd at the beginning of groups
 					$group = $v['group'];
 				}
 				if ($total) {
@@ -516,8 +516,12 @@ class table {
 						}
 					}
 				}
+				
+				//row and arguments
 				$return .= '<tr class="' . $row;
 				if (isset($v['class']) && !empty($v['class'])) $return .= ' ' . $v['class'] . ' ' . $row . '_' . $v['class'];
+				if ($counter == 1) $return .= ' first_row';
+				if ($counter == $count_rows) $return .= ' last_row';
 				$return .= '"';
 				if ($hover) {
 					if (isset($v['link'])) $return .= ' onclick="location.href=\'' . $v['link'] . '\';"';
@@ -527,11 +531,15 @@ class table {
 				}
 				if (isset($v['id'])) $return .= ' id="item_' . $v['id'] . '"';
 				$return .= '>' . $_josh['newline'];
-				foreach ($this->columns as $c) $return .= draw_container('td', $v[$c['name']], array('class'=>$c['class']));
+				
+				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['class']), $v[$c['name']]);
+				
 				$return .= '</tr>' . $_josh['newline'];
+				
 				$row = ($row == 'even') ? 'odd' : 'even';
 			}
 			$return .= '</tbody>';
+			$counter++;
 		}
 		if ($total) {
 			$return .= '<tr class="total"><tfoot>';
@@ -597,9 +605,7 @@ class table {
 	}
 	
 	function draw_title() {
-		$colspan = count($this->columns);
-		if ($this->title) return draw_container('tr', draw_container('th', $this->title, array('class'=>'title', 'colspan'=>$colspan)));
-		return '';
+		return ($this->title) ? draw_container('tr', draw_container('th', $this->title, array('class'=>'title', 'colspan'=>count($this->columns)))) : '';
 	}
 	
 	function col($name, $class=false, $title=false, $width=false) {

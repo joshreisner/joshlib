@@ -112,13 +112,13 @@ function url_parse($url) {
 		$_domainPart = array_pop($domainarray);
 		if (!$tld_isReady) {
 			if (in_array($_domainPart, $tldarray)) {
-				$tld = '.$_domainPart' . $tld;
+				$tld = '.' . $_domainPart . $tld;
 			} else {
 				$domainname = $_domainPart;
 				$tld_isReady = 1;
 			}
 		} else {
-			$subs = '.$_domainPart' . $subs;
+			$subs = '.' . $_domainPart . $subs;
 		}
 	}
 
@@ -166,7 +166,7 @@ function url_parse($url) {
 	$return['protocol'] = $return['scheme'];
 	
 	//get full browser address
-	$return['url']			= $return['protocol'] . '://' . $return['host'] . $return['path_query'];
+	$return['url'] = $return['protocol'] . '://' . $return['host'] . $return['path_query'];
 	
 	//handle possible mod_rewrite slots
 	if (isset($_GET['slot1'])) {
@@ -187,6 +187,11 @@ function url_parse($url) {
 	ksort($return);
 	//die(draw_array($return));
 	return $return;
+}
+
+function url_query_action($value, $go=true) {
+	//quick method to add a query_query_add for action
+	return url_query_add(array("action"=>$value), $go);
 }
 
 function url_query_add($adds, $go=true, $path=false) { //add specified query arguments
