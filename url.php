@@ -104,6 +104,7 @@ function url_parse($url) {
 	$tldarray		= array_merge($gtlds, $ctlds); 
 	$tld_isReady	= false;
 	$return			= parse_url(trim($url));
+	$return['host']	= strtolower($return['host']); //fixing errors i'm getting on livingcities finding config
 	$domainarray	= explode('.', $return['host']);
 	$top			= count($domainarray);
 	
