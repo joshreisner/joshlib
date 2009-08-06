@@ -100,7 +100,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		//platform-specific info
 		if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) { //platform is PC
 			$_josh['folder']			= '\\';
-			$_josh['newline']			= '\r\n';
+			$_josh['newline']			= "\r\n";
 			//$_josh['root']				= str_replace(str_replace('/', '\\', $_josh['request']['path']), '', str_replace('\\\\', '\\foo', $_SERVER['PATH_TRANSLATED']));
 			$_josh['root']				= str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']);
 			$_josh['slow']				= true;
