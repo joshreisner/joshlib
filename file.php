@@ -53,7 +53,7 @@ function file_dynamic($table, $column, $id, $extension, $lastmod) {
 	//function file_dynamic($filename, $lastmod, $query) {
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
 	$filename = $_josh['write_folder'] . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
-	if (!file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) file_put($filename, db_grab('SELECT $column FROM $table WHERE id = $id'));
+	if (!file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) file_put($filename, db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id));
 	return $filename;
 }
 
