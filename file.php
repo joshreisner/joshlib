@@ -133,13 +133,22 @@ function file_get_type_id($filename, $table='documents_types') {
 	return $type_id;
 }
 
-function file_get_uploaded($fieldname, $table=false) {
+function file_get_uploaded($fieldname, $types_table=false) {
 	global $_FILES;
 	error_debug('<b>file_get_uploaded</b> running ~ user is uploading a file');
 	$content = file_get($_FILES[$fieldname]['tmp_name']);
 	@unlink($_FILES[$fieldname]['tmp_name']);
-	if ($table) return array($content, file_get_type_id($_FILES[$fieldname]['name'], $table));
+	if ($types_table) return array($content, file_get_type_id($_FILES[$fieldname]['name'], $table));
 	return $content;
+}
+
+function file_uploaded_image_orientation($fieldname) {
+	//for smarter toddler, resize one way if oriented landscape, resize another if portrait
+	global $_FILES;
+	error_debug('<b>file_uploaded_image_orientation</b>');
+	list($width, $height) = getimagesize($_FILES[$fieldname]['tmp_name']);
+	if ($width > $height) return "landscape";
+	return "portrait";
 }
 
 function file_import_fixedlength($content, $definitions) {

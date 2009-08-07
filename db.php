@@ -534,4 +534,10 @@ function db_undelete($table, $id=false) {
 		WHERE id = ' . $id);
 }
 
+function db_updated($table=false) {
+	//$table generally means a disambuiguator, eg SELECT t.id FROM table t, although it could also be the table name
+	$table = ($table) ? $table . '.' : '';
+	return 'IFNULL(' . $table . 'updated_date, ' . $table . 'created_date) updated';
+}
+
 ?>

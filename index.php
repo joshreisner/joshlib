@@ -262,6 +262,7 @@ function geocode($address, $zip) {
 class form { 
 	var $fields = array();
 	var $title	= false;
+	var $id		= false;
 	var $table	= false;
 	var $values = array();
 	var $submit = false;
@@ -274,6 +275,7 @@ class form {
 		
 		$this->table = $table;
 		$this->submit = $submit;
+		$this->id = $id;
 		if ($table) $this->set_table($table);
 		$this->title = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($table));
 		if ($id) $this->set_values(db_grab('SELECT * FROM ' . $table . ' WHERE id = ' . $id));
@@ -354,6 +356,7 @@ class form {
 				$return .= draw_form_date($name, $value, true) . $additional;
 			} elseif ($type == 'file') {
 				$return .= draw_form_file($name, $class, $onchange) . $additional;
+				if ($value) echo draw_img(file_dynamic($this->table, $name, $this->id, "jpg", "2006-02-02"));
 			} elseif ($type == 'note') {
 				$return .= '<div class="note">' . $additional . '</div>';
 			} elseif ($type == 'password') {
@@ -444,6 +447,7 @@ class form {
 				$this->set_field(array('type'=>'datetime', 'name'=>$c['name'], 'additional'=>$c['comments']));
 			} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob')) {
 				$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
+				//value in this case
 			} elseif ($c['type'] == 'int') {
 				$this->set_field(array('type'=>'hidden', 'name'=>$c['name'], 'additional'=>$c['comments']));
 			}
