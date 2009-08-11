@@ -197,15 +197,22 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 
 	//get time into proper format
 	$nulled = (!$required && !$timestamp);
-	if (!$timestamp) $timestamp = time();
-	if (!is_int($timestamp)) $timestamp = strToTime($timestamp);
-	$month  = date('n', $timestamp);
-	$day    = date('j', $timestamp);
-	$year   = date('Y', $timestamp);
-	$hour   = date('g', $timestamp);
-	$minute = date('i', $timestamp);
-	$ampm   = date('A', $timestamp);
+	if ($timestamp && !is_int($timestamp)) $timestamp = strToTime($timestamp);
 
+	//required, default to today
+	if (!$timestamp && $required) $timestamp = time();
+	
+	if ($timestamp) {
+		$month  = date('n', $timestamp);
+		$day    = date('j', $timestamp);
+		$year   = date('Y', $timestamp);
+		$hour   = date('g', $timestamp);
+		$minute = date('i', $timestamp);
+		$ampm   = date('A', $timestamp);
+	} else {
+		$month = $day = $year = $hour = $minute = $ampm = false;
+	}
+	
 	//assemble date fields
 	$months = array();
 	foreach ($_josh['months'] as $key=>$value) $months[$key + 1] = $value;

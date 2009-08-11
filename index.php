@@ -351,7 +351,7 @@ class form {
 				if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
 				$return .= draw_list($options, array('id'=>$options_table));
 			} elseif ($type == 'date') {
-				$return .= draw_form_date($name, $value, false) . $additional;
+				$return .= draw_form_date($name, $value, false, false, $required) . $additional;
 			} elseif ($type == 'datetime') {
 				$return .= draw_form_date($name, $value, true) . $additional;
 			} elseif ($type == 'file') {
