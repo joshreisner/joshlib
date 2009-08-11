@@ -1,6 +1,6 @@
 <?php
 /* 
-WELCOME TO JOSHLIB
+WELCOME TO JOSHLIB!
 	http://code.google.com/p/joshlib/ (wiki / documentation / report issues here)
 	http://joshlib.joshreisner.com/ (eventual website)
 
