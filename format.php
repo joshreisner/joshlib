@@ -110,7 +110,7 @@ function format_date($timestamp=false, $error='', $format='M d, Y', $relativetim
 	}
 	
 	if ($return === 1) return $error;
-	return draw_container('nobr', $return);
+	return $return;
 }
 
 function format_date_iso8601($timestamp=false) {
