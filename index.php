@@ -260,6 +260,7 @@ function geocode($address, $zip) {
 
 //form class
 class form { 
+	var $name	= false;
 	var $fields = array();
 	var $title	= false;
 	var $id		= false;
@@ -267,50 +268,50 @@ class form {
 	var $values = array();
 	var $submit = false;
 	
-	function __construct($table=false, $id=false, $submit=true) {
+	function __construct($name, $id=false, $submit=true, $cancel=false) {
 		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
 		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		//$submit is a boolean, and indicates whether you should auto-add a submit button at the bottom
 		//if you pass $submit as a string, it will title use the text you passed, and title the form that
 		
-		$this->table = $table;
+		$this->name = $name;
 		$this->submit = $submit;
+		$this->cancel = $cancel;
 		$this->id = $id;
-		if ($table) $this->set_table($table);
-		$this->title = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($table));
-		if ($id) $this->set_values(db_grab('SELECT * FROM ' . $table . ' WHERE id = ' . $id));
+		if ($name) $this->set_table($name);
+		if ($submit === true) {
+			$this->title = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($name));
+		} else {
+			$this->title = $submit;
+		}
+		if ($this->table && $id) $this->set_values(db_grab('SELECT * FROM ' . $this->table . ' WHERE id = ' . $id));
 	}
 
-	function draw($validate=false, $values=false) {
-		//todo ~ remove arguments.  validate should happen automatically, but be extensible somehow.  values i think is obsolete now.
-	
+	function draw() {
 		global $_josh, $_GET;
 		
-		//sometimes you can get to a form from multiple places.  you might want to return the way you came.
-		if (isset($_GET['return_to'])) {
-			$additional = 'or ' . draw_link($_GET['return_to'], 'cancel');
-			$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_GET['return_to']));
-		} elseif (isset($_josh['referrer']['url'])) {
-			$additional = 'or ' . draw_link($_josh['referrer']['url'], 'cancel');
-			$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_josh['referrer']['url']));
-		} else {
-			$additional = '';
+		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh['request']['path_query'] . '" name="' . $this->name . '" class="' . $this->name . '" onsubmit="javascript:return form_validate(\'' . $this->name . '\');">';
+		
+		$return .= '<dl class="' . $this->name . '">';
+
+		//add submit?
+		if ($this->submit) {
+			$additional = false;
+			if ($this->cancel) {
+				//add cancel?
+				if (isset($_GET['return_to'])) {
+					$additional = 'or ' . draw_link($_GET['return_to'], 'cancel');
+					$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_GET['return_to']));
+				} elseif (isset($_josh['referrer']['url'])) {
+					$additional = 'or ' . draw_link($_josh['referrer']['url'], 'cancel');
+					$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_josh['referrer']['url']));
+				}
+			}
+			
+			//add button
+			$return .= $this->set_field(array('type'=>'submit', 'value'=>strip_tags($this->title), 'additional'=>$additional));
 		}
-		
-		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh['request']['path_query'] . '"';
-		if ($validate) $return .= ' name="' . $validate . '" onsubmit="javascript:return validate_' . $validate . '(this);"';
-		
-		$class = 'form';
-		if ($validate) $class .= ' ' . $validate;
-		$return .= '>
-			<dl class="' . $class . '">';
-
-		//add values?
-		if ($values) $this->set_values($values);
-
-		//submit button
-		if ($this->submit) $return .= $this->set_field(array('type'=>'submit', 'value'=>strip_tags($this->title), 'additional'=>$additional));
-		
+				
 		//add fields
 		foreach ($this->fields as $field) $return .= $this->draw_row($field);
 		
@@ -429,29 +430,32 @@ class form {
 	}
 	
 	function set_table($table) {
-		$cols = db_columns($table, true);
-		foreach ($cols as $c) {
-			if ($c['type'] == 'varchar') {
-				if ($c['name'] == 'password') {
-					$this->set_field(array('type'=>'password', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
-				} else {
-					$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+		$this->table = false;
+		if ($cols = db_columns($table, true)) {
+			$this->table = $table;
+			foreach ($cols as $c) {
+				if ($c['type'] == 'varchar') {
+					if ($c['name'] == 'password') {
+						$this->set_field(array('type'=>'password', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+					} else {
+						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+					}
+				} elseif ($c['type'] == 'text') {
+					$this->set_field(array('type'=>'textarea', 'name'=>$c['name'], 'class'=>'mceEditor'));
+				} elseif (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
+					$this->set_field(array('type'=>'checkbox', 'name'=>$c['name']));
+				} elseif ($c['type'] == 'date') {
+					$this->set_field(array('type'=>'date', 'name'=>$c['name'], 'additional'=>$c['comments']));
+				} elseif ($c['type'] == 'datetime') {
+					$this->set_field(array('type'=>'datetime', 'name'=>$c['name'], 'additional'=>$c['comments']));
+				} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob')) {
+					$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
+					//value in this case
+				} elseif ($c['type'] == 'int') {
+					$this->set_field(array('type'=>'hidden', 'name'=>$c['name'], 'additional'=>$c['comments']));
 				}
-			} elseif ($c['type'] == 'text') {
-				$this->set_field(array('type'=>'textarea', 'name'=>$c['name'], 'class'=>'mceEditor'));
-			} elseif (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
-				$this->set_field(array('type'=>'checkbox', 'name'=>$c['name']));
-			} elseif ($c['type'] == 'date') {
-				$this->set_field(array('type'=>'date', 'name'=>$c['name'], 'additional'=>$c['comments']));
-			} elseif ($c['type'] == 'datetime') {
-				$this->set_field(array('type'=>'datetime', 'name'=>$c['name'], 'additional'=>$c['comments']));
-			} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob')) {
-				$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
-				//value in this case
-			} elseif ($c['type'] == 'int') {
-				$this->set_field(array('type'=>'hidden', 'name'=>$c['name'], 'additional'=>$c['comments']));
 			}
-		}	
+		}
 	}
 	
 	function set_title($title=false) {
@@ -563,12 +567,12 @@ class table {
 		$return = draw_container('table', $return, array('cellspacing'=>0, 'class'=>$class));
 		
 		//drag and drop table
-		if ($this->draggable) {
+		if ($this->draggable && $count_rows) {
 		$return .= draw_javascript('
 			function reorder() {
 				var ampcharcode= "%26";
 				var serializeOpts = Sortable.serialize("' . $this->name . '") + unescape(ampcharcode) + "key=' . $this->name . '" + unescape(ampcharcode) + "update=' . $this->name . '";
-				var options = { method:"post", parameters:serializeOpts, onSuccess: function(transport) {
+				var options = { method:"post", parameters:serializeOpts, onSuccess:function(transport) {
 					//alert(transport.responseText);
 				} };
 				new Ajax.Request("' . $this->target . '", options);

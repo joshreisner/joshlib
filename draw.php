@@ -426,6 +426,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	//get width and height
 	$image = @getimagesize($path);
 	if (!$image) $image = @getimagesize($_josh['root'] . $path);
+	//if (!$image) die('could not find' . $path);
 	if (!$image) return '';
 	
 	//assemble tag
@@ -570,16 +571,15 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 			$thisoption .= $title;
 		} elseif (($type == 'images') || ($type == 'rollovers')) {
 			$img = str_replace('/', '', $url);
+			if ($pos = strpos($img, '?')) $img = substr($img, 0, $pos);
 			if (empty($img)) $img = 'home';
-			$img = $folder . $img;
 			if ($type == 'rollovers') {
 				$javascript .= $name . '_on		 = new Image;' . $_josh['newline'];
 				$javascript .= $name . '_off	 = new Image;' . $_josh['newline'];
-				$javascript .= $name . '_on.src	 = "' . $img . '_on.png";' . $_josh['newline'];
-				$javascript .= $name . '_off.src = "' . $img . '_off.png";' . $_josh['newline'];
+				$javascript .= $name . '_on.src	 = "' . $folder . $img . '_on.png";' . $_josh['newline'];
+				$javascript .= $name . '_off.src = "' . $folder . $img . '_off.png";' . $_josh['newline'];
 			}
-			$img .= $img_state . '.png';
-			$thisoption .= draw_img($img, false, false, $name);
+			$thisoption .= draw_img($folder . $img . $img_state . '.png', false, false, $name);
 		}
 		$thisoption .= '</a>';
 		$return[] = $thisoption;
@@ -622,7 +622,7 @@ function draw_tag($tag, $args=false, $innerhtml=false) {
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
 		$return .= '>' . $innerhtml . '</' . $tag . '>';
 	}
-	$nonbreaking_tags = array('a', 'b', 'img', 'nobr');
+	$nonbreaking_tags = array('a', 'b', 'img', 'nobr', 'input');
 	if (!in_array($tag, $nonbreaking_tags)) $return .= draw_newline();
 	if ($tag == 'table') $return .= draw_newline(2);
 	return $return;

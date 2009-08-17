@@ -144,7 +144,7 @@ function file_get_uploaded($fieldname, $types_table=false) {
 	error_debug('<b>file_get_uploaded</b> running ~ user is uploading a file');
 	$content = file_get($_FILES[$fieldname]['tmp_name']);
 	@unlink($_FILES[$fieldname]['tmp_name']);
-	if ($types_table) return array($content, file_get_type_id($_FILES[$fieldname]['name'], $table));
+	if ($types_table) return array($content, file_get_type_id($_FILES[$fieldname]['name'], $types_table));
 	return $content;
 }
 

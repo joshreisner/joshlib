@@ -4,6 +4,7 @@
 	
 	contains the following sections
 	
+	ajax
 	css
 	form
 	format
@@ -13,6 +14,13 @@
 	url
 	window
 */
+
+/*ajax*/
+function ajax_reorder() {
+	//don't know how i'm going to execute this because the function is defined in the script
+	//eg Sortable.create("photos_uws", { tag:"tr", handle:"draggy", ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
+}
+
 
 /* css */
 function css_add(object, what) {

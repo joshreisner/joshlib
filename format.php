@@ -644,6 +644,7 @@ function format_singular($string) {
 	} elseif (format_text_ends('s', $string)) {
 		return substr($string, 0, $string-1);
 	}
+	return $string;
 }
 
 function format_size($size) {

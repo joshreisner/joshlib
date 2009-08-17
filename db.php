@@ -125,6 +125,8 @@ function db_close($keepalive=false) { //close connection and quit
 function db_columns($tablename, $omitSystemFields=false) {
 	global $_josh;
 	error_debug('<b>db_columns</b> running');
+	if (!db_table_exists($tablename)) return false;
+	
 	$return = array();
 	if ($_josh['db']['language'] == 'mysql') {
 		$result = db_query('SHOW FULL COLUMNS FROM ' . $tablename);
@@ -500,6 +502,16 @@ function db_table($sql, $limit=false, $suppress_error=false) {
 	$result = db_query($sql, $limit, $suppress_error);
 	while ($r = db_fetch($result)) $return[] = $r;
 	return $return;
+}
+
+function db_table_exists($name) {
+	global $_josh;
+	if ($_josh['db']['language'] == 'mssql') {
+		//not implemented yet
+		error_handle('db_table_exists', 'this function is not yet implemented for mssql');
+	} elseif ($_josh['db']['language'] == 'mysql') {
+		return (db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'')));
+	}
 }
 
 function db_translate($sql, $from, $to) {
