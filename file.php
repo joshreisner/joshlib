@@ -49,11 +49,17 @@ function file_download($content, $filename, $extension) {
 	db_close();
 }
 
-function file_dynamic($table, $column, $id, $extension, $lastmod) {
-	//function file_dynamic($filename, $lastmod, $query) {
+function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
+	//function file_dynamic($filename, $lastmod, $query);
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
 	$filename = $_josh['write_folder'] . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
-	if (!file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) file_put($filename, db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id));
+	if (!$lastmod || !file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) {
+		if ($content = db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id)) {
+			file_put($filename, $content);
+		} else {
+			return false;
+		}
+	}
 	return $filename;
 }
 

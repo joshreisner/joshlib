@@ -422,7 +422,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		//only resizing width
 		if ($width == $max_width) {
 			//already exact width, skip resizing
-			copy($source_name, $target_name);
+			copy($_josh['root'] . $source_name, $_josh['root'] . $target_name);
 		} else {
 			//resize width
 			$new_height = ($height / $width) * $max_width;
@@ -433,7 +433,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		//only resizing height	
 		if ($height == $max_height) {
 			//already exact height, skip resizing
-			copy($source_name, $target_name, $source_name, $target_name, $width, $height);
+			copy($_josh['root'] . $source_name, $_josh['root'] . $target_name);
 		} else {
 			//resize height
 			//not implemented yet
