@@ -202,6 +202,30 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	$_josh['editing']	= url_id();
 	
 
+//handle ajax calls
+	if (url_action('ajax_delete,ajax_reorder,ajax_set') && isset($_SESSION['user_id']) && $_SESSION['user_id']) {
+		//try to handle the following ajax calls automatically -- requires the session for security
+		
+		$array = array_ajax();
+		
+		//quick thing for sessions -- might make it sliiiightly more secure (but it shouldn't)
+		if (isset($array['id']) && ($array['id'] == 'session')) $array['id'] = $_SESSION['user_id'];
+		
+		switch($_GET['action']) {
+			case 'ajax_delete':
+				break;
+			case 'ajax_reorder':
+				break;
+			case 'ajax_set':
+				db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . $array['value'] . ' WHERE id = ' . $array['id']);
+				//echo 'UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . $array['value'] . ' WHERE id = ' . $array['id'];
+				echo $array['table'] . ' updated';
+				break;
+		}
+		exit;
+	}
+
+
 //special functions that don't yet fit into a category
 
 function cookie($name=false, $value=false, $session=false) {

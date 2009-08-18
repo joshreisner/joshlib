@@ -505,6 +505,11 @@ function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
 	return draw_container('a', $str, $args);
 }
 
+function draw_link_ajax_set($table, $column, $id, $value, $str, $args=false) {
+	if (!$id) $Id = 'session';
+	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $args);
+}
+
 function draw_list($options, $args=false, $type='ul', $selected=false) {
 	//make a ul or an ol out of a one-dimensional array
 	global $_josh;

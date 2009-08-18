@@ -8,6 +8,7 @@
 	css
 	form
 	format
+	function
 	img
 	map
 	scroll
@@ -16,6 +17,21 @@
 */
 
 /*ajax*/
+function ajax_set(table, column, id, value) {
+	//success = false;
+	new Ajax.Request(url_action_add('ajax_set', true), {
+		method: 'post',
+		parameters: { 'table':table, 'column':column, 'id':id, 'value':value },
+		onSuccess: function(transport) {
+			function_run('set_' + table + '_' + column, value);
+			//feedback here
+			//alert(transport.responseText);
+			//success = true;
+		}
+	});
+	//return success;
+}
+
 function ajax_reorder() {
 	//don't know how i'm going to execute this because the function is defined in the script
 	//eg Sortable.create("photos_uws", { tag:"tr", handle:"draggy", ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
@@ -214,6 +230,14 @@ function format_title(string) {
 }
 
 
+/*function*/
+function function_run(name, argument) {
+	if (typeof(argument) == 'string') argument = "'" + argument + "'";
+	if (eval("typeof " + name + " == 'function'")) {
+		eval(name + "(" + argument + ")");
+	}
+} 
+
 /*img*/
 function img_roll(what, how) { 
 	eval("document." + what + ".src = " + what + "_" + how + ".src;"); 
@@ -291,6 +315,10 @@ function scroll_to(newPallet) {
 
 
 /* url */
+function url_action_add(value, returnval) {
+	return url_query_set('action', value, returnval);
+}
+
 function url_id() {
 	return url_query("id");
 }
@@ -312,7 +340,7 @@ function url_query(key) {
 	return false;
 }
 
-function url_query_set(key, value) {
+function url_query_set(key, value, returnval) {
 	//sets a query string value.  leaves other query elements alone
 	var query	= window.location.search.substring(1);
 	var pairs	= query.split("&");
@@ -331,7 +359,8 @@ function url_query_set(key, value) {
     ret.sort();
     var target = (query) ? location.href.replace(query, ret.join("&")) : location.href + '?' + ret.join("&");
     //alert(target);
-    location.href = target;
+    if (returnval) return target;
+	location.href = target;
 }
 	
 
