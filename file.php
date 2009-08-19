@@ -325,34 +325,12 @@ function file_unzip($source, $target) {
 
     if (!is_resource($zip)) {
 		$errors = array(
-		'ZIPARCHIVE::ER_MULTIDISK' => 'Multi-disk zip archives not supported.',
-		'ZIPARCHIVE::ER_RENAME' => 'Renaming temporary file failed.',
-		'ZIPARCHIVE::ER_CLOSE' => 'Closing zip archive failed', 
-		'ZIPARCHIVE::ER_SEEK' => 'Seek error',
-		'ZIPARCHIVE::ER_READ' => 'Read error',
-		'ZIPARCHIVE::ER_WRITE' => 'Write error',
-		'ZIPARCHIVE::ER_CRC' => 'CRC error',
-		'ZIPARCHIVE::ER_ZIPCLOSED' => 'Containing zip archive was closed',
-		'ZIPARCHIVE::ER_NOENT' => 'No such file.',
-		'ZIPARCHIVE::ER_EXISTS' => 'File already exists',
-		'ZIPARCHIVE::ER_OPEN' => 'Can\'t open file', 
-		'ZIPARCHIVE::ER_TMPOPEN' => 'Failure to create temporary file.', 
-		'ZIPARCHIVE::ER_ZLIB' => 'Zlib error',
-		'ZIPARCHIVE::ER_MEMORY' => 'Memory allocation failure', 
-		'ZIPARCHIVE::ER_CHANGED' => 'Entry has been changed',
-		'ZIPARCHIVE::ER_COMPNOTSUPP' => 'Compression method not supported.', 
-		'ZIPARCHIVE::ER_EOF' => 'Premature EOF',
-		'ZIPARCHIVE::ER_INVAL' => 'Invalid argument',
-		'ZIPARCHIVE::ER_NOZIP' => 'Not a zip archive',
-		'ZIPARCHIVE::ER_INTERNAL' => 'Internal error',
-		'ZIPARCHIVE::ER_INCONS' => 'Zip archive inconsistent', 
-		'ZIPARCHIVE::ER_REMOVE' => 'Can\'t remove file',
-		'ZIPARCHIVE::ER_DELETED' => 'Entry has been deleted'
+		'Multi-disk zip archives not supported.', 'Renaming temporary file failed.',
+		'Closing zip archive failed',  'Seek error', 'Read error', 'Write error', 'CRC error', 'Containing zip archive was closed', 'No such file.', 'File already exists',
+		'Can\'t open file', 'Failure to create temporary file.', 'Zlib error', 'Memory allocation failure', 'Entry has been changed', 'Compression method not supported.', 
+		'Premature EOF', 'Invalid argument', 'Not a zip archive', 'Internal error', 'Zip archive inconsistent', 'Can\'t remove file', 'Entry has been deleted'
 		);
-		foreach ($errors as $constant=>$error) {
-			if (defined($constant) and constant($error) === $zip) error_handle('ZIP won\'t open', 'zip_open failed with ' . $error . ' for ' . $source);
-		}
-		error_handle('ZIP won\'t open', 'error not defined for ' . $source);
+		error_handle('ZIP won\'t open', 'zip_open failed with ' . $errors[$zip] . ' for ' . $source);
     }
 
 	while ($zip_entry = zip_read($zip)) {
