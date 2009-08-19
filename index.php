@@ -321,15 +321,14 @@ class form {
 		//add submit?
 		if ($this->submit) {
 			$additional = false;
-			if ($this->cancel) {
-				//add cancel?
-				if (isset($_GET['return_to'])) {
-					$additional = 'or ' . draw_link($_GET['return_to'], 'cancel');
-					$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_GET['return_to']));
-				} elseif (isset($_josh['referrer']['url'])) {
-					$additional = 'or ' . draw_link($_josh['referrer']['url'], 'cancel');
-					$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_josh['referrer']['url']));
-				}
+			
+			//add cancel?
+			if (isset($_GET['return_to'])) {
+				if ($this->cancel) $additional = 'or ' . draw_link($_GET['return_to'], 'cancel');
+				$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_GET['return_to']));
+			} elseif (isset($_josh['referrer']['url'])) {
+				if ($this->cancel) $additional = 'or ' . draw_link($_josh['referrer']['url'], 'cancel');
+				$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_josh['referrer']['url']));
 			}
 			
 			//add button
