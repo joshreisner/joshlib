@@ -391,6 +391,7 @@ function db_save($table, $id='get', $array=false) {
 	foreach ($columns as $c) {
 		error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type']);
 		if (isset($array[$c['name']])) {
+			//we have a value to save for this column
 			if (($c['type'] == 'decimal') || ($c['type'] == 'float')) {
 				$value = format_null(format_numeric($array[$c['name']], false));
 			} elseif ($c['type'] == 'int') { //integer
@@ -420,7 +421,7 @@ function db_save($table, $id='get', $array=false) {
 				$query2[] = $value;
 			}
 		} elseif (isset($array[$c['name'] . 'Month'])) {
-			//this could be a date or datetime
+			//this could be a date or datetime -- field names don't match column because there are three parts
 			if ($c['type'] == 'datetime') {
 				$value = format_post_date($c['name'], $array);
 			} elseif ($c['type'] == 'date') {
@@ -432,36 +433,24 @@ function db_save($table, $id='get', $array=false) {
 				$query1[] = $c['name'];
 				$query2[] = $value;
 			}
-		} elseif ($c['type'] == 'tinyint') { 
-			//checkbox that's not set
-			//if the checkbox field isn't present in the form, we maybe have a problem
-			$value = 0;
-			if ($id) {
-				$query1[] = $c['name'] . ' = ' . $value;
-			} else {
-				$query1[] = $c['name'];
-				$query2[] = $value;
-			}
 		} elseif ($id) {
 			//we're ok, because we should already have it
-		} elseif ($c['default'] != '') {
+		} elseif (!empty($c['default'])) {
+			//we have a default value to set for this
 			if ($id) {
 				$query1[] = $c['name'] . ' = ' . $c['default'];
 			} else {
 				$query1[] = $c['name'];
 				$query2[] = $c['default'];
 			}
-		} elseif (!$id && $c['required']) {
-			//fill values with admin defaults?  eg 0s for numeric and NOW()s for datetimes?
-			//if ($type == 'tinyint') $value = 0;
+		} elseif ($c['required']) {
+			//fill values with admin defaults
 			if ($c['name'] == 'secret_key') {
-				if ($id) {
-					//keep existing keys
-					//$query1[] = $c['name'] . ' = ' . $c['default'];
-				} else {
-					$query1[] = $c['name'];
-					$query2[] = db_key();
-				}
+				$query1[] = $c['name'];
+				$query2[] = db_key();
+			} elseif (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
+				$query1[] = $c['name'];
+				$query2[] = 0;
 			} else {
 				error_handle('required value missing', 'db_save is expecting a value for ' . $c['name']);
 			}
@@ -510,8 +499,9 @@ function db_table_exists($name) {
 		//not implemented yet
 		error_handle('db_table_exists', 'this function is not yet implemented for mssql');
 	} elseif ($_josh['db']['language'] == 'mysql') {
-		return (db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'')));
+		return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\''));
 	}
+	return false;
 }
 
 function db_translate($sql, $from, $to) {

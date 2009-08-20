@@ -126,6 +126,19 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		if (!isset($_josh['referrer']))	$_josh['referrer']	= false;
 	}
 	
+
+//set defaults for configuration for variables
+	if (!isset($_josh['db']['location']))	$_josh['db']['location']	= 'localhost';
+	if (!isset($_josh['db']['language']))	$_josh['db']['language']	= 'mysql';
+	if (!isset($_josh['db']['database']))	$_josh['db']['database']	= '';
+	if (!isset($_josh['db']['username']))	$_josh['db']['username']	= '';
+	if (!isset($_josh['db']['password']))	$_josh['db']['password']	= '';
+	if (!isset($_josh['basedblanguage']))	$_josh['basedblanguage']	= $_josh['db']['language'];
+	if (!isset($_josh['is_secure']))		$_josh['is_secure']			= false;
+	if (!isset($_josh['email_admin']))		$_josh['email_admin']		= 'josh@joshreisner.com';
+	if (!isset($_josh['email_default']))	$_josh['email_default']		= ((empty($_josh['request']['subdomain'])) ? 'www' : $_josh['request']['subdomain']) . '@' . $_josh['request']['domain'];
+	if (!isset($_josh['error_log_api']))	$_josh['error_log_api']		= false;
+		
 	
 //get configuration variables
 	if (!isset($_josh['write_folder'])) $_josh['write_folder'] = '/_' . $_josh['request']['sanswww']; //eg /_example.com
@@ -140,18 +153,8 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		file_put_config();
 		require($_josh['root'] . $_josh['config']);
 	}
-
-
-//set defaults for configuration for variables it didn't find (this could happen if you roll your own)
-	if (!isset($_josh['db']['location']))	$_josh['db']['location']	= 'localhost';
-	if (!isset($_josh['db']['language']))	$_josh['db']['language']	= 'mysql';
-	if (!isset($_josh['basedblanguage']))	$_josh['basedblanguage']	= $_josh['db']['language'];
-	if (!isset($_josh['is_secure']))		$_josh['is_secure']			= false;
-	if (!isset($_josh['email_admin']))		$_josh['email_admin']		= 'josh@joshreisner.com';
-	if (!isset($_josh['email_default']))	$_josh['email_default']		= 'josh@joshreisner.com';
-	if (!isset($_josh['error_log_api']))	$_josh['error_log_api']		= false;
-		
-
+	
+	
 //ensure lib exists
 	if (!is_dir($_josh['root'] . $_josh['write_folder'] . $_josh['folder'] . 'lib')) {
 		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'dynamic'); //used by file_dynamic
