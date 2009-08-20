@@ -25,17 +25,14 @@ function error_debug($message, $file=false, $line=false) {
 function error_draw($title, $html) {	
 	global $_josh;
 	error_debug("drawing error handling page");
-	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . $_josh['newline'] . $_josh['newline'] . $html); //this is a cron, so no html needed
-	return '<html><head><title>' . strip_tags($title) . '</title></head>
-			<body style="margin:0px;">
-				<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
-					<tr><td align="center">
-					<div style="background-color:#fff; text-align:left; padding:10px 20px 10px 20px; width:360px; min-height:260px;">
-						<h1 style="color:#444; font-weight:normal; font-size:24px; margin-bottom:30px;"><span style="background-color:#5599cc; color:#fff; padding:0px 11px 3px 11px">error</span> ' . $title . '</h1>' . $html . '
-					</div>
-				</td></tr></table>
-			</body>
-		</html>';
+	
+	//suppress HTML output if it's a CRON job
+	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . $_josh['newline'] . $_josh['newline'] . $html);
+
+	//add fancy error element
+	$title = '<span style="background-color:#5599cc; color:#fff; padding:0px 11px 3px 11px">error</span>' . $title;
+	
+	return draw_page($title, $html);
 }
 
 function error_handle($type, $message="") {

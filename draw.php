@@ -244,6 +244,21 @@ function draw_form_hidden($name, $value='') {
 	return draw_tag('input', array('type'=>'hidden', 'name'=>$name, 'id'=>$name, 'value'=>$value));
 }
 
+function draw_page($title, $html) {
+	//this is for joshserver and error handling, eventually for setup your site messages
+	return '<html><head><title>' . strip_tags($title) . '</title></head>
+			<body style="margin:0px;">
+				<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
+					<tr><td align="center">
+					<div style="background-color:#fff; text-align:left; padding:10px 20px 10px 20px; width:360px; min-height:260px;">
+						<h1 style="color:#444; font-weight:normal; font-size:24px; margin-bottom:30px;">' . $title . '</h1>' . 
+						$html . '
+					</div>
+				</td></tr></table>
+			</body>
+		</html>';
+}
+
 function draw_form_password($name, $value='', $class=false, $maxlength=255, $autocomplete=true) {
 	global $_josh;
 	$class = ($class) ? $class . ' password' : 'password';
