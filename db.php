@@ -296,23 +296,23 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	if ($language) $_josh['db']['language'] = $language;
 		
 	//connect to db
-	if (!isset($_josh['db']['database']) || !isset($_josh['db']['username']) || !isset($_josh['db']['password'])) {
-		error_handle('database variables error', 'joshserver could not find the right database connection variables.  please fix this before proceeding.');
-		exit;
-	} elseif ($_josh['db']['language'] == 'mysql') {
-		error_debug('<b>db_open</b> trying to connect mysql on ' . $_josh['db']['location']);
-		if (!$_josh['db']['pointer'] = @mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password'])) {
-			error_handle('database connection error', 'this application is not able to connect its database.  we\'re sorry for the inconvenience, the administrator is attempting to fix the issue.');
-			exit;
-		}
-		mysql_set_charset('utf8', $_josh['db']['pointer']);
+	error_debug('<b>db_open</b> trying to connect ' . $_josh['db']['language'] . ' on ' . $_josh['db']['location']);
+	if ($_josh['db']['language'] == 'mysql') {
+		$_josh['db']['pointer'] = @mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 	} elseif ($_josh['db']['language'] == 'mssql') {
 		error_debug('<b>db_open</b> trying to connect mssql on ' . $_josh['db']['location'] . ' with username ' . $_josh['db']['username']);
-		if (!$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password'])) {
-			error_handle('database connection error', 'this application is not able to connect its database.  we\'re sorry for the inconvenience, the administrator is attempting to fix the issue.');
-			exit;
-		}
+		$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
+		//msssql 2000 doesn't support utf8
 	}
+
+	//handle error
+	if (!$_josh['db']['pointer']) {
+		error_handle('Database Connection Error', 'Either the database server is suddenly down, or please check the variables in ' . $_josh['config'] . '.');
+		exit; //to prevent massive repetition
+	}
+
+	if ($_josh['db']['language'] == 'mysql') mysql_set_charset('utf8', $_josh['db']['pointer']);
+
 	
 	//select db
 	db_switch();

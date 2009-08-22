@@ -51,6 +51,9 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	set_exception_handler('error_handle_exception');
 	error_debug('error handling set up', __file__, __line__);
 	
+//suddenly this is an issue
+date_default_timezone_set('America/New_York');
+	
 //set static variables
 	$_josh['debug_log']				= array();	//for holding execution messages
 	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
@@ -317,10 +320,6 @@ class form {
 	function draw() {
 		global $_josh, $_GET;
 		
-		$return = '<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="' . $_josh['request']['path_query'] . '" name="' . $this->name . '" class="' . $this->name . '" onsubmit="javascript:return form_validate(\'' . $this->name . '\');">';
-		
-		$return .= '<dl class="' . $this->name . '">';
-
 		//add submit?
 		if ($this->submit) {
 			$additional = false;
@@ -334,18 +333,27 @@ class form {
 				$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_josh['referrer']['url']));
 			}
 			
-			//add button
-			$return .= $this->set_field(array('type'=>'submit', 'value'=>strip_tags($this->title), 'additional'=>$additional));
+			//add submit
+			$this->set_field(array('type'=>'submit', 'value'=>strip_tags($this->title), 'additional'=>$additional));
 		}
 				
+		//start output
+		if (!$this->title) $this->title = ''; //legend is showing up <legend/>
+		$return = draw_container('legend', $this->title);
+
 		//add fields
 		foreach ($this->fields as $field) $return .= $this->draw_row($field);
+
+		//wrap in unnecessary fieldset
+		$return = draw_tag('fieldset', false, $return);
 		
-		$return .= '</dl></form>';
+		//wrap in form
+		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$_josh['request']['path_query'], 'name'=>$this->name, 'class'=>$this->name, 'onsubmit'=>'javascript:return form_validate(\'' . $this->name . '\');'), $return);
 		
 		//focus on first element
 		reset($this->fields);
 		if ($this->fields[key($this->fields)]['name']) $return .= draw_form_focus($this->fields[key($this->fields)]['name']);
+
 		return $return;
 	}
 	
@@ -353,20 +361,21 @@ class form {
 		global $_josh;
 		extract($field);
 		$return = '';
+		
+		//value is being set manually		
 		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
-		if ($type == 'group') {
-			$return .= '<dt class="group">' . $value . '</dt>';
-		} elseif ($type == 'hidden') {
+		
+		//wrap additional
+		if ($additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
+		
+		//draw the field
+		if ($type == 'hidden') {
 			$return .= draw_form_hidden($name, $value);
-		} elseif ($type == 'title') {
-			$return .= draw_container('dd', $value, array('class'=>'title'));
 		} else {
 			if ($label) {
-				$return .= '<dt class="' . $type . '">' . $label;
-				if ($additional && (($type == 'checkboxes') || ($type == 'textarea'))) $return .= '<br>' . $additional;
-				$return .= '</dt>' . $_josh['newline'];
+				if ($additional && (($type == 'checkboxes') || ($type == 'textarea'))) $label .= $additional;
+				$return .= draw_tag('label', array('for'=>$name), $label);
 			}
-			$return .= '<dd class="' . $type . '">';
 			if ($type == 'checkbox') {
 				$return .= draw_div_class('checkbox_option', draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span>');
 			} elseif ($type == 'checkboxes') {
@@ -384,7 +393,10 @@ class form {
 				$return .= draw_form_date($name, $value, true) . $additional;
 			} elseif ($type == 'file') {
 				$return .= draw_form_file($name, $class, $onchange) . $additional;
-				if ($value) echo draw_img(file_dynamic($this->table, $name, $this->id, "jpg", "2006-02-02"));
+				//todo -- this is wonky -- presupposes it's a jpg
+				if ($value) $return .= draw_img(file_dynamic($this->table, $name, $this->id, 'jpg'));
+			} elseif ($type == 'group') {
+				$return .= $value;
 			} elseif ($type == 'note') {
 				$return .= '<div class="note">' . $additional . '</div>';
 			} elseif ($type == 'password') {
@@ -414,7 +426,9 @@ class form {
 			} elseif ($type == 'textarea') {
 				$return .= draw_form_textarea($name, $value, $class) . $additional;
 			} 
-			$return .= '</dd>' . $_josh['newline'];
+			
+			//wrap it up
+			$return = draw_div_class('field ' . $type . ' ' . $name, $return);
 		}
 		return $return;
 	}
@@ -429,19 +443,17 @@ class form {
 		
 		//type is required
 		if (!$type) return error_handle('type not set');
-		
+
 		if ((($type == 'text') || ($type == 'password')) && !isset($array['additional']) && $required) $additional = '(required)';
 
 		error_debug('adding field ' . $label, __file__, __line__);
-		
+
 		if (!$name)	$name	= format_text_code($label);
 		if ($label === false) $label = format_text_human($name);
 		if (!$value) $value	= (isset($this->values[$name])) ? $this->values[$name] : false;
 		if (!$class) $class	= '';
 		if (!$option_id) $option_id	= 'option_id';
 		if (!$object_id) $object_id	= 'object_id';
-		
-		if ($additional) $additional = '<span class="additional">' . $additional . '</span>';
 		
 		if ($type == 'checkbox') {
 			$additional = $label;

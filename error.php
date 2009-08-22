@@ -30,9 +30,13 @@ function error_draw($title, $html) {
 	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . $_josh['newline'] . $_josh['newline'] . $html);
 
 	//add fancy error element
-	$title = '<span style="background-color:#5599cc; color:#fff; padding:0px 11px 3px 11px">error</span>' . $title;
+	$title = '<div style="background-color:#59c;color:#fff;height:36px;line-height:36px;padding:0px 20px 0px 20px;position:absolute;top:-36px;left:0px;">Error</div>' . $title;
 	
-	return draw_page($title, $html);
+	if (function_exists('draw_page')) return draw_page($title, $html);
+
+	//if we're at this point, it means the error is happening before the includes in joshlib
+	echo '<h1>' . $title . '</h1>' . $html;
+	exit;
 }
 
 function error_handle($type, $message="") {
@@ -136,6 +140,7 @@ function error_handle_php($number, $message, $file, $line) {
 	}
 	
 	//debug();
-	error_handle($title, format_code($message));
+	//format_code($message)
+	error_handle($title, $message);
 }
 ?>

@@ -250,7 +250,7 @@ function draw_page($title, $html) {
 			<body style="margin:0px;">
 				<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
 					<tr><td align="center">
-					<div style="background-color:#fff; text-align:left; padding:10px 20px 10px 20px; width:360px; min-height:260px;">
+					<div style="background-color:#fff;text-align:left;padding:10px 20px 10px 20px;width:360px;min-height:230px;position:relative;">
 						<h1 style="color:#444; font-weight:normal; font-size:24px; margin-bottom:30px;">' . $title . '</h1>' . 
 						$html . '
 					</div>
@@ -330,9 +330,8 @@ function draw_form_select_month($name, $start, $default=false, $length=false, $c
 
 function draw_form_submit($message='Submit Form', $class=false) {
 	global $_josh;
-	$class = ($class) ? $class . ' button' : 'button';
+	$class = ($class) ? $class . ' submit' : 'submit';
 	return draw_tag('input', array('type'=>'submit', 'value'=>$message, 'class'=>$class));
-	//return '<input type='submit' value='   ' . $message . '   ' class='' . $class . ''>';
 }
 
 function draw_form_text($name, $value='', $class=false, $maxlength=255, $style=false, $autocomplete=true) {
