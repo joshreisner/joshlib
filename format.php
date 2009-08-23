@@ -881,7 +881,6 @@ function format_url($str='') {
 }
 
 function format_verify($variable, $type='int') {
-	//error_debug('<b>format_verify</b> for ' . $variable, __file__, __line__);
 	if ($type == 'int') {
 		if (!is_numeric($variable)) return false;
 		return ((string) $variable) === ((string)(int) $variable);

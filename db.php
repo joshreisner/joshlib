@@ -86,7 +86,7 @@ function db_check($table, $column=false) {
 function db_checkboxes($name, $linking_table, $object_col, $option_col, $id) {
 	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $id);
 	foreach ($_POST as $key => $value) {
-		error_debug('<b>db_checkboxes</b> checking ' . $key);
+		error_debug('<b>db_checkboxes</b> checking ' . $key, __file__, __line__);
 		@list($control, $field_name, $categoryID) = explode('_', $key);
 		if (($control == 'chk') && ($field_name == $name)) {
 			db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $id . ', ' . $categoryID . ' )');
@@ -103,7 +103,7 @@ function db_clear($tables=false) { //cant find where this is called from.  obsol
 
 function db_close($keepalive=false) { //close connection and quit
 	global $_josh;
-	error_debug('<b>db_close</b> there were a total of ' . $_josh['queries'] . ' queries.');
+	error_debug('<b>db_close</b> there were a total of ' . $_josh['queries'] . ' queries.', __file__, __line__);
 	if (isset($_josh['db']['pointer'])) {
 		if ($_josh['db']['language'] == 'mysql') {
 			@mysql_close($_josh['db']['pointer']);
@@ -124,7 +124,7 @@ function db_close($keepalive=false) { //close connection and quit
 
 function db_columns($tablename, $omitSystemFields=false) {
 	global $_josh;
-	error_debug('<b>db_columns</b> running');
+	error_debug('<b>db_columns</b> running', __file__, __line__);
 	if (!db_table_exists($tablename)) return false;
 	
 	$return = array();
@@ -238,10 +238,10 @@ function db_found($result) {
 
 function db_grab($query, $checking=false) {
 	global $_josh;
-	error_debug('<b>db_grab</b> running');
+	error_debug('<b>db_grab</b> running', __file__, __line__);
 	$result = db_query($query, 1, $checking);
 	if (!db_found($result)) {
-		error_debug('grabbing value');
+		error_debug('grabbing value', __file__, __line__);
 		return false;
 	} else {
 		$r = db_fetch($result);
@@ -286,7 +286,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	//skip if already connected
 	if (isset($_josh['db']['pointer'])) return;
 	
-	error_debug('<b>db_open</b> running');
+	error_debug('<b>db_open</b> running', __file__, __line__);
 
 	//reset variables if you're specifying which ones to use
 	if ($location) $_josh['db']['location'] = $location;
@@ -296,11 +296,11 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	if ($language) $_josh['db']['language'] = $language;
 		
 	//connect to db
-	error_debug('<b>db_open</b> trying to connect ' . $_josh['db']['language'] . ' on ' . $_josh['db']['location']);
+	error_debug('<b>db_open</b> trying to connect ' . $_josh['db']['language'] . ' on ' . $_josh['db']['location'], __file__, __line__);
 	if ($_josh['db']['language'] == 'mysql') {
 		$_josh['db']['pointer'] = @mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 	} elseif ($_josh['db']['language'] == 'mssql') {
-		error_debug('<b>db_open</b> trying to connect mssql on ' . $_josh['db']['location'] . ' with username ' . $_josh['db']['username']);
+		error_debug('<b>db_open</b> trying to connect mssql on ' . $_josh['db']['location'] . ' with username ' . $_josh['db']['username'], __file__, __line__);
 		$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 		//msssql 2000 doesn't support utf8
 	}
@@ -320,7 +320,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 
 function db_pwdcompare($string, $field) {
 	global $_josh;
-	error_debug('<b>db_pwdcompare</b> running');
+	error_debug('<b>db_pwdcompare</b> running', __file__, __line__);
 	if ($_josh['db']['language'] == 'mssql') {
 		return 'PWDCOMPARE("' . $string . '", ' . $field . ')';
 	} else {
@@ -340,12 +340,12 @@ function db_query($query, $limit=false, $suppress_error=false) {
 		$error = mysql_error();
 		if (!$error) {
 			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-			error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned');
+			error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned', __file__, __line__);
 			if (format_text_starts('insert', $query)) return db_id();
 			return $result;
 		} else {
 			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-			error_debug('<b>db_query</b> failed <i>' . $query . '</i>');
+			error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__);
 			if ($suppress_error) return false;
 			error_handle('mysql error', format_code($query) . $error);
 			//error_handle('mysql error', $error);
@@ -355,7 +355,7 @@ function db_query($query, $limit=false, $suppress_error=false) {
 
 		if ($result = @mssql_query($query, $_josh['db']['pointer'])) {
 			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-			error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned');
+			error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned', __file__, __line__);
 			if (format_text_starts('insert', $query)) return db_id();
 			return $result;
 		} else {
@@ -389,7 +389,7 @@ function db_save($table, $id='get', $array=false) {
 	//debug();
 	
 	foreach ($columns as $c) {
-		error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type']);
+		error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type'], __file__, __line__);
 		if (isset($array[$c['name']])) {
 			//we have a value to save for this column
 			if (($c['type'] == 'decimal') || ($c['type'] == 'float')) {

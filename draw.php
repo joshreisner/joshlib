@@ -15,7 +15,7 @@ function draw_args($array) {
 function draw_array($array, $nice=false) {
 	global $_josh;
 	if (!is_array($array)) return false;
-	$return = '<table width="100%" cellpadding="3" cellspacing="1" border="0" style="background-color:#eee;">';
+	$return = '<table cellpadding="3" cellspacing="1" border="0" style="background-color:#eee;">';
 	//if (!$nice) ksort($array);
 	while(list($key, $value) = each($array)) {
 		if ($nice && (strToLower($key) == 'j')) continue;
@@ -31,7 +31,7 @@ function draw_array($array, $nice=false) {
 		$return  .= '
 			<tr style="background-color:#fff; font-family: verdana; font-size:11px; padding:6px; line-height:16px; width:100%;" valign="top"';
 		if (strToLower($key) == 'message') $return .= ' height="160"';
-		$return .= '><td style="background-color:#eee;" width="21%"><nobr>';
+		$return .= '><td style="background-color:#f6f6f6;" width="120"><nobr>';
 		$return .= ($nice) ? format_text_human($key)  : $key;
 		$return .= '&nbsp;</nobr></td><td width="79%">';
 		$return .= is_object($value) ? 'object value' : nl2br($value);
@@ -343,7 +343,7 @@ function draw_form_text($name, $value='', $class=false, $maxlength=255, $style=f
 }
 
 function draw_form_textarea($name, $value='', $class=false) {
-	error_debug('drawing textarea');
+	error_debug('drawing textarea', __file__, __line__);
 	global $_josh;
 	if (!$value) $value = '';
 	$class = ($class) ? $class . ' textarea' : 'textarea';
@@ -418,7 +418,7 @@ function draw_google_map($markers, $center=false) {
 }
 
 function draw_google_tracker($id) {
-	error_debug('drawing google tracker');
+	error_debug('drawing google tracker', __file__, __line__);
 	//this is google's code, so restraining myself from draw_javascript and single-quote encapsulation
 	return "
 	<script type='text/javascript'>
@@ -568,7 +568,7 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 		//to take care of a common / . folder . / scenario
 		$match = '/';
 	}
-	error_debug('<b>draw_navigation</b> match is ' . $match);
+	error_debug('<b>draw_navigation</b> match is ' . $match, __file__, __line__);
 	$selected = false;
 	$counter = 1;
 	$javascript = $_josh['newline'];

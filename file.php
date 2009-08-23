@@ -141,7 +141,7 @@ function file_get_type_id($filename, $table='documents_types') {
 
 function file_get_uploaded($fieldname, $types_table=false) {
 	global $_FILES;
-	error_debug('<b>file_get_uploaded</b> running ~ user is uploading a file');
+	error_debug('<b>file_get_uploaded</b> running ~ user is uploading a file', __file__, __line__);
 	$content = file_get($_FILES[$fieldname]['tmp_name']);
 	@unlink($_FILES[$fieldname]['tmp_name']);
 	if ($types_table) return array($content, file_get_type_id($_FILES[$fieldname]['name'], $types_table));
@@ -151,7 +151,7 @@ function file_get_uploaded($fieldname, $types_table=false) {
 function file_uploaded_image_orientation($fieldname) {
 	//for smarter toddler, resize one way if oriented landscape, resize another if portrait
 	global $_FILES;
-	error_debug('<b>file_uploaded_image_orientation</b>');
+	error_debug('<b>file_uploaded_image_orientation</b>', __file__, __line__);
 	list($width, $height) = getimagesize($_FILES[$fieldname]['tmp_name']);
 	if ($width > $height) return "landscape";
 	return "portrait";
@@ -304,10 +304,10 @@ function file_sister($filename, $ext) {
 		list ($file, $extension, $path) = file_name($filename);
 		$sister = $path . $_josh['folder'] . $file . '.' . $ext;
 		if (file_is($sister)) {
-			error_debug('file sister file exists');
+			error_debug('file sister file exists', __file__, __line__);
 			return $sister;
 		} else {
-			error_debug('file sister $sister does not exist');
+			error_debug('file sister $sister does not exist', __file__, __line__);
 		}
 	}
 	return false;

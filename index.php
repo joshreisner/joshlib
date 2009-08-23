@@ -4,17 +4,20 @@ WELCOME TO JOSHLIB!
 	http://code.google.com/p/joshlib/ (wiki / documentation / report issues here)
 	http://joshlib.joshreisner.com/ (eventual website)
 
+LICENSE
+	all files other than lib.zip are authored by josh reisner and provided to the public under the terms of the LGPL
+	
 THIRD PARTY SOFTWARE
-	[new!] included in lib.zip.  thank you so much to each of the contributors for these excellent packages
-	> fpdf				(php)	version 1.6		http://www.fpdf.org/
-	> prototype			(js)	version 1.5		http://prototypejs.org/
-	> scriptaculous		(js)	version 1.8.2	http://script.aculo.us/
-	> simple_html_dom	(php)	version 1.11	http://sourceforge.net/projects/simplehtmldom/
-	> tinymce			(js)	version 3.2.5	http://tinymce.moxiecode.com/
-
-VARIABLES YOU CAN PASS THAT JOSHLIB WON'T OVERWRITE
-	$_josh['debug']				true / false.  turn this on to get detailed error logging output to the browser
-	$_josh['write_folder']		the location of where to write stuff to (current default is /_site)
+	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
+	
+	--title-------------lang----version---------url---------------------------------------------license-------------------------
+	> codepress			(js)	version 0.9.6	http://sourceforge.net/projects/codepress/		LGPL
+	> fpdf				(php)	version 1.6		http://www.fpdf.org/							no license
+	> prototype			(js)	version 1.6.0.3	http://prototypejs.org/							MIT
+	> lightbox			(js)	version 2.04	http://www.lokeshdhakar.com/projects/lightbox2/	Creative Commons Attribution 2.5
+	> scriptaculous		(js)	version 1.8.2	http://script.aculo.us/							MIT (I think)
+	> simple_html_dom	(php)	version 1.11	http://sourceforge.net/projects/simplehtmldom/	MIT
+	> tinymce			(js)	version 3.2.5	http://tinymce.moxiecode.com/					LGPL
 
 VARIABLES THAT JOSHLIB TRIES TO GET FROM THE WEBSERVER -- IF YOU'RE RUNNING FROM THE COMMAND LINE YOU MIGHT NEED TO PASS THEM
 	$_josh['request']			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)
@@ -24,6 +27,10 @@ VARIABLES THAT JOSHLIB TRIES TO GET FROM THE WEBSERVER -- IF YOU'RE RUNNING FROM
 	$_josh['root']				path to the site, eg /Users/yourusername/Sites/thissite
 	$_josh['slow']				true or false; whether to use javascript when redirecting (true) or header variables (false)
 	$_josh['mobile']			true or false
+
+USING THE DEBUGGER
+	you can run the debug() function after joshlib has been included to see output of various processes
+	to debug the loading of the joshlib itself, set $_josh['debug'] = true before you include it
 
 MISC FUNCTIONS DEFINED ON THIS PAGE
 	cookie
@@ -43,19 +50,18 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	error_reporting(E_ALL);
 	ini_set('display_errors', TRUE);
 	ini_set('display_startup_errors', TRUE);
-	$_josh['joshlib_folder']	= dirname(__file__);
-	//$_josh['debug']	= true;
+	$_josh['joshlib_folder'] = dirname(__file__);
 	if (!isset($_josh['debug'])) $_josh['debug'] = false;
 	require($_josh['joshlib_folder'] . '/error.php');
 	set_error_handler('error_handle_php');
 	set_exception_handler('error_handle_exception');
-	error_debug('error handling set up', __file__, __line__);
+	error_debug('<b>index</b> error handling is set up', __file__, __line__);
 	
 //suddenly this is an issue
-date_default_timezone_set('America/New_York');
+	//todo, make settable
+	date_default_timezone_set('America/New_York');
 	
 //set static variables
-	$_josh['debug_log']				= array();	//for holding execution messages
 	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
 	$_josh['drawn']['focus']		= false;	//only autofocus on one form element
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
@@ -91,7 +97,8 @@ date_default_timezone_set('America/New_York');
 		//build request as string, then set it to array with url_parse
 		$_josh['request'] = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) ? 'https' : 'http';
 		$_josh['request'] .= '://' . $_SERVER['HTTP_HOST'];
-		if (isset($_SERVER['REDIRECT_URL'])) { //we are using mod_rewrite
+		if (isset($_SERVER['REDIRECT_URL'])) {
+			//we are using mod_rewrite, probably as part of a CMS system
 			$_josh['request'] .= $_SERVER['REQUEST_URI'];
 			$_GET = array_merge($_GET, url_query_parse($_josh['request']));
 		} else {
@@ -129,7 +136,6 @@ date_default_timezone_set('America/New_York');
 		if (!isset($_josh['referrer']))	$_josh['referrer']	= false;
 	}
 	
-
 //set defaults for configuration for variables
 	if (!isset($_josh['db']['location']))	$_josh['db']['location']	= 'localhost';
 	if (!isset($_josh['db']['language']))	$_josh['db']['language']	= 'mysql';
@@ -142,7 +148,6 @@ date_default_timezone_set('America/New_York');
 	if (!isset($_josh['email_default']))	$_josh['email_default']		= ((empty($_josh['request']['subdomain'])) ? 'www' : $_josh['request']['subdomain']) . '@' . $_josh['request']['domain'];
 	if (!isset($_josh['error_log_api']))	$_josh['error_log_api']		= false;
 		
-	
 //get configuration variables
 	if (!isset($_josh['write_folder'])) $_josh['write_folder'] = '/_' . $_josh['request']['sanswww']; //eg /_example.com
 	if (!isset($_josh['config'])) $_josh['config'] = $_josh['write_folder'] . $_josh['folder'] . 'config.php'; //eg /_example.com/config.php
@@ -157,7 +162,6 @@ date_default_timezone_set('America/New_York');
 		require($_josh['root'] . $_josh['config']);
 	}
 	
-	
 //ensure lib exists
 	if (!is_dir($_josh['root'] . $_josh['write_folder'] . $_josh['folder'] . 'lib')) {
 		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'dynamic'); //used by file_dynamic
@@ -165,7 +169,6 @@ date_default_timezone_set('America/New_York');
 		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'images'); //used my tinymce
 		file_unzip($_josh['joshlib_folder'] . $_josh['folder'] . 'lib.zip', $_josh['write_folder']);
 	}		
-
 
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_SERVER['HTTP_HOST']) && (format_text_starts('dev-', $_SERVER['HTTP_HOST']) || format_text_starts('beta.', $_SERVER['HTTP_HOST']) || format_text_ends('.site', $_SERVER['HTTP_HOST']))) {
@@ -176,7 +179,6 @@ date_default_timezone_set('America/New_York');
 		error_reporting(0);
 	}
 
-
 //handle https forwarding
 	if (isset($_josh['request']['protocol'])) {
 		if ($_josh['is_secure'] && ($_josh['request']['protocol'] != 'https')) {
@@ -186,8 +188,7 @@ date_default_timezone_set('America/New_York');
 		}
 	}
 
-
-//set convenience state variables and escape quotes if necessary
+//set convenience state variabless and escape quotes if necessary
 	$_josh['getting']	= !empty($_GET);
 	if ($_josh['getting']) foreach($_GET as $key=>$value) $_GET[$key] = format_quotes($value);
 	
@@ -201,14 +202,12 @@ date_default_timezone_set('America/New_York');
 		}
 	}
 	
-	
 	$_josh['posting']	= !empty($_POST);
 	if ($_josh['posting']) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes($value);
 	
 	$_josh['editing']	= url_id();
 	
-
-//handle ajax calls
+//handle system ajax calls
 	if (url_action('ajax_delete,ajax_reorder,ajax_set') && isset($_SESSION['user_id']) && $_SESSION['user_id']) {
 		//try to handle the following ajax calls automatically -- requires the session for security
 		
@@ -230,7 +229,6 @@ date_default_timezone_set('America/New_York');
 		}
 		exit;
 	}
-
 
 //special functions that don't yet fit into a category
 
@@ -674,4 +672,6 @@ class table {
 		$this->title = $html;
 	}
 }
+
+if ($_josh['debug']) error_debug('joshlib has finished loading and self-debugging in ' . format_time_exec(), __file__, __line__);
 ?>

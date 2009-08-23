@@ -9,22 +9,34 @@ function error_break() {
 	exit;
 }
 
-function error_debug($message, $file=false, $line=false) {
-	global $_josh;
-	$_josh['debug_log'][] = $message;
-	if ($file && $line) {
-		if (isset($_josh['root']) && stristr($file, $_josh['root'])) $file = str_replace($_josh['root'], "", $file);
-		if (isset($_josh['joshlib_folder']) && stristr($file, $_josh['joshlib_folder'])) $file = "joshlib " . str_replace($_josh['joshlib_folder'], "", $file);
-		$message = '<div style="font-weight:bold;">' . $file . ', line ' . $line . '</div>' . $message;
+function error_debug($message, $file, $line) {
+	global $_josh;	
+	if (!$_josh['debug']) return;
+	
+	if (!isset($_josh['time_lastdebug'])) {
+		$_josh['time_lastdebug'] = $_josh['time_start'];
+		error_debug('<b>error_debug</b> welcome to joshlib!', __file__, __line__);
 	}
-	if ($_josh['debug']) {
-		echo '<div style="width:400px; padding-bottom:10px; border-bottom:2px solid #999; font-family:verdana; font-size:12px;">', $message, '</div>';
-	}
+	
+	if (isset($_josh['root']) && stristr($file, $_josh['root'])) $file = str_replace($_josh['root'], "", $file);
+	if (isset($_josh['joshlib_folder']) && stristr($file, $_josh['joshlib_folder'])) $file = str_replace($_josh['joshlib_folder'], "/joshlib", $file);
+
+	//timer
+	$time = round(microtime(true) - $_josh['time_lastdebug'], 3);
+	$time = ($time < .001) ? '' : $time . 's';
+	echo '<div style="width:400px;margin:10px;padding:10px;border:2px dashed #6699cc;font-family:verdana;font-size:15px;min-height:70px;">
+			<div style="font-weight:normal;font-size:12px;margin-bottom:7px;color:#888;">', $file, ' line ', $line, '
+				<div style="float:right;color:#ccc;">', $time, '</div>
+			</div>', 
+			$message, 
+		'</div>';
+	
+	$_josh['time_lastdebug'] = microtime(true);
 }
 
 function error_draw($title, $html) {	
 	global $_josh;
-	error_debug("drawing error handling page");
+	error_debug('drawing error handling page', __file__, __line__);
 	
 	//suppress HTML output if it's a CRON job
 	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . $_josh['newline'] . $_josh['newline'] . $html);
@@ -41,7 +53,7 @@ function error_draw($title, $html) {
 
 function error_handle($type, $message="") {
 	global $_josh, $_SESSION, $_SERVER;
-	error_debug('ERROR! type is:' . $type . ' and message is: ' . $message);
+	error_debug('ERROR! type is:' . $type . ' and message is: ' . $message, __file__, __line__);
 	
 	//small possiblity these vars aren't set yet
 	if (!isset($_josh['mode']))  $_josh['mode'] = 'dev';

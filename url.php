@@ -3,7 +3,7 @@
 should this be called http instead of url?  i could include cookie, and url_header would make more sense.
 */
 
-error_debug('including url.php');
+error_debug('including url.php', __file__, __line__);
 
 function url_action($matches, $key='action') {
 	//don't know whether this is any good.  matches possible $_GET['action'] values
@@ -33,11 +33,11 @@ function url_change($target='') {
 		$target = $_josh['request']['path_query'];
 	}
 	if ($_josh['slow']) {
-		error_debug('<b>url_change</b> (slow) to ' . $target);
+		error_debug('<b>url_change</b> (slow) to ' . $target, __file__, __line__);
 		if ($_josh['debug']) db_close(); //exit early so you can see log
 		echo draw_javascript('location.href="' . $target . '"');
 	} else {
-		error_debug('<b>url_change</b> (fast) to ' . $target);
+		error_debug('<b>url_change</b> (fast) to ' . $target, __file__, __line__);
 		if ($_josh['debug']) db_close(); //exit early so you can see log
 		header('Location: ' . $target);
 	}
@@ -74,26 +74,21 @@ function url_id($index='id') {
 }
 
 function url_parse($url) {
-	error_debug('<b>url_parse</b> running for  ' . $url);
-	global $_GET;
-	$gtlds = explode(',', str_replace(' ', '', 'aero, biz, com, coop, info,
-	jobs, museum, name, net, org, pro, travel, gov, edu, mil, int, site'));
+	global $_josh;
+	error_debug('<b>url_parse</b> running for  ' . $url, __file__, __line__);
+	
+	$gtlds = array('aero','biz','com','coop','info','jobs','museum','name','net','org','pro','travel','gov','edu','mil','int','site');
 
-	$ctlds = explode(',', str_replace(' ', '', 'ac, ad, ae, af, ag, ai, al,
-	am, an, ao, aq, ar, as, at, au, aw, az, ax, ba, bb, bd, be, bf, bg, bh,
-	bi, bj, bm, bn, bo, br, bs, bt, bv, bw, by, bz, ca, cc, cd, cf, cg, ch,
-	ci, ck, cl, cm, cn, co, cr, cs, cu, cv, cx, cy, cz, de, dj, dk, dm, do,
-	dz, ec, ee, eg, eh, er, es, et, eu, fi, fj, fk, fm, fo, fr, ga, gb, gd,
-	ge, gf, gg, gh, gi, gl, gm, gn, gp, gq, gr, gs, gt, gu, gw, gy, hk, hm,
-	hn, hr, ht, hu, id, ie, il, im, in, io, iq, ir, is, it, je, jm, jo, jp,
-	ke, kg, kh, ki, km, kn, kp, kr, kw, ky, kz, la, lb, lc, li, lk, lr, ls,
-	lt, lu, lv, ly, ma, mc, md, mg, mh, mk, ml, mm, mn, mo, mp, mq, mr, ms,
-	mt, mu, mv, mw, mx, my, mz, na, nc, ne, nf, ng, ni, nl, no, np, nr, nu,
-	nz, om, pa, pe, pf, pg, ph, pk, pl, pm, pn, pr, ps, pt, pw, py, qa, re,
-	ro, ru, rw, sa, sb, sc, sd, se, sg, sh, si, sj, sk, sl, sm, sn, so, sr,
-	st, sv, sy, sz, tc, td, tf, tg, th, tj, tk, tl, tm, tn, to, tp, tr, tt,
-	tv, tw, tz, ua, ug, uk, um, us, uy, uz, va, vc, ve, vg, vi, vn, vu, wf,
-	ws, ye, yt, yu, za, zm, zw'));
+	$ctlds = array('ac','ad','ae','af','ag','ai','al','am','an','ao','aq','ar','as','at','au','aw','az','ax','ba','bb','bd','be','bf',
+	'bg','bh','bi','bj','bm','bn','bo','br','bs','bt','bv','bw','by','bz','ca','cc','cd','cf','cg','ch','ci','ck','cl','cm','cn','co',
+	'cr','cs','cu','cv','cx','cy','cz','de','dj','dk','dm','do','dz','ec','ee','eg','eh','er','es','et','eu','fi','fj','fk','fm','fo',
+	'fr','ga','gb','gd','ge','gf','gg','gh','gi','gl','gm','gn','gp','gq','gr','gs','gt','gu','gw','gy','hk','hm','hn','hr','ht','hu',
+	'id','ie','il','im','in','io','iq','ir','is','it','je','jm','jo','jp','ke','kg','kh','ki','km','kn','kp','kr','kw','ky','kz','la',
+	'lb','lc','li','lk','lr','ls','lt','lu','lv','ly','ma','mc','md','mg','mh','mk','ml','mm','mn','mo','mp','mq','mr','ms','mt','mu',
+	'mv','mw','mx','my','mz','na','nc','ne','nf','ng','ni','nl','no','np','nr','nu','nz','om','pa','pe','pf','pg','ph','pk','pl','pm',
+	'pn','pr','ps','pt','pw','py','qa','re','ro','ru','rw','sa','sb','sc','sd','se','sg','sh','si','sj','sk','sl','sm','sn','so','sr',
+	'st','sv','sy','sz','tc','td','tf','tg','th','tj','tk','tl','tm','tn','to','tp','tr','tt','tv','tw','tz','ua','ug','uk','um','us',
+	'uy','uz','va','vc','ve','vg','vi','vn','vu','wf','ws','ye','yt','yu','za','zm','zw');
 
 	//add protocol if missing.  when would this be missing?
 	if (!strstr($url, 'http://') && !strstr($url, 'https://')) $url = 'http://' . $url; 
@@ -130,10 +125,9 @@ function url_parse($url) {
 	$return['sanswww']		= ($return['usingwww']) ? substr($return['host'], 4) : $return['host'];
 	$return['subdomain']	= substr($subs, 1);
 	$return['path']			= str_replace('index.php', '', $return['path']);
-	$return['path_query']	= $return['path'];
 	
-	//get folder, subfolder
-	$urlparts = explode('/', $return['path_query']);
+	//get folder, subfolder, subsubfolder (there must be a smoother way)
+	$urlparts = explode('/', $return['path']);
 	$urlcount = count($urlparts);
 
 	if ($urlcount < 3) {
@@ -155,7 +149,7 @@ function url_parse($url) {
 	}
 	
 	//add query string to path_query
-	//don't use $_GET because we might be parsing a different address
+	$return['path_query']	= $return['path'];
 	if (isset($return['query'])) {
 		$return['path_query'] .= '?' . $return['query'];
 	} else {
@@ -168,7 +162,7 @@ function url_parse($url) {
 	//get full browser address
 	$return['url'] = $return['protocol'] . '://' . $return['host'] . $return['path_query'];
 	
-	//handle possible mod_rewrite slots
+	/*handle possible mod_rewrite slots (i don't think we need this anymore 8/22/09
 	if (isset($_GET['slot1'])) {
 		$return['folder'] = $_GET['slot1'];
 		$return['path'] = '/' . $_GET['slot1'] . '/';
@@ -181,11 +175,14 @@ function url_parse($url) {
 			}
 		}
 		$return['path_query'] = $return['path'];
+	}*/
+	
+	//output for debugging ~ testing for debug since it takes some processing
+	if ($_josh['debug']) {
+		ksort($return);
+		error_debug('<b>url_parse</b> is returning ' . draw_array($return), __file__, __line__);
 	}
-
-
-	ksort($return);
-	//die(draw_array($return));
+	
 	return $return;
 }
 
