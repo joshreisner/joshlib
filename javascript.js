@@ -17,15 +17,17 @@
 */
 
 /*ajax*/
-function ajax_set(table, column, id, value) {
+function ajax_set(table, column, id, value, update) {
 	//success = false;
+	//used by intranet helptext toggle
+	//and work mgmt invoice date set
 	new Ajax.Request(url_action_add('ajax_set', true), {
 		method: 'post',
 		parameters: { 'table':table, 'column':column, 'id':id, 'value':value },
 		onSuccess: function(transport) {
+			if (update && (typeof(update) == 'object')) update.innerHTML = transport.responseText;
 			function_run('set_' + table + '_' + column, value);
-			//feedback here
-			//alert(transport.responseText);
+			
 			//success = true;
 		}
 	});

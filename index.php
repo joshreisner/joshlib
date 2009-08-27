@@ -62,6 +62,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	date_default_timezone_set('America/New_York');
 	
 //set static variables
+	//todo, limit these
 	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
 	$_josh['drawn']['focus']		= false;	//only autofocus on one form element
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
@@ -85,6 +86,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 
 //get includes
 	require($_josh['joshlib_folder'] . '/array.php');
+	require($_josh['joshlib_folder'] . '/cache.php');
 	require($_josh['joshlib_folder'] . '/db.php');
 	require($_josh['joshlib_folder'] . '/draw.php');
 	require($_josh['joshlib_folder'] . '/email.php');
@@ -216,15 +218,19 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		//quick thing for sessions -- might make it sliiiightly more secure (but it shouldn't)
 		if (isset($array['id']) && ($array['id'] == 'session')) $array['id'] = $_SESSION['user_id'];
 		
-		switch($_GET['action']) {
+		switch ($_GET['action']) {
 			case 'ajax_delete':
 				break;
 			case 'ajax_reorder':
 				break;
 			case 'ajax_set':
-				db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . $array['value'] . ' WHERE id = ' . $array['id']);
-				//echo 'UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . $array['value'] . ' WHERE id = ' . $array['id'];
-				echo $array['table'] . ' updated';
+				//todo, better column type sensing
+				if (stristr($array['column'], 'date')) $array['value'] = format_date($array['value'], 'NULL', 'SQL');
+				if (db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = \'' . $array['value'] . '\' WHERE id = ' . $array['id'])) {
+					echo (stristr($array['column'], 'date')) ? format_date($array['value']) : $array['value'];
+				} else {
+					echo 'ERROR';
+				}
 				break;
 		}
 		exit;
@@ -374,57 +380,72 @@ class form {
 				if ($additional && (($type == 'checkboxes') || ($type == 'textarea'))) $label .= $additional;
 				$return .= draw_tag('label', array('for'=>$name), $label);
 			}
-			if ($type == 'checkbox') {
-				$return .= draw_div_class('checkbox_option', draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span>');
-			} elseif ($type == 'checkboxes') {
-				if (!$option_title) $option_title = 'title';
-				$options = ($value) ? db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $value . ') checked FROM ' . $options_table . ' o ORDER BY o.' . $option_title) : db_table('SELECT id, title, 0 checked FROM ' . $options_table . ' ORDER BY title');
-				foreach ($options as &$o) {
-					$name = 'chk_' . str_replace('_', '-', $options_table) . '_' . $o['id'];
-					$o = draw_form_checkbox($name, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o[$option_title] . '</span>';
-				}
-				if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
-				$return .= draw_list($options, array('id'=>$options_table));
-			} elseif ($type == 'date') {
-				$return .= draw_form_date($name, $value, false, false, $required) . $additional;
-			} elseif ($type == 'datetime') {
-				$return .= draw_form_date($name, $value, true) . $additional;
-			} elseif ($type == 'file') {
-				$return .= draw_form_file($name, $class, $onchange) . $additional;
-				//todo -- this is wonky -- presupposes it's a jpg
-				if ($value) $return .= draw_img(file_dynamic($this->table, $name, $this->id, 'jpg'));
-			} elseif ($type == 'group') {
-				$return .= $value;
-			} elseif ($type == 'note') {
-				$return .= '<div class="note">' . $additional . '</div>';
-			} elseif ($type == 'password') {
-				$return .= draw_form_password($name, $value, $class, 255, false) . $additional;
-			} elseif ($type == 'radio') {
-				if (!$options) {
-					if (!$sql) $sql = 'SELECT id, name FROM options_' . str_replace('_id', '', $name);
-					$options = db_array($sql);
-				}
-				if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
-				foreach ($options as $id=>$description) {
-					$return .= '<div class="radio_option">' . draw_form_radio($name, $id, ($value == $id), $class) . $description . '</div>';
-				}
-			} elseif ($type == 'readonly') {
-				$return .= $value . ' ' . $additional;
-			} elseif ($type == 'select') {
-				if (!$options) {
-					if (!$sql) $sql = 'SELECT id, name FROM options_' . str_replace('_id', '', $name);
-					$options = db_array($sql);
-				}
-				if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
-				$return .= draw_form_select($name, $options, $value, $required, $class, $action) . $additional;
-			} elseif ($type == 'submit') {
-				$return .= draw_form_submit($value, $class) . $additional;
-			} elseif ($type == 'text') {
-				$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
-			} elseif ($type == 'textarea') {
-				$return .= draw_form_textarea($name, $value, $class) . $additional;
-			} 
-			
+			switch ($type) {
+				case 'checkbox':	
+					$return .= draw_div_class('checkbox_option', draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span>');
+					break;
+				case 'checkboxes':
+					if (!$option_title) $option_title = 'title';
+					$options = ($value) ? db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $value . ') checked FROM ' . $options_table . ' o ORDER BY o.' . $option_title) : db_table('SELECT id, ' . $option_title . ', 0 checked FROM ' . $options_table . ' ORDER BY ' . $option_title);
+					foreach ($options as &$o) {
+						$name = 'chk_' . str_replace('_', '-', $options_table) . '_' . $o['id'];
+						$o = draw_form_checkbox($name, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o[$option_title] . '</span>';
+					}
+					if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
+					$return .= draw_list($options, array('id'=>$options_table));
+					break;
+				case 'date':
+					$return .= draw_form_date($name, $value, false, false, $required) . $additional;
+					break;
+				case 'datetime':
+					$return .= draw_form_date($name, $value, true) . $additional;
+					break;
+				case 'file':
+					$return .= draw_form_file($name, $class, $onchange) . $additional;
+					//todo -- this is wonky -- presupposes it's a jpg
+					if ($value) $return .= draw_img(file_dynamic($this->table, $name, $this->id, 'jpg'));
+					break;
+				case 'group':
+					$return .= $value;
+					break;
+				case 'note':
+					$return .= '<div class="note">' . $additional . '</div>';
+					break;
+				case 'password':
+					$return .= draw_form_password($name, $value, $class, 255, false) . $additional;
+					break;
+				case 'radio':
+					if (!$options) {
+						if (!$sql) $sql = 'SELECT id, name FROM options_' . str_replace('_id', '', $name);
+						$options = db_array($sql);
+					}
+					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
+					foreach ($options as $id=>$description) {
+						$return .= '<div class="radio_option">' . draw_form_radio($name, $id, ($value == $id), $class) . $description . '</div>';
+					}
+					break;
+				case 'readonly':
+					$return .= $value . ' ' . $additional;
+					break;
+				case 'select':
+					if (!$options) {
+						if (!$sql) $sql = 'SELECT id, name FROM options_' . str_replace('_id', '', $name);
+						$options = db_array($sql);
+					}
+					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
+					$return .= draw_form_select($name, $options, $value, $required, $class, $action) . $additional;
+					break;
+				case 'submit':
+					$return .= draw_form_submit($value, $class) . $additional;
+					break;
+				case 'text':
+					$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+					break;
+				case 'textarea':
+					$return .= draw_form_textarea($name, $value, $class) . $additional;
+					break;
+			}
+						
 			//wrap it up
 			$return = draw_div_class('field ' . $type . ' ' . $name, $return);
 		}

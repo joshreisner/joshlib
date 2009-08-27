@@ -134,7 +134,7 @@ function error_handle_php($number, $message, $file, $line) {
 	if (!defined('E_RECOVERABLE_ERROR')) define('E_RECOVERABLE_ERROR', 4096);
 
 	$title = 'PHP ';
-	switch($number){
+	switch ($number) {
 		case E_ERROR:				$title .= 'Error';						break;
 		case E_WARNING:				$title .= 'Warning';					break;
 		case E_PARSE:				$title .= 'Parse Error';				break;
