@@ -8,7 +8,7 @@ function cache_clear() {
 function cache_end() {
 	global $_josh;
 
-	//flush el buffer
+	//stop buffering
 	$contents = ob_get_contents();
 	ob_end_clean();
 
@@ -30,11 +30,11 @@ function cache_start($user=false) {
 	if (file_is($filename)) {
 		//get cache file
 		echo file_get($filename);
-		return false;
+		return false; //ie you don't need to continue processing, because i've got a cache here
 	} else {
 		$_josh['cache'] = $filename;
 		ob_start();
-		return true;
+		return true; //ie you do need to process
 	}
 }
 
