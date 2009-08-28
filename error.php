@@ -34,6 +34,10 @@ function error_debug($message, $file, $line) {
 	$_josh['time_lastdebug'] = microtime(true);
 }
 
+function error_deprecated() {
+	//use this to deprecate use of various functions
+}
+
 function error_draw($title, $html) {	
 	global $_josh;
 	error_debug('drawing error handling page', __file__, __line__);

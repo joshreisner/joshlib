@@ -735,7 +735,7 @@ function format_text_shorten($text, $length=30, $append='&#8230;', $appendlength
 
 function format_text_starts($needle, $haystack) {
 	//function to see if a $haystack starts with $needle
-	//now returns $haystack sans needle for harvard: trimming news clip publication titles
+	//returns $haystack without the needle
 	$needle_len = strlen($needle);
 	if ($needle == $haystack) return true;
 	if (strToLower(substr($haystack, 0, $needle_len)) == strToLower($needle)) return substr($haystack, $needle_len);

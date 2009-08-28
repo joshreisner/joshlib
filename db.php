@@ -307,7 +307,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 
 	//handle error
 	if (!$_josh['db']['pointer']) {
-		error_handle('Database Connection Error', 'Either the database server is suddenly down, or please check the variables in ' . $_josh['config'] . '.');
+		error_handle('Database Connection', 'Most likely, you haven\'t yet configured the variables in ' . $_josh['config'] . '.  It\'s also possible that the database is suddenly down.');
 		exit; //to prevent massive repetition
 	}
 

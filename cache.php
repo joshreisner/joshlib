@@ -1,8 +1,8 @@
 <?php
 error_debug('including cache.php', __file__, __line__);
 
-function cache_clear() {
-
+function cache_clear($match=false) {
+	
 }
 
 function cache_end() {
@@ -17,15 +17,25 @@ function cache_end() {
 
 	//write the cache file
 	file_put($_josh['cache'], $contents);
+	
+	//unset the filename variable because we don't need it anymore
+	unset($_josh['cache']);
 }
 
-function cache_start($page=false) {
+function cache_start($filename=false) {
 	global $_josh;
 	
 	//determine what filename we should use--defaults to path_query
-	$filename = $_josh['write_folder'] . '/caches/';
-	if (!empty($_SESSION['user_id'])) $filename .= $_SESSION['user_id'] . '/';
-	$filename .= urlencode((($page) ? $page : $_josh['request']['path_query']));
+	if (!$filename) $filename = $_josh['request']['path_query'];
+	
+	//strip front slash for easier matching later
+	$filename = format_string_starts('/', $filename);
+	
+	//append user_id (if set) as query argument
+	if (!empty($_SESSION['user_id'])) $filename .= ((stristr('?', $filename)) ? '?' : '&') . 'user_id=' $_SESSION['user_id'];
+	
+	//finalize
+	$filename = $_josh['write_folder'] . '/caches/' . urlencode($filename);
 
 	if (file_is($filename)) {
 		//get cache file

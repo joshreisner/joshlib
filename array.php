@@ -2,8 +2,8 @@
 error_debug('including array.php', __file__, __line__);
 
 function array_2d($array) {
-	//to take a scalar array and convert it to a 2d array by doubling the keys / values
-	//what's it used for??
+	//to take a scalar array and convert it to a two-dimensional array by doubling the keys / values
+	error_deprecated();
 	$return = array();
 	foreach ($array as $a) $return[$a] = $a;
 	return $return;
@@ -52,24 +52,6 @@ function array_insert($array, $position, $value) {
     $array[] = $value;
     $array = array_merge($array, $array_clip);
     return $array;
-}
-
-function array_key_compare_asc($a, $b) {
-	//for use by array_sort() below
-	//can't imagine a situation where you'd use this normally
-	//todo == figure out whether these should be encapsulated in array_sort
-	global $_josh;
-	error_debug('<b>arrayKeyCompare</b> comparing' . $a[$_josh['sort_key']], __file__, __line__);
-	return strcmp($a[$_josh['sort_key']], $b[$_josh['sort_key']]);
-}
-
-function array_key_compare_desc($a, $b) {
-	//for use by array_sort() below
-	//can't imagine a situation where you'd use this normally
-	//todo == figure out whether these should be encapsulated in array_sort
-	global $_josh;
-	error_debug('<b>arrayKeyCompare</b> comparing' . $a[$_josh['sort_key']], __file__, __line__);
-	return strcmp($b[$_josh['sort_key']], $a[$_josh['sort_key']]);
 }
 
 function array_key_filter($array, $key, $value) {
@@ -165,11 +147,36 @@ function array_send($array, $target) {
 }
 
 function array_sort($array, $direction='asc', $key=false) {
-	//sort an array by the names of its keys
+	//sort an array's values for a particular key
 	global $_josh;
+	
+	//key defaults to the first key
 	$_josh['sort_key'] = ($key) ? $key : array_shift(array_keys($array[0]));
+	
 	error_debug('<b>arraySort</b> running for $key', __file__, __line__);
-	usort($array, 'array_key_compare_' . strToLower($direction));
+	
+	//define our custom callback functions
+	if (!function_exists('array_sort_asc')) {
+		function array_sort_asc($a, $b) {
+			global $_josh;
+			error_debug('<b>arrayKeyCompare</b> comparing' . $a[$_josh['sort_key']], __file__, __line__);
+			return strcmp($a[$_josh['sort_key']], $b[$_josh['sort_key']]);
+		}
+	}
+
+	if (!function_exists('array_sort_desc')) {
+		function array_sort_desc($a, $b) {
+			global $_josh;
+			error_debug('<b>arrayKeyCompare</b> comparing' . $a[$_josh['sort_key']], __file__, __line__);
+			return strcmp($b[$_josh['sort_key']], $a[$_josh['sort_key']]);
+		}
+	}
+	
+	usort($array, 'array_sort_' . strToLower($direction));
+
+	//don't need this anymore
+	unset($_josh['sort_key']);
+	
 	return $array;
 }
 
