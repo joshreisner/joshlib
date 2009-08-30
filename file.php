@@ -318,7 +318,7 @@ function file_unzip($source, $target) {
 	
 	//check to see if the ZIP library is installed
 	if (!function_exists('zip_open')) {
-		return error_handle("ZIP library missing", "trying to unzip a file but the library is not installed");
+		return error_handle('ZIP library missing', 'trying to unzip a file but the library is not installed.  if you don\'t want to install it, you must manually unzip lib.zip and put the resulting folder inside ' . $_josh['write_folder'] . ' for joshlib to run.');
 	}
 	
     $zip = zip_open($source);
