@@ -598,7 +598,7 @@ class table {
 				if (isset($v['id'])) $return .= ' id="item_' . $v['id'] . '"';
 				$return .= '>' . $_josh['newline'];
 				
-				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['class']), $v[$c['name']]);
+				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class']), $v[$c['name']]);
 				
 				$return .= '</tr>' . $_josh['newline'];
 				
@@ -612,7 +612,6 @@ class table {
 			foreach ($this->columns as $c) {
 				$return .= '<td class="' . $c['name'];
 				if ($c['class']) $this->return .= ' ' . $c['class'];
-				$return .= '">';
 				if (isset($totals[$c['name']])) {
 					$return .= $totals[$c['name']];
 				} else {
@@ -634,12 +633,15 @@ class table {
 					//alert(transport.responseText);
 				} };
 				new Ajax.Request("' . $this->target . '", options);
+				/* i think for wmgmt
 				newOrder = Sortable.sequence("' . $this->name . '");
 				var state = "odd";
 				for (var i = 0; i < newOrder.length; i++) {
-					document.getElementById("item_" + newOrder[i]).className = state;
+					obj = document.getElementById("item_" + newOrder[i]);
+					if (obj.className = state;
 					state = (state == "odd") ? "even" : "odd";
 				}
+				*/
 			}
 			Sortable.create("' . $this->name . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
 			');

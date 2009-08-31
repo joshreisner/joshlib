@@ -38,8 +38,8 @@ function email_address_parse($address) {
 }
 
 function email_post($to, $subject=false, $from=false) {
-	global $_POST;
-	if (!$subject) $subject = 'Form Submission from ' . $_josh['domainname'];
+	global $_josh, $_POST;
+	if (!$subject) $subject = 'Form Submission from ' . $_josh['request']['domain'];
 	email($to, draw_page($subject, draw_array($_POST), false, true), $subject, $from);
 }
 ?>
