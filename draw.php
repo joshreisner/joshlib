@@ -200,7 +200,7 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 	if ($timestamp && !is_int($timestamp)) $timestamp = strToTime($timestamp);
 
 	//required, default to today
-	if (!$timestamp && $required) $timestamp = time();
+	if (empty($timestamp) && $required) $timestamp = time();
 	
 	if ($timestamp) {
 		$month  = date('n', $timestamp);

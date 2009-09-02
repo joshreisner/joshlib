@@ -321,8 +321,10 @@ class form {
 		if ($this->table && $id) $this->set_values(db_grab('SELECT * FROM ' . $this->table . ' WHERE id = ' . $id));
 	}
 
-	function draw() {
+	function draw($values=false) {
 		global $_josh, $_GET;
+		
+		if ($values) $this->set_values($values);
 		
 		//add submit?
 		if ($this->submit) {
@@ -395,7 +397,7 @@ class form {
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
-					$return .= draw_form_date($name, $value, false, false, $required) . $additional;
+					$return .= draw_form_date($name, $value, false) . $additional;
 					break;
 				case 'datetime':
 					$return .= draw_form_date($name, $value, true) . $additional;
