@@ -223,6 +223,11 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 				break;
 			case 'ajax_reorder':
 				break;
+			case 'ajax_draw_select':
+			//draw_form_select($name, $sql_options, $value=false, $required=true, $class=false, $action=false, $nullvalue='', $maxlength=false) {
+
+				echo draw_form_select($array['name'], 'SELECT id, value FROM ' . $array['table'] . ' WHERE is_active = 1', $array['value'], $array['required']);
+				break;
 			case 'ajax_set':
 				//todo, better column type sensing
 				if (stristr($array['column'], 'date')) $array['value'] = format_date($array['value'], 'NULL', 'SQL');
