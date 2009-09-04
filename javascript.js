@@ -213,6 +213,12 @@ function form_text_complex(text) {
 	return complex;
 }
 
+function form_validate(form) {
+	if (eval("typeof validate_" + form.name + " == 'function'")) {
+		return eval("validate_" + form.name + "(form);");
+	}
+}
+
 /* format */
 function format_title(string) {
 	string = string.replace(/_/g, " ");
