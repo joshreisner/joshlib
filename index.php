@@ -209,8 +209,8 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	
 	$_josh['editing']	= url_id();
 	
-//handle system ajax calls
-	if (url_action('ajax_delete,ajax_reorder,ajax_set') && isset($_SESSION['user_id']) && $_SESSION['user_id']) {
+//handle system url calls
+	if (url_action('ajax_delete,ajax_reorder,ajax_set,flushcache,debug,phpinfo') && (($_josh['mode'] == 'dev') || !empty($_SESSION['user_id']))) {
 		//try to handle the following ajax calls automatically -- requires the session for security
 		
 		$array = array_ajax();
@@ -220,14 +220,14 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		
 		switch ($_GET['action']) {
 			case 'ajax_delete':
-				break;
+				exit;
 			case 'ajax_reorder':
-				break;
+				exit;
 			case 'ajax_draw_select':
 			//draw_form_select($name, $sql_options, $value=false, $required=true, $class=false, $action=false, $nullvalue='', $maxlength=false) {
 
 				echo draw_form_select($array['name'], 'SELECT id, value FROM ' . $array['table'] . ' WHERE is_active = 1', $array['value'], $array['required']);
-				break;
+				exit;
 			case 'ajax_set':
 				//todo, better column type sensing
 				if (stristr($array['column'], 'date')) $array['value'] = format_date($array['value'], 'NULL', 'SQL');
@@ -236,9 +236,18 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 				} else {
 					echo 'ERROR';
 				}
+				exit;
+			case 'debug':
+				debug();
 				break;
+			case 'flushcache':
+				cache_clear();
+				echo 'caches cleared';
+				exit;
+			case 'phpinfo':
+				phpinfo();
+				exit;
 		}
-		exit;
 	}
 
 //special functions that don't yet fit into a category

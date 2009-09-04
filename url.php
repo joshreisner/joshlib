@@ -9,9 +9,16 @@ function url_action($matches, $key='action') {
 	//don't know whether this is any good.  matches possible $_GET['action'] values
 	global $_GET;
 	if (isset($_GET[$key])) {
+		error_debug('<b>' . __function__ . '</b> checking $_GET[\'' . $key . '\'] for ' . $matches, __file__, __line__);
 		$matches = explode(',', $matches);
-		foreach ($matches as $m) if ($_GET[$key] == trim($m)) return true;
+		foreach ($matches as $m) {
+			if ($_GET[$key] == trim($m)) {
+				error_debug('<b>' . __function__ . '</b> found a match!', __file__, __line__);
+				return true;
+			}
+		}
 	}
+	error_debug('<b>' . __function__ . '</b> didn\'t find any matches', __file__, __line__);
 	return false;
 }
 

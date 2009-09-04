@@ -65,11 +65,11 @@ function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
 
 function file_folder($folder, $endfilter=false) {
 	global $_josh;
-	error_debug('<b>file folder</b> running with $folder', __file__, __line__);
+	error_debug('<b>file folder</b> running with ' . $folder, __file__, __line__);
 	
 	//check to make sure folder exists
 	if (!is_dir($_josh['root'] . $folder)) {
-		error_debug('<b>file folder</b> $folder is not a directory, exiting', __file__, __line__);
+		error_debug('<b>file folder</b> ' . $folder . ' is not a directory, exiting', __file__, __line__);
 		return false;
 	}
 	error_debug('<b>file folder</b> $folder is a directory!', __file__, __line__);

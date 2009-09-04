@@ -2,7 +2,17 @@
 error_debug('including cache.php', __file__, __line__);
 
 function cache_clear($match=false) {
-	
+	global $_josh;
+	if ($files = file_folder($_josh['write_folder'] . '/caches/')) {
+		foreach ($files as $f) {
+			if ($match) {
+				//delete only certain files
+			} else {
+				//delete everything
+				file_delete($f['path_name']);
+			}
+		}
+	}
 }
 
 function cache_end() {
@@ -29,13 +39,13 @@ function cache_start($filename=false) {
 	if (!$filename) $filename = $_josh['request']['path_query'];
 	
 	//strip front slash for easier matching later
-	$filename = format_string_starts('/', $filename);
+	$filename = format_text_starts('/', $filename);
 	
 	//append user_id (if set) as query argument
 	if (!empty($_SESSION['user_id'])) $filename .= ((stristr('?', $filename)) ? '?' : '&') . 'user_id=' . $_SESSION['user_id'];
 	
 	//finalize
-	$filename = $_josh['write_folder'] . '/caches/' . urlencode($filename);
+	$filename = $_josh['write_folder'] . '/caches/' . urlencode($filename) . '.html';
 
 	if (file_is($filename)) {
 		//get cache file
