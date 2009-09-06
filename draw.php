@@ -529,12 +529,17 @@ function draw_list($options, $args=false, $type='ul', $selected=false) {
 	global $_josh;
 	if (!is_array($options) || (!$count = count($options))) return false;
 	if (!is_array($args)) $args = array('class'=>$args); //if args is a string, it's legacy class
+	
+	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
 		$liclass = 'option' . ($i + 1);
+		if ($counter == 1) $liclass .= ' first';
+		if ($counter == $count) $liclass .= ' last';
 		if ($selected == ($i + 1)) $liclass .= ' selected';
 		$options[$i] = draw_tag('li', array('class'=>$liclass), $options[$i]);
+		$counter++;
 	}
-	return draw_tag($type, $args, implode($options,  $_josh['newline'] . "\t"));
+	return draw_tag($type, $args, implode($options,  "\t"));
 }
 
 function draw_meta_description($string) {
