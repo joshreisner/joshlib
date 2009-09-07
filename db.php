@@ -433,8 +433,6 @@ function db_save($table, $id='get', $array=false) {
 				$query1[] = $c['name'];
 				$query2[] = $value;
 			}
-		} elseif ($id) {
-			//we're ok, because we should already have it
 		} elseif (!empty($c['default'])) {
 			//we have a default value to set for this
 			if ($id) {
@@ -443,6 +441,13 @@ function db_save($table, $id='get', $array=false) {
 				$query1[] = $c['name'];
 				$query2[] = $c['default'];
 			}
+		} elseif ($id) {
+			//this is an update, so don't do anything
+		} elseif ($c['name'] == 'precedence') {
+			//setting the precedence for a new object -- insert into slot 1, increment everything else
+			$query1[] = 'precedence';
+			$query2[] = 1;
+			db_query('UPDATE ' . $table . ' SET precedence = precedence + 1');
 		} elseif ($c['required']) {
 			//fill values with admin defaults
 			if ($c['name'] == 'secret_key') {

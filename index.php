@@ -526,7 +526,8 @@ class form {
 					$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
 					//value in this case
 				} elseif ($c['type'] == 'int') {
-					$this->set_field(array('type'=>'hidden', 'name'=>$c['name'], 'additional'=>$c['comments']));
+					//curious to know why this is happening.  don't like because precedence is in post values
+					//$this->set_field(array('type'=>'hidden', 'name'=>$c['name'], 'additional'=>$c['comments']));
 				}
 			}
 		}
@@ -600,7 +601,9 @@ class table {
 				}
 				
 				//row and arguments
-				$return .= '<tr class="' . $row;
+				$return .= '<tr';
+				if (isset($v['id'])) $return .= ' id="item_' . $v['id'] . '"';				
+				$return .= ' class="' . $row;
 				if (isset($v['class']) && !empty($v['class'])) $return .= ' ' . $v['class'] . ' ' . $row . '_' . $v['class'];
 				if ($counter == 1) $return .= ' first_row';
 				if ($counter == $count_rows) $return .= ' last_row';
@@ -611,7 +614,6 @@ class table {
 					$return .= ' onmouseover="css_add(this, \'hover\');"';
 					$return .= ' onmouseout="css_remove(this, \'hover\');"';
 				}
-				if (isset($v['id'])) $return .= ' id="item_' . $v['id'] . '"';
 				$return .= '>' . $_josh['newline'];
 				
 				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class']), $v[$c['name']]);
@@ -641,26 +643,17 @@ class table {
 		
 		//drag and drop table
 		if ($this->draggable && $count_rows) {
-		$return .= draw_javascript('
-			function reorder() {
-				var ampcharcode= "%26";
-				var serializeOpts = Sortable.serialize("' . $this->name . '") + unescape(ampcharcode) + "key=' . $this->name . '" + unescape(ampcharcode) + "update=' . $this->name . '";
-				var options = { method:"post", parameters:serializeOpts, onSuccess:function(transport) {
-					//alert(transport.responseText);
-				} };
-				new Ajax.Request("' . $this->target . '", options);
-				/* i think for wmgmt
-				newOrder = Sortable.sequence("' . $this->name . '");
-				var state = "odd";
-				for (var i = 0; i < newOrder.length; i++) {
-					obj = document.getElementById("item_" + newOrder[i]);
-					if (obj.className = state;
-					state = (state == "odd") ? "even" : "odd";
+			$return .= draw_javascript('
+				function reorder() {
+					var ampcharcode= "%26";
+					var serializeOpts = Sortable.serialize("' . $this->name . '") + unescape(ampcharcode) + "key=' . $this->name . '" + unescape(ampcharcode) + "update=' . $this->name . '";
+					var options = { method:"post", parameters:serializeOpts, onSuccess:function(transport) {
+						//alert(transport.responseText);
+					} };
+					new Ajax.Request("' . $this->target . '", options);
 				}
-				*/
-			}
-			Sortable.create("' . $this->name . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
-			');
+				Sortable.create("' . $this->name . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
+				');
 		}
 		return $return;
 	}

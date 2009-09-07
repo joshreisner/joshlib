@@ -18,6 +18,7 @@ function draw_array($array, $nice=false) {
 	$return = '<table cellpadding="3" cellspacing="1" border="0" style="background-color:#eee;">';
 	//if (!$nice) ksort($array);
 	while(list($key, $value) = each($array)) {
+		$key = urldecode($key);
 		if ($nice && (strToLower($key) == 'j')) continue;
 		$value = format_quotes($value);
 		if (strToLower($key) == 'email') $value = '<a href="mailto:' . $value . '">' . $value . '</a>';
@@ -472,7 +473,7 @@ function draw_javascript_lib() {
 	global $_josh;
 	return 
 	draw_javascript_src() .
-	draw_javascript_src($_josh['write_folder'] . '/lib/prototype.js') .
+	draw_javascript_src($_josh['write_folder'] . '/lib/prototype-1.5.js') .
 	draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous.js') .
 	draw_javascript_src($_josh['write_folder'] . '/lib/tiny_mce/tiny_mce.js') .
 	draw_javascript('form_tinymce_init("/styles/tinymce.css")');
