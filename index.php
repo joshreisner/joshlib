@@ -385,6 +385,9 @@ class form {
 		//value is being set manually		
 		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
 		
+		//values has default
+		if (!$value && $default) $value = $default;
+		
 		//wrap additional
 		if ($additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
 		
@@ -407,7 +410,7 @@ class form {
 						$name = 'chk_' . str_replace('_', '-', $options_table) . '_' . $o['id'];
 						$o = draw_form_checkbox($name, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o[$option_title] . '</span>';
 					}
-					if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
+					if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . str_replace('_', '-', $options_table) . '\', \'' . $allow_changes . '\');">add new</a>';
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
@@ -470,7 +473,7 @@ class form {
 	
 	function set_field($array) {
 		//defaults
-		$type = $value = $class = $name = $label = $required = $append = $allow_changes = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $option_title = $object_id = $options = $linking_table = false;
+		$type = $value = $class = $default = $name = $label = $required = $append = $allow_changes = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $option_title = $object_id = $options = $linking_table = false;
 		
 		//load inputs
 		if (!is_array($array)) return error_handle('array not set');
@@ -496,7 +499,7 @@ class form {
 		}
 		
 		//package and save
-		$this->fields[$name] = compact('name', 'type', 'label', 'value', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength');
+		$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength');
 	}
 	
 	function set_group($string='') {
