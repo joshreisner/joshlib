@@ -250,7 +250,7 @@ function file_put_config() {
 
 function file_rss($title, $link, $items, $filename=false) {
 	global $_josh;
-	//$items should be an array with title, description, link and date
+	//$items should be an array with title, description, link, author and date
 	//dtfmt Wed, 12 Nov 2008 09:13:11 -0500
 	
 	//w3c feed validator wants this, if possible

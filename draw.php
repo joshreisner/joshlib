@@ -238,7 +238,12 @@ function draw_form_file($name, $class=false, $onchange=false) {
 }
 
 function draw_form_focus($name) {
-	return draw_javascript('document.getElementById("' . $name . '").focus();');
+	global $_josh;
+	if (!$_josh['drawn']['focus']) {
+		//only draw focus once -- don't want competition
+		$_josh['drawn']['focus'] = $name;
+		return draw_javascript('document.getElementById("' . $name . '").focus();');
+	}
 }
 
 function draw_form_hidden($name, $value='') {
