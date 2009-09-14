@@ -137,24 +137,13 @@ function url_parse($url) {
 	$urlparts = explode('/', $return['path']);
 	$urlcount = count($urlparts);
 
-	if ($urlcount < 3) {
-		$return['folder']		= false;
-		$return['subfolder']	= false;
-		$return['subsubfolder']	= false;
-	} elseif ($urlcount == 3) {
-		$return['folder']		= $urlparts[1];
-		$return['subfolder']	= false;
-		$return['subsubfolder']	= false;
-	} elseif ($urlcount == 4) {
-		$return['folder']		= $urlparts[1];
-		$return['subfolder']	= $urlparts[2];
-		$return['subsubfolder']	= false;
-	} else {
-		$return['folder']		= $urlparts[1];
-		$return['subfolder']	= $urlparts[2];
-		$return['subsubfolder']	= $urlparts[3];
-	}
-	
+	$return['folder']		= (empty($urlparts[1])) ? false : $urlparts[1];
+	$return['subfolder']	= (empty($urlparts[2])) ? false : $urlparts[2];
+	$return['subsubfolder']	= (empty($urlparts[3])) ? false : $urlparts[3];
+
+	//special $_GET['id']
+	$return['id'] = (format_check($urlparts[$urlcount-1])) ? $urlparts[$urlcount-1] : false;
+
 	//add query string to path_query
 	$return['path_query']	= $return['path'];
 	if (isset($return['query'])) {

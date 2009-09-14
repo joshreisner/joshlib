@@ -108,6 +108,9 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 			if (isset($_SERVER['QUERY_STRING'])) $_josh['request'] .= '?' . $_SERVER['QUERY_STRING'];
 		}
 		$_josh['request'] = url_parse($_josh['request']);
+		
+		//special set $_GET['id']
+		if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
 			
 		//platform-specific info
 		if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) { //platform is PC

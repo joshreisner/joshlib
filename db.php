@@ -271,6 +271,20 @@ function db_key() {
 	}
 }
 
+function db_keys($table) {
+	global $_josh;
+	//SELECT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_schema = 'ashinstitute'
+	$result = db_query('SELECT 
+		column_name col, 
+		referenced_table_schema ref_database, 
+		referenced_table_name ref_table, 
+		referenced_column_name ref_col 
+		FROM information_schema.key_column_usage 
+		WHERE table_schema = "' . $_josh['db']['database'] . '"
+			AND table_name = "' . $table . '" 
+			AND referenced_table_name IS NOT NULL');
+}
+
 function db_num_fields($result) {
 	global $_josh;
 	if ($_josh['db']['language'] == 'mysql') {
