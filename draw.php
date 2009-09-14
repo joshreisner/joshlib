@@ -459,7 +459,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 		$args['name'] = $args['class'] = $args['id'] = $name;
 	}
 	$return = draw_tag('img', $args);
-	if ($link) $return = draw_link($link, $return, $linknewwindow);
+	if ($link) $return = draw_link($link, $return, $linknewwindow, $alt);
 	return $return;
 }
 
@@ -530,12 +530,13 @@ function draw_link_ajax_set($table, $column, $id, $value, $str, $args=false) {
 	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $args);
 }
 
-function draw_list($options, $args=false, $type='ul', $selected=false) {
+function draw_list($options, $args_or_class=false, $type='ul', $selected=false) {
 	//make a ul or an ol out of a one-dimensional array
+	
 	global $_josh;
 	if (!is_array($options) || (!$count = count($options))) return false;
-	if (!is_array($args)) $args = array('class'=>$args); //if args is a string, it's legacy class
-	
+	if (!is_array($args_or_class)) $args_or_class = array('class'=>$args_or_class); //if args is a string, it's legacy class
+		
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
 		$liclass = 'option' . ($i + 1);
@@ -545,7 +546,7 @@ function draw_list($options, $args=false, $type='ul', $selected=false) {
 		$options[$i] = draw_tag('li', array('class'=>$liclass), $options[$i]);
 		$counter++;
 	}
-	return draw_tag($type, $args, implode($options,  "\t"));
+	return draw_tag($type, $args_or_class, implode($options,  "\t"));
 }
 
 function draw_meta_description($string) {

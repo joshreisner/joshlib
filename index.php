@@ -306,6 +306,19 @@ function geocode($address, $zip) {
 	return false;
 }
 
+function var_name(&$iVar, &$aDefinedVars) {
+	//get the name of the variable you are passing in
+	//via http://mach13.com/how-to-get-a-variable-name-as-a-string-in-php
+	//was considering it for auto-classing draw_list
+	foreach ($aDefinedVars as $k=>$v) $aDefinedVars_0[$k] = $v;
+	$iVarSave	= $iVar;
+	$iVar		= !$iVar;
+	$aDiffKeys	= array_keys(array_diff_assoc($aDefinedVars_0, $aDefinedVars));
+	$iVar		= $iVarSave;
+	return $aDiffKeys[0];
+}
+
+
 //form class
 class form { 
 	var $name	= false;
