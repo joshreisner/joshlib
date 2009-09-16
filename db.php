@@ -87,7 +87,7 @@ function db_checkboxes($name, $linking_table, $object_col, $option_col, $id) {
 	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $id);
 	foreach ($_POST as $key => $value) {
 		error_debug('<b>db_checkboxes</b> checking ' . $key, __file__, __line__);
-		@list($control, $field_name, $categoryID) = explode('_', $key);
+		@list($control, $field_name, $categoryID) = explode('-', $key);
 		if (($control == 'chk') && ($field_name == $name)) {
 			db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $id . ', ' . $categoryID . ' )');
 		}
@@ -271,18 +271,43 @@ function db_key() {
 	}
 }
 
-function db_keys($table) {
+function db_keys_from($table, $exclude_table=false) {
 	global $_josh;
-	//SELECT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE table_schema = 'ashinstitute'
-	$result = db_query('SELECT 
-		column_name col, 
-		referenced_table_schema ref_database, 
+
+	$exclude_table = ($exclude_table) ? 'AND referenced_table_name <> "' . $exclude_table . '"' : '';
+
+	$result = db_table('SELECT 
+		column_name name, 
+		constraint_name label,
 		referenced_table_name ref_table, 
-		referenced_column_name ref_col 
+		referenced_column_name ref_name
 		FROM information_schema.key_column_usage 
 		WHERE table_schema = "' . $_josh['db']['database'] . '"
-			AND table_name = "' . $table . '" 
+			AND table_name = "' . $table . '" ' . $exclude_table . '
 			AND referenced_table_name IS NOT NULL');
+	
+	//i really don't like how numbers are showing up in the sql statement
+	foreach ($result as &$r) {
+		if ($pos = strpos($r['label'], '_')) $r['label'] = substr($r['label'], 0, $pos);
+	}
+	return $result;
+}
+
+function db_keys_to($table) {
+	global $_josh;
+	$keys = db_table('SELECT
+			constraint_name,
+			table_name,
+			column_name
+		FROM information_schema.key_column_usage 
+		WHERE table_schema = "' . $_josh['db']['database'] . '"
+			AND constraint_name NOT LIKE "exclude%"
+			AND referenced_table_name = "' . $table . '"');
+	foreach ($keys as &$key) {
+		if ($pos = strpos($key['constraint_name'], '_')) $key['constraint_name'] = substr($key['constraint_name'], 0, $pos);
+		if ($result = current(db_keys_from($key['table_name'], $table))) $key = array_merge($key, $result);
+	}
+	return $keys;
 }
 
 function db_num_fields($result) {
@@ -479,8 +504,7 @@ function db_save($table, $id='get', $array=false) {
 	if ($id) {
 		$query1[] = 'updated_date = ' .  db_date();
 		$query1[] = 'updated_user = ' . ((isset($array['updated_user'])) ? $array['updated_user'] : $userID);
-		if (db_query('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id)) return $id;
-		return false;
+		if (!db_query('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id)) return false;
 	} else {
 		$query1[] = 'created_date';
 		$query2[] = db_date();
@@ -489,8 +513,16 @@ function db_save($table, $id='get', $array=false) {
 		$query1[] = 'is_active';
 		$query2[] = 1;
 		$query = 'INSERT INTO ' . $table . ' ( ' . implode(', ', $query1) . ' ) VALUES ( ' . implode(', ', $query2) . ' )';
-		return db_query($query);
+		$id = db_query($query);
 	}
+	
+	//handle checkboxes based on foreign key situation
+	if ($keys = db_keys_to($table)) {
+		foreach ($keys as $key) {
+			db_checkboxes($key['ref_table'], $key['table_name'], $key['column_name'], $key['name'], $id);
+		}
+	}
+	return $id;
 }
 
 function db_switch($target=false) {

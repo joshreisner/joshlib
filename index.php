@@ -420,13 +420,17 @@ class form {
 					$return .= draw_div_class('checkbox_option', draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span>');
 					break;
 				case 'checkboxes':
-					if (!$option_title) $option_title = 'title';
+					if (!$option_title) {
+						//$option_title = 'title';
+						$options_columns = db_columns($options_table);
+						$option_title = $options_columns[1]['name'];
+					}
 					$options = ($value) ? db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $value . ') checked FROM ' . $options_table . ' o ORDER BY o.' . $option_title) : db_table('SELECT id, ' . $option_title . ', 0 checked FROM ' . $options_table . ' ORDER BY ' . $option_title);
 					foreach ($options as &$o) {
-						$name = 'chk_' . str_replace('_', '-', $options_table) . '_' . $o['id'];
+						$name = 'chk-' . $options_table . '-' . $o['id'];
 						$o = draw_form_checkbox($name, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o[$option_title] . '</span>';
 					}
-					if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . str_replace('_', '-', $options_table) . '\', \'' . $allow_changes . '\');">add new</a>';
+					if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
@@ -525,11 +529,18 @@ class form {
 	function set_table($table) {
 		$this->table = false;
 		if ($cols = db_columns($table, true)) {
+		
+			//preload foreign keys
+			$foreign_keys = array();
+			if ($keys = db_keys_from($table)) foreach ($keys as $key) $foreign_keys[$key['name']] = $key;
+
 			$this->table = $table;
 			foreach ($cols as $c) {
 				if ($c['type'] == 'varchar') {
 					if ($c['name'] == 'password') {
 						$this->set_field(array('type'=>'password', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+					} elseif ($c['name'] == 'secret_key') {
+						//hide this field
 					} else {
 						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
 					}
@@ -543,13 +554,36 @@ class form {
 					$this->set_field(array('type'=>'datetime', 'name'=>$c['name'], 'additional'=>$c['comments']));
 				} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob')) {
 					$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
-					//value in this case
 				} elseif ($c['type'] == 'int') {
-					//curious to know why this is happening.  don't like because precedence is in post values
-					//$this->set_field(array('type'=>'hidden', 'name'=>$c['name'], 'additional'=>$c['comments']));
+					if (isset($foreign_keys[$c['name']])) {
+						$this->set_field(array('type'=>'select', 'name'=>$key['name'], 'label'=>$key['label'], 'sql'=>'SELECT * FROM ' . $key['ref_table'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+					}
+				}
+			}
+			
+			//load checkboxes tables
+			if ($keys = db_keys_to($table)) {
+				foreach ($keys as $key) {
+					if (isset($key['ref_table'])) {
+						$this->set_field(array(
+							'type'=>'checkboxes', 
+							'value'=>$this->id, //this doesn't feel like the right place to set this
+							'name'=>$key['ref_table'], //todo make this unnecessary: make it the linking table instead of the options table
+							'label'=>$key['constraint_name'],
+							//'option_title'=>'name',
+							//"additional"=>$additional, 
+							//"allow_changes"=>$allow_changes, 
+							'options_table'=>$key['ref_table'], 
+							'linking_table'=>$key['table_name'], 
+							'option_id'=>$key['name'], 
+							'object_id'=>$key['column_name']
+							)
+						);
+					}
 				}
 			}
 		}
+		
 	}
 	
 	function set_title($title=false) {
