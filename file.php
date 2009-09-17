@@ -88,9 +88,9 @@ function file_folder($folder, $endfilter=false) {
 				'ext'=>array_pop($nameparts),
 				'human'=>format_text_human(implode(' ', $nameparts)), 
 				'path_name'=>$folder . $name,
-				'type'=>filetype($_josh['root'] . $folder . $name),
-				'fmod'=>filemtime($_josh['root'] . $folder . $name),
-				'size'=>filesize($_josh['root'] . $folder . $name)
+				'type'=>@filetype($_josh['root'] . $folder . $name),
+				'fmod'=>@filemtime($_josh['root'] . $folder . $name),
+				'size'=>@filesize($_josh['root'] . $folder . $name)
 			);
 			if ($thisfile['type'] == 'dir') $thisfile['path_name'] .= '/';
 			error_debug('<b>file folder</b> found ' . $thisfile['name'] . ' of type ' . $thisfile['type'], __file__, __line__);
