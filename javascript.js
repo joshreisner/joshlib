@@ -328,7 +328,11 @@ function url_action_add(value, returnval) {
 }
 
 function url_id() {
-	return url_query("id");
+	var id = url_query("id");
+	if (id) return id;
+	var urlparts = window.location.toString().split("/");
+	return urlparts[urlparts.length-1];
+	//return url_query("id");
 }
 
 function url_prompt(url, question) {

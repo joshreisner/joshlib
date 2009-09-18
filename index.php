@@ -169,9 +169,10 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	
 //ensure lib exists
 	if (!is_dir($_josh['root'] . $_josh['write_folder'] . $_josh['folder'] . 'lib')) {
-		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'dynamic'); //used by file_dynamic
-		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'files'); //used by tinymce
-		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'images'); //used my tinymce
+		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'dynamic');	//used by file_dynamic
+		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'files');		//used by tinymce
+		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'images');	//used my tinymce
+		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'rss');		//common -- eventually used by file_rss
 		file_unzip($_josh['joshlib_folder'] . $_josh['folder'] . 'lib.zip', $_josh['write_folder']);
 	}		
 
