@@ -459,10 +459,12 @@ class form {
 						if (!$sql) $sql = 'SELECT id, name FROM options_' . str_replace('_id', '', $name);
 						$options = db_array($sql);
 					}
+					$return .= '<div class="radio">';
 					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
 					foreach ($options as $id=>$description) {
 						$return .= '<div class="radio_option">' . draw_form_radio($name, $id, ($value == $id), $class) . $description . '</div>';
 					}
+					$return .= '</div>';
 					break;
 				case 'readonly':
 					$return .= $value . ' ' . $additional;
