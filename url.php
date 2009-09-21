@@ -72,6 +72,25 @@ function url_header_utf8() {
 	header('Content-Type: text/html; charset=utf-8');
 }
 
+function url_get($address) {
+	if (function_exists('curl_init')) {
+		$useragent	= "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)";
+		$referrer	= "http://www.google.com/";
+		
+		$ch = curl_init($address);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+		curl_setopt($ch, CURLOPT_REFERER, $referrer);
+		
+		$return = curl_exec($ch);
+		curl_close($ch);
+		//$return = $tmp;
+	} else {
+		$return = @implode('', @file($address));
+	}
+	return $return;
+}
+
 function url_id($index='id') {
 	global $_GET;
 	//check to see whether there's an id and if so, if it's an integer

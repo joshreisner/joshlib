@@ -304,15 +304,21 @@ function format_html_entities($string) {
 
 function format_html_trim($text) {
 	global $_josh;
+	$text = format_html($text);
+	
+	require_once($_josh['root'] . $_josh['write_folder'] . '/lib/simple_html_dom.php');
+
 	//find td, div or body with longest text block
 	$html = str_get_html($text);
 	$blocks = $html->find('text');
 	foreach ($blocks as $b) format_html_set_max(strlen(trim($b)));
 	
-	function get_parent($e) {
-		$options = array('td', 'div', 'body');
-		if (!is_object($e)) die($e);
-		return (in_array($e->tag, $options)) ? $e : get_parent($e->parent);
+	if (!function_exists('get_parent')) {
+		function get_parent($e) {
+			$options = array('td', 'div', 'body');
+			if (!is_object($e)) die($e);
+			return (in_array($e->tag, $options)) ? $e : get_parent($e->parent);
+		}
 	}
 
 	foreach ($blocks as $b) {
@@ -320,11 +326,14 @@ function format_html_trim($text) {
 		if ($len == $_josh['max_text_len']) {
 			$e = get_parent($b->parent);
 			$text = $e->innertext;
+			echo $text;
 		}
 	}
 	
 	$html->clear();
 	unset($html);
+	
+	
 	$html = str_get_html($text);
 
 	//get rid of any sub-divs
@@ -334,6 +343,9 @@ function format_html_trim($text) {
 	//reset html to get rid of artifacts and compress
 	$text = trim($html->save());
 	$html->clear();
+	
+	die($text);
+	
 	return $text;
 }
 

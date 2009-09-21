@@ -85,7 +85,7 @@ function db_check($table, $column=false) {
 //db_checkboxes('doc', 'documents_to_categories', 'documentID', 'categoryID', $_GET['id']);
 function db_checkboxes($name, $linking_table, $object_col, $option_col, $id) {
 	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $id);
-	foreach ($_POST as $key => $value) {
+	foreach ($_POST as $key=>$value) {
 		error_debug('<b>db_checkboxes</b> checking ' . $key, __file__, __line__);
 		@list($control, $field_name, $categoryID) = explode('-', $key);
 		if (($control == 'chk') && ($field_name == $name)) {
