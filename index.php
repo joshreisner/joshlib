@@ -328,6 +328,7 @@ class form {
 	var $name	= false;
 	var $fields = array();
 	var $title	= false;
+	var $title_prefix = false;
 	var $id		= false;
 	var $table	= false;
 	var $values = array();
@@ -376,7 +377,7 @@ class form {
 				
 		//start output
 		if (!$this->title) $this->title = ''; //legend is showing up <legend/>
-		$return = draw_container('legend', $this->title);
+		$return = draw_container('legend', $this->title_prefix . $this->title);
 
 		//add fields
 		foreach ($this->fields as $field) $return .= $this->draw_row($field);
@@ -406,7 +407,7 @@ class form {
 		if (!$value && $default) $value = $default;
 		
 		//wrap additional
-		if ($additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
+		if (isset($additional) && $additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
 		
 		//draw the field
 		if ($type == 'hidden') {
@@ -596,6 +597,10 @@ class form {
 		array_unshift($this->fields, array('type'=>'title', 'name'=>'','class'=>'title', 'value'=>$this->title, 'label'=>false));
 	}
 	
+	function set_title_prefix($prefix=false) {
+		$this->title_prefix = $prefix;
+	}
+	
 	function set_values($values=false) {
 		//if you want to do a custom select and pass in the associative array
 		if (!is_array($values)) return false;
@@ -617,8 +622,9 @@ class table {
 	var $name		= false;
 	var $title		= false;
 
-	public function __construct($name='table') {
+	public function __construct($name='table', $title=false) {
 		$this->name = format_text_code($name);
+		$this->title = $title;
 	}
 	
 	function draw($values, $errmsg='Sorry, no results!', $hover=false, $total=false) {
@@ -695,6 +701,8 @@ class table {
 			}
 			$return .= '</tr></tfoot>' . $_josh['newline'];
 		}
+		
+		$class .= ' table'; //temp for intranet
 		$return = draw_container('table', $return, array('cellspacing'=>0, 'class'=>$class));
 		
 		//drag and drop table
