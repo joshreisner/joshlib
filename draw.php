@@ -457,10 +457,12 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	} else {
 		$args['alt'] = $alt;
 		$args['name'] = $args['class'] = $args['id'] = $name;
+		$alt = false; //this was passed as a string, needs to be nulled so it doesn't go to draw_link
 	}
-	$return = draw_tag('img', $args);
-	if ($link) $return = draw_link($link, $return, $linknewwindow, $alt);
-	return $return;
+
+	$image = draw_tag('img', $args);
+	if ($link) return draw_link($link, $image, $linknewwindow, $alt);
+	return $image;
 }
 
 function draw_javascript($javascript=false) {
@@ -518,11 +520,10 @@ function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
 	} elseif (!$str) {
 		if (!$str)	$str = format_string($href, 60);
 	}
-	
 	$args['href']	= $href;	
 	if ($newwindow) $args['target'] = '_blank';
-
-	return draw_container('a', $str, $args);
+	
+	return draw_tag('a', $args, $str);
 }
 
 function draw_link_ajax_set($table, $column, $id, $value, $str, $args=false) {
