@@ -472,6 +472,9 @@ function db_save($table, $id='get', $array=false) {
 				$query1[] = $c['name'];
 				$query2[] = $value;
 			}
+		} elseif ($id) {
+			//this is an update, so don't do anything
+			//needs to go above the default one!  eg living cities web pages level field
 		} elseif (!empty($c['default'])) {
 			//we have a default value to set for this
 			if ($id) {
@@ -480,8 +483,6 @@ function db_save($table, $id='get', $array=false) {
 				$query1[] = $c['name'];
 				$query2[] = $c['default'];
 			}
-		} elseif ($id) {
-			//this is an update, so don't do anything
 		} elseif ($c['name'] == 'precedence') {
 			//setting the precedence for a new object -- insert into slot 1, increment everything else
 			$query1[] = 'precedence';
