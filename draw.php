@@ -60,9 +60,11 @@ function draw_calendar($month, $year, $events=false) {
 	$cal_events = array();
 	if ($events) {
 		foreach ($events as $e)	{
+			$e['title'] = format_string($e['title']);
+			if (!empty($e['link'])) $e['title'] = draw_link($e['link'], $e['title'], false, array('id'=>'calendar_link_' . $e['id']));
 			if (!isset($cal_events[$e['day']])) $cal_events[$e['day']] = '';
 			$style = (isset($e['color'])) ? 'background-color:#' . $e['color'] : false;
-			$cal_events[$e['day']] .= draw_div_class('event', format_string($e['title']), array('style'=>$style));
+			$cal_events[$e['day']] .= draw_div_class('event', $e['title'], array('style'=>$style));
 		}
 	}
 	
@@ -248,21 +250,6 @@ function draw_form_focus($name) {
 
 function draw_form_hidden($name, $value='') {
 	return draw_tag('input', array('type'=>'hidden', 'name'=>$name, 'id'=>$name, 'value'=>$value));
-}
-
-function draw_page($title, $html) {
-	//this is for joshserver and error handling, eventually for setup your site messages
-	return '<html><head><title>' . strip_tags($title) . '</title></head>
-			<body style="margin:0px;">
-				<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
-					<tr><td align="center">
-					<div style="background-color:#fff;text-align:left;padding:10px 20px 10px 20px;width:360px;min-height:230px;position:relative;">
-						<h1 style="color:#444; font-weight:normal; font-size:24px; line-height:30px;">' . $title . '</h1>' . 
-						$html . '
-					</div>
-				</td></tr></table>
-			</body>
-		</html>';
 }
 
 function draw_form_password($name, $value='', $class=false, $maxlength=255, $autocomplete=true) {
@@ -629,6 +616,21 @@ function draw_newline($count=1) {
 		$return .= $_josh['newline'];
 	}
 	return $return;
+}
+
+function draw_page($title, $html) {
+	//this is for joshserver and error handling, eventually for setup your site messages
+	return '<html><head><title>' . strip_tags($title) . '</title></head>
+			<body style="margin:0px;">
+				<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
+					<tr><td align="center">
+					<div style="background-color:#fff;text-align:left;padding:10px 20px 10px 20px;width:360px;min-height:230px;position:relative;">
+						<h1 style="color:#444; font-weight:normal; font-size:24px; line-height:30px;">' . $title . '</h1>' . 
+						$html . '
+					</div>
+				</td></tr></table>
+			</body>
+		</html>';
 }
 
 function draw_rss_link($address) {

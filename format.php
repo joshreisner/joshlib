@@ -154,9 +154,9 @@ function format_date_time_range($start, $end) {
 	
 	if (format_date($start) == format_date($end)) {
 		//occur on same day
-		return format_date_time($start) . ' to ' . format_time($end);
+		return format_date($start) . ' from ' . format_time($start) . ' to ' . format_time($end);
 	} else {
-		return format_date_time($start, '', ' at ') . ' to ' . format_date_time($end, '', ' at ');
+		return format_date($start) . ' from ' . format_time($start) . ' to ' . format_date_time($end);
 	}
 }
 
