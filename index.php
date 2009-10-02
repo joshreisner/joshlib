@@ -427,7 +427,7 @@ class form {
 						$options_columns = db_columns($options_table);
 						$option_title = $options_columns[1]['name'];
 					}
-					$options = ($value) ? db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $value . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title) : db_table('SELECT id, ' . $option_title . ', 0 checked FROM ' . $options_table . ' WHERE o.is_active = 1 ORDER BY ' . $option_title);
+					$options = ($value) ? db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $value . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title) : db_table('SELECT id, ' . $option_title . ', 0 checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title);
 					foreach ($options as &$o) {
 						$name = 'chk-' . $options_table . '-' . $o['id'];
 						$o = draw_form_checkbox($name, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o[$option_title] . '</span>';
