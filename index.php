@@ -226,6 +226,16 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 			case 'ajax_delete':
 				exit;
 			case 'ajax_reorder':
+				db_query('UPDATE ' . $array['update'] . ' SET precedence = NULL');
+				
+				//email('josh@joshreisner.com', draw_array($array));
+				
+				foreach ($array as $key=>$value) {
+					$key = urldecode($key);
+					if (format_text_starts($array['key'], $key)) db_query('UPDATE ' . $array['update'] . ' SET precedence = ' . (format_numeric($key, true) + 1) . ' WHERE id = ' . $value);
+				}
+				
+				echo 'reordered';
 				exit;
 			case 'ajax_draw_select':
 			//draw_form_select($name, $sql_options, $value=false, $required=true, $class=false, $action=false, $nullvalue='', $maxlength=false) {
@@ -714,7 +724,7 @@ class table {
 					var options = { method:"post", parameters:serializeOpts, onSuccess:function(transport) {
 						//alert(transport.responseText);
 					} };
-					new Ajax.Request("' . $this->target . '", options);
+					new Ajax.Request("' . url_action_add('ajax_reorder') . '", options);
 				}
 				Sortable.create("' . $this->name . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
 				');
@@ -758,9 +768,8 @@ class table {
 		$this->columns[] = compact('name', 'class', 'title', 'width');
 	}
 	
-	function set_draggable($target, $draghandle=false) {
+	function set_draggable($draghandle=false) {
 		$this->draggable = true;
-		$this->target = $target;
 		$this->draghandle = $draghandle;
 	}
 	
