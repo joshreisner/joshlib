@@ -705,10 +705,11 @@ class table {
 			$counter++;
 		}
 		if ($total) {
-			$return .= '<tr class="total"><tfoot>';
+			$return .= '<tfoot><tr class="total">';
 			foreach ($this->columns as $c) {
 				$return .= '<td class="' . $c['name'];
-				if ($c['class']) $this->return .= ' ' . $c['class'];
+				if ($c['class']) $return .= ' ' . $c['class'];
+				$return .= '">';
 				if (isset($totals[$c['name']])) {
 					$return .= $totals[$c['name']];
 				} else {
