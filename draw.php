@@ -280,7 +280,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 	if (!$required) $return .= '<option value="">' . $nullvalue . '</option>';
 	if (is_array($sql_options)) {
 		while (list($key, $val) = each($sql_options)) {
-			$val = format_text_shorten($val);
+			$val = format_string($val);
 			$return .= '<option value="' . $key . '" id="' . $name . $key . '"';
 			if ($key == $value) $return .= ' selected';
 			$return .= '>' . $val . '</option>';
@@ -290,7 +290,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 		$key = false;
 		while ($r = db_fetch($result)) {
 			if (!$key) $key = array_keys($r);
-			$r[$key[1]] = format_text_shorten($r[$key[1]]);
+			$r[$key[1]] = format_string($r[$key[1]]);
 			$return .= '<option value="' . $r[$key[0]] . '" id="' . $name . $r[$key[0]] . '"';
 			if ($r[$key[0]] == $value) $return .= ' selected';
 			$return .= '>' . $r[$key[1]] . '</option>';
@@ -653,6 +653,7 @@ function draw_tag($tag, $args=false, $innerhtml=false) {
 	if ($innerhtml === false) {
 		$return .= '/>';
 	} else {
+		if (is_numeric($innerhtml) && ($innerhtml == 0)) $innerhtml = '&#48;';
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
 		$return .= '>' . $innerhtml . '</' . $tag . '>';
 	}

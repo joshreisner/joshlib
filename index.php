@@ -363,7 +363,7 @@ class form {
 		if ($this->table && $id) $this->set_values(db_grab('SELECT * FROM ' . $this->table . ' WHERE id = ' . $id));
 	}
 
-	function draw($values=false) {
+	function draw($values=false, $focus=true) {
 		global $_josh, $_GET;
 		
 		if ($values) $this->set_values($values);
@@ -400,7 +400,7 @@ class form {
 		
 		//focus on first element
 		reset($this->fields);
-		if ($this->fields[key($this->fields)]['name']) $return .= draw_form_focus($this->fields[key($this->fields)]['name']);
+		if ($focus && $this->fields[key($this->fields)]['name']) $return .= draw_form_focus($this->fields[key($this->fields)]['name']);
 
 		return $return;
 	}
@@ -439,8 +439,8 @@ class form {
 					}
 					$options = ($value) ? db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $value . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title) : db_table('SELECT id, ' . $option_title . ', 0 checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title);
 					foreach ($options as &$o) {
-						$name = 'chk-' . $options_table . '-' . $o['id'];
-						$o = draw_form_checkbox($name, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $o[$option_title] . '</span>';
+						$chkname = 'chk-' . $options_table . '-' . $o['id'];
+						$o = draw_form_checkbox($chkname, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $chkname . '\');">' . $o[$option_title] . '</span>';
 					}
 					if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
 					$return .= draw_list($options, array('id'=>$options_table));
@@ -500,7 +500,7 @@ class form {
 			}
 						
 			//wrap it up
-			$return = draw_div_class('field ' . $type . ' ' . $name, $return);
+			$return = draw_div_class('field ' . $type . ' ' . $name . (($class) ? ' ' . $class : ''), $return);
 		}
 		return $return;
 	}
@@ -538,6 +538,18 @@ class form {
 	
 	function set_group($string='') {
 		$this->set_field(array('name'=>'group', 'type'=>'group', 'value'=>$string));
+	}
+	
+	function set_order($strorder='') {
+		$fields = array_post_fields($strorder);
+		$return = array();
+		foreach ($fields as $f) {
+			if (isset($this->fields[$f])) {
+				$return[$f] = $this->fields[$f];
+				unset($this->fields[$f]);
+			}
+		}
+		$this->fields = array_merge($return, $this->fields);
 	}
 	
 	function set_table($table) {
@@ -637,7 +649,7 @@ class table {
 		$this->title = $title;
 	}
 	
-	function draw($values, $errmsg='Sorry, no results!', $hover=false, $total=false) {
+	function draw($values, $errmsg='Sorry, no results!', $total=false) {
 		global $_josh;
 		$class			= $this->name;
 		$count_columns	= count($this->columns);
@@ -658,7 +670,7 @@ class table {
 			
 			foreach ($values as $v) {
 				if (isset($v['group']) && ($group != $v['group'])) {
-					$return .= draw_container('tr', draw_container('td', $v['group'], array('colspan'=>$count_columns, 'class'=>'group')));
+					$return .= draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $v['group']));
 					$row = 'odd'; //reset even/odd at the beginning of groups
 					$group = $v['group'];
 				}
@@ -680,12 +692,7 @@ class table {
 				if ($counter == 1) $return .= ' first_row';
 				if ($counter == $count_rows) $return .= ' last_row';
 				$return .= '"';
-				if ($hover) {
-					if (isset($v['link'])) $return .= ' onclick="location.href=\'' . $v['link'] . '\';"';
-					//hover class must exist
-					$return .= ' onmouseover="css_add(this, \'hover\');"';
-					$return .= ' onmouseout="css_remove(this, \'hover\');"';
-				}
+				if (isset($v['link'])) $return .= ' onclick="location.href=\'' . $v['link'] . '\';"';
 				$return .= '>' . $_josh['newline'];
 				
 				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class']), $v[$c['name']]);

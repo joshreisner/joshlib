@@ -741,6 +741,8 @@ function format_text_human($str, $convertdashes=true) {
 }
 
 function format_text_shorten($text, $length=30, $append='&#8230;', $appendlength=1) {
+	//this function is deprecated
+	error_handle('deprecated format_text_shorten', 'this function was deprecated 10/3/2009.  use format_string instead');
 	if ($append) $length = $length - $appendlength;
 	if (strlen($text) > $length) return substr($text, 0, $length) . $append;
 	return $text;
