@@ -159,7 +159,8 @@ function url_parse($url) {
 	$return['folder']		= (empty($urlparts[1])) ? false : $urlparts[1];
 	$return['subfolder']	= (empty($urlparts[2])) ? false : $urlparts[2];
 	$return['subsubfolder']	= (empty($urlparts[3])) ? false : $urlparts[3];
-
+	
+	if (stristr($return['subfolder'], '.')) $return['subfolder'] = false;
 	//special $_GET['id']
 	$return['id'] = (format_check($urlparts[$urlcount-1])) ? $urlparts[$urlcount-1] : false;
 
