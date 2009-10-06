@@ -113,7 +113,7 @@ class form {
 						$options = db_table('SELECT id, ' . $option_title . ', 0 checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title);
 					}
 					foreach ($options as &$o) {
-						$chkname = 'chk-' . $options_table . '-' . $o['id'];
+						$chkname = 'chk-' . $name . '-' . $o['id'];
 						$o = draw_form_checkbox($chkname, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $chkname . '\');">' . $o[$option_title] . '</span>';
 					}
 					if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
