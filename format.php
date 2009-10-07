@@ -233,9 +233,12 @@ function format_html($text) {
 			if (in_array($e->tag, $bad_tags)) tag_unset($e);
 			
 			//these are the tags we want	
-			$good_tags1	= array('a', 'b', 'blockquote', 'br', 'dir', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'i', 'img');
-			$good_tags2	= array('p', 'span', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li');
-			$good_tags = array_merge($good_tags1, $good_tags2);
+			$good_tags	= array(
+				'a', 'b', 'blockquote', 'br', 'dir', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'i', 'img',
+				'p', 'span', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
+				'object', 'embed', 'param'
+				);
+			
 			
 			if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : '';
 					
