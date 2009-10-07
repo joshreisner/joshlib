@@ -104,8 +104,11 @@ class form {
 				case 'checkboxes':
 					if (!$option_title) {
 						//$option_title = 'title';
-						$options_columns = db_columns($options_table);
-						$option_title = $options_columns[1]['name'];
+						if ($options_columns = db_columns($options_table)) {
+							$option_title = $options_columns[1]['name'];
+						} else {
+							error_handle('options_table does not exist', 'form checkboxes ' . $name . ' is looking for ' . $options_table . ' which does not exist');
+						}
 					}
 					if ($this->id) {
 						$options = db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $this->id . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title);
@@ -195,7 +198,13 @@ class form {
 		error_debug('adding field ' . $label, __file__, __line__);
 
 		if (!$name)	$name	= format_text_code($label);
-		if ($label === false) $label = format_text_human($name);
+		if ($label === false) {
+			if ($label = format_text_ends('_id', $name)) {
+			} else {
+				$label = $name;
+			}
+			$label = format_text_human($label);
+		}
 		if (!$value) $value	= (isset($this->values[$name])) ? $this->values[$name] : false;
 		if (!$class) $class	= '';
 		if (!$option_id) $option_id	= 'option_id';

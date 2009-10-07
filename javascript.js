@@ -156,7 +156,7 @@ function form_tinymce_init(cssLocation) {
 function form_checkboxes_empty(form, name) {
 	oneFound = false;
 	for (var i = 0; i < form.elements.length; i++) {
-		var checkParts = form.elements[i].name.split("_");
+		var checkParts = form.elements[i].name.split("-");
 		if ((checkParts[0] == "chk") && (checkParts[1] == name) && (form.elements[i].checked)) oneFound = true;
 	}
 	return !oneFound;
