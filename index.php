@@ -318,6 +318,36 @@ function geocode($address, $zip) {
 	return false;
 }
 
+function language_translate($string, $from, $to) {
+	global $_josh;
+	
+	//todo figure out how to do this with POST since the limit is higher
+	//todo figure out exactly what the limit is
+	
+	$chunks = array_chunk_html($string, 1450);
+	$string = '';
+	foreach ($chunks as $c) {
+		error_debug('<b>lanuage_translate</b> running query for a string that is ' . strlen($c) . ' characters long', __file__, __line__);
+	
+		if (!isset($_josh['google_search_api_key'])) error_handle('api key not set', 'this script needs a google search api key');
+		
+		$ch = curl_init();
+		$url = 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&langpair=' . $from . '%7C' . $to;
+		
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_REFERER, $_josh['request']['url']);
+		$body = curl_exec($ch);
+		curl_close($ch);
+		
+		// now, process the JSON string
+		$json = json_decode($body, true);
+		if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string was ' . strlen($c) . '.  ' . draw_array($json));	
+		$string .= $json['responseData']['translatedText'];
+	}
+	return $string;
+}
+
 function var_name(&$iVar, &$aDefinedVars) {
 	//get the name of the variable you are passing in
 	//via http://mach13.com/how-to-get-a-variable-name-as-a-string-in-php
