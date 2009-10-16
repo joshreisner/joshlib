@@ -123,10 +123,10 @@ class form {
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
-					$return .= draw_form_date($name, $value, false) . $additional;
+					$return .= draw_form_date($name, $value, false, false, $required) . $additional;
 					break;
 				case 'datetime':
-					$return .= draw_form_date($name, $value, true) . $additional;
+					$return .= draw_form_date($name, $value, true, false, $required) . $additional;
 					break;
 				case 'file':
 					$return .= draw_form_file($name, $class, $onchange) . $additional;
@@ -258,9 +258,9 @@ class form {
 				} elseif (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
 					$this->set_field(array('type'=>'checkbox', 'name'=>$c['name']));
 				} elseif ($c['type'] == 'date') {
-					$this->set_field(array('type'=>'date', 'name'=>$c['name'], 'additional'=>$c['comments']));
+					$this->set_field(array('type'=>'date', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
 				} elseif ($c['type'] == 'datetime') {
-					$this->set_field(array('type'=>'datetime', 'name'=>$c['name'], 'additional'=>$c['comments']));
+					$this->set_field(array('type'=>'datetime', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
 				} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob')) {
 					$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
 				} elseif ($c['type'] == 'int') {
