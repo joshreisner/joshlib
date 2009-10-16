@@ -496,6 +496,10 @@ function format_money($value, $dollarsign=true, $comma=true, $error='') {
 	return $value;
 }
 
+function format_nobr($string='') {
+	return '<nobr>' . $string . '</nobr>';
+}
+
 function format_null($value='') {
 	//could also be a db function?
 	if (empty($value)) return 'NULL';
