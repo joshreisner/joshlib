@@ -79,7 +79,7 @@ class form {
 		global $_josh;
 		extract($field);
 		$return = '';
-		
+
 		//value is being set manually		
 		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
 		
@@ -113,7 +113,8 @@ class form {
 					if ($this->id) {
 						$options = db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $this->id . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title);
 					} else {
-						$options = db_table('SELECT id, ' . $option_title . ', 0 checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title);
+						$value = (strToLower($value) == 'all') ? 1 : 0;
+						$options = db_table('SELECT id, ' . $option_title . ', ' . $value . ' checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title);
 					}
 					foreach ($options as &$o) {
 						$chkname = 'chk-' . $name . '-' . $o['id'];
@@ -189,7 +190,7 @@ class form {
 		//load inputs
 		if (!is_array($array)) return error_handle('array not set');
 		extract($array);
-		
+
 		//type is required
 		if (!$type) return error_handle('type not set');
 
@@ -214,7 +215,7 @@ class form {
 			$additional = $label;
 			$label = '&nbsp;';
 		}
-		
+				
 		//package and save
 		$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength');
 	}

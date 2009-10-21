@@ -321,6 +321,9 @@ function geocode($address, $zip) {
 function language_translate($string, $from, $to) {
 	global $_josh;
 	
+	//make sure there's something to translate
+	if (empty($string)) return '';
+	
 	//todo figure out how to do this with POST since the limit is higher
 	//todo figure out exactly what the limit is
 	

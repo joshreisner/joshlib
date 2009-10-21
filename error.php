@@ -71,13 +71,22 @@ function error_handle($type, $message="") {
 	if (($_josh['mode'] == 'dev') && $_josh['debug']) exit;
 	
 	//get backtrace
-	$backtrace = debug_backtrace();
-	$level = 1;
+	if ($backtrace = debug_backtrace()) {
+		$message .= '<p>';
+		foreach ($backtrace as $b) {
+			$message .= '<b>' . $b['file'] . '</b>, line ' . $b['line'];
+			if (!empty($b['function'])) $message .= ', ' . $b['function'];
+			$message .= '<br>';
+		}
+		$message .= '</p>';
+	}	
+	
+	/*$level = 1;
 	if (isset($backtrace[$level]['line']) && isset($backtrace[$level]['file'])) {
 		$message .= '<p>At line ' . $backtrace[$level]['line'] . ' of ' . $backtrace[$level]['file'];
 		if (isset($backtrace[$level+1]['function'])) $message .= ', inside function ' . $backtrace[$level+1]['function'];
 		$message .= ".</p>";
-	}
+	}*/
 
 	//take out full path -- security hazard and decreases readability
 	if (isset($_josh['root'])) $message = str_replace($_josh['root'], "", $message);
