@@ -57,13 +57,13 @@ class form {
 				
 		//start output
 		if (!$this->title) $this->title = ''; //legend is showing up <legend/>
-		$return = draw_container('legend', $this->title_prefix . $this->title);
+		$return = draw_container('legend', draw_container('span', $this->title_prefix . $this->title));
 
 		//add fields
 		foreach ($this->fields as $field) $return .= $this->draw_row($field);
 
 		//wrap in unnecessary fieldset
-		$return = draw_tag('fieldset', false, $return);
+		$return = draw_div_class('fieldset', draw_tag('fieldset', false, $return));
 		
 		//wrap in form
 		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$_josh['request']['path_query'], 'name'=>$this->name, 'class'=>$this->name, 'onsubmit'=>'javascript:return form_validate(this);'), $return);
@@ -248,11 +248,11 @@ class form {
 			foreach ($cols as $c) {
 				if ($c['type'] == 'varchar') {
 					if ($c['name'] == 'password') {
-						$this->set_field(array('type'=>'password', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+						$this->set_field(array('type'=>'password', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required'], 'maxlength'=>$c['length']));
 					} elseif ($c['name'] == 'secret_key') {
 						//hide this field
 					} else {
-						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required'], 'maxlength'=>$c['length']));
 					}
 				} elseif ($c['type'] == 'text') {
 					$this->set_field(array('type'=>'textarea', 'name'=>$c['name'], 'class'=>'mceEditor'));

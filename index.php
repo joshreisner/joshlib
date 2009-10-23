@@ -324,6 +324,9 @@ function language_translate($string, $from, $to) {
 	//make sure there's something to translate
 	if (empty($string)) return '';
 	
+	//unescape in case of post
+	$string = str_replace("''", "'", $string);
+	
 	//todo figure out how to do this with POST since the limit is higher
 	//todo figure out exactly what the limit is
 	

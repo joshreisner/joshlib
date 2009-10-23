@@ -145,7 +145,7 @@ function db_columns($tablename, $omitSystemFields=false) {
 			$required = ($r['Null'] == 'YES') ? false : true;
 			$default = $r['Default'];
 			$comments = $r['Comment'];
-			$return[] = compact('name','type','required','default','comments');
+			$return[] = compact('name','type','required','default','comments','length');
 		}
 	} else {
 		$result = db_table('SELECT 

@@ -161,8 +161,14 @@ function url_parse($url) {
 	$return['subsubfolder']	= (empty($urlparts[3])) ? false : $urlparts[3];
 	
 	if (stristr($return['subfolder'], '.')) $return['subfolder'] = false;
-	//special $_GET['id']
-	$return['id'] = (format_check($urlparts[$urlcount-1])) ? $urlparts[$urlcount-1] : false;
+
+	$return['id'] = $return['page'] = false;
+	if (!empty($urlparts[$urlcount-1])) {
+		$return['page'] = $urlparts[$urlcount-1];
+
+		//special GET for mod_rewrite pages -- id == 13 if http://foo.com/bar/13
+		$return['id'] = (format_check($urlparts[$urlcount-1])) ? $urlparts[$urlcount-1] : false;
+	}
 
 	//add query string to path_query
 	$return['path_query']	= $return['path'];
