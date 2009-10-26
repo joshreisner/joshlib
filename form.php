@@ -44,10 +44,10 @@ class form {
 			
 			//add cancel?
 			if (isset($_GET['return_to'])) {
-				if ($this->cancel) $additional = 'or ' . draw_link($_GET['return_to'], 'cancel');
+				if ($this->cancel) $additional = ($this->cancel === true) ? 'or ' . draw_link($_GET['return_to'], 'cancel') : $this->cancel;
 				$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_GET['return_to']));
 			} elseif (isset($_josh['referrer']['url'])) {
-				if ($this->cancel) $additional = 'or ' . draw_link($_josh['referrer']['url'], 'cancel');
+				if ($this->cancel) $additional = ($this->cancel === true) ? 'or ' . draw_link($_josh['referrer']['url'], 'cancel') : $this->cancel;
 				$this->set_field(array('type'=>'hidden', 'name'=>'return_to', 'value'=>$_josh['referrer']['url']));
 			}
 			
@@ -199,7 +199,7 @@ class form {
 		error_debug('adding field ' . $label, __file__, __line__);
 
 		if (!$name)	$name	= format_text_code($label);
-		if ($label === false) {
+		if (($label === false) && ($type != 'submit')) {
 			if ($label = format_text_ends('_id', $name)) {
 			} else {
 				$label = $name;
