@@ -207,7 +207,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	}
 	
 	$_josh['posting']	= !empty($_POST);
-	if ($_josh['posting']) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes($value);
+	if ($_josh['posting']) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes(str_replace('& ', '&amp; ', $value));
 	
 	$_josh['editing']	= url_id();
 	

@@ -141,6 +141,11 @@ function draw_dl($array, $class=false) {
 	return draw_container('dl', $return, array('class'=>$class));
 }
 
+function draw_doctype() {
+	return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
+}
+
 function draw_favicon($location='/images/favicon.png') {
 	//only accepts PNGs right now
 	return draw_tag('link', array('rel'=>'shortcut icon', 'href'=>$location, 'type'=>'image/png')); 
@@ -173,8 +178,8 @@ function draw_form_checkbox($name, $checked=false, $class=false, $javascript=fal
 	$class = ($class) ? $class . ' checkbox' : 'checkbox';
 	$return  = '<input type="checkbox" name="' . $name . '" id="' . $name . '" class="' . $class . '"';
 	if ($javascript) $return .= ' onclick="javascript:' . $javascript . '"';
-	if ($checked) $return .= ' checked';
-	$return .= '>';
+	if ($checked) $return .= ' checked="checked"';
+	$return .= '/>';
 	return $return;
 }
 
@@ -446,6 +451,12 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 		$args['name'] = $args['class'] = $args['id'] = $name;
 		$alt = false; //this was passed as a string, needs to be nulled so it doesn't go to draw_link
 	}
+	
+	//force alt text for w3 validation
+	if (empty($args['alt'])) {
+		list($name, $ext, $path) = file_name($path);
+		$args['alt'] = format_text_human($name);
+	}
 
 	$image = draw_tag('img', $args);
 	if ($link) return draw_link($link, $image, $linknewwindow, $alt);
@@ -507,7 +518,7 @@ function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
 	} elseif (!$str) {
 		if (!$str)	$str = format_string($href, 60);
 	}
-	$args['href']	= $href;	
+	$args['href']	= htmlentities($href);
 	if ($newwindow) $args['target'] = '_blank';
 	
 	return draw_tag('a', $args, $str);
@@ -638,12 +649,15 @@ function draw_rss_link($address) {
 }
 
 function draw_swf($path, $width, $height, $border=0) {
-	$return = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0" width="' . $width . '" height="' . $height . '">
+	//standards-compliant satay method (http://www.alistapart.com/articles/flashsatay)
+	return '<object type="application/x-shockwave-flash" data="' . $path . '" width="' . $width . '" height="' . $height . '"><param name="movie" value="' . $path . '" /></object>';
+
+	//adobe method, deprecated
+	return '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0" width="' . $width . '" height="' . $height . '">
 		<param name="movie" value="' . $path . '" />
 		<param name="quality" value="high" />
 		<embed src="' . $path . '" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="' . $width . '" height="' . $height . '" border="' . $border . '"></embed>
 	  </object>';
-	return $return;
 }
 
 function draw_tag($tag, $args=false, $innerhtml=false) {
