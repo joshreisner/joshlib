@@ -497,6 +497,8 @@ function format_money($value, $dollarsign=true, $comma=true, $error='') {
 }
 
 function format_nobr($string='') {
+	//should have been draw_nobr anyway
+	error_handle('function deprecated', 'format_nobr was deprecated on 10/28/2009 because it\'s invalid html -- use table width instead, or white-space: nowrap;', __file__, __line__);
 	return '<nobr>' . $string . '</nobr>';
 }
 

@@ -257,12 +257,10 @@ function draw_form_hidden($name, $value='') {
 	return draw_tag('input', array('type'=>'hidden', 'name'=>$name, 'id'=>$name, 'value'=>$value));
 }
 
-function draw_form_password($name, $value='', $class=false, $maxlength=255, $autocomplete=true) {
+function draw_form_password($name, $value='', $class=false, $maxlength=255) {
 	global $_josh;
 	$class = ($class) ? $class . ' password' : 'password';
-	$return = '<input type="password" name="' . $name . '" id="' . $name . '" value="' . $value . '" class="' . $class . '" maxlength="' . $maxlength . '" class="' . $class . '"';
-	if (!$autocomplete) $return .= ' autocomplete="off"';
-	$return .= '>';
+	$return = '<input type="password" name="' . $name . '" id="' . $name . '" value="' . $value . '" class="' . $class . '" maxlength="' . $maxlength . '" class="' . $class . '">';
 	return $return;
 }
 
@@ -287,7 +285,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 		while (list($key, $val) = each($sql_options)) {
 			$val = format_string($val);
 			$return .= '<option value="' . $key . '" id="' . $name . $key . '"';
-			if ($key == $value) $return .= ' selected';
+			if ($key == $value) $return .= ' selected="selected"';
 			$return .= '>' . $val . '</option>';
 		}
 	} else {
@@ -297,7 +295,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 			if (!$key) $key = array_keys($r);
 			$r[$key[1]] = format_string($r[$key[1]]);
 			$return .= '<option value="' . $r[$key[0]] . '" id="' . $name . $r[$key[0]] . '"';
-			if ($r[$key[0]] == $value) $return .= ' selected';
+			if ($r[$key[0]] == $value) $return .= ' selected="selected"';
 			$return .= '>' . $r[$key[1]] . '</option>';
 		}
 	}
@@ -332,12 +330,11 @@ function draw_form_submit($message='Submit Form', $class=false) {
 	return draw_tag('input', array('type'=>'submit', 'value'=>$message, 'class'=>$class));
 }
 
-function draw_form_text($name, $value='', $class=false, $maxlength=255, $style=false, $autocomplete=true) {
+function draw_form_text($name, $value='', $class=false, $maxlength=255, $style=false) {
 	$class			= ($class) ? $class . ' text' : 'text';
-	$autocomplete	= format_boolean($autocomplete, 'on|off');
 	$type			= 'text';
 	$id				= $name;
-	return draw_tag('input', compact('type', 'name', 'id', 'value', 'class', 'maxlength', 'style', 'autocomplete'));
+	return draw_tag('input', compact('type', 'name', 'id', 'value', 'class', 'maxlength', 'style'));
 }
 
 function draw_form_textarea($name, $value='', $class=false) {
@@ -345,7 +342,7 @@ function draw_form_textarea($name, $value='', $class=false) {
 	global $_josh;
 	if (!$value) $value = '';
 	$class = ($class) ? $class . ' textarea' : 'textarea';
-	return draw_container('textarea', $value, array('name'=>$name, 'id'=>$name, 'class'=>$class));
+	return draw_container('textarea', $value, array('name'=>$name, 'id'=>$name, 'class'=>$class, 'rows'=>5, 'cols'=>50));
 	//return '<textarea name='' . $name . '' id='' . $name . '' class='' . $class . ''>' . $value . '</textarea>';
 }
 
