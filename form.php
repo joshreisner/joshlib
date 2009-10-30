@@ -161,7 +161,7 @@ class form {
 				case 'select':
 					if (!$options) {
 						if (!$sql) $sql = 'SELECT id, name FROM options_' . str_replace('_id', '', $name);
-						$options = db_array($sql);
+						$options = (stristr($sql, 'optgroup')) ? db_table($sql) : db_array($sql);
 					}
 					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
 					$return .= draw_form_select($name, $options, $value, $required, $class, $action) . $additional;
@@ -215,7 +215,7 @@ class form {
 			$additional = $label;
 			$label = '&nbsp;';
 		}
-				
+
 		//package and save
 		$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength');
 	}
@@ -267,6 +267,8 @@ class form {
 				} elseif ($c['type'] == 'int') {
 					if (isset($foreign_keys[$c['name']])) {
 						$this->set_field(array('type'=>'select', 'name'=>$key['name'], 'label'=>$key['label'], 'sql'=>'SELECT * FROM ' . $key['ref_table'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+					} else {
+						$this->set_field(array('type'=>'hidden', 'name'=>$c['name']));
 					}
 				}
 			}

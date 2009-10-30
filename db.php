@@ -5,6 +5,10 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 	//exec a sql query and return an array of the results
 	//need more description of purpose for prepend_id, prepend_value
 	//what's the difference between this and db_table?
+	
+	//db_table returns resultsets like $array[0] = array('name'=>'josh', 'role'=>'coder', 'gender'=>'m');
+	//db_array can return either $array = array('foo', 'bar', 'baz') or $array = array('name'=>'josh', 'role'=>'coder', 'gender'=>'m');
+	
 	global $_josh;
 	$result = db_query($sql, $limit);
 	if (!$array) $array = array();

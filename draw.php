@@ -281,9 +281,26 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 	if ($action) $return .= ' onchange="javascript:' . $action . '"';
 	$return .= '>';
 	if (!$required) $return .= '<option value="">' . $nullvalue . '</option>';
+	$lastgroup = '';
 	if (is_array($sql_options)) {
-		while (list($key, $val) = each($sql_options)) {
+		while (@list($key, $val, $group) = each($sql_options)) {
+			if (is_array($val)) @list($key, $val, $group) = array_values($val); //possible db_table optgroup situation
 			$val = format_string($val);
+			
+			//new optgroup code
+			if (!isset($grouped)) {
+				if ($group) {
+					$grouped = true;
+					//first group
+					$lastgroup = $group;
+					$return .= '<optgroup label="' . $lastgroup . '">';
+				}
+			} elseif ($grouped && ($lastgroup != $group)) {
+				//subsequent group
+				$lastgroup = $group;
+				$return .= '</optgroup><optgroup label="' . $lastgroup . '">';
+			}
+			
 			$return .= '<option value="' . $key . '" id="' . $name . $key . '"';
 			if ($key == $value) $return .= ' selected="selected"';
 			$return .= '>' . $val . '</option>';
@@ -293,12 +310,27 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 		$key = false;
 		while ($r = db_fetch($result)) {
 			if (!$key) $key = array_keys($r);
+			
+			//new optgroup code
+			if (!isset($grouped)) {
+				$grouped = array_keys($r, 'optgroup');
+				if ($grouped) {
+					//first group
+					$lastgroup = $r['optgroup'];
+					$return .= '<optgroup label="' . $lastgroup . '">';
+				}
+			} elseif ($grouped && ($lastgroup != $r['optgroup'])) {
+				//subsequent group
+				$lastgroup = $r['optgroup'];
+				$return .= '</optgroup><optgroup label="' . $lastgroup . '">';
+			}
 			$r[$key[1]] = format_string($r[$key[1]]);
 			$return .= '<option value="' . $r[$key[0]] . '" id="' . $name . $r[$key[0]] . '"';
 			if ($r[$key[0]] == $value) $return .= ' selected="selected"';
 			$return .= '>' . $r[$key[1]] . '</option>';
 		}
 	}
+	if ($grouped) $return .= '</optgroup>';
 	$return .= '</select>';
 	return $return;
 }
