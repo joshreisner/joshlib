@@ -330,7 +330,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 			$return .= '>' . $r[$key[1]] . '</option>';
 		}
 	}
-	if ($grouped) $return .= '</optgroup>';
+	if (isset($grouped) && $grouped) $return .= '</optgroup>';
 	$return .= '</select>';
 	return $return;
 }
