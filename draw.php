@@ -542,12 +542,12 @@ function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
 	
 	//obfuscate email
 	if (format_text_starts('mailto:', $href)) {
-		if (!$str)	$str = format_ascii(format_string(str_replace('mailto:', '', $href), 60));
-		$href = format_ascii($href);
-	} elseif (!$str) {
-		if (!$str)	$str = format_string($href, 60);
+		if (!$str) $str = format_ascii(format_string(str_replace('mailto:', '', $href), 60));
+		$args['href'] = format_ascii($href);
+	} else {
+		if (!$str) $str = format_string($href, 60);
+		$args['href'] = htmlentities($href);
 	}
-	$args['href']	= htmlentities($href);
 	if ($newwindow) $args['target'] = '_blank';
 	
 	return draw_tag('a', $args, $str);

@@ -35,7 +35,7 @@ function format_ascii($string) {
 	//used by draw_link() for email obfuscation
 	$len = strlen($string);
 	$return = '';
-	for ($i = 0; $i < $len; $i++) $return .= '&#' . ord($string[$i]);
+	for ($i = 0; $i < $len; $i++) $return .= '&#' . ord($string[$i]) . ';';
 	return $return;
 }
 
