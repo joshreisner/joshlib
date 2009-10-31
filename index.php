@@ -262,7 +262,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		}
 	} elseif (url_action('validate')) {
 		//validate redirect
-		url_change('http://validator.w3.org/check?uri=' . urlencode(url_query_drop('action', false));
+		url_change('http://validator.w3.org/check?uri=' . urlencode(url_query_drop('action', false)));
 	}
 
 //special functions that don't yet fit into a category
