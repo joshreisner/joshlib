@@ -15,27 +15,21 @@ function draw_args($array) {
 function draw_array($array, $nice=false) {
 	global $_josh;
 	if (!is_array($array)) return false;
-	$return = '<table cellpadding="3" cellspacing="1" border="0" style="background-color:#eee;">';
+	$return = '
+
+<table border="1">';
 	//if (!$nice) ksort($array);
 	while(list($key, $value) = each($array)) {
 		$key = urldecode($key);
 		if ($nice && (strToLower($key) == 'j')) continue;
 		$value = format_quotes($value);
 		if (strToLower($key) == 'email') $value = '<a href="mailto:' . $value . '">' . $value . '</a>';
-		if (is_array($value)) {
-			$return2 = '';
-			foreach ($value as $key2 => $value2) {
-				$return2 .= '&#8226; ' . $value2 . '<br>';
-			}
-			$value = $return2;
-		}
+		if (is_array($value)) $value = draw_array($value, $nice);
 		$return  .= '
-			<tr style="background-color:#fff; font-family: verdana; font-size:11px; padding:6px; line-height:16px; width:100%;" valign="top"';
-		if (strToLower($key) == 'message') $return .= ' height="160"';
-		$return .= '><td style="background-color:#f6f6f6;" width="120"><nobr>';
+			<tr><td bgcolor="#eee"><b>';
 		$return .= ($nice) ? format_text_human($key)  : $key;
-		$return .= '&nbsp;</nobr></td><td width="79%">';
-		$return .= is_object($value) ? 'object value' : nl2br($value);
+		$return .= '&nbsp;</b></td><td>';
+		$return .= is_object($value) ? 'object value' : $value;
 		$return .= '</td></tr>';
 	}
 	$return .= '</table>';
@@ -234,6 +228,12 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 		draw_form_select($namePrefix . 'AMPM', array_2d(array('AM', 'PM')), $ampm, $required, $class);
 	}
 	return draw_container('nobr', $return);
+}
+
+function draw_form_date_cal($name, $value=false) {
+	if ($value) $value = date('n/j/Y', strToTime($value));
+	$return = draw_form_text($name, $value, 'date', 10);
+	return $return;
 }
 
 function draw_form_file($name, $class=false, $onchange=false) {

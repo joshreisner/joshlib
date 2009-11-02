@@ -466,7 +466,19 @@ function db_save($table, $id='get', $array=false) {
 			} elseif (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
 				$value = format_boolean($array[$c['name']], '1|0');
 			} elseif ($c['type'] == 'datetime') {
+				//this would never happen
 				$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
+			} elseif ($c['type'] == 'date') {
+				//new date field
+				if (empty($array[$c['name']])) {
+					if (!$c['required']) {
+						$value = 'NULL';
+					} else {
+						error_handle('required value', $c['name'] . ' is required');
+					}
+				} else {
+					$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
+				}
 			} else {
 				error_handle('unhandled data type', 'db_save hasn\'t been programmed yet to handle ' . $c['type']);
 			}

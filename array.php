@@ -136,6 +136,11 @@ function array_key_filter($array, $key, $value) {
 	return $return;
 }
 
+function array_object($object) {
+    if (is_object($object)) $object = get_object_vars($object);
+    return is_array($object) ? array_map(__FUNCTION__, $object) : $object;
+}
+
 function array_post_fields($fieldnames, $delimiter=',') {
 	//this function is used by format_post_nulls() etc to format $_POST variables
 	//array is a comma-delimited string, spaces are ok
@@ -280,5 +285,13 @@ function array_url($str, $defaults=false, $separator='&') {
 		$return[urldecode($key)] = urldecode($value);
 	}
 	return $return;
+}
+
+function array_xml($stringxml) {
+	//for harvest import -- take data in string xml format and return it as an associative array
+	$data = new SimpleXMLElement($stringxml);
+	if (is_object($data)) {
+		return array_object($data->children());
+	}
 }
 ?>

@@ -86,8 +86,11 @@ class form {
 		//values has default
 		if (!$value && $default) $value = $default;
 		
+		//this is a bad idea
+		//if (!$value && !$required && !$additional) $additional = 'optional';
+		
 		//wrap additional
-		if (isset($additional) && $additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
+		if ($additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
 		
 		//draw the field
 		if ($type == 'hidden') {
@@ -124,7 +127,8 @@ class form {
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
-					$return .= draw_form_date($name, $value, false, false, $required) . $additional;
+					//$return .= draw_form_date($name, $value, false, false, $required) . $additional;
+					$return .= draw_form_date_cal($name, $value) . $additional;
 					break;
 				case 'datetime':
 					$return .= draw_form_date($name, $value, true, false, $required) . $additional;
@@ -238,7 +242,7 @@ class form {
 	
 	function set_table($table) {
 		$this->table = false;
-		if (db_connected() && $cols = db_columns($table, true)) {
+		if ($cols = db_columns($table, true)) {
 		
 			//preload foreign keys
 			$foreign_keys = array();
