@@ -115,7 +115,7 @@ function db_clear($tables=false) { //cant find where this is called from.  obsol
 function db_close($keepalive=false) { //close connection and quit
 	global $_josh;
 	error_debug('<b>db_close</b> there were a total of ' . $_josh['queries'] . ' queries.', __file__, __line__);
-	if (isset($_josh['db']['pointer'])) {
+	if (db_connected()) {
 		if ($_josh['db']['language'] == 'mysql') {
 			@mysql_close($_josh['db']['pointer']);
 		} elseif ($_josh['db']['language'] == 'mssql') {
@@ -173,6 +173,12 @@ function db_columns($tablename, $omitSystemFields=false) {
 		}
 	}
 	return $return;
+}
+
+function db_connected() {
+	//return boolean if database is connected or not -- stop referring to pointer
+	global $_josh;
+	return (isset($_josh['db']['pointer']) && $_josh['db']['pointer']);
 }
 
 function db_date() {
@@ -334,7 +340,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	global $_josh;
 	
 	//skip if already connected
-	if (isset($_josh['db']['pointer'])) return;
+	if (db_connected()) return;
 	
 	error_debug('<b>db_open</b> running', __file__, __line__);
 
@@ -356,11 +362,12 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	}
 
 	//handle error
-	if (!$_josh['db']['pointer']) {
+	if (!db_connected()) {
 		error_handle('Database Connection', 'Most likely, you haven\'t yet configured the variables in ' . $_josh['config'] . '.  It\'s also possible that the database is suddenly down.');
 		exit; //to prevent massive repetition
 	}
-
+	
+	//set utf8 -- todo mssql 2005
 	if ($_josh['db']['language'] == 'mysql') mysql_set_charset('utf8', $_josh['db']['pointer']);
 
 	

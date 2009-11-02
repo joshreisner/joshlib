@@ -238,7 +238,7 @@ class form {
 	
 	function set_table($table) {
 		$this->table = false;
-		if ($cols = db_columns($table, true)) {
+		if (db_connected() && $cols = db_columns($table, true)) {
 		
 			//preload foreign keys
 			$foreign_keys = array();
