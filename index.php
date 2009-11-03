@@ -354,7 +354,7 @@ function language_translate($string, $from, $to) {
 		if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string was ' . strlen($c) . '.  ' . draw_array($json));	
 		$string .= $json['responseData']['translatedText'];
 	}
-	return $string;
+	return format_quotes($string);
 }
 
 function var_name(&$iVar, &$aDefinedVars) {
