@@ -26,6 +26,14 @@ function url_action_add($action=false, $go=false) {
 	return url_query_add(array('action'=>$action), $go);
 }
 
+function url_array($array, $separator='&') {
+	//use array_url() to reverse this
+	//must be key=>value array pairs
+	$pairs = array();
+	foreach ($array as $key=>$value) $pairs[] = rawurlencode($key) . '=' . rawurlencode($value);
+	return implode($separator, $pairs);
+}
+
 function url_base() {
 	global $_josh;
 	return $_josh['request']['protocol'] . '://' . $_josh['request']['host'];
@@ -180,6 +188,14 @@ function url_parse($url) {
 	
 	//protocol is a better word than scheme
 	$return['protocol'] = $return['scheme'];
+	
+	//get socket
+	//todo ~ handle http://www.example.com:80/
+	if ($return ['protocol'] == 'http') {
+		$return['socket'] = 80;
+	} elseif ($return ['protocol'] == 'https') {
+		$return['socket'] = 443;
+	}
 	
 	//get full browser address
 	$return['url'] = $return['protocol'] . '://' . $return['host'] . $return['path_query'];
