@@ -587,7 +587,8 @@ function draw_meta_utf8() {
 	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8')) . $_josh['newline'];
 }
 
-function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/') {
+function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $useid=false) {
+	//useid is for rollover navigation -- use everything after id= instead of slashless url
 	//type could be text, images or rollovers
 	global $_josh;
 	
@@ -629,9 +630,13 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 		if ($type == 'text') {
 			$thisoption .= $title;
 		} elseif (($type == 'images') || ($type == 'rollovers')) {
-			$img = str_replace('/', '', $url);
-			if ($pos = strpos($img, '?')) $img = substr($img, 0, $pos);
-			if (empty($img)) $img = 'home';
+			if ($useid) {
+				$img = substr($url, strpos($url, 'id=') + 3);
+			} else {
+				$img = str_replace('/', '', $url);
+				if ($pos = strpos($img, '?')) $img = substr($img, 0, $pos);
+				if (empty($img)) $img = 'home';
+			}
 			if ($type == 'rollovers') {
 				$javascript .= $name . '_on		 = new Image;' . $_josh['newline'];
 				$javascript .= $name . '_off	 = new Image;' . $_josh['newline'];
