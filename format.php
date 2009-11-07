@@ -237,7 +237,7 @@ function format_html($text) {
 				'a', 'b', 'blockquote', 'br', 'dir', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'i', 'img',
 				'p', 'span', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
 				'object', 'embed', 'param'
-				);
+			);
 			
 			
 			if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : '';
