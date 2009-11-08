@@ -74,6 +74,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	$_josh['month']					= date('n');
 	$_josh['months']				= array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
 	$_josh['mos']					= array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+	$_josh['newline']				= "\n"; //default
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
 	$_josh['queries']				= 0;	//for counting trips to the database
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
@@ -105,6 +106,10 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 			$_josh['request'] .= $_SERVER['SCRIPT_NAME'];
 			if (isset($_SERVER['QUERY_STRING'])) $_josh['request'] .= '?' . $_SERVER['QUERY_STRING'];
 		}
+		
+		//dealing with odd situation where i'm getting requests for http://www.domain.comhttp//www.domain.com/ -- trying to track it down
+		if (substr_count($_josh['request'], 'http') > 1) email('josh@joshreisner.com', draw_array($_SERVER), 'Odd Double-Domain Situation', 'josh@joshreisner.com');
+		
 		$_josh['request'] = url_parse($_josh['request']);
 		
 		//special set $_GET['id']

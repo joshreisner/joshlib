@@ -356,6 +356,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	if ($_josh['db']['language'] == 'mysql') {
 		$_josh['db']['pointer'] = @mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 	} elseif ($_josh['db']['language'] == 'mssql') {
+	die('hi');
 		error_debug('<b>db_open</b> trying to connect mssql on ' . $_josh['db']['location'] . ' with username ' . $_josh['db']['username'], __file__, __line__);
 		$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 		//msssql 2000 doesn't support utf8
@@ -369,7 +370,6 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	
 	//set utf8 -- todo mssql 2005
 	if ($_josh['db']['language'] == 'mysql') mysql_set_charset('utf8', $_josh['db']['pointer']);
-
 	
 	//select db
 	db_switch();
