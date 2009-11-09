@@ -254,6 +254,9 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 					echo 'ERROR';
 				}
 				exit;
+			case 'ajax_updateinplace';
+				echo 'hi there';
+				exit;
 			case 'debug':
 				debug();
 				break;

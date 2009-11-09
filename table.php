@@ -140,6 +140,7 @@ class table {
 	
 	function set_column($name, $class=false, $title=false, $width=false) {
 		$this->columns[] = compact('name', 'class', 'title', 'width');
+		if ($name == 'draggy') $this->set_draggable('draggy');
 	}
 	
 	function set_draggable($draghandle=false) {
