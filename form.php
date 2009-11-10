@@ -271,7 +271,7 @@ class form {
 				} elseif ($c['type'] == 'int') {
 					if (isset($foreign_keys[$c['name']])) {
 						$this->set_field(array('type'=>'select', 'name'=>$key['name'], 'label'=>$key['label'], 'sql'=>'SELECT * FROM ' . $key['ref_table'], 'additional'=>$c['comments'], 'required'=>$c['required']));
-					} else {
+					} elseif ($c['name'] != 'precedence') {
 						$this->set_field(array('type'=>'hidden', 'name'=>$c['name']));
 					}
 				}
