@@ -121,9 +121,17 @@ function array_explode_html($separator, $string) {
 }
 
 function array_insert($array, $position, $value) {
-	//insert an arbitrary $value into a flat $array at a particular $position
+	//insert a $value into a flat $array at a particular $position
     $array_clip = array_splice($array, $position);
     $array[] = $value;
+    $array = array_merge($array, $array_clip);
+    return $array;
+}
+
+function array_insert_assoc($array, $position, $key, $value) {
+	//insert a $value into an associative $array at a particular $position
+    $array_clip = array_splice($array, $position);
+    $array[$key] = $value;
     $array = array_merge($array, $array_clip);
     return $array;
 }

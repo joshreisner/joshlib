@@ -189,7 +189,7 @@ class form {
 	
 	function set_field($array) {
 		//defaults
-		$type = $value = $class = $default = $name = $label = $required = $append = $allow_changes = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $option_title = $object_id = $options = $linking_table = false;
+		$type = $value = $class = $default = $name = $label = $required = $append = $position = $allow_changes = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $option_title = $object_id = $options = $linking_table = false;
 		
 		//load inputs
 		if (!is_array($array)) return error_handle('array not set');
@@ -221,11 +221,23 @@ class form {
 		}
 
 		//package and save
-		$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength');
+		if ($position === false) {
+			$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength');
+		} else {
+			$this->fields = array_insert_assoc($this->fields, $position, $name, compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength'));
+		}
 	}
 	
-	function set_group($string='') {
-		$this->set_field(array('name'=>'group', 'type'=>'group', 'value'=>$string));
+	function set_field_label($name, $label='') {
+		if (isset($this->fields[$name])) $this->fields[$name]['label'] = $label;
+	}
+	
+	function set_field_labels($pairs) {
+		foreach ($pairs as $name=>$label) $this->set_field_label($name, $label);
+	}
+	
+	function set_group($string='', $position=false) {
+		$this->set_field(array('name'=>'group' . (($position) ? $position : count($this->fields)), 'type'=>'group', 'value'=>$string, 'position'=>$position, 'label'=>''));
 	}
 	
 	function set_order($strorder='') {
@@ -321,8 +333,8 @@ class form {
 		}
 	}
 	
-	function unset_fields($fieldnames) {
-		$fields = array_post_fields($fieldnames);
+	function unset_fields($fields) {
+		if (!is_array($fields)) $fields = array_post_fields($fields);
 		foreach ($fields as $f) unset($this->fields[$f]);
 	}
 }
