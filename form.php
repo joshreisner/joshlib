@@ -106,6 +106,7 @@ class form {
 					break;
 				case 'checkboxes':
 					if (!$option_title) {
+						if (!$options_table) error_handle('options table not set', 'please specify your options table', __file__, __line__, __function__);
 						//$option_title = 'title';
 						if ($options_columns = db_columns($options_table)) {
 							$option_title = $options_columns[1]['name'];
