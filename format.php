@@ -22,12 +22,17 @@ function format_accents_encode($string) {
 }
 
 function format_array_text($array) {
-	//string_array?
-	if (count($array) > 1) {
+	if (!is_array($array)) {
+		//string
+		return $array;
+	} elseif (!count($array)) {
+		//empty array
+		return '';
+	} elseif (count($array) == 1) {
+		return $array[0];
+	} else {
 		$last = array_pop($array);
 		return implode(', ', $array) . ' and ' . $last;
-	} else {
-		return $array[0];
 	}
 }
 
