@@ -537,7 +537,12 @@ function draw_javascript_src($filename=false) {
 }
 
 function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
-	if (!$args)	$args = array();
+	if (!$args)	{
+		$args = array();
+	} elseif (!is_array($args)) {
+		//if args is a string, make it the link's class
+		$args = array('class'=>$args);
+	}
 	if (!$href) return $str;
 	
 	//obfuscate email
