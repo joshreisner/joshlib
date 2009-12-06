@@ -107,10 +107,16 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 			if (isset($_SERVER['QUERY_STRING'])) $_josh['request'] .= '?' . $_SERVER['QUERY_STRING'];
 		}
 		
-		//dealing with odd situation where i'm getting requests for http://www.domain.comhttp//www.domain.com/ -- trying to track it down
-		if (substr_count($_josh['request'], 'http') > 1) email('josh@joshreisner.com', draw_array($_SERVER), 'Odd Double-Domain Situation', 'josh@joshreisner.com');
-		
 		$_josh['request'] = url_parse($_josh['request']);
+		
+		//dealing with odd situation where i'm getting requests for http://www.domain.comhttp//www.domain.com/ -- trying to track it down
+		//it's an issue for database connections
+		if (stristr($_josh['request']['sanswww'], 'http')) {
+			email('josh@joshreisner.com', draw_array($_SERVER) . $_josh['request'], 'Odd Double-Domain Situation', 'josh@joshreisner.com');
+		} elseif (substr($_josh['request']['sanswww'], -1) == '.') {
+			//seeing this error too http://livingcities.org./
+			$_josh['request']['sanswww'] = substr($_josh['request']['sanswww'], 0, -1);
+		}
 		
 		//special set $_GET['id']
 		if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
