@@ -576,10 +576,20 @@ function draw_list($options, $args_or_class=false, $type='ul', $selected=false) 
 		if ($counter == 1) $liclass .= ' first';
 		if ($counter == $count) $liclass .= ' last';
 		if ($selected == ($i + 1)) $liclass .= ' selected';
+		if ($options[$i] == false) $options[$i] = '';
 		$options[$i] = draw_tag('li', array('class'=>$liclass), $options[$i]);
 		$counter++;
 	}
 	return draw_tag($type, $args_or_class, implode($options,  "\t"));
+}
+
+function draw_list_db($table_or_sql, $linkprefix='', $args_or_class=false, $type='ul', $selected=false) {
+	//experiment.  draw_list_table('blog_categories', '/c/?id=') will return a UL with a list of links
+	//todo: add better behaviors like if id column dne, or something
+	if (!stristr($table_or_sql, ' ')) $table_or_sql = 'SELECT id, title FROM ' . $table_or_sql . ' t WHERE t.is_active = 1 ORDER BY t.precedence';
+	$result = db_table($table_or_sql);
+	foreach ($result as &$r) $r = draw_link($linkprefix . $r['id'], $r['title']);
+	return draw_list($result, $args_or_class, $type, $selected);
 }
 
 function draw_meta_description($string) {
