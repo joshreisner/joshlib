@@ -128,8 +128,8 @@ class form {
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
-					//$return .= draw_form_date($name, $value, false, false, $required) . $additional;
-					$return .= draw_form_date_cal($name, $value) . $additional;
+					$return .= draw_form_date($name, $value, false, false, $required) . $additional;
+					//return .= draw_form_date_cal($name, $value) . $additional;
 					break;
 				case 'datetime':
 					$return .= draw_form_date($name, $value, true, false, $required) . $additional;
