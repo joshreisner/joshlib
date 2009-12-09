@@ -107,6 +107,10 @@ function url_id($index='id') {
 	return false;
 }
 
+function url_id_add($id=false, $go=false) {
+	return url_query_add(array('id'=>$id), $go);
+}
+
 function url_parse($url) {
 	global $_josh;
 	error_debug('<b>url_parse</b> running for  ' . $url, __file__, __line__);

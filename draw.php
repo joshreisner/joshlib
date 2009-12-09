@@ -178,7 +178,7 @@ function draw_form_checkbox($name, $checked=false, $class=false, $javascript=fal
 }
 
 function draw_form_checkboxes($name, $linking_table=false, $object_col=false, $option_col=false, $id=false) {
-	if (stristr($name, '_')) error_handle('draw_form_checkboxes()', 'an error occurred with the calling of this function; you can\'t have an underscore in the field name', true);
+	if (stristr($name, '_')) error_handle('draw_form_checkboxes()', 'an error occurred with the calling of this function; you can\'t have an underscore in the field name', __file__. __line__);
 	if ($linking_table) {
 		$result = db_query('SELECT o.id, o.value, (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_col . ' = o.id AND ' . $object_col . ' = ' . $id . ') checked  FROM option_' . $name . ' o ORDER BY value');
 	} else {
@@ -695,6 +695,18 @@ function draw_page($title, $html) {
 
 function draw_rss_link($address) {
 	return draw_tag('link', array('rel'=>'alternate', 'type'=>'application/rss+xml', 'title'=>'RSS', 'href'=>$address));
+}
+
+function draw_span($class, $inner) {
+	//eg draw_span('title', $r) == draw_container('span', $r['title'], array('class'=>'title')) == '<span class="title">' . $r['title'] . '</span>'
+	if (is_array($inner)) {
+		if (isset($inner[$class])) {
+			$inner = $inner[$class];
+		} else {
+			error_handle('$inner not set', __function__ . ' is looking for ' . $class . ' to be a key in the array passed'. __file__, __line__);
+		}
+	}
+	return draw_container('span', $inner, array('class'=>$class));
 }
 
 function draw_swf($path, $width, $height, $border=0) {
