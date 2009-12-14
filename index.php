@@ -11,6 +11,7 @@ THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
 	--title-------------lang----version---------url---------------------------------------------license-------------------------
+	> ckeditor			(js)	version 3.0.1	http://ckeditor.com/							GPL, LGPL and MPL
 	> codepress			(js)	version 0.9.6	http://sourceforge.net/projects/codepress/		LGPL
 	> fpdf				(php)	version 1.6		http://www.fpdf.org/							no license
 	> prototype			(js)	version 1.6.0.3	http://prototypejs.org/							MIT
