@@ -503,14 +503,25 @@ function draw_javascript($javascript=false) {
 	';
 }
 
-function draw_javascript_lib() {
+function draw_javascript_ckeditor() {
 	global $_josh;
-	return 
-	draw_javascript_src() .
+	return draw_javascript_src($_josh['write_folder'] . '/lib/ckeditor/ckeditor.js');
+}
+
+function draw_javascript_lib($editor='tinymce') {
+	//todo, replace tinymce default with ckeditor, if that goes ok
+	global $_josh;
+	$return = draw_javascript_src() .
 	draw_javascript_src($_josh['write_folder'] . '/lib/prototype-1.5.js') .
-	draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous.js') .
-	draw_javascript_src($_josh['write_folder'] . '/lib/tiny_mce/tiny_mce.js') .
-	draw_javascript('form_tinymce_init("/styles/tinymce.css")');
+	draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous.js');
+	
+	if ($editor == 'tinymce') {
+		$return .= draw_javascript_src($_josh['write_folder'] . '/lib/tiny_mce/tiny_mce.js') . draw_javascript('form_tinymce_init("/styles/tinymce.css")');
+	} elseif ($editor == 'ckeditor') {
+		$return .= draw_javascript_ckeditor();
+	}
+	
+	return $return;
 }
 
 function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='/_site/tiny_mce/tiny_mce.js') {
