@@ -229,12 +229,21 @@ class form {
 		}
 	}
 	
-	function set_field_label($name, $label='') {
-		if (isset($this->fields[$name])) $this->fields[$name]['label'] = $label;
+	function set_field_default($name, $value='') {
+		$this->set_field_property($name, 'default', $value);
+	}
+	
+	function set_field_label($name, $value='') {
+		$this->set_field_property($name, 'label', $value);
 	}
 	
 	function set_field_labels($pairs) {
-		foreach ($pairs as $name=>$label) $this->set_field_label($name, $label);
+		foreach ($pairs as $name=>$value) $this->set_field_label($name, $value);
+	}
+
+	function set_field_property($name, $property, $value=false) {
+		//generic field property setter
+		if (isset($this->fields[$name])) $this->fields[$name][$property] = $value;
 	}
 	
 	function set_group($string='', $position=false) {

@@ -264,7 +264,13 @@ function map_marker(latitude, longitude, html, icon) {
 
 
 /* scroll*/
-function scroll_init(which, count, width, hashes) {
+//this should really be a class, sorry
+
+function scroll_auto() {
+	scroll_direction('right', true);
+}
+
+function scroll_init(which, count, width, hashes, auto_interval) {
 	scroll_element		= document.getElementById(which);
 	scroll_current		= 1;
 	scroll_count		= count;
@@ -280,16 +286,22 @@ function scroll_init(which, count, width, hashes) {
 			window.location.hash = "";
 		}
 	}
+	
+	if (auto_interval) {
+		interval = setInterval("scroll_auto()", auto_interval);
+	} else {
+		interval = false;
+	}
 }
 
-function scroll_direction(direction) {
+function scroll_direction(direction, dont_clear_interval) {
 	if (!scroll_initialized || scrolling) return false;
 	if (direction == "left") {
 		newPallet		= (scroll_current == 1) ? scroll_count : scroll_current - 1;
 	} else {
 		newPallet		= (scroll_current == scroll_count) ? 1 : (scroll_current - 0) + 1;
 	}
-	scroll_to(newPallet);
+	scroll_to(newPallet, dont_clear_interval);
 }
 
 function scroll_horizontally() {
@@ -305,8 +317,9 @@ function scroll_horizontally() {
 	}
 }
 
-function scroll_to(newPallet) {
+function scroll_to(newPallet, dont_clear_interval) {
 	if (!scroll_initialized || scrolling) return false;
+	if (interval && !dont_clear_interval) clearInterval(interval);
 	scrolling = true;
 	if (typeof(scrollStarted) == "function") scrollStarted(newPallet);
 	currentLocation		= ((scroll_current - 1) * scroll_width);
