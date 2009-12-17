@@ -181,8 +181,10 @@ class form {
 					$return .= draw_form_textarea($name, $value, $class) . $additional;
 					if (!$_josh['drawn']['tinymce'] && ($class == 'tinymce')) {
 						$return .= draw_javascript_src($_josh['write_folder'] . '/lib/tiny_mce/tiny_mce.js') . draw_javascript('form_tinymce_init("/styles/tinymce.css")');
+						$_josh['drawn']['tinymce'] = true;
 					} elseif (!$_josh['drawn']['ckeditor'] && ($class == 'ckeditor')) {
 						$return .= draw_javascript_ckeditor();
+						$_josh['drawn']['ckeditor'] = true;
 					}
 					break;
 			}
