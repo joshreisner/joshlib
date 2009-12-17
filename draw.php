@@ -508,21 +508,24 @@ function draw_javascript_ckeditor() {
 	return draw_javascript_src($_josh['write_folder'] . '/lib/ckeditor/ckeditor.js');
 }
 
-function draw_javascript_lib($editor='tinymce') {
-	//todo, replace tinymce default with ckeditor, if that goes ok
+function draw_javascript_lib() {
 	global $_josh;
-	$return = draw_javascript_src() .
-	draw_javascript_src($_josh['write_folder'] . '/lib/prototype-1.5.js') .
-	draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous.js');
-	
-	/* putting this in form now which is where it should really go
-	if ($editor == 'tinymce') {
-		$return .= draw_javascript_src($_josh['write_folder'] . '/lib/tiny_mce/tiny_mce.js') . draw_javascript('form_tinymce_init("/styles/tinymce.css")');
-	} elseif ($editor == 'ckeditor') {
-		$return .= draw_javascript_ckeditor();
+	return draw_javascript_src() .
+		draw_javascript_src($_josh['write_folder'] . '/lib/prototype-1.5.js') .
+		draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous.js');
+}
+
+function draw_javascript_link($target, $text, $id=false, $class=false) {
+	//so as to avoid return false;
+	$id = ($id) ? ' id="' . $id . '"' : '';
+	$class = ($class) ? ' class="' . $class . '"' : '';
+	if ($target) {
+		if (stristr($target, '"')) $target = str_replace('"', "'", $target);
+		$target = ' onclick="javascript:' . $target . ';"';
+	} else {
+		$target = '';
 	}
-	*/
-	return $return;
+	return '<a style="cursor:pointer;"' . $target . $id . $class . '>' . $text . '</a>';
 }
 
 function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='/_site/tiny_mce/tiny_mce.js') {
