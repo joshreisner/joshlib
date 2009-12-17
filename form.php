@@ -179,6 +179,11 @@ class form {
 					break;
 				case 'textarea':
 					$return .= draw_form_textarea($name, $value, $class) . $additional;
+					if (!$_josh['drawn']['tinymce'] && ($class == 'tinymce')) {
+						$return .= draw_javascript_src($_josh['write_folder'] . '/lib/tiny_mce/tiny_mce.js') . draw_javascript('form_tinymce_init("/styles/tinymce.css")');
+					} elseif (!$_josh['drawn']['ckeditor'] && ($class == 'ckeditor')) {
+						$return .= draw_javascript_ckeditor();
+					}
 					break;
 			}
 						
@@ -281,7 +286,8 @@ class form {
 						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required'], 'maxlength'=>$c['length']));
 					}
 				} elseif ($c['type'] == 'text') {
-					$this->set_field(array('type'=>'textarea', 'name'=>$c['name'], 'class'=>'mceEditor'));
+					//todo make tinymce reference dynamic here
+					$this->set_field(array('type'=>'textarea', 'name'=>$c['name'], 'class'=>'tinymce'));
 				} elseif (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
 					$this->set_field(array('type'=>'checkbox', 'name'=>$c['name']));
 				} elseif ($c['type'] == 'date') {
@@ -325,10 +331,7 @@ class form {
 	}
 	
 	function set_title($title=false) {
-		//title should be a string, and indicates you want a title dd at the top of your form
-		//if you don't pass a $title, there had better be a title already set via the constructor
 		if ($title) $this->title = $title;
-		array_unshift($this->fields, array('type'=>'title', 'name'=>'','class'=>'title', 'value'=>$this->title, 'label'=>false));
 	}
 	
 	function set_title_prefix($prefix=false) {

@@ -146,8 +146,7 @@ function form_tinymce_init(cssLocation) {
 		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[align|style],p[align]",
 		content_css : cssLocation + "?" + new Date().getTime(),
 		plugins : "imagemanager,filemanager",
-		editor_selector : "mceEditor",
-		editor_deselector : "mceNoEditor",
+		editor_selector : "tinymce",
 		relative_urls : false,
 		remove_script_host : false
 	});

@@ -515,12 +515,13 @@ function draw_javascript_lib($editor='tinymce') {
 	draw_javascript_src($_josh['write_folder'] . '/lib/prototype-1.5.js') .
 	draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous.js');
 	
+	/* putting this in form now which is where it should really go
 	if ($editor == 'tinymce') {
 		$return .= draw_javascript_src($_josh['write_folder'] . '/lib/tiny_mce/tiny_mce.js') . draw_javascript('form_tinymce_init("/styles/tinymce.css")');
 	} elseif ($editor == 'ckeditor') {
 		$return .= draw_javascript_ckeditor();
 	}
-	
+	*/
 	return $return;
 }
 

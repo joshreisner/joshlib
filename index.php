@@ -60,8 +60,10 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	
 //set static variables
 	//todo, limit these
-	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
+	$_josh['drawn']['ckeditor']		= false;	//only include ckeditor js once
 	$_josh['drawn']['focus']		= false;	//only autofocus on one form element
+	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
+	$_josh['drawn']['tinymce']		= false;	//only include tinymce js once
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
 									'as','at','be','because','been','before','being','between','both','but','by','came','can','come',
 									'could','did','do','does','each','else','for','from','get','got','has','had','he','have','her','here',
