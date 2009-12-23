@@ -172,7 +172,12 @@ class form {
 					$return .= draw_form_select($name, $options, $value, $required, $class, $action) . $additional;
 					break;
 				case 'submit':
-					$return .= draw_form_submit($value, $class) . $additional;
+					if (substr($value, 0, 1) == '/') {
+						//if the button text starts with a / then the implication is it's an image
+						$return .= draw_form_img($value, $class) . $additional;						
+					} else {
+						$return .= draw_form_submit($value, $class) . $additional;
+					}
 					break;
 				case 'text':
 					$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
@@ -234,6 +239,10 @@ class form {
 		} else {
 			$this->fields = array_insert_assoc($this->fields, $position, $name, compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength'));
 		}
+	}
+	
+	function set_field_class($name, $value='') {
+		$this->set_field_property($name, 'class', $value);
 	}
 	
 	function set_field_default($name, $value='') {

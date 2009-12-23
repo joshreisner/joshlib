@@ -257,6 +257,11 @@ function draw_form_hidden($name, $value='') {
 	return draw_tag('input', array('type'=>'hidden', 'name'=>$name, 'id'=>$name, 'value'=>$value));
 }
 
+function draw_form_img($url, $class='submit') {
+	if (empty($class)) $class = 'submit';
+	return draw_tag('input', array('type'=>'image', 'src'=>$url, 'class'=>$class));
+}
+
 function draw_form_password($name, $value='', $class=false, $maxlength=255) {
 	global $_josh;
 	$class = ($class) ? $class . ' password' : 'password';
