@@ -53,12 +53,16 @@ function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
 	//function file_dynamic($filename, $lastmod, $query);
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
 	$filename = $_josh['write_folder'] . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
+	error_debug('<b>' . __function__ . '</b> running with filename = ' . $filename, __file__, __line__);
 	if (!$lastmod || !file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) {
 		if ($content = db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id)) {
 			file_put($filename, $content);
 		} else {
+			error_debug('<b>' . __function__ . '</b> returning false because no select', __file__, __line__);
 			return false;
 		}
+	} else {
+		error_debug('<b>' . __function__ . '</b> if statement did not qualify', __file__, __line__);	
 	}
 	return $filename;
 }
