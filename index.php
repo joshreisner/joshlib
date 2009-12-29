@@ -115,7 +115,8 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		//dealing with odd situation where i'm getting requests for http://www.domain.comhttp//www.domain.com/ -- trying to track it down
 		//it's an issue for database connections
 		if (stristr($_josh['request']['sanswww'], 'http')) {
-			email('josh@joshreisner.com', draw_array($_SERVER) . $_josh['request'], 'Odd Double-Domain Situation', 'josh@joshreisner.com');
+			email('josh@joshreisner.com', draw_array($_SERVER) . draw_array($_josh['request']), 'Double-Domain Error', 'josh@joshreisner.com');
+			url_change(false);
 		} elseif (substr($_josh['request']['sanswww'], -1) == '.') {
 			//seeing this error too http://livingcities.org./
 			$_josh['request']['sanswww'] = substr($_josh['request']['sanswww'], 0, -1);
