@@ -92,6 +92,8 @@ class form {
 		//wrap additional
 		if ($additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
 		
+		error_debug('<b>' . __function__ . '</b> drawing field ' . $name . ' of type ' . $type, __file__, __line__);
+
 		//draw the field
 		if ($type == 'hidden') {
 			$return .= draw_form_hidden($name, $value);
@@ -213,8 +215,6 @@ class form {
 
 		if ((($type == 'text') || ($type == 'password')) && !isset($array['additional']) && $required) $additional = '(required)';
 
-		error_debug('adding field ' . $label, __file__, __line__);
-
 		if (!$name)	$name	= format_text_code($label);
 		if (($label === false) && ($type != 'submit')) {
 			if ($label = format_text_ends('_id', $name)) {
@@ -233,10 +233,13 @@ class form {
 			$label = '&nbsp;';
 		}
 
+		error_debug('<b>' . __function__ . '</b> adding ' . $name . ' of type ' . $type, __file__, __line__);
+
 		//package and save
 		if ($position === false) {
 			$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength');
 		} else {
+			if (isset($this->fields[$name])) unset($this->fields[$name]);
 			$this->fields = array_insert_assoc($this->fields, $position, $name, compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength'));
 		}
 	}

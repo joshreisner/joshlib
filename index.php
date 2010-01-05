@@ -96,14 +96,24 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	require($_josh['joshlib_folder'] . '/table.php');
 	require($_josh['joshlib_folder'] . '/url.php');
 
-//parse environment variables
-	if (isset($_SERVER) && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SCRIPT_NAME'])) { //this could not be set if this were running from the command line (eg by a cron)
+/*parse environment variables
+	the server variables that this script depends on are
+		HTTP_HOST www.example.com required
+		SCRIPT_NAME /index.php required
+		HTTPS on (or not present)
+		REQUEST_URI / (sometimes this shows the entire http://www.example.com/ request.  i believe it's when i redirect with url_change or url_query_add, etc)
+		*/
+	if (isset($_SERVER) && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SCRIPT_NAME'])) { //this would not be set if this were running from the command line (eg by a cron)
 		//build request as string, then set it to array with url_parse
 		$_josh['request'] = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) ? 'https' : 'http';
 		$_josh['request'] .= '://' . $_SERVER['HTTP_HOST'];
+		
+		//sometimes getting this error http://www.example.com./
+		if (substr($_josh['request'], -1) == '.') $_josh['request'] = substr($_josh['request'], 0, -1);
+		
+		//check if we're using mod_rewrite
 		if (isset($_SERVER['REDIRECT_URL'])) {
-			//we are using mod_rewrite, probably as part of a CMS system
-			$_josh['request'] .= $_SERVER['REQUEST_URI'];
+			$_josh['request'] .= str_ireplace($_josh['request'], '', $_SERVER['REQUEST_URI']); //sometimes REQUEST_URI contains full http://www.example.com when it should not, due (i think) to redirection with url_query_add() or the like
 			$_GET = array_merge($_GET, url_query_parse($_josh['request']));
 		} else {
 			$_josh['request'] .= $_SERVER['SCRIPT_NAME'];
@@ -111,17 +121,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		}
 		
 		$_josh['request'] = url_parse($_josh['request']);
-		
-		//dealing with odd situation where i'm getting requests for http://www.domain.comhttp//www.domain.com/ -- trying to track it down
-		//it's an issue for database connections
-		if (stristr($_josh['request']['sanswww'], 'http')) {
-			email('josh@joshreisner.com', draw_array($_SERVER) . draw_array($_josh['request']), 'Double-Domain Error', 'josh@joshreisner.com');
-			url_change(false);
-		} elseif (substr($_josh['request']['sanswww'], -1) == '.') {
-			//seeing this error too http://livingcities.org./
-			$_josh['request']['sanswww'] = substr($_josh['request']['sanswww'], 0, -1);
-		}
-		
+				
 		//special set $_GET['id']
 		if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
 			
