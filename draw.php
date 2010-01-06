@@ -478,7 +478,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	//assemble tag
 	$args = array('src'=>url_base() . $path, 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
 	if (is_array($alt)) {
-		//values of alt can overwrite width, height, border, even src but that could get ugly -- maybe i should prevent that?
+		//values of alt can overwrite width, height, border, even src
 		$args = array_merge($args, $alt);
 	} else {
 		$args['alt'] = $alt;
