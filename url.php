@@ -238,8 +238,9 @@ function url_query_add($adds, $go=true, $path=false) { //add specified query arg
 	$target = url_base() . (($path) ? $path : $_josh['request']['path']);
 	//$adds = array_unique(array_merge($_GET, $adds));
 	$adds = array_merge($_GET, $adds);
+	$pairs = array();
 	if (count($adds)) foreach ($adds as $key=>$value) if ($value) $pairs[] = $key . '=' . urlencode($value);
-	sort($pairs);
+	if (count($pairs)) sort($pairs);
 	if (count($pairs)) $target .= '?' . implode('&', $pairs);
 	if ($go) url_change($target);
 	return $target;
