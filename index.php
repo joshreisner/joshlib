@@ -10,15 +10,16 @@ LICENSE
 THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
-	--title-------------lang----version---------url---------------------------------------------license-------------------------
-	> ckeditor			(js)	version 0.9.6	http://ckeditor.com/							GPL, LGPL and MPL
-	> codepress			(js)	version 0.9.6	http://sourceforge.net/projects/codepress/		LGPL
-	> fpdf				(php)	version 1.6		http://www.fpdf.org/							no license
-	> prototype			(js)	version 1.6.0.3	http://prototypejs.org/							MIT
-	> lightbox			(js)	version 2.04	http://www.lokeshdhakar.com/projects/lightbox2/	Creative Commons Attribution 2.5
-	> scriptaculous		(js)	version 1.8.2	http://script.aculo.us/							MIT (I think)
-	> simple_html_dom	(php)	version 1.11	http://sourceforge.net/projects/simplehtmldom/	MIT
-	> tinymce			(js)	version 3.2.5	http://tinymce.moxiecode.com/					LGPL
+	--title-------------lang----url---------------------------------------------license-------------------------
+	> ckeditor			(js)	http://ckeditor.com/							GPL, LGPL and MPL
+	> codepress			(js)	http://sourceforge.net/projects/codepress/		LGPL
+	> fpdf				(php)	http://www.fpdf.org/							no license
+	> lightbox2			(js)	http://www.lokeshdhakar.com/projects/lightbox2/	Creative Commons Attribution 2.5
+	> prototype			(js)	http://prototypejs.org/							MIT
+	> salesforce		(php)	http://developer.force.com/						~ not sure.  this is just an API
+	> scriptaculous		(js)	http://script.aculo.us/							MIT (I think)
+	> simple_html_dom	(php)	http://sourceforge.net/projects/simplehtmldom/	MIT
+	> tinymce			(js)	http://tinymce.moxiecode.com/					LGPL
 
 VARIABLES THAT JOSHLIB TRIES TO GET FROM THE WEBSERVER -- IF YOU'RE RUNNING FROM THE COMMAND LINE YOU MIGHT NEED TO PASS THEM
 	$_josh['request']			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)

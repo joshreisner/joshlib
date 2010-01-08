@@ -516,8 +516,8 @@ function draw_javascript_ckeditor() {
 function draw_javascript_lib() {
 	global $_josh;
 	return draw_javascript_src() .
-		draw_javascript_src($_josh['write_folder'] . '/lib/prototype-1.5.js') .
-		draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous.js');
+		draw_javascript_src($_josh['write_folder'] . '/lib/prototype/prototype-1.5.0.js') .
+		draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js');
 }
 
 function draw_javascript_link($target, $text, $id=false, $class=false) {

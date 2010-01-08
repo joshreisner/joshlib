@@ -133,13 +133,22 @@ function format_date_rss($timestamp=false) {
 	return date(DATE_RSS, $timestamp);
 }
 
-function format_date_sql($month, $day, $year, $hour=0, $minute=0, $second=1) {
-	//db_date?  db_date_format?
-	if (!empty($month) && !empty($day) && !empty($year)) {
-		return '"' . date('Y-m-d H:i:00', mktime($hour, $minute, $second, $month, $day, $year)) . '"';
-	} else {
-		return 'NULL';
+function format_date_sql($month, $day=false, $year=false, $hour=false, $minute=false, $second=false) {	
+	//format a date for sql
+
+	if (!$day) {
+		//new functionality; month could be a timestamp that needs to be converted a sql-ready date 
+		if (empty($month)) return 'NULL';
+		$date = strToTime($month);
+	} elseif (!$hour) {
+		//restore old defaults
+		$hour = 0;
+		$minute = 0;
+		$second = 1;
+		$date = mktime($hour, $minute, $second, $month, $day, $year);
 	}
+	
+	return '"' . date('Y-m-d H:i:00', $date) . '"';
 }
 
 function format_date_time($timestamp=false, $error='', $separator='&nbsp;', $suppressMidnight=true, $relativetime=true) {
@@ -219,7 +228,7 @@ function format_hilite($haystack, $needles, $style='background-color:#FFFFBB;pad
 
 function format_html($text) {
 	global $_josh;
-	require_once($_josh['root'] . $_josh['write_folder'] . '/lib/simple_html_dom.php');
+	require_once($_josh['root'] . $_josh['write_folder'] . '/lib/simple_html_dom/simple_html_dom-1.11.php');
 	$html = str_get_html($text);
 
 	$html->set_callback('cleanup');
