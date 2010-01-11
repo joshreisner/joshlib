@@ -40,18 +40,21 @@ function draw_autorefresh($minutes=5) {
 	return draw_tag('meta', array('http-equiv'=>'refresh', 'content'=>$minutes * 60));
 }
 
-function draw_calendar($month, $year, $events=false) {
-	//for livingcities roundup
-	//$events is an optional 2d array that you can pass in (from db via db_table) that's looking for the following values
-	//title -- required -- the event title
-	//day -- required (1, 2, 3 ... 31)
-	//link -- if the event should be linked
-	//color -- if there should be a background color to its div
-	
+function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar') {
+	/*
+		for livingcities roundup
+		$events is an optional 2d array that you can pass in (from db via db_table) that's looking for the following values
+			title -- required -- the event title
+			day -- required (1, 2, 3 ... 31)
+			link -- if the event should be linked
+			color -- if there should be a background color to its div
+	*/
 	global $_josh;
 	
 	//reprocess the events into a different kind of array
 	$cal_events = array();
+	if (!$month) $month = $_josh['month'];
+	if (!$year) $year = $_josh['year'];
 	if ($events) {
 		foreach ($events as $e)	{
 			$e['title'] = format_string($e['title']);
@@ -68,24 +71,24 @@ function draw_calendar($month, $year, $events=false) {
 	$days_short = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
 	$days_long = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
 	
-	$return = '';
-	for ($i = 0; $i < 7; $i++) $return .= '<div class="header ' . $days_short[$i] . '">' . $days_long[$i] . '</div>';
+	$return = ($_josh['mode'] == 'dev') ? $_josh['newline'] . $_josh['newline'] . '<!--calendar ' . $divclass . ' starts -->' . $_josh['newline'] : '';
+	for ($i = 0; $i < 7; $i++) $return .= draw_div_class('header ' . $days_short[$i], $days_long[$i]);
 	for ($week = 1, $thisday = 1; ($thisday < $lastday); $week++) {
 		for ($day = 1; $day <= 7; $day++) {
 			$thisday = (((7 * ($week - 1)) + $day) - $firstday);
 			if ($thisday > 0 && $thisday <= $lastday) {
 				$class = 'day';
 				if (($year == $_josh['year']) && ($month == $_josh['month']) && ($thisday == $_josh['today'])) $class .= ' today';
-				$return .= '<div class="' . $class . ' ' . $days_short[$day-1] . '"><div class="number">' . $thisday . '</div>';
+				if (isset($cal_events[$thisday])) $class .= ' events';
+				$return .= draw_div_class($class . ' ' . $days_short[$day-1], '<div class="number">' . $thisday . '</div>');
 				$return .= @$cal_events[$thisday];
-				$return .= '</div>';
 			} else {
-				$return .= '<div class="blank ' . $days_short[$day-1] . '"></div>';
+				$return .= draw_div_class('blank ' . $days_short[$day-1]);
 			}
 		}
 	}
 	
-	return draw_div_class('calendar', $return);
+	return draw_div_class($divclass, $return);
 }
 
 function draw_css($content) {
