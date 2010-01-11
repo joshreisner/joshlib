@@ -376,6 +376,19 @@ function language_translate($string, $from, $to) {
 	return format_quotes($string);
 }
 
+function lib_location($string) {
+	global $_josh;
+	
+	//i'm thinking i'll start a lib.php file
+	switch ($string) {
+		case 'tinymce' :
+		$return = '/tinymce/tinymce-3.2.7/tiny_mce.js';
+		break;
+	}
+	
+	return $_josh['write_folder'] . '/lib' . $return;
+}
+
 function var_name(&$iVar, &$aDefinedVars) {
 	//get the name of the variable you are passing in
 	//via http://mach13.com/how-to-get-a-variable-name-as-a-string-in-php
