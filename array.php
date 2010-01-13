@@ -145,6 +145,7 @@ function array_key_filter($array, $key, $value) {
 }
 
 function array_object($object) {
+	//convert object to associative array
     if (is_object($object)) $object = get_object_vars($object);
     return is_array($object) ? array_map(__FUNCTION__, $object) : $object;
 }

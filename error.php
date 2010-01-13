@@ -135,7 +135,7 @@ function error_handle($type, $message="", $file=false, $line=false, $function=fa
 }
 
 function error_handle_exception($exception) {
-	return error_handle('Exception Error', $description);
+	return error_handle('Exception Error', $exception);
 }
 
 function error_handle_php($number, $message, $file, $line) {
