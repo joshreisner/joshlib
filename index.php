@@ -182,6 +182,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	}
 	
 //ensure lib exists
+	//todo autogen lib folder when lib.zip has been updated
 	if (!is_dir($_josh['root'] . $_josh['write_folder'] . $_josh['folder'] . 'lib')) {
 		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'dynamic');	//used by file_dynamic
 		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'files');		//used by tinymce
@@ -381,12 +382,18 @@ function lib_location($string) {
 	
 	//i'm thinking i'll start a lib.php file
 	switch ($string) {
+		case 'prototype' :
+		return $_josh['write_folder'] . '/lib/prototype/prototype-1.5.0.js';
+		
+		case 'scriptaculous' :
+		return $_josh['write_folder'] . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js';
+		
+		case 'simple_html_dom' :
+		return $_josh['root'] . $_josh['write_folder'] . '/lib/simple_html_dom/simple_html_dom-1.11.php';
+
 		case 'tinymce' :
-		$return = '/tinymce/tinymce-3.2.7/tiny_mce.js';
-		break;
+		return $_josh['write_folder'] . '/lib/tinymce/tinymce-3.2.7/tiny_mce.js';
 	}
-	
-	return $_josh['write_folder'] . '/lib' . $return;
 }
 
 function var_name(&$iVar, &$aDefinedVars) {

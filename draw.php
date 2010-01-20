@@ -519,8 +519,8 @@ function draw_javascript_ckeditor() {
 function draw_javascript_lib() {
 	global $_josh;
 	return draw_javascript_src() .
-		draw_javascript_src($_josh['write_folder'] . '/lib/prototype/prototype-1.5.0.js') .
-		draw_javascript_src($_josh['write_folder'] . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js');
+		draw_javascript_src(lib_location('prototype')) .
+		draw_javascript_src(lib_location('scriptaculous'));
 }
 
 function draw_javascript_link($target, $text, $id=false, $class=false) {
@@ -538,6 +538,7 @@ function draw_javascript_link($target, $text, $id=false, $class=false) {
 
 function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='/_site/tiny_mce/tiny_mce.js') {
 	//todo deprecated
+	error_handle(__FUNCTION__ . ' is deprecated', __file__, __line__);
 	return draw_javascript_src() . draw_javascript_src($path_script) . draw_javascript('form_tinymce_init("' . $path_css . '");');
 }
 
