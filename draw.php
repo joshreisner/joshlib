@@ -148,6 +148,10 @@ function draw_favicon($location='/images/favicon.png') {
 	return draw_tag('link', array('rel'=>'shortcut icon', 'href'=>$location, 'type'=>'image/png')); 
 }
 
+function draw_file_icon($filename, $link=true) {
+	return file_icon($filename, $link);
+}
+
 function draw_focus($form_element) {
 	global $_josh;
 	if ($_josh['drawn']['focus']) return false;

@@ -164,16 +164,28 @@ function format_date_time($timestamp=false, $error='', $separator='&nbsp;', $sup
 }
 
 function format_date_time_range($start, $end) {
-	//under dev
+	//return a string date range, like Jan 21-22 2010, or Jan 8 from 11-11:30am
 	$start	= strtotime($start);
 	$end	= strtotime($end);
 	
-	if (format_date($start) == format_date($end)) {
-		//occur on same day
-		return format_date($start) . ' from ' . format_time($start) . ' to ' . format_time($end);
-	} else {
-		return format_date($start) . ' from ' . format_time($start) . ' to ' . format_date_time($end);
+	if (date('Y', $start) == date('Y', $end)) {
+		if (date('n', $start) == date('n', $end)) {
+			if (date('j', $start) == date('j', $end)) {
+				if (date('a', $start) == date('a', $end)) {
+					//same am/pm
+					return format_date($start) . ' ' . date('g', $start) . '-' . date('g', $end) . date('a', $end);
+				}
+				//same day
+				return format_date($start) . ' from ' . format_time($start) . ' to ' . format_time($end);
+			}
+			//same month
+			return date('M', $start) . ' ' . date('j', $start) . '-' . date('j', $end) . ', ' . date('Y', $end);
+		}
+		//same year
+		return format_date_time($start, false, ' at ') . ' to ' . format_date_time($end, false, ' at ');
 	}
+	//different years
+	return format_date_time($start, false, ' at ') . ' to ' . format_date_time($end, false, ' at ');
 }
 
 function format_date_excel($timestamp) {

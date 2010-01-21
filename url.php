@@ -233,8 +233,9 @@ function url_query_action($value, $go=true) {
 	return url_query_add(array("action"=>$value), $go);
 }
 
-function url_query_add($adds, $go=true, $path=false) { //add specified query arguments
-	global $_josh, $_GET;
+function url_query_add($adds=false, $go=true, $path=false) { //add specified query arguments
+	global $_josh;
+	if (!$adds) $adds = array();
 	$target = url_base() . (($path) ? $path : $_josh['request']['path']);
 	//$adds = array_unique(array_merge($_GET, $adds));
 	$adds = array_merge($_GET, $adds);

@@ -67,6 +67,23 @@ function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
 	return $filename;
 }
 
+function file_ext($filename) {
+	$info = pathinfo($filename);
+	
+	switch ($info['extension']) {
+		//correct horrible filenames
+		case 'htm' :
+		$info['extension'] = 'html';
+		break;
+
+		case 'jpeg' :
+		$info['extension'] = 'jpg';
+		break;
+	}
+		
+	return $info['extension'];
+}
+
 function file_folder($folder, $endfilter=false) {
 	global $_josh;
 	error_debug('<b>file folder</b> running with ' . $folder, __file__, __line__);
@@ -153,13 +170,13 @@ function file_get_uploaded($fieldname, $types_table=false) {
 	return $content;
 }
 
-function file_uploaded_image_orientation($fieldname) {
-	//for smarter toddler, resize one way if oriented landscape, resize another if portrait
-	global $_FILES;
-	error_debug('<b>file_uploaded_image_orientation</b>', __file__, __line__);
-	list($width, $height) = getimagesize($_FILES[$fieldname]['tmp_name']);
-	if ($width > $height) return "landscape";
-	return "portrait";
+function file_icon($filename, $link=true, $type='16x16') {
+	//show the icon for a given filename
+	global $_josh;
+	if (!$ext = file_ext($filename)) return false;
+	if ($return = draw_img($_josh['write_folder'] . '/lib/file_icons/' . $type . '/' . $ext . '.png')) return $return;
+	error_handle('file type not added yet', 'the file type ' . $ext . ' was not found in the file_icons library.  this has been noted.');
+	return false;
 }
 
 function file_import_fixedlength($content, $definitions) {
@@ -193,7 +210,7 @@ function file_name($filepath) {
 	$extension	= array_pop($fileparts);
 	$filename	= implode('.', $fileparts);
 	error_debug('file_name returning file = ' . $file . ', ext = ' . $extension . ', path = ' . $path, __file__, __line__);
-	return array($filename, $extension, $path);
+	return draw_array(array($filename, $extension, $path));
 }
 
 function file_pass($filename) {
@@ -367,6 +384,15 @@ function file_unzip($source, $target) {
     zip_close($zip);
 
 	return true;
+}
+
+function file_uploaded_image_orientation($fieldname) {
+	//for smarter toddler, resize one way if oriented landscape, resize another if portrait
+	global $_FILES;
+	error_debug('<b>file_uploaded_image_orientation</b>', __file__, __line__);
+	list($width, $height) = getimagesize($_FILES[$fieldname]['tmp_name']);
+	if ($width > $height) return "landscape";
+	return "portrait";
 }
 
 function file_write_folder($folder=false) {
