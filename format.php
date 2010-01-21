@@ -146,6 +146,8 @@ function format_date_sql($month, $day=false, $year=false, $hour=false, $minute=f
 		$minute = 0;
 		$second = 1;
 		$date = mktime($hour, $minute, $second, $month, $day, $year);
+	} else {
+		$date = mktime($hour, $minute, $second, $month, $day, $year);
 	}
 	
 	return '"' . date('Y-m-d H:i:00', $date) . '"';
