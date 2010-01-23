@@ -58,10 +58,11 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 	if ($events) {
 		foreach ($events as $e)	{
 			$e['title'] = format_string($e['title']);
-			if (!empty($e['link'])) $e['title'] = draw_link($e['link'], $e['title'], false, array('id'=>'calendar_link_' . $e['id']));
+			if (!empty($e['link'])) $e['title'] = draw_link($e['link'], $e['title'], false, array('id'=>'calendar_link_' . $e['id'], 'onmouseover'=>((isset($e['onmouseover'])) ? $e['onmouseover'] : false), 'onmouseout'=>((isset($e['onmouseout'])) ? $e['onmouseout'] : false)));
+			if (isset($e['description'])) $e['title'] .= draw_div_class('description', $e['description'], array('id'=>'event_' . $e['id'] . '_description'));
 			if (!isset($cal_events[$e['day']])) $cal_events[$e['day']] = '';
 			$style = (isset($e['color'])) ? 'background-color:#' . $e['color'] : false;
-			$cal_events[$e['day']] .= draw_div_class('event', $e['title'], array('style'=>$style));
+			$cal_events[$e['day']] .= draw_div_class('event', $e['title'], array('style'=>$style, 'id'=>'event_' . $e['id']));
 		}
 	}
 	
@@ -80,8 +81,7 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 				$class = 'day';
 				if (($year == $_josh['year']) && ($month == $_josh['month']) && ($thisday == $_josh['today'])) $class .= ' today';
 				if (isset($cal_events[$thisday])) $class .= ' events';
-				$return .= draw_div_class($class . ' ' . $days_short[$day-1], '<div class="number">' . $thisday . '</div>');
-				$return .= @$cal_events[$thisday];
+				$return .= draw_div_class($class . ' ' . $days_short[$day-1], '<div class="number">' . $thisday . '</div>' . @$cal_events[$thisday]);
 			} else {
 				$return .= draw_div_class('blank ' . $days_short[$day-1]);
 			}
