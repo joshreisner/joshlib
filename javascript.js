@@ -131,6 +131,21 @@ function form_checkbox_add(options_table, target) {
 	}
 }
 
+function form_checkboxes_checked(form, filter) {
+	//returns all the checkboxes checked in the form.  the name must be in the format chk_type_id, eg chk_topics_12
+	returnArray = new Array();
+	for (var i = 0; i < form.elements.length; i++) {
+		var chkParts = form.elements[i].name.split('_');
+		if ((chkParts.length == 3) && (chkParts[0] == 'chk') && form.elements[i].checked) {
+			if (!filter || (filter && (chkParts[1] == filter))) {
+				returnArray[returnArray.length] = chkParts[2];
+			}
+		}
+	}
+	return returnArray;
+}
+
+
 function form_errors(errors) {
 	var error;
 	if (errors.length == 0) return true;
