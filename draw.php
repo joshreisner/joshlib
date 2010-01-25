@@ -40,7 +40,7 @@ function draw_autorefresh($minutes=5) {
 	return draw_tag('meta', array('http-equiv'=>'refresh', 'content'=>$minutes * 60));
 }
 
-function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar') {
+function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar', $linknumbers=false) {
 	/*
 		for livingcities roundup
 		$events is an optional 2d array that you can pass in (from db via db_table) that's looking for the following values
@@ -81,7 +81,7 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 				$class = 'day';
 				if (($year == $_josh['year']) && ($month == $_josh['month']) && ($thisday == $_josh['today'])) $class .= ' today';
 				if (isset($cal_events[$thisday])) $class .= ' events';
-				$return .= draw_div_class($class . ' ' . $days_short[$day-1], '<div class="number">' . $thisday . '</div>' . @$cal_events[$thisday]);
+				$return .= draw_div_class($class . ' ' . $days_short[$day-1], '<div class="number">' . ((isset($cal_events[$thisday]) && $linknumbers) ? draw_link('javascript:calendarNumberLink(' . $month . ',' . $thisday . ',' . $year . ');', $thisday) : $thisday) . '</div>' . @$cal_events[$thisday]);
 			} else {
 				$return .= draw_div_class('blank ' . $days_short[$day-1]);
 			}

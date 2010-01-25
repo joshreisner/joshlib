@@ -151,13 +151,7 @@ function array_object($object) {
 }
 
 function array_post_fields($fieldnames, $delimiter=',') {
-	//this function is used by format_post_nulls() etc to format $_POST variables
-	//array is a comma-delimited string, spaces are ok
-	//this should be renamed to be more generic, and/or combined with array_csv
-	$return = array();
-	$fields = explode($delimiter, $fieldnames);
-	foreach ($fields as $f) $return[] = trim($f);
-	return $return;
+	return array_separated($fieldnames, $delimiter);
 }
 
 function array_post_filter($control, $delimiter='_') {
@@ -239,6 +233,17 @@ function array_send($array, $target) {
 	}
 	echo $response;
 	return false;	
+}
+
+function array_separated($content, $separator=',') {
+	//like explode, but strips empty spaces and null content
+	$return = array();
+	$fields = explode($separator, $content);
+	foreach ($fields as $f) {
+		$f = trim($f);
+		if (!empty($f)) $return[] = $f;
+	}
+	return $return;
 }
 
 function array_sort($array, $direction='asc', $key=false) {
