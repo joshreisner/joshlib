@@ -87,22 +87,10 @@ function db_check($table, $column=false) {
 }
 
 //db_checkboxes('doc', 'documents_to_categories', 'documentID', 'categoryID', $_GET['id']);
-function db_checkboxes($name, $linking_table, $object_col, $option_col, $id) {
-	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $id);
-	foreach ($_POST as $key=>$value) {
-		@list($control, $field_name, $categoryID) = explode('-', $key);
-		if (($control == 'chk') && ($field_name == $name)) {
-			error_debug('<b>db_checkboxes</b> checking ' . $key . ', ' . $field_name . ' is a match for ' . $name, __file__, __line__);
-			db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $id . ', ' . $categoryID . ' )');
-		} else {
-			//debugging is important for this function
-			if (empty($field_name)) {
-				error_debug('<b>db_checkboxes</b> checking ' . $key . ', could not get a field name to match to ' . $name, __file__, __line__);
-			} else {
-				error_debug('<b>db_checkboxes</b> checking ' . $key . ', ' . $field_name . ' not a match for ' . $name, __file__, __line__);
-			}
-		}
-	}
+function db_checkboxes($name, $linking_table, $object_col, $option_col, $object_id) {
+	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $object_id);
+	$categories = array_post_checkboxes($name);
+	foreach ($categories as $category_id) db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $object_id . ', ' . $category_id . ' )');
 }
 
 function db_clear($tables=false) { //cant find where this is called from.  obsolete?

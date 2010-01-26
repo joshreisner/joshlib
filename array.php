@@ -1,13 +1,15 @@
 <?php
 error_debug('including array.php', __file__, __line__);
 
-function array_2d($array) {
+/* function array_2d($array) {
+	//commented on Jan 26, 2010
 	//to take a scalar array and convert it to a two-dimensional array by doubling the keys / values
+	//how is this possibly
 	error_deprecated();
 	$return = array();
 	foreach ($array as $a) $return[$a] = $a;
 	return $return;
-}
+} */
 
 function array_ajax($source=false) {
 	//returns an array of ajax-posted content
@@ -18,13 +20,13 @@ function array_ajax($source=false) {
 }
 
 function array_chunk_html($string, $length) {
-	//split an html string into smaller chunks while not breaking tags
+	//split an html string into smaller chunks while not breaking inside an HTML tag
 	//used by language_translate
 
 	//maybe string doesn't need to be split bc is too short
 	if (strlen($string) < $length) return array($string);
 	
-	$words = array_explode_html(' ', $string);
+	$words = array_explode_html($string, ' ');
 	$wordcount = count($words);
 	
 	//iterator variables
@@ -62,12 +64,11 @@ function array_chunk_html($string, $length) {
 function array_csv($content, $delimiter=',') {
 	global $_josh;
 	error_debug('doing an array csv on delimiter ' . $delimiter, __file__, __line__);
-	//input function.  pass it a file_get() 'ed CSV and it will give you an array back
-	//if a header row is present, it will return an array of associative arrays
+	//input function.  pass it a file_get() 'ed CSV and it will give you an associative array back
+	//assumes first line is header
 	//written by josh on 5/15/09 for work mgmt: harvest import
-	//todo == make header optional
 	
-	$rows = explode($_josh['newline'], trim($content));
+	$rows = array_separated($content, $_josh['newline']);
 	
 	//parse header
 	$columns = array();
@@ -79,7 +80,7 @@ function array_csv($content, $delimiter=',') {
 	//do rows
 	$return = array();
 	foreach ($rows as $r) {
-		$cells = explode($delimiter, trim($r));
+		$cells = array_separated($r, $delimiter);
 		$thisrow = array();
 		for ($i = 0; $i < $count; $i++) $thisrow[$columns[$i]] = trim(@$cells[$i]);
 		$return[] = $thisrow;
@@ -88,36 +89,34 @@ function array_csv($content, $delimiter=',') {
 	return $return;
 }
 
-function array_explode_html($separator, $string) { 
+function array_explode_html($string, $separator) { 
 	//used by array_chunk_html
-	//splits an HTML string into an array like explode() but treats HTML tags as a piece
-	//lifted from stefan at NOSPAM dot elakpistol dot com http://theserverpages.com/php/manual/en/function.explode.php
-	//made modifications -- todo clean up
-	$res = array();
-	for ($i=0, $j=0; $i < strlen($string); $i++) { 
-		if ($string{$i} == $separator) { 
-		   while ($string{$i+1} == $separator) 
-		   $i++; 
-		   $j++; 
-		   continue; 
+	//splits an HTML string into an array like explode() but keeps HTML tags together
+	//adapted from stefan at NOSPAM dot elakpistol dot com http://theserverpages.com/php/manual/en/function.explode.php
+	$return = array();
+	for ($i = 0, $j = 0; $i < strlen($string); $i++) {
+		if ($string[$i] == $separator) {
+			while ($string[$i + 1] == $separator) $i++;
+			$j++;
+			continue;
 		}
-		if (!isset($res[$j])) $res[$j] = '';		
-		if ($string{$i} == '<') { 
-		   if (strlen($res[$j]) > 0) $j++; 
-		   $pos = strpos($string, '>', $i); 
-		   if (isset($res[$j])) {
-			   $res[$j] .= substr($string, $i, $pos - $i+1); 
-		   } else {
-			   $res[$j] = substr($string, $i, $pos - $i+1); 
-		   }
-		   $i += ($pos - $i); 
-		   $j++; 
-		   continue; 
-		} 
-		if ((($string{$i} == "\n") || ($string{$i} == "\r")) && (strlen($res[$j]) == 0)) continue; 
-		$res[$j] .= $string{$i}; 
-	} 
-	return $res; 
+		if (!isset($return[$j])) $return[$j] = '';
+		if ($string[$i] == '<') {
+			if (strlen($return[$j]) > 0) $j++;
+			$pos = strpos($string, '>', $i);
+			if (isset($return[$j])) {
+				$return[$j] .= substr($string, $i, $pos - $i + 1);
+			} else {
+				$return[$j] = substr($string, $i, $pos - $i + 1);
+			}
+			$i += ($pos - $i);
+			$j++;
+			continue;
+		}
+		if ((($string[$i] == "\n") || ($string[$i] == "\r")) && (strlen($return[$j]) == 0)) continue;
+		$return[$j] .= $string[$i];
+	}
+	return $return;
 }
 
 function array_insert($array, $position, $value) {
@@ -138,7 +137,6 @@ function array_insert_assoc($array, $position, $key, $value) {
 
 function array_key_filter($array, $key, $value) {
 	//only return array keys of a particular value
-	//todo ~~ what's this used for?  something tells me jeffrey or coddington?
 	$return = array();
 	foreach ($array as $element) if ($element[$key] == $value) $return[] = $element;
 	return $return;
@@ -150,22 +148,19 @@ function array_object($object) {
     return is_array($object) ? array_map(__FUNCTION__, $object) : $object;
 }
 
-function array_post_fields($fieldnames, $delimiter=',') {
-	return array_separated($fieldnames, $delimiter);
-}
-
-function array_post_filter($control, $delimiter='_') {
-	//this was started for livingcities, but applicable for db_checkboxes
-	global $_POST;
+function array_post_checkboxes($field_name) {
+	//used by db_checkboxes and living cities internal newsletter
 	$return = array();
-	$trim_length = strlen($control) + strlen($delimiter);
 	foreach ($_POST as $key=>$value) {
-		$array = explode($delimiter, $key);
-		if ($array[0] == $control) {
-			$return[substr($key, $trim_length)] = $value;
-		}
+		$array = explode('-', $key);
+		if ((count($array) == 3) && ($array[0] == 'chk') && ($array[1] == $field_name)) $return[] = $array[2];
 	}
 	return $return;
+}
+
+function array_post_fields($fieldnames, $delimiter=',') {
+	//legacy alias, todo deprecate
+	return array_separated($fieldnames, $delimiter);
 }
 
 function array_range($start, $end, $increment=1) {

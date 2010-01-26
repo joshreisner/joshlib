@@ -26,7 +26,7 @@ function draw_array($array, $nice=false) {
 		if (strToLower($key) == 'email') $value = '<a href="mailto:' . $value . '">' . $value . '</a>';
 		if (is_array($value)) $value = draw_array($value, $nice);
 		$return  .= '
-			<tr><td bgcolor="#eee"><b>';
+			<tr><td bgcolor="#eeeeee"><b>';
 		$return .= ($nice) ? format_text_human($key)  : $key;
 		$return .= '&nbsp;</b></td><td>';
 		$return .= is_object($value) ? 'object value' : $value;
