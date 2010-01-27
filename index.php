@@ -40,6 +40,12 @@ MISC FUNCTIONS DEFINED ON THIS PAGE
 	daysInMonth
 	debug
 	geocode
+
+RUNNING ON THE CLI
+	joshlib depends on certain $SERVER variables being present.  add these lines before including joshlib:
+	$_SERVER['HTTP_HOST']		= 'backend.livingcities.org';
+	$_SERVER['SCRIPT_NAME']		= '/salesforce/index.php';
+	$_SERVER['DOCUMENT_ROOT']	= '/home/livingcities/www/backend';
 	
 */
 $_josh['time_start'] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
@@ -97,13 +103,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	require($_josh['joshlib_folder'] . '/table.php');
 	require($_josh['joshlib_folder'] . '/url.php');
 
-/*parse environment variables
-	the server variables that this script depends on are
-		HTTP_HOST www.example.com required
-		SCRIPT_NAME /index.php required
-		HTTPS on (or not present)
-		REQUEST_URI / (sometimes this shows the entire http://www.example.com/ request.  i believe it's when i redirect with url_change or url_query_add, etc)
-		*/
+//parse environment variables
 	if (isset($_SERVER) && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SCRIPT_NAME'])) { //this would not be set if this were running from the command line (eg by a cron)
 		//build request as string, then set it to array with url_parse
 		$_josh['request'] = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) ? 'https' : 'http';

@@ -363,6 +363,19 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	db_switch();
 }
 
+function db_option($table, $value) {
+	//enter $value into option $table.  $table schema must conform
+	//used for living cities salesforce calendar api
+	//don't know whether to escape quotes
+	if ($id = db_grab('SELECT id FROM ' . $table . ' WHERE title = \'' . $value . '\'')) return $id;
+	
+	//does not exist, enter it
+	if ($id = db_query('INSERT INTO ' . $table . ' ( title, created_date, is_active ) VALUES ( \'' . $value . '\', NOW(), 1 )')) return $id;
+	
+	//there was an error
+	error_handle(__function__ . ' error', 'could not add db_option' . $value . ' to table ' . $table);
+}
+
 function db_pwdcompare($string, $field) {
 	global $_josh;
 	error_debug('<b>db_pwdcompare</b> running', __file__, __line__);
