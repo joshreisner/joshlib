@@ -1,15 +1,14 @@
 <?php
 error_debug('including array.php', __file__, __line__);
 
-/* function array_2d($array) {
-	//commented on Jan 26, 2010
+function array_2d($array) {
 	//to take a scalar array and convert it to a two-dimensional array by doubling the keys / values
-	//how is this possibly
+	//used by draw_form_date()
 	error_deprecated();
 	$return = array();
 	foreach ($array as $a) $return[$a] = $a;
 	return $return;
-} */
+}
 
 function array_ajax($source=false) {
 	//returns an array of ajax-posted content
