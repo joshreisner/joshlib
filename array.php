@@ -10,11 +10,15 @@ function array_2d($array) {
 	return $return;
 }
 
-function array_ajax($source=false) {
+function array_ajax($required=false) {
 	//returns an array of ajax-posted content
-	if (!$source) $source = file_get_contents('php://input');
-	$array = url_query_parse($source);
+	//if (!$source) $source = file_get_contents('php://input');
+	$array = url_query_parse(file_get_contents('php://input'));
 	foreach ($array as $key=>$value) $array[$key] = format_quotes($value);
+	if ($required) {
+		$required = array_separated($required);
+		foreach ($required as $r) if (!isset($array[$r])) exit; //intended to just quietly bomb.  lots of spiders seem to want to post empty to ajax urls for some reason.
+	}
 	return $array;
 }
 
