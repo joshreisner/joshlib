@@ -7,6 +7,7 @@ error_debug('including table.php', __file__, __line__);
 class table {
 	var $columns	= array();
 	var $draggable	= false;
+	var $dragcolumn	= false;
 	var $name		= false;
 	var $title		= false;
 
@@ -94,7 +95,7 @@ class table {
 			$return .= draw_javascript('
 				function reorder() {
 					var ampcharcode= "%26";
-					var serializeOpts = Sortable.serialize("' . $this->name . '") + unescape(ampcharcode) + "key=' . $this->name . '" + unescape(ampcharcode) + "update=' . $this->name . '";
+					var serializeOpts = Sortable.serialize("' . $this->name . '") + unescape(ampcharcode) + "table=' . $this->name . '" + unescape(ampcharcode) + "column=' . $this->dragcolumn . '";
 					var options = { method:"post", parameters:serializeOpts, onSuccess:function(transport) {
 						//alert(transport.responseText);
 					} };
@@ -143,9 +144,10 @@ class table {
 		if ($name == 'draggy') $this->set_draggable('draggy');
 	}
 	
-	function set_draggable($draghandle=false) {
+	function set_draggable($draghandle=false, $dragcolumn='precedence') {
 		$this->draggable = true;
 		$this->draghandle = $draghandle;
+		$this->dragcolumn = $dragcolumn;
 	}
 	
 	function set_title($html) {

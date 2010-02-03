@@ -55,6 +55,7 @@ function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
 	$filename = $_josh['write_folder'] . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
 	error_debug('<b>' . __function__ . '</b> running with filename = ' . $filename, __file__, __line__);
 	if (!$lastmod || !file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) {
+		//die('file_dynamic executive on ' . $filename . ' lastmod was ' . $lastmod);
 		if ($content = db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id)) {
 			file_put($filename, $content);
 		} else {
@@ -270,15 +271,19 @@ function file_put_config() {
 	return file_put($_josh['config'], $return);
 }
 
-function file_rss($title, $link, $items, $filename=false) {
+function file_rss($title, $link, $items, $filename=false, $limit=false) {
 	global $_josh;
 	//$items should be an array with title, description, link, author and date
-	//dtfmt Wed, 12 Nov 2008 09:13:11 -0500
+	//date should be a udate
 	
 	//w3c feed validator wants this, if possible
 	$return = ($filename) ? '<atom:link href="' . url_base() . $filename . '" rel="self" type="application/rss+xml" />' : '';
 	
 	$lastBuildDate = false;
+	
+	$items = array_sort($items, 'desc', 'date');
+
+	if ($limit && (count($items) > $limit)) $items = array_slice($items, 0, $limit);
 
 	foreach ($items as $i) {
 		if (!$lastBuildDate) $lastBuildDate = format_date_rss($i['date']);
@@ -313,7 +318,9 @@ function file_rss($title, $link, $items, $filename=false) {
 		' . $return . '
 		</channel>
 		</rss>';
+	
 	if (!$filename) return $return;
+	
 	return file_put($filename, utf8_encode($return));
 }
 

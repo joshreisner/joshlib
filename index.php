@@ -241,13 +241,13 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 			case 'ajax_delete':
 				exit;
 			case 'ajax_reorder':
-				db_query('UPDATE ' . $array['update'] . ' SET precedence = NULL');
+				db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = NULL');
 				
 				//email('josh@joshreisner.com', draw_array($array));
 				
 				foreach ($array as $key=>$value) {
 					$key = urldecode($key);
-					if (format_text_starts($array['key'], $key)) db_query('UPDATE ' . $array['update'] . ' SET precedence = ' . (format_numeric($key, true) + 1) . ' WHERE id = ' . $value);
+					if (format_text_starts($array['table'], $key)) db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . (format_numeric($key, true) + 1) . ' WHERE id = ' . $value);
 				}
 				
 				echo 'reordered';
