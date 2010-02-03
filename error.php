@@ -34,8 +34,10 @@ function error_debug($message, $file, $line) {
 	$_josh['time_lastdebug'] = microtime(true);
 }
 
-function error_deprecated() {
+function error_deprecated($date=false) {
 	//use this to deprecate use of various functions
+	//$date says when it was deprecated
+	//todo
 }
 
 function error_draw($title, $html) {	

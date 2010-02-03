@@ -3,8 +3,7 @@ error_debug('including array.php', __file__, __line__);
 
 function array_2d($array) {
 	//to take a scalar array and convert it to a two-dimensional array by doubling the keys / values
-	//used by draw_form_date()
-	error_deprecated();
+	//used by draw_form_date(), so not deprecated
 	$return = array();
 	foreach ($array as $a) $return[$a] = $a;
 	return $return;

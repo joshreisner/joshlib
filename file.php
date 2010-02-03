@@ -173,7 +173,7 @@ function file_get_uploaded($fieldname, $types_table=false) {
 function file_icon($filename, $link=true, $type='16x16') {
 	//show the icon for a given filename
 	global $_josh;
-	if (!$ext = file_ext($filename)) return false;
+	if (!$ext = strToLower(file_ext($filename))) return false;
 	if ($return = draw_img($_josh['write_folder'] . '/lib/file_icons/' . $type . '/' . $ext . '.png')) return $return;
 	error_handle('file type not added yet', 'the file type ' . $ext . ' was not found in the file_icons library.  this has been noted.');
 	return false;
