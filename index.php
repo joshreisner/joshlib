@@ -396,6 +396,12 @@ function lib_location($string) {
 	}
 }
 
+function user() {
+	//shortcut to say if a session exists and what the id is
+	if (empty($_SESSION['user_id'])) return false;
+	return $_SESSION['user_id'];
+}
+
 function var_name(&$iVar, &$aDefinedVars) {
 	//get the name of the variable you are passing in
 	//via http://mach13.com/how-to-get-a-variable-name-as-a-string-in-php

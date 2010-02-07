@@ -426,7 +426,7 @@ function db_query($query, $limit=false, $suppress_error=false) {
 
 function db_save($table, $id='get', $array=false) {
 	global $_SESSION, $_POST, $_josh;
-	
+		
 	//default behavior is to use $_GET['id'] as the id number to deal with
 	if ($id == 'get') $id = url_id();
 	if ($id == 'id') {
@@ -497,6 +497,15 @@ function db_save($table, $id='get', $array=false) {
 			} elseif ($c['type'] == 'date') {
 				$value = format_post_date($c['name'], $array);
 			}
+			if ($id) {
+				$query1[] = $c['name'] . ' = ' . $value;
+			} else {
+				$query1[] = $c['name'];
+				$query2[] = $value;
+			}
+		} elseif (($c['type'] == 'mediumblob') && ($file = file_get_uploaded($c['name']))) {
+			//file isn't getting passed in (after resizing eg), but was uploaded
+			$value = format_binary($file);		
 			if ($id) {
 				$query1[] = $c['name'] . ' = ' . $value;
 			} else {
