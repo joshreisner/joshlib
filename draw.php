@@ -40,7 +40,7 @@ function draw_autorefresh($minutes=5) {
 	return draw_tag('meta', array('http-equiv'=>'refresh', 'content'=>$minutes * 60));
 }
 
-function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar', $linknumbers=false) {
+function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar', $linknumbers=false, $type='div') {
 	/*
 		for livingcities roundup
 		$events is an optional 2d array that you can pass in (from db via db_table) that's looking for the following values
@@ -73,22 +73,46 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 	$days_long = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
 	
 	$return = ($_josh['mode'] == 'dev') ? $_josh['newline'] . $_josh['newline'] . '<!--calendar ' . $divclass . ' starts -->' . $_josh['newline'] : '';
-	for ($i = 0; $i < 7; $i++) $return .= draw_div_class('header ' . $days_short[$i], $days_long[$i]);
+	if ($type == 'table') $return .= '<tr>';
+	for ($i = 0; $i < 7; $i++) {
+		if ($type == 'table') {
+			$return .= draw_container('td', $days_long[$i], 'header ' . $days_short[$i]);
+		} else {
+			$return .= draw_div_class('header ' . $days_short[$i], $days_long[$i]);
+		}
+	}
+	if ($type == 'table') $return .= '</tr>';
 	for ($week = 1, $thisday = 1; ($thisday < $lastday); $week++) {
+		if ($type == 'table') $return .= '<tr>';
 		for ($day = 1; $day <= 7; $day++) {
 			$thisday = (((7 * ($week - 1)) + $day) - $firstday);
 			if ($thisday > 0 && $thisday <= $lastday) {
 				$class = 'day';
 				if (($year == $_josh['year']) && ($month == $_josh['month']) && ($thisday == $_josh['today'])) $class .= ' today';
 				if (isset($cal_events[$thisday])) $class .= ' events';
-				$return .= draw_div_class($class . ' ' . $days_short[$day-1], '<div class="number">' . ((isset($cal_events[$thisday]) && $linknumbers) ? draw_link('javascript:calendarNumberLink(' . $month . ',' . $thisday . ',' . $year . ');', $thisday) : $thisday) . '</div>' . @$cal_events[$thisday]);
+				if ($type == 'table') {
+					$return .= draw_container('td', 
+						'<div class="number">' . 
+						((isset($cal_events[$thisday]) && $linknumbers) ? draw_link('javascript:calendarNumberLink(' . $month . ',' . $thisday . ',' . $year . ');', $thisday) : $thisday) . '</div>' . @$cal_events[$thisday],
+						 $class . ' ' . $days_short[$day-1]);
+				} else {
+					$return .= draw_div_class($class . ' ' . $days_short[$day-1], '<div class="number">' . ((isset($cal_events[$thisday]) && $linknumbers) ? draw_link('javascript:calendarNumberLink(' . $month . ',' . $thisday . ',' . $year . ');', $thisday) : $thisday) . '</div>' . @$cal_events[$thisday]);
+				}
 			} else {
-				$return .= draw_div_class('blank ' . $days_short[$day-1]);
+				if ($type == 'table') {
+					$return .= draw_container('td', '', 'blank ' . $days_short[$day-1]);
+				} else {
+					$return .= draw_div_class('blank ' . $days_short[$day-1]);
+				}
 			}
 		}
+		if ($type == 'table') $return .= '</tr>';
 	}
-	
-	return draw_div_class($divclass, $return);
+	if ($type == 'table') {
+		return draw_container('table', $return, array('class'=>$divclass, 'cellspacing'=>'0'));
+	} else {
+		return draw_div_class($divclass, $return);
+	}
 }
 
 function draw_css($content) {
@@ -752,7 +776,7 @@ function draw_swf($path, $width, $height, $border=0) {
 function draw_tag($tag, $args=false, $innerhtml=false) {
 	$tag = strToLower($tag);
 	$return = '<' . $tag;
-	$return .= (is_array($args)) ? draw_args($args) : draw_arg($args);
+	$return .= (is_array($args)) ? draw_args($args) : draw_arg('class', $args);
 	if ($innerhtml === false) {
 		$return .= '/>';
 	} else {
