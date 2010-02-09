@@ -37,6 +37,8 @@ function file_download($content, $filename, $extension) {
 	//header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	//header('Cache-Control: public');
 
+	$filename = format_file_name($filename, $extension);
+	
 	//for IE over SSL
 	header('Cache-Control: maxage=1'); //In seconds
 	header('Pragma: public');
@@ -44,7 +46,7 @@ function file_download($content, $filename, $extension) {
 	header('Content-Description: File Transfer');
 	header('Content-Type: application/octet-stream');
 	header('Content-Length: ' . strlen($content));
-	header('Content-Disposition: attachment; filename=' . format_file_name($filename, $extension));
+	header('Content-Disposition: attachment; filename=' . $filename);
 	echo $content;
 	db_close();
 }

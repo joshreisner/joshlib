@@ -215,12 +215,17 @@ function format_email($address) {
 function format_file_name($str, $ext) {
 	//formatting for downloaded files
 	//TODO: only truly invalid characters should be checked.  i'm sure it's ok to download files with spaces, for example.
+	
+	$str = html_entity_decode($str);
+	
 	$str = str_replace('  ',	' ',	$str);
+	$str = str_replace('"',		'', 	$str);
 	$str = str_replace("'",		'', 	$str);
 	$str = str_replace('.',		'', 	$str);
 	$str = str_replace(':',		'',		$str);
 	$str = str_replace(' ',		'_',	$str);
 	$str = substr($str, 0, 30);
+	
 	return strtolower($str . '.' . $ext);
 }  
 
