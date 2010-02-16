@@ -382,7 +382,21 @@ function db_pwdcompare($string, $field) {
 	if ($_josh['db']['language'] == 'mssql') {
 		return 'PWDCOMPARE("' . $string . '", ' . $field . ')';
 	} else {
-		return 'IF (' . $field . ' = PASSWORD("' . $string . '"), 1, 0)';
+		if (empty($string)) {
+			return 'CASE WHEN ' . $field . ' IS NULL THEN 1 ELSE 0 END';
+		} else {
+			return 'IF (' . $field . ' = PASSWORD("' . $string . '"), 1, 0)';
+		}
+	}
+}
+
+function db_pwdencrypt($string) {
+	global $_josh;
+	error_debug('<b>db_pwdcompare</b> running', __file__, __line__);
+	if ($_josh['db']['language'] == 'mssql') {
+		return 'PWDENCRYPT("' . $string . '")';
+	} else {
+		return 'PASSWORD("' . $string . '")';
 	}
 }
 
@@ -454,6 +468,13 @@ function db_save($table, $id='get', $array=false) {
 				$value = format_null(format_numeric($array[$c['name']], false));
 			} elseif ($c['type'] == 'int') { //integer
 				$value = format_null(format_numeric($array[$c['name']], true));
+			} elseif (($c['type'] == 'mediumblob') && ($c['name'] == 'password')) {
+				if ($id) {
+					$query1[] = $c['name'] . ' = ' . db_pwdencrypt($value);
+				} else {
+					$query1[] = $c['name'];
+					$query2[] = db_pwdencrypt($value);
+				}
 			} elseif (($c['type'] == 'mediumblob') || ($c['type'] == 'image')) { //document
 				$value = format_binary($array[$c['name']]);
 			} elseif ($c['type'] == 'varchar') { //text

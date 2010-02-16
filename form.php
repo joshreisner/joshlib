@@ -13,6 +13,7 @@ class form {
 	var $table			= false;
 	var $values			= array();
 	var $submit			= false;
+	var $focus			= false;
 	
 	function __construct($name, $id=false, $submit=true, $cancel=false) {
 		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
@@ -70,7 +71,13 @@ class form {
 		
 		//focus on first element
 		reset($this->fields);
-		if ($focus && $this->fields[key($this->fields)]['name']) $return .= draw_form_focus($this->fields[key($this->fields)]['name']);
+		if ($focus) {
+			if (!empty($this->focus)) {
+				draw_form_focus($this->focus);
+			} elseif ($this->fields[key($this->fields)]['name']) {
+				$return .= draw_form_focus($this->fields[key($this->fields)]['name']);
+			}
+		}
 
 		return $return;
 	}
@@ -263,6 +270,10 @@ class form {
 	function set_field_property($name, $property, $value=false) {
 		//generic field property setter
 		if (isset($this->fields[$name])) $this->fields[$name][$property] = $value;
+	}
+	
+	function set_focus($field) {
+		$this->focus = $field;
 	}
 	
 	function set_group($string='', $position=false) {
