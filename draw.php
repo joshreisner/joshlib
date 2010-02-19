@@ -40,29 +40,61 @@ function draw_autorefresh($minutes=5) {
 	return draw_tag('meta', array('http-equiv'=>'refresh', 'content'=>$minutes * 60));
 }
 
-function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar', $linknumbers=false, $type='div') {
+function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar', $linknumbers=false, $type='div', $toggling=false) {
 	/*
-		for livingcities roundup
-		$events is an optional 2d array that you can pass in (from db via db_table) that's looking for the following values
-			title -- required -- the event title
-			day -- required (1, 2, 3 ... 31)
-			link -- if the event should be linked
-			color -- if there should be a background color to its div
+		for livingcities roundup & events page, soon intranet
+		$events is an optional associative array that you can pass in (like via db_table) which can contain the following values:
+			start		REQUIRED	string date
+			title		REQUIRED	the event title
+			end			optional	string date
+			description	optional	should there be a description below the title?  eg used in a bubble
+			link		optional	if the event should be linked
+			color		optional	if there should be a background color to its div
+			toggling	optional	mouseover event
 	*/
 	global $_josh;
+	$id = 0;
 	
-	//reprocess the events into a different kind of array
-	$cal_events = array();
+	if (!function_exists('draw_event')) {
+		function draw_event($e, $id, $toggling) {
+			global $id;
+			$id++;
+			$e['title'] = format_string($e['title']);
+			if (!isset($id)) $id = 'idempty'; //id should really be defined
+			$toggling = ($toggling) ? 'javascript:toggleEvent(' . $id . ');' : false;
+			if (!empty($e['link'])) $e['title'] = draw_link($e['link'], $e['title'], false, array('id'=>'calendar_link_' . $id, 'onmouseover'=>$toggling, 'onmouseout'=>$toggling));
+			if (!empty($e['description'])) $e['title'] .= draw_div_class('description', $e['description'], array('id'=>'event_' . $id . '_description'));
+			$style = (isset($e['color'])) ? 'background-color:#' . $e['color'] : false;
+			return draw_div_class('event', $e['title'], array('style'=>$style, 'id'=>'event_' . $id));		
+		}
+	}
+
+	//decide which month we're drawing
 	if (!$month) $month = $_josh['month'];
 	if (!$year) $year = $_josh['year'];
-	if ($events) {
+	
+	//reprocess the $events array into $cal_events
+	$cal_events = array(1=>'', 2=>'', 3=>'', 4=>'', 5=>'', 6=>'', 7=>'', 8=>'', 9=>'', 10=>'', 11=>'', 12=>'', 13=>'', 14=>'', 15=>'', 16=>'', 17=>'', 18=>'', 19=>'', 20=>'', 21=>'', 22=>'', 23=>'', 24=>'', 25=>'', 26=>'', 27=>'', 28=>'', 29=>'', 30=>'', 31=>'');
+	if (is_array($events)) {
+		$month_start	= mktime(0, 0, 0, $month, 1, $year);
+		$month_end		= mktime(23, 59, 59, $month+1, 0, $year);
 		foreach ($events as $e)	{
-			$e['title'] = format_string($e['title']);
-			if (!empty($e['link'])) $e['title'] = draw_link($e['link'], $e['title'], false, array('id'=>'calendar_link_' . $e['id'], 'onmouseover'=>((isset($e['onmouseover'])) ? $e['onmouseover'] : false), 'onmouseout'=>((isset($e['onmouseout'])) ? $e['onmouseout'] : false)));
-			if (isset($e['description'])) $e['title'] .= draw_div_class('description', $e['description'], array('id'=>'event_' . $e['id'] . '_description'));
-			if (!isset($cal_events[$e['day']])) $cal_events[$e['day']] = '';
-			$style = (isset($e['color'])) ? 'background-color:#' . $e['color'] : false;
-			$cal_events[$e['day']] .= draw_div_class('event', $e['title'], array('style'=>$style, 'id'=>'event_' . $e['id']));
+			if (!empty($e['start'])) {
+				//parse start
+				$start			= strToTime($e['start']);
+				$start_day		= date('j', $start);
+				
+				if (empty($e['end'])) {
+					//if the end is empty then the event doesn't span. we have to assume that it's just this day
+					$cal_events[$start_day] .= draw_event($e, $id, $toggling);
+				} else {
+					//otherwise could be before or after
+					$end			= strToTime($e['end']);
+					$startAt		= ($month_start > $start) ? 1 : $start_day;
+					$endAt			= ($month_end < $end) ? 31 : date('j', $end);
+					for ($i = $startAt; $i <= $endAt; $i++) $cal_events[$i] .= draw_event($e, $id, $toggling);
+				}
+			}
 		}
 	}
 	
@@ -89,7 +121,7 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 			if ($thisday > 0 && $thisday <= $lastday) {
 				$class = 'day';
 				if (($year == $_josh['year']) && ($month == $_josh['month']) && ($thisday == $_josh['today'])) $class .= ' today';
-				if (isset($cal_events[$thisday])) $class .= ' events';
+				if (!empty($cal_events[$thisday])) $class .= ' events';
 				if ($type == 'table') {
 					$return .= draw_container('td', 
 						'<div class="number">' . 
@@ -732,7 +764,7 @@ function draw_newline($count=1) {
 
 function draw_page($title, $html) {
 	//this is for joshserver and error handling, eventually for setup your site messages
-	return url_header_utf8() . draw_doctype() . '
+	return draw_doctype() . '
 			<head>
 				' . draw_meta_utf8() . '
 				<title>' . strip_tags($title) . '</title>
