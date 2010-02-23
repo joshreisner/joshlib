@@ -208,7 +208,7 @@ function file_is($filename) {
 
 function file_name($filepath) {
 	global $_josh;
-	error_debug('file_name receiving filepath = $filepath', __file__, __line__);
+	error_debug('file_name receiving filepath = ' . $filepath, __file__, __line__);
 	$pathparts	= explode('/', $filepath);
 	$file		= array_pop($pathparts);
 	$path		= implode($_josh['folder'], $pathparts);
@@ -216,7 +216,7 @@ function file_name($filepath) {
 	$extension	= array_pop($fileparts);
 	$filename	= implode('.', $fileparts);
 	error_debug('file_name returning file = ' . $file . ', ext = ' . $extension . ', path = ' . $path, __file__, __line__);
-	return draw_array(array($filename, $extension, $path));
+	return array($filename, $extension, $path);
 }
 
 function file_pass($filename) {
