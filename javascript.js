@@ -21,18 +21,14 @@
 function ajax_set(table, column, id, value, update) {
 	//success = false;
 	//used by intranet helptext toggle
-	//and work mgmt invoice date set
 	new Ajax.Request(url_action_add('ajax_set', true), {
 		method: 'post',
 		parameters: { 'table':table, 'column':column, 'id':id, 'value':value },
 		onSuccess: function(transport) {
-			if (update && (typeof(update) == 'object')) update.innerHTML = transport.responseText;
+			if (update && object_exists('object')) update.innerHTML = transport.responseText;
 			function_run('set_' + table + '_' + column, value);
-			
-			//success = true;
 		}
 	});
-	//return success;
 }
 
 function ajax_reorder() {
@@ -134,6 +130,10 @@ function form_checkbox_add(options_table, target) {
 function form_checkboxes_checked(form, filter) {
 	//returns all the checkboxes checked in the form.  the name must be in the format chk_type_id, eg chk_topics_12
 	returnArray = new Array();
+	if (!object_exists(form)) {
+		alert('form den');
+		return false;
+	}
 	for (var i = 0; i < form.elements.length; i++) {
 		var chkParts = form.elements[i].name.split('_');
 		if ((chkParts.length == 3) && (chkParts[0] == 'chk') && form.elements[i].checked) {
@@ -144,7 +144,6 @@ function form_checkboxes_checked(form, filter) {
 	}
 	return returnArray;
 }
-
 
 function form_errors(errors) {
 	var error;
@@ -288,7 +287,6 @@ function img_roll(what, how) {
 	eval("document." + what + ".src = " + what + "_" + how + ".src;"); 
 }
 
-
 /* map */
 function map_marker(latitude, longitude, html, icon) {
 	var point	= new GLatLng(latitude, longitude);
@@ -299,6 +297,10 @@ function map_marker(latitude, longitude, html, icon) {
 	return marker;
 }
 
+/* object */
+function object_exists(obj) {
+	return (typeof(obj) == 'object');
+}
 
 /* scroll*/
 //this should really be a class, sorry
