@@ -24,7 +24,6 @@ THIRD PARTY SOFTWARE
 VARIABLES THAT JOSHLIB TRIES TO GET FROM THE WEBSERVER -- IF YOU'RE RUNNING FROM THE COMMAND LINE YOU MIGHT NEED TO PASS THEM
 	$_josh['request']			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)
 	$_josh['referrer']			same as request
-	$_josh['folder']			/ or \
 	$_josh['newline']			\n or \r\n
 	$_josh['root']				path to the site, eg /Users/yourusername/Sites/thissite
 	$_josh['slow']				true or false; whether to use javascript when redirecting (true) or header variables (false)
@@ -128,13 +127,11 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 			
 		//platform-specific info
 		if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) { //platform is PC
-			$_josh['folder']			= '\\';
 			$_josh['newline']			= "\r\n";
 			//$_josh['root']				= str_replace(str_replace('/', '\\', $_josh['request']['path']), '', str_replace('\\\\', '\\foo', $_SERVER['PATH_TRANSLATED']));
 			$_josh['root']				= str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']);
 			$_josh['slow']				= true;
 		} else { //platform is UNIX or Mac
-			$_josh['folder']			= '/';
 			$_josh['newline']			= "\n"; //has to be double-quotes for some reason
 			$_josh['root']				= $_SERVER['DOCUMENT_ROOT'];
 			if (!isset($_josh['slow']))	$_josh['slow'] = false;
@@ -147,7 +144,6 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		//probably running from command line -- set defaults
 		if (!isset($_josh['debug']))	$_josh['debug']		= false;
 		if (!isset($_josh['request']))	$_josh['request']	= false;
-		if (!isset($_josh['folder']))	$_josh['folder']	= '/';
 		if (!isset($_josh['newline']))	$_josh['newline']	= '\n';
 		if (!isset($_josh['root']))		$_josh['root']		= false;
 		if (!isset($_josh['slow']))		$_josh['slow']		= false;
@@ -169,7 +165,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		
 //get configuration variables
 	if (!isset($_josh['write_folder'])) $_josh['write_folder'] = '/_' . $_josh['request']['sanswww']; //eg /_example.com
-	if (!isset($_josh['config'])) $_josh['config'] = $_josh['write_folder'] . $_josh['folder'] . 'config.php'; //eg /_example.com/config.php
+	if (!isset($_josh['config'])) $_josh['config'] = $_josh['write_folder'] . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
 	if (file_is($_josh['config'])) {
 		error_debug('<b>configure</b> found file', __file__, __line__);
 		require($_josh['root'] . $_josh['config']);
@@ -183,12 +179,12 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	
 //ensure lib exists
 	//todo autogen lib folder when lib.zip has been updated
-	if (!is_dir($_josh['root'] . $_josh['write_folder'] . $_josh['folder'] . 'lib')) {
-		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'dynamic');	//used by file_dynamic
-		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'files');		//used by tinymce
-		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'images');	//used my tinymce
-		file_write_folder($_josh['write_folder'] . $_josh['folder'] . 'rss');		//common -- eventually used by file_rss
-		file_unzip($_josh['joshlib_folder'] . $_josh['folder'] . 'lib.zip', $_josh['write_folder']);
+	if (!is_dir($_josh['root'] . $_josh['write_folder'] . DIRECTORY_SEPARATOR . 'lib')) {
+		file_write_folder($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'dynamic');	//used by file_dynamic
+		file_write_folder($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'files');		//used by tinymce
+		file_write_folder($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'images');	//used my tinymce
+		file_write_folder($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'rss');		//common -- eventually used by file_rss
+		file_unzip($_josh['joshlib_folder'] . DIRECTORY_SEPARATOR . 'lib.zip', $_josh['write_folder']);
 	}		
 
 //set error reporting level by determining whether this is a dev or live situation

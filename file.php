@@ -211,7 +211,7 @@ function file_name($filepath) {
 	error_debug('file_name receiving filepath = ' . $filepath, __file__, __line__);
 	$pathparts	= explode('/', $filepath);
 	$file		= array_pop($pathparts);
-	$path		= implode($_josh['folder'], $pathparts);
+	$path		= implode(DIRECTORY_SEPARATOR, $pathparts);
 	$fileparts	= explode('.', $file);
 	$extension	= array_pop($fileparts);
 	$filename	= implode('.', $fileparts);
@@ -224,7 +224,7 @@ function file_pass($filename) {
 	global $_josh;
 	$content		= file_get($filename);
 	//die($filename);
-	$nameparts		= explode($_josh['folder'], $filename);
+	$nameparts		= explode(DIRECTORY_SEPARATOR, $filename);
 	$filenameparts	= explode('.', $nameparts[count($nameparts) - 1]);
 	$extension		= array_pop($filenameparts);
 	$filename		= implode('.', $filenameparts);
@@ -336,7 +336,7 @@ function file_sister($filename, $ext) {
 	global $_josh;
 	if (file_is($filename)) {
 		list ($file, $extension, $path) = file_name($filename);
-		$sister = $path . $_josh['folder'] . $file . '.' . $ext;
+		$sister = $path . DIRECTORY_SEPARATOR . $file . '.' . $ext;
 		if (file_is($sister)) {
 			error_debug('file sister file exists', __file__, __line__);
 			return $sister;
@@ -372,13 +372,13 @@ function file_unzip($source, $target) {
 		if (format_text_starts('.', $folder)) continue;
 		if (format_text_starts('__MACOSX', $folder)) continue;
 
-        $completePath = $_josh['root'] . $target . $_josh['folder'] . $folder;
-        $completeName = $_josh['root'] . $target . $_josh['folder'] . zip_entry_name($zip_entry);
+        $completePath = $_josh['root'] . $target . DIRECTORY_SEPARATOR . $folder;
+        $completeName = $_josh['root'] . $target . DIRECTORY_SEPARATOR . zip_entry_name($zip_entry);
         if (!file_exists($completeName)) {
             $tmp = '';
-            foreach(explode($_josh['folder'], $folder) AS $k) {
-                $tmp .= $k . $_josh['folder'];
-                if(!is_dir($_josh['root'] . $target . $_josh['folder'] . $tmp)) mkdir($_josh['root'] . $target . $_josh['folder'] . $tmp, 0777);
+            foreach(explode(DIRECTORY_SEPARATOR, $folder) AS $k) {
+                $tmp .= $k . DIRECTORY_SEPARATOR;
+                if(!is_dir($_josh['root'] . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir($_josh['root'] . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
             }
         }
         
@@ -418,12 +418,9 @@ function file_write_folder($folder=false) {
 	if (!is_dir($folder) && !@mkdir($folder)) error_handle('couldn\'t create folder', 'file_write_folder tried to create a folder at ' . $folder . ' but could not.  please create a folder there and make it writable.');
 
 	//set permissions
-	if (!is_writable($folder)) {
-		@chmod($folder, 0777); //might only need 755?
-		return is_writable($folder);
-	} else {
-		return true;
-	}
+	if (!is_writable($folder) && !@chmod($folder, 0755)) error_handle('couldn\'t set permissions', 'file_write_folder needs the ' . $folder . ' to be writable by the webserver (755).');
+	
+	return true;
 }
 
 ?>

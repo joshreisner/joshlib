@@ -764,11 +764,7 @@ function draw_newline($count=1) {
 
 function draw_page($title, $html) {
 	//this is for joshserver and error handling, eventually for setup your site messages
-	return draw_doctype() . '
-			<head>
-				' . draw_meta_utf8() . '
-				<title>' . strip_tags($title) . '</title>
-			</head>
+	return '<html><head>' . draw_meta_utf8() . '<title>' . strip_tags($title) . '</title></head>
 			<body style="margin:0px;">
 				<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
 					<tr><td align="center">
