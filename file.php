@@ -376,7 +376,7 @@ function file_unzip($source, $target) {
         $completeName = $_josh['root'] . $target . DIRECTORY_SEPARATOR . zip_entry_name($zip_entry);
         if (!file_exists($completeName)) {
             $tmp = '';
-            foreach(explode(DIRECTORY_SEPARATOR, $folder) AS $k) {
+            foreach(explode(DIRECTORY_SEPARATOR, $folder) as $k) {
                 $tmp .= $k . DIRECTORY_SEPARATOR;
                 if(!is_dir($_josh['root'] . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir($_josh['root'] . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
             }
