@@ -194,6 +194,9 @@ class form {
 				case 'textarea':
 					$return .= draw_form_textarea($name, $value, $class) . $additional;
 					if (!$_josh['drawn']['tinymce'] && ($class == 'tinymce')) {
+						//todo: we might need a folder for this -- also these names are a bit too generic
+						file_write_folder('images');
+						file_write_folder('files');
 						$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css")');
 						$_josh['drawn']['tinymce'] = true;
 					} elseif (!$_josh['drawn']['ckeditor'] && ($class == 'ckeditor')) {

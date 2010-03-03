@@ -179,15 +179,8 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		require($_josh['root'] . $_josh['config']);
 	}
 	
-//ensure lib exists
-	//todo autogen lib folder when lib.zip has been updated
-	if (!is_dir($_josh['root'] . $_josh['write_folder'] . DIRECTORY_SEPARATOR . 'lib')) {
-		file_write_folder($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'dynamic');	//used by file_dynamic
-		file_write_folder($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'files');		//used by tinymce
-		file_write_folder($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'images');	//used my tinymce
-		file_write_folder($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'rss');		//common -- eventually used by file_rss
-		file_unzip($_josh['joshlib_folder'] . DIRECTORY_SEPARATOR . 'lib.zip', $_josh['write_folder']);
-	}		
+//ensure lib exists--todo autogen lib folder when lib.zip has been updated
+	if (!is_dir($_josh['root'] . $_josh['write_folder'] . DIRECTORY_SEPARATOR . 'lib')) file_unzip($_josh['joshlib_folder'] . DIRECTORY_SEPARATOR . 'lib.zip', $_josh['write_folder']);
 
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_SERVER['HTTP_HOST']) && (format_text_starts('dev-', $_SERVER['HTTP_HOST']) || format_text_starts('beta.', $_SERVER['HTTP_HOST']) || format_text_ends('.site', $_SERVER['HTTP_HOST']))) {

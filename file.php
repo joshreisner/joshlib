@@ -54,6 +54,7 @@ function file_download($content, $filename, $extension) {
 function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
 	//function file_dynamic($filename, $lastmod, $query);
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
+	file_write_folder('dynamic');
 	$filename = $_josh['write_folder'] . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
 	error_debug('<b>' . __function__ . '</b> running with filename = ' . $filename, __file__, __line__);
 	if (!$lastmod || !file_exists($_josh['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['root'] . $filename))) {
@@ -280,7 +281,7 @@ function file_rss($title, $link, $items, $filename=false, $limit=false) {
 	global $_josh;
 	//$items should be an array with title, description, link, author and date
 	//date should be a udate
-	
+
 	//w3c feed validator wants this, if possible
 	$return = ($filename) ? '<atom:link href="' . url_base() . $filename . '" rel="self" type="application/rss+xml" />' : '';
 	
@@ -325,8 +326,10 @@ function file_rss($title, $link, $items, $filename=false, $limit=false) {
 		</rss>';
 	
 	if (!$filename) return $return;
-	
-	return file_put($filename, utf8_encode($return));
+
+	//we're going to put it in the special write_folder rss folder
+	file_write_folder('rss');
+	return file_put($_josh['write_folder'] . DIRECTORY_SEPARATOR . $filename, utf8_encode($return));
 }
 
 function file_sister($filename, $ext) {
@@ -407,12 +410,12 @@ function file_uploaded_image_orientation($fieldname) {
 	return "portrait";
 }
 
-function file_write_folder($folder=false) {
+function file_write_folder($subfolder=false) {
 	//make sure there's a writable folder where you said.  defaults to write_folder
 	global $_josh;
 	
-	if (!$folder) $folder = $_josh['write_folder'];
-	$folder = $_josh['root'] . $folder;
+	$folder = $_josh['root'] . $_josh['write_folder'];
+	if ($subfolder) $folder .= DIRECTORY_SEPARATOR . $subfolder;
 	
 	//make folder
 	if (!is_dir($folder) && !@mkdir($folder)) error_handle('couldn\'t create folder', 'file_write_folder tried to create a folder at ' . $folder . ' but could not.  please create a folder there and make it writable.');
