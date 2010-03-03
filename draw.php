@@ -805,6 +805,18 @@ function draw_swf($path, $width, $height, $border=0) {
 	  </object>';
 }
 
+function draw_table_rows($array, $columns=2) {
+	//generates <tr><td>value</td><td>value</td><td>value</td></tr> blocks of $columns length from an $array
+	$count	= count($array);
+	$mod	= $count % $columns;
+	$width	= round(100 / $columns);
+	$return	= '';
+	for ($i = 0; $i < $mod; $i++) $array[] = '&nbsp;'; //fill empties at end
+	foreach ($array as &$a) $a = draw_container('td', $a, array('width'=>$width . '%')); //wrap all cells in TDs
+	for ($i = 0; $i < $count; $i += $columns) $return .= draw_container('tr', implode('', array_slice($array, $i, $columns))); //set TRs
+	return $return;
+}
+
 function draw_tag($tag, $args=false, $innerhtml=false) {
 	$tag = strToLower($tag);
 	$return = '<' . $tag;

@@ -33,13 +33,6 @@ USING THE DEBUGGER
 	you can run the debug() function after joshlib has been included to see output of various processes
 	to debug the loading of the joshlib itself, set $_josh['debug'] = true before you include it
 
-MISC FUNCTIONS DEFINED ON THIS PAGE
-	cookie
-	cookie_get
-	daysInMonth
-	debug
-	geocode
-
 RUNNING ON THE CLI
 	joshlib depends on certain $SERVER variables being present.  add these lines before including joshlib:
 	$_SERVER['HTTP_HOST']		= 'backend.livingcities.org';
@@ -64,12 +57,24 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	//todo, make settable
 	date_default_timezone_set('America/New_York');
 	
-//set static variables
-	//todo, limit these
+//set static variables todo, limit these
+
+	//date
+	$_josh['days']					= array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+	$_josh['month']					= date('n');
+	$_josh['months']				= array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+	$_josh['mos']					= array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+	$_josh['today']					= date('j');
+	$_josh['year']					= date('Y');
+	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
+
+	//status
 	$_josh['drawn']['ckeditor']		= false;	//only include ckeditor js once
 	$_josh['drawn']['focus']		= false;	//only autofocus on one form element
 	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
 	$_josh['drawn']['tinymce']		= false;	//only include tinymce js once
+
+	//search -- perhaps make this local to search function?
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
 									'as','at','be','because','been','before','being','between','both','but','by','came','can','come',
 									'could','did','do','does','each','else','for','from','get','got','has','had','he','have','her','here',
@@ -80,15 +85,12 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 									'want','was','way','we','well','were','what','when','where','which','while','who','will','with',
 									'would','you','your','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s',
 									't','u','v','w','x','y','z',''); //ignore these words when making search indexes
-	$_josh['month']					= date('n');
-	$_josh['months']				= array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
-	$_josh['mos']					= array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+
+	//etc
 	$_josh['newline']				= "\n"; //default
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
 	$_josh['queries']				= 0;	//for counting trips to the database
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
-	$_josh['today']					= date('j');
-	$_josh['year']					= date('Y');
 
 //get includes
 	require($_josh['joshlib_folder'] . '/array.php');
@@ -282,6 +284,17 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	}
 
 //special functions that don't yet fit into a category
+
+function browser_gzip() {
+    return in_array('gzip', array_separated($_SERVER['HTTP_ACCEPT_ENCODING']));
+}
+
+function browser_output($html) {
+	//one easy way to employ this is with ob_start('browser_output')
+    if (!browser_gzip() || headers_sent()) return $html;
+    header('Content-Encoding: gzip');
+    return gzencode($html);
+}
 
 function cookie($name=false, $value=false, $session=false) {
 	global $_josh, $_COOKIE, $_SERVER;

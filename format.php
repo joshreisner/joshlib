@@ -72,7 +72,7 @@ function format_code($code) {
 	return '<p style="font-family:courier; font-size:13px;">' . nl2br(str_replace('\t', '&nbsp;', htmlentities($code))) . '</p>';
 }
 
-function format_date($timestamp=false, $error='', $format='M d, Y', $relativetime=true) {
+function format_date($timestamp=false, $error='', $format='%b %d, %Y', $relativetime=true) {
 	global $_josh;
 
 	if ($timestamp === false) $timestamp = time();
@@ -81,37 +81,37 @@ function format_date($timestamp=false, $error='', $format='M d, Y', $relativetim
 	if (empty($timestamp) || ($timestamp == 'Jan 1 1900 12:00AM')) return $error;
 	if (!is_int($timestamp)) $timestamp = strToTime($timestamp);
 	
-	//get timestamp for today
-	$todaysdate = mktime(0, 0, 1, $_josh['month'], $_josh['today'], $_josh['year']);
-
-	//get timestamp for argument, without time
-	$returnday    = date('d', $timestamp);
-	$returnyear   = date('Y', $timestamp);
-	$returnmonth  = date('n', $timestamp);
-	$returndate   = mktime(0, 0, 1, $returnmonth, $returnday, $returnyear);
-	
 	//special thing to format for sql
-	if (stristr($format, 'sql')) {
-		$format = 'Y-m-d H:i:00';
-		$todaytime = $relativetime = false;
-	}
-	
+	if (stristr($format, 'sql')) return date('Y-m-d H:i:00', $timestamp);
+
 	if ($relativetime) {
+		//get timestamp for today
+		$todaysdate = mktime(0, 0, 1, $_josh['month'], $_josh['today'], $_josh['year']);
+	
+		//get timestamp for argument, without time
+		$returnday    = date('d', $timestamp);
+		$returnyear   = date('Y', $timestamp);
+		$returnmonth  = date('n', $timestamp);
+		$returndate   = mktime(0, 0, 1, $returnmonth, $returnday, $returnyear);
+			
 		//setup return date
 		$datediff = ($returndate - $todaysdate) / 86400;
 		if ($datediff == 0) {
-			$return = 'Today';
+			$return = $_josh['date']['strings'][1];
 		} elseif ($datediff == -1) {
-			$return = 'Yesterday';
+			$return = $_josh['date']['strings'][0];
 		} elseif ($datediff == 1) {
-			$return = 'Tomorrow';
+			$return = $_josh['date']['strings'][2];
 		} elseif (($datediff < -1) && ($datediff > -7)) { //last six days
-			$return = date('l', $timestamp); //return day of week
+			$return = strftime('%A', $timestamp); //return day of week
+			//$return = date('l', $timestamp); //return day of week
 		} else {
-			$return = date($format, $timestamp);
+			$return = strftime($format, $timestamp);
+			//$return = date($format, $timestamp); //M d, Y
 		}
 	} else {
-		$return = date($format, $timestamp);
+		$return = strftime($format, $timestamp);
+		//$return = date($format, $timestamp);
 	}
 	
 	if ($return === 1) return $error;
@@ -156,7 +156,7 @@ function format_date_sql($month, $day=false, $year=false, $hour=false, $minute=f
 function format_date_time($timestamp=false, $error='', $separator='&nbsp;', $suppressMidnight=true, $relativetime=true) {
 	//string_datetime?
 	if ($timestamp === false) $timestamp = time();
-	$return = format_date($timestamp, $error, 'M d, Y', $relativetime);
+	$return = format_date($timestamp, $error, '%b %d, %Y', $relativetime);
 	//if (($return == 'Today') || ($return == 'Yesterday') || ($return == 'Tomorrow')) 
 	$time = format_time($timestamp);
 	if ($suppressMidnight && ($time == '12:00am')) return $return;

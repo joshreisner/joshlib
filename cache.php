@@ -42,7 +42,7 @@ function cache_start($filename=false) {
 	$filename = format_text_starts('/', $filename);
 	
 	//append user_id (if set) as query argument
-	if (!empty($_SESSION['user_id'])) $filename .= ((stristr('?', $filename)) ? '?' : '&') . 'user_id=' . $_SESSION['user_id'];
+	if ($userID = user_id()) $filename .= ((stristr('?', $filename)) ? '?' : '&') . 'user_id=' . $userID;
 	
 	//finalize
 	$filename = $_josh['write_folder'] . '/caches/' . urlencode($filename) . '.html';
