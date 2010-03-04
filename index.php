@@ -93,13 +93,13 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	
 	//cms / db_save stuff
 	$_josh['field_types']			= array(
-										'text'=>'Text',
-										'textarea'=>'Textarea',
+										'date'=>'Date',
 										'file'=>'File',
 										'image'=>'Image',
-										'date'=>'Date',
 										'int'=>'Integer',
-										'image-alt'=>'Image (Alt)'
+										'image-alt'=>'Image (Alt)',
+										'text'=>'Text',
+										'textarea'=>'Textarea'
 									);
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
 
