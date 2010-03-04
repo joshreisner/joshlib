@@ -484,7 +484,8 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 			copy($_josh['root'] . $source_name, $_josh['root'] . $target_name);
 		} else {
 			//resize height
-			//not implemented yet
+			$new_width = ($width / $height) * $max_height;
+			resize($new_width, $max_height, $source_name, $target_name, $width, $height);
 		}
 	}
 	$return = file_get($target_name);

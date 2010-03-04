@@ -400,43 +400,42 @@ function db_pwdencrypt($string) {
 	}
 }
 
-function db_query($query, $limit=false, $suppress_error=false) {
+function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) {
 	global $_josh;
 	db_open();
-	$query = trim($query);
+	$query = trim($sql);
 	if (isset($_josh['basedblanguage']) && ($_josh['basedblanguage'] != $_josh['db']['language'])) $query = db_translate($query, $_josh['basedblanguage'], $_josh['db']['language']);
 	$_josh['queries']++;
+	
 	if ($_josh['db']['language'] == 'mysql') {
 		if ($limit) $query .= ' LIMIT ' . $limit;
 		$result = @mysql_query($query, $_josh['db']['pointer']);
 		$error = mysql_error();
-		if (!$error) {
-			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-			error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned', __file__, __line__);
-			if (format_text_starts('insert', $query)) return db_id();
-			return $result;
-		} else {
-			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-			error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__);
-			if ($suppress_error) return false;
-			error_handle('mysql error', format_code($query) . $error);
-			//error_handle('mysql error', $error);
-		}
 	} elseif ($_josh['db']['language'] == 'mssql') {
 		if ($limit) $query = 'SELECT TOP ' . $limit . substr($query, 6);
-
-		if ($result = @mssql_query($query, $_josh['db']['pointer'])) {
-			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-			error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned', __file__, __line__);
-			if (format_text_starts('insert', $query)) return db_id();
-			return $result;
-		} else {
-			if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-			if ($suppress_error) return false;
-			error_handle('mssql error', format_code($query) . mssql_get_last_message());
-		}
+		$error = ($result = @mssql_query($query, $_josh['db']['pointer'])) ? false : mssql_get_last_message();
 	}
+
+	if ($error) {
+		//check for dbCheck--this is a local function you can define to check the db schema to see if it needs an update
+		if (!$rechecking && function_exists('dbCheck') && dbCheck()) return db_query($sql, $limit, $suppress_error, true);
+		
+		//report error
+		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
+		error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__);
+		if ($suppress_error) return false;
+		error_handle('sql error', format_code($query) . $error);
+	} else {
+		//handle success
+		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
+		error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned', __file__, __line__);
+		if (format_text_starts('insert', $query)) return db_id();
+		return $result;
+	}
+
 }
+
+
 
 function db_save($table, $id='get', $array=false) {
 	global $_SESSION, $_POST, $_josh;
@@ -614,7 +613,6 @@ function db_table_exists($name) {
 	} elseif ($_josh['db']['language'] == 'mysql') {
 		return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\''));
 	}
-	return false;
 }
 
 function db_translate($sql, $from, $to) {

@@ -90,6 +90,17 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	$_josh['newline']				= "\n"; //default
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
 	$_josh['queries']				= 0;	//for counting trips to the database
+	
+	//cms / db_save stuff
+	$_josh['field_types']			= array(
+										'text'=>'Text',
+										'textarea'=>'Textarea',
+										'file'=>'File',
+										'image'=>'Image',
+										'date'=>'Date',
+										'int'=>'Integer',
+										'image-alt'=>'Image (Alt)'
+									);
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
 
 //get includes
