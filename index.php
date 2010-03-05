@@ -91,7 +91,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
 	$_josh['queries']				= 0;	//for counting trips to the database
 	
-	//cms / db_save stuff
+	//used by cms, db_column_add, and form::set_field
 	$_josh['field_types']			= array(
 										'date'=>'Date',
 										'file'=>'File',
@@ -101,6 +101,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 										'text'=>'Text',
 										'textarea'=>'Textarea'
 									);
+	//used by cms and db_save
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
 
 //get includes
@@ -230,14 +231,12 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	
 	$_josh['editing']	= url_id();
 	
-//handle system url calls
-	if (url_action('ajax_delete,ajax_reorder,ajax_set,flushcache,debug,phpinfo') && (($_josh['mode'] == 'dev') || !empty($_SESSION['user_id']))) {
-		//try to handle the following ajax calls automatically -- requires the session for security
-		
+//handle some ajax calls automatically -- requires user to be logged in
+	if (user() && url_action('ajax_delete,ajax_reorder,ajax_set,flushcache,debug,phpinfo')) {
 		$array = array_ajax();
 		
-		//quick thing for sessions -- might make it sliiiightly more secure (but it shouldn't)
-		if (isset($array['id']) && ($array['id'] == 'session')) $array['id'] = $_SESSION['user_id'];
+		//quick thing for sessions -- why do we need this?
+		if (isset($array['id']) && ($array['id'] == 'session')) $array['id'] = user();
 		
 		switch ($_GET['action']) {
 			case 'ajax_delete':
@@ -262,14 +261,15 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 			case 'ajax_set':
 				//todo, better column type sensing
 				if (stristr($array['column'], 'date')) $array['value'] = format_date($array['value'], 'NULL', 'SQL');
+				
+				//special exception for #panel in cms on object list and form pages
+				if (($array['table'] == 'app_objects')) $array['value'] = str_replace("\n", '<br/>', $array['value']); //nl2br($array['value'])
+				
 				if (db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = \'' . $array['value'] . '\' WHERE id = ' . $array['id'])) {
 					echo (stristr($array['column'], 'date')) ? format_date($array['value']) : $array['value'];
 				} else {
 					echo 'ERROR';
 				}
-				exit;
-			case 'ajax_updateinplace';
-				echo 'hi there';
 				exit;
 			case 'debug':
 				debug();
@@ -409,9 +409,9 @@ function lib_location($string) {
 	}
 }
 
-function user() {
-	//shortcut to say if a session exists and what the id is
-	if (empty($_SESSION['user_id'])) return false;
+function user($return=false) {
+	//shortcut to say if a session exists and what the id is, or return $return
+	if (empty($_SESSION['user_id'])) return $return;
 	return $_SESSION['user_id'];
 }
 

@@ -41,8 +41,8 @@ function cache_start($filename=false) {
 	//strip front slash for easier matching later
 	$filename = format_text_starts('/', $filename);
 	
-	//append user_id (if set) as query argument
-	if ($userID = user_id()) $filename .= ((stristr('?', $filename)) ? '?' : '&') . 'user_id=' . $userID;
+	//append user id (if set) as query argument
+	if ($userID = user()) $filename .= ((stristr('?', $filename)) ? '?' : '&') . 'user_id=' . $userID;
 	
 	//finalize
 	$filename = $_josh['write_folder'] . '/caches/' . urlencode($filename) . '.html';

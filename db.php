@@ -121,6 +121,67 @@ function db_close($keepalive=false) { //close connection and quit
 	if (!$keepalive) exit;
 }
 
+function db_column_add($table, $column, $type) {
+	global $_josh;
+	
+	//type, in this case, means a key from $_josh['field_types'], not mysql datatypes
+	if (!in_array($type, array_keys($_josh['field_types']))) error_handle('unknown data type', __function__ . ' received a request for ' . $type . ' which is not handled.');
+	
+	//handle single-field translations.  multi-field and linked tables are todo
+	$datatype = false;
+	switch ($type) {
+		case 'date': 
+		$datatype = 'datetime';
+		break;
+	
+		case 'file': 
+		$datatype = 'mediumblob';
+		break;
+	
+		case 'image': 
+		$datatype = 'mediumblob';
+		break;
+	
+		case 'int': 
+		$datatype = 'int';
+		break;
+	
+		case 'image-alt': 
+		$datatype = 'mediumblob';
+		break;
+	
+		case 'text': 
+		$datatype = 'varchar';		
+		break;
+	
+		case 'textarea': 
+		$datatype = 'text';
+		break;
+	}
+	
+	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype) . ' DEFAULT NULL')) return $column;
+	return false;
+}
+
+function db_column_exists($table, $column) {
+	global $_josh;
+	if ($_josh['db']['language'] == 'mysql') {
+		$result = db_query('SHOW COLUMNS FROM ' . $table . ' WHERE Field = "' . $column . '"');
+		return db_found($result);
+	} else {
+		error_handle('db_column_exists not yet supported for mssql');
+	}
+}
+
+function db_column_type($datatype) {
+	//edit $datatype declaration in sql statement
+	//$datatype in this case is a mysql datatype
+	$datatype = strToUpper($datatype);
+	if ($datatype == 'VARCHAR') $datatype .= '(255)';
+	if ($datatype == 'INT') $datatype .= '(11)';
+	return $datatype;
+}
+
 function db_columns($tablename, $omitSystemFields=false) {
 	global $_josh;
 	error_debug('<b>db_columns</b> running', __file__, __line__);
@@ -197,10 +258,9 @@ function db_delete($table, $id=false) {
 			error_handle('expecting \$_GET[\'id\']', 'db_delete is expecting an id variable');
 		}
 	}
-	$user = (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) ? $_SESSION['user_id'] : 'NULL';
 	db_query('UPDATE ' . $table . ' SET 
 		deleted_date = ' . db_date() . ', 
-		deleted_user = ' . $user . ', 
+		deleted_user = ' . user('NULL') . ', 
 		is_active = 0 
 		WHERE id = ' . $id);
 }
@@ -438,7 +498,7 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 
 
 function db_save($table, $id='get', $array=false) {
-	global $_SESSION, $_POST, $_josh;
+	global $_josh;
 		
 	//default behavior is to use $_GET['id'] as the id number to deal with
 	if ($id == 'get') $id = url_id();
@@ -448,8 +508,7 @@ function db_save($table, $id='get', $array=false) {
 		exit;
 	}
 	
-	//if (!isset($_SESSION['user_id'])) error_handle('session not set', 'db_save needs a session user_id variable');
-	$userID = (isset($_SESSION['user_id'])) ? $_SESSION['user_id'] : 'NULL';
+	$userID = user('NULL');
 	
 	if (!$array) $array = $_POST;
 	
@@ -603,6 +662,30 @@ function db_table($sql, $limit=false, $suppress_error=false) {
 	$result = db_query($sql, $limit, $suppress_error);
 	while ($r = db_fetch($result)) $return[] = $r;
 	return $return;
+}
+
+function db_table_create($tablename, $fields=false, $rechecking=false) {
+	//create table based on array schema
+	
+	//config columns
+	$columns = '';
+	if ($fields) foreach ($fields as $field=>$type) $columns .= '`' . $field . '` ' . db_column_type($type) . ' DEFAULT NULL, ';
+	
+	//run sql
+	if (db_query('CREATE TABLE `' . $tablename . '` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  ' . $columns . '
+		  `created_date` datetime NOT NULL,
+		  `created_user` int(11) NOT NULL,
+		  `updated_date` datetime DEFAULT NULL,
+		  `updated_user` int(11) DEFAULT NULL,
+		  `deleted_date` datetime DEFAULT NULL,
+		  `deleted_user` int(11) DEFAULT NULL,
+		  `is_active` tinyint(4) NOT NULL,
+		  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;', false, false, $rechecking)) return $tablename;
+	
+	//or not
+	error_handle('could not create table' . $tablename);
 }
 
 function db_table_exists($name) {
