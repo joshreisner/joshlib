@@ -192,7 +192,7 @@ class form {
 					$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
 					break;
 				case 'textarea':
-					$return .= draw_form_textarea($name, $value, $class) . $additional;
+					$return .= draw_form_textarea($name, $value, $class);
 					if (!$_josh['drawn']['tinymce'] && ($class == 'tinymce')) {
 						//todo: we might need a folder for this -- also these names are a bit too generic
 						file_write_folder('images');

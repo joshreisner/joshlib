@@ -268,7 +268,7 @@ function format_html($text) {
 			//these are the tags we want	
 			$good_tags	= array(
 				'a', 'b', 'blockquote', 'br', 'dir', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'i', 'img',
-				'p', 'span', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
+				'p', 'span', 'strike', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
 				'object', 'embed', 'param'
 			);
 			

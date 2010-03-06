@@ -93,6 +93,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	
 	//used by cms, db_column_add, and form::set_field
 	$_josh['field_types']			= array(
+										'checkbox'=>'Checkbox',
 										'date'=>'Date',
 										'file'=>'File',
 										'image'=>'Image',

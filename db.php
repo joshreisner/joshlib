@@ -129,7 +129,13 @@ function db_column_add($table, $column, $type) {
 	
 	//handle single-field translations.  multi-field and linked tables are todo
 	$datatype = false;
+	$default = 'DEFAULT NULL';
 	switch ($type) {
+		case 'checkbox': 
+		$datatype = 'tinyint';
+		$default = 'NOT NULL';
+		break;
+	
 		case 'date': 
 		$datatype = 'datetime';
 		break;
@@ -159,7 +165,7 @@ function db_column_add($table, $column, $type) {
 		break;
 	}
 	
-	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype) . ' DEFAULT NULL')) return $column;
+	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype) . ' ' . $default)) return $column;
 	return false;
 }
 
@@ -177,8 +183,9 @@ function db_column_type($datatype) {
 	//edit $datatype declaration in sql statement
 	//$datatype in this case is a mysql datatype
 	$datatype = strToUpper($datatype);
-	if ($datatype == 'VARCHAR') $datatype .= '(255)';
 	if ($datatype == 'INT') $datatype .= '(11)';
+	if ($datatype == 'TINYINT') $datatype .= '(4)';
+	if ($datatype == 'VARCHAR') $datatype .= '(255)';
 	return $datatype;
 }
 
@@ -540,7 +547,7 @@ function db_save($table, $id='get', $array=false) {
 				$value = "'" . $array[$c['name']] . "'";
 				//$value = ''' . format_html_entities($array[$c['name']]) . ''';
 				if (($value == "''") && (!$c['required'])) $value = 'NULL'; //special null
-			} elseif ($c['type'] == 'text') { //textarea
+			} elseif (($c['type'] == 'text') || ($c['type'] == 'longtext')) { //textarea
 				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
 				$value = "'" . format_html($array[$c['name']] . "'");
 			} elseif (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
