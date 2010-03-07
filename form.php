@@ -96,6 +96,9 @@ class form {
 		//this is a bad idea
 		//if (!$value && !$required && !$additional) $additional = 'optional';
 		
+		//won't always need this
+		if (!$options_table) $options_table = 'options_' . str_replace('_id', '', $name);
+		
 		//wrap additional
 		if ($additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
 		
@@ -159,7 +162,7 @@ class form {
 					break;
 				case 'radio':
 					if (!$options) {
-						if (!$sql) $sql = 'SELECT id, name FROM options_' . str_replace('_id', '', $name);
+						if (!$sql) $sql = 'SELECT id, title FROM ' . $options_table . ' WHERE is_active = 1';
 						$options = db_array($sql);
 					}
 					$return .= '<div class="radio">';
@@ -174,7 +177,7 @@ class form {
 					break;
 				case 'select':
 					if (!$options) {
-						if (!$sql) $sql = 'SELECT id, name FROM options_' . str_replace('_id', '', $name);
+						if (!$sql) $sql = 'SELECT id, title FROM ' . $options_table . ' WHERE is_active = 1';
 						$options = (stristr($sql, 'optgroup')) ? db_table($sql) : db_array($sql);
 					}
 					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;

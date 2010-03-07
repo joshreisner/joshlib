@@ -234,7 +234,7 @@ function db_columns($tablename, $omitSystemFields=false) {
 function db_connected() {
 	//return boolean if database is connected or not -- stop referring to pointer
 	global $_josh;
-	return (isset($_josh['db']['pointer']) && $_josh['db']['pointer']);
+	return (isset($_josh['db']['pointer']) && is_resource($_josh['db']['pointer']));
 }
 
 function db_date() {
@@ -409,10 +409,8 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	//connect to db
 	error_debug('<b>db_open</b> trying to connect ' . $_josh['db']['language'] . ' on ' . $_josh['db']['location'], __file__, __line__);
 	if ($_josh['db']['language'] == 'mysql') {
-		$_josh['db']['pointer'] = @mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
+		$_josh['db']['pointer'] = mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 	} elseif ($_josh['db']['language'] == 'mssql') {
-	die('hi');
-		error_debug('<b>db_open</b> trying to connect mssql on ' . $_josh['db']['location'] . ' with username ' . $_josh['db']['username'], __file__, __line__);
 		$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 		//msssql 2000 doesn't support utf8
 	}
@@ -422,7 +420,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 		error_handle('Database Connection', 'Most likely, you haven\'t yet configured the variables in ' . $_josh['config'] . '.  It\'s also possible that the database is suddenly down.');
 		exit; //to prevent massive repetition
 	}
-	
+
 	//set utf8 -- todo mssql 2005
 	if ($_josh['db']['language'] == 'mysql') mysql_set_charset('utf8', $_josh['db']['pointer']);
 	
@@ -656,6 +654,7 @@ function db_switch($target=false) {
 	global $_josh;
 	db_open();
 	if (!$target) $target = $_josh['db']['database'];
+	if (empty($_josh['db']['database'])) error_handle('database nots specified');
 	if ($_josh['db']['language'] == 'mssql') {
 		mssql_select_db($target, $_josh['db']['pointer']);
 	} elseif ($_josh['db']['language'] == 'mysql') {
@@ -701,7 +700,7 @@ function db_table_exists($name) {
 		//not implemented yet
 		error_handle('db_table_exists', 'this function is not yet implemented for mssql');
 	} elseif ($_josh['db']['language'] == 'mysql') {
-		return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\''));
+		return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding massive db repition with dbCheck
 	}
 }
 

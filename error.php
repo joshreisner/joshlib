@@ -57,8 +57,8 @@ function error_draw($title, $html) {
 	exit;
 }
 
-function error_handle($type, $message="", $file=false, $line=false, $function=false) {
-	global $_josh, $_SESSION, $_SERVER;
+function error_handle($type, $message='', $file=false, $line=false, $function=false) {
+	global $_josh;
 	error_debug('ERROR! type is:' . $type . ' and message is: ' . $message, __file__, __line__);
 	
 	//small possiblity these vars aren't set yet

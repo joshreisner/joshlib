@@ -95,6 +95,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	$_josh['field_types']			= array(
 										'checkbox'=>'Checkbox',
 										'date'=>'Date',
+										'select'=>'Dropdown',
 										'file'=>'File',
 										'image'=>'Image',
 										'int'=>'Integer',
