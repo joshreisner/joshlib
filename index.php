@@ -396,6 +396,9 @@ function lib_location($string) {
 	
 	//i'm thinking i'll start a lib.php file
 	switch ($string) {
+		case 'fpdf' :
+		return $_josh['write_folder'] . '/lib/fpdf/fpdf-1.6.php';
+		
 		case 'prototype' :
 		return $_josh['write_folder'] . '/lib/prototype/prototype-1.5.0.js';
 		
