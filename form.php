@@ -98,6 +98,7 @@ class form {
 		
 		//won't always need this
 		if (!$options_table) $options_table = 'options_' . str_replace('_id', '', $name);
+		if (!$option_title) $option_title = 'title';
 		
 		//wrap additional
 		if ($additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
@@ -162,7 +163,7 @@ class form {
 					break;
 				case 'radio':
 					if (!$options) {
-						if (!$sql) $sql = 'SELECT id, title FROM ' . $options_table . ' WHERE is_active = 1';
+						if (!$sql) $sql = 'SELECT id, ' . $option_title . ' FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title;
 						$options = db_array($sql);
 					}
 					$return .= '<div class="radio">';
@@ -177,7 +178,7 @@ class form {
 					break;
 				case 'select':
 					if (!$options) {
-						if (!$sql) $sql = 'SELECT id, title FROM ' . $options_table . ' WHERE is_active = 1';
+						if (!$sql) $sql = 'SELECT id, ' . $option_title . ' FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title;
 						$options = (stristr($sql, 'optgroup')) ? db_table($sql) : db_array($sql);
 					}
 					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
@@ -206,6 +207,10 @@ class form {
 						$return .= draw_javascript_ckeditor();
 						$_josh['drawn']['ckeditor'] = true;
 					}
+					break;
+				case 'url':
+					if (!$value) $value = 'http://';
+					$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
 					break;
 			}
 						
@@ -336,7 +341,8 @@ class form {
 				}
 			}
 			
-			//load checkboxes tables
+			//load checkboxes tables 
+			//todo deprecate
 			if ($keys = db_keys_to($table)) {
 				foreach ($keys as $key) {
 					if (isset($key['ref_table'])) {

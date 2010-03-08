@@ -163,6 +163,10 @@ function db_column_add($table, $column, $type) {
 		case 'textarea': 
 		$datatype = 'text';
 		break;
+		
+		case 'url': 
+		$datatype = 'varchar';
+		break;
 	}
 	
 	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype) . ' ' . $default)) return $column;
@@ -525,7 +529,17 @@ function db_save($table, $id='get', $array=false) {
 	
 	foreach ($columns as $c) {
 		error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type'], __file__, __line__);
-		if (isset($array[$c['name']])) {
+		
+		//making bits always required, never null
+		if (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
+			$value = format_boolean(empty($array[$c['name']]), '0|1');
+			if ($id) {
+				$query1[] = $c['name'] . ' = ' . $value;
+			} else {
+				$query1[] = $c['name'];
+				$query2[] = $value;
+			}
+		} elseif (isset($array[$c['name']])) {
 			//we have a value to save for this column
 			if (($c['type'] == 'decimal') || ($c['type'] == 'float')) {
 				$value = format_null(format_numeric($array[$c['name']], false));
@@ -548,8 +562,8 @@ function db_save($table, $id='get', $array=false) {
 			} elseif (($c['type'] == 'text') || ($c['type'] == 'longtext')) { //textarea
 				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
 				$value = "'" . format_html($array[$c['name']] . "'");
-			} elseif (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
-				$value = format_boolean($array[$c['name']], '1|0');
+			//} elseif (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
+			//	$value = format_boolean($array[$c['name']], '1|0');
 			} elseif ($c['type'] == 'datetime') {
 				//this would never happen
 				$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';

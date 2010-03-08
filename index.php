@@ -101,7 +101,8 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 										'int'=>'Integer',
 										'image-alt'=>'Image (Alt)',
 										'text'=>'Text',
-										'textarea'=>'Textarea'
+										'textarea'=>'Textarea',
+										'url'=>'URL'
 									);
 	//used by cms and db_save
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
