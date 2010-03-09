@@ -169,6 +169,7 @@ function form_tinymce_clear(field_id) {
 }
 
 function form_tinymce_init(cssLocation) {
+	//todo have user() based tinymce / disable insertimage (replace with image) and comment out plugins
 	tinyMCE.init({
 		mode : "textareas",
 		theme : "advanced",
@@ -186,23 +187,6 @@ function form_tinymce_init(cssLocation) {
 		relative_urls : false,
 		remove_script_host : false
 	});
-/*	tinyMCE.init({
-		mode : "textareas",
-		theme : "simple",
-		theme_advanced_buttons1 : "bold,italic,underline,strikethrough,separator,justifyleft,justifycenter,blockquote,separator,bullist,numlist,separator,undo,redo,separator,link,unlink,image,|,code",
-		theme_advanced_buttons2 : "",
-		theme_advanced_buttons3 : "",
-		theme_advanced_resizing : true,		
-		//theme_advanced_statusbar_location : "bottom",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "center",
-		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[align|style],p[align]",
-		content_css : cssLocation + "?" + new Date().getTime(),
-		plugins : "imagemanager,filemanager",
-		editor_selector : "tinymce",
-		relative_urls : false,
-		remove_script_host : false
-	});*/
 }
 
 function form_checkboxes_empty(form, name) {
