@@ -411,7 +411,7 @@ function lib_location($string) {
 		return $_josh['root'] . $_josh['write_folder'] . '/lib/simple_html_dom/simple_html_dom-1.11.php';
 
 		case 'tinymce' :
-		return $_josh['write_folder'] . '/lib/tinymce/tinymce-3.2.7/tiny_mce.js';
+		return $_josh['write_folder'] . '/lib/tinymce/tinymce-3.3rc1/tiny_mce.js';
 	}
 }
 

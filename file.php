@@ -329,7 +329,7 @@ function file_rss($title, $link, $items, $filename=false, $limit=false) {
 
 	//we're going to put it in the special write_folder rss folder
 	file_write_folder('rss');
-	return file_put($_josh['write_folder'] . DIRECTORY_SEPARATOR . $filename, utf8_encode($return));
+	return file_put($_josh['write_folder'] . DIRECTORY_SEPARATOR . 'rss' . DIRECTORY_SEPARATOR . $filename, utf8_encode($return));
 }
 
 function file_sister($filename, $ext) {

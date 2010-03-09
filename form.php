@@ -196,7 +196,6 @@ class form {
 					$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
 					break;
 				case 'textarea':
-					$return .= draw_form_textarea($name, $value, $class);
 					if (!$_josh['drawn']['tinymce'] && ($class == 'tinymce')) {
 						//todo: we might need a folder for this -- also these names are a bit too generic
 						file_write_folder('images');
@@ -207,6 +206,7 @@ class form {
 						$return .= draw_javascript_ckeditor();
 						$_josh['drawn']['ckeditor'] = true;
 					}
+					$return .= draw_form_textarea($name, $value, $class);
 					break;
 				case 'url':
 					if (!$value) $value = 'http://';
