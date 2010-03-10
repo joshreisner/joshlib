@@ -251,26 +251,26 @@ function file_put($filename, $content) {
 function file_put_config() {
 	global $_josh;
 	
-	$return	 = '<?php' . $_josh['newline'];
+	$return	 = '<?php' . NEWLINE;
 	
 	//db variables
-	$return .= '$_josh[\'db\'][\'location\']	= \'' . $_josh['db']['location'] . '\'; //server' . $_josh['newline'];
-	$return .= '$_josh[\'db\'][\'language\']	= \'' . $_josh['db']['language'] . '\'; //mysql or mssql' . $_josh['newline'];
-	$return .= '$_josh[\'db\'][\'database\']	= \'' . $_josh['db']['database'] . '\';' . $_josh['newline'];
-	$return .= '$_josh[\'db\'][\'username\']	= \'' . $_josh['db']['username'] . '\';' . $_josh['newline'];
-	$return .= '$_josh[\'db\'][\'password\']	= \'' . $_josh['db']['password'] . '\';' . $_josh['newline'];
-	$return .= '$_josh[\'basedblanguage\']	= \'' . $_josh['basedblanguage'] . '\'; //mysql or mssql (not necessary unless you want it translated)' . $_josh['newline'];
-	$return .= $_josh['newline'];
+	$return .= '$_josh[\'db\'][\'location\']	= \'' . $_josh['db']['location'] . '\'; //server' . NEWLINE;
+	$return .= '$_josh[\'db\'][\'language\']	= \'' . $_josh['db']['language'] . '\'; //mysql or mssql' . NEWLINE;
+	$return .= '$_josh[\'db\'][\'database\']	= \'' . $_josh['db']['database'] . '\';' . NEWLINE;
+	$return .= '$_josh[\'db\'][\'username\']	= \'' . $_josh['db']['username'] . '\';' . NEWLINE;
+	$return .= '$_josh[\'db\'][\'password\']	= \'' . $_josh['db']['password'] . '\';' . NEWLINE;
+	$return .= '$_josh[\'basedblanguage\']	= \'' . $_josh['basedblanguage'] . '\'; //mysql or mssql (not necessary unless you want it translated)' . NEWLINE;
+	$return .= NEWLINE;
 	
 	//error variables
-	$return .= '$_josh[\'error_log_api\']		= ' . (($_josh['error_log_api']) ? $_josh['error_log_api'] : 'false') . '; //error logging url, eg http://tasks.joshreisner.com/errorapi.php' . $_josh['newline'];
-	$return .= '$_josh[\'email_default\']		= \'' . $_josh['email_default'] . '\'; //regular site emails come from this address' . $_josh['newline'];
-	$return .= '$_josh[\'email_admin\']		= \'' . $_josh['email_admin'] . '\'; //error emails go to this address' . $_josh['newline'];
-	$return .= $_josh['newline'];
+	$return .= '$_josh[\'error_log_api\']		= ' . (($_josh['error_log_api']) ? $_josh['error_log_api'] : 'false') . '; //error logging url, eg http://tasks.joshreisner.com/errorapi.php' . NEWLINE;
+	$return .= '$_josh[\'email_default\']		= \'' . $_josh['email_default'] . '\'; //regular site emails come from this address' . NEWLINE;
+	$return .= '$_josh[\'email_admin\']		= \'' . $_josh['email_admin'] . '\'; //error emails go to this address' . NEWLINE;
+	$return .= NEWLINE;
 	
 	//url variables
-	$return .= '$_josh[\'is_secure\']			= ' . (($_josh['is_secure']) ? $_josh['is_secure'] : 'false') . '; //indicates whether it should use https (true) or not (false)' . $_josh['newline'];
-	$return .= $_josh['newline'];
+	$return .= '$_josh[\'is_secure\']			= ' . (($_josh['is_secure']) ? $_josh['is_secure'] : 'false') . '; //indicates whether it should use https (true) or not (false)' . NEWLINE;
+	$return .= NEWLINE;
 
 	$return .= '?>';
 	

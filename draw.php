@@ -101,8 +101,8 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 	
 	$days_short = array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat');
 	$days_long = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
-	
-	$return = ($_josh['mode'] == 'dev') ? $_josh['newline'] . $_josh['newline'] . '<!--calendar ' . $divclass . ' starts -->' . $_josh['newline'] : '';
+
+	$return = '';	
 	if ($type == 'table') $return .= '<tr>';
 	for ($i = 0; $i < 7; $i++) {
 		if ($type == 'table') {
@@ -490,7 +490,7 @@ function draw_google_map($markers, $center=false) {
 	foreach ($markers as $m) {
 		$lat += $m['latitude'];
 		$lon += $m['longitude'];
-		$markerstr .= $_josh['newline'] . '
+		$markerstr .= NEWLINE . '
 			var marker = draw_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "' . $m['title'] . '", "' . $m['description'] . '", "' . $m['color'] . '");
 			map.addOverlay(marker);
 			';
@@ -619,8 +619,7 @@ function draw_javascript_src($filename=false) {
 	} elseif (!$filename) {
 		return error_handle(__FUNCTION__ . ' needs the variable _josh[\'write_folder\'] to be set.', __file__, __line__);
 	}
-	//$src = 'http://joshlib.joshreisner.com/javascript.js';
-	return $_josh['newline'] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
+	return '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
 function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) {
@@ -667,7 +666,7 @@ function draw_list($options, $arguments_or_class=false, $type='ul', $selected=fa
 		$options[$i] = draw_tag('li', array('class'=>$liclass), $options[$i]);
 		$counter++;
 	}
-	return draw_tag($type, $arguments_or_class, implode($options,  "\t"));
+	return draw_tag($type, $arguments_or_class, implode($options, ''));
 }
 
 function draw_list_db($table_or_sql, $linkprefix='', $arguments_or_class=false, $type='ul', $selected=false) {
@@ -681,12 +680,12 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguments_or_class=false, 
 
 function draw_meta_description($string) {
 	global $_josh;
-	return draw_tag('meta', array('name'=>'description', 'content'=>$string)) . $_josh['newline'];
+	return draw_tag('meta', array('name'=>'description', 'content'=>$string));
 }
 
 function draw_meta_utf8() {
 	global $_josh;
-	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8')) . $_josh['newline'];
+	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
 }
 
 function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $useid=false) {
@@ -701,7 +700,6 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	//skip if empty
 	if (!is_array($options) || !count($options)) return false;
 	
-	//$return = $_josh['newline'] . $_josh['newline'] . '<!--start nav-->' . $_josh['newline'] . '<ul class='' . $class . ''>';
 	$return = array();
 	if ($match === false) {
 		$match = $_josh['request']['path'];
@@ -714,7 +712,7 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	error_debug('<b>draw_navigation</b> match is ' . $match, __file__, __line__);
 	$selected = false;
 	$counter = 1;
-	$javascript = $_josh['newline'];
+	$javascript = NEWLINE;
 	foreach ($options as $url=>$title) {
 		$name = 'option_' . $_josh['drawn_navigation'] . '_' . $counter;
 		$thisoption = '<a href="' . $url . '" class="' . $name;
@@ -740,10 +738,10 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 				if (empty($img)) $img = 'home';
 			}
 			if ($type == 'rollovers') {
-				$javascript .= $name . '_on		 = new Image;' . $_josh['newline'];
-				$javascript .= $name . '_off	 = new Image;' . $_josh['newline'];
-				$javascript .= $name . '_on.src	 = "' . $folder . $img . '_on.png";' . $_josh['newline'];
-				$javascript .= $name . '_off.src = "' . $folder . $img . '_off.png";' . $_josh['newline'];
+				$javascript .= $name . '_on		 = new Image;' . NEWLINE;
+				$javascript .= $name . '_off	 = new Image;' . NEWLINE;
+				$javascript .= $name . '_on.src	 = "' . $folder . $img . '_on.png";' . NEWLINE;
+				$javascript .= $name . '_off.src = "' . $folder . $img . '_off.png";' . NEWLINE;
 			}
 			$thisoption .= draw_img($folder . $img . $img_state . '.png', false, false, $name);
 		}
@@ -753,15 +751,6 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	}
 	$return = 	draw_javascript_src() . draw_list($return, $class, 'ul', $selected);
 	if ($type == 'rollovers') $return = draw_javascript('if (document.images) {' . $javascript . '}') . $return;
-	return $return;
-}
-
-function draw_newline($count=1) {
-	global $_josh;
-	$return = '';
-	for ($i = 0; $i < $count; $i++) {
-		$return .= $_josh['newline'];
-	}
 	return $return;
 }
 
@@ -831,9 +820,6 @@ function draw_tag($tag, $arguments=false, $innerhtml=false) {
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
 		$return .= '>' . $innerhtml . '</' . $tag . '>';
 	}
-	$nonbreaking_tags = array('a', 'b', 'img', 'nobr', 'input');
-	if (!in_array($tag, $nonbreaking_tags)) $return .= draw_newline();
-	if ($tag == 'table') $return .= draw_newline(2);
 	return $return;
 }
 

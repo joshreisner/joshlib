@@ -45,7 +45,7 @@ function error_draw($title, $html) {
 	error_debug('drawing error handling page', __file__, __line__);
 	
 	//suppress HTML output if it's a CRON job
-	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . $_josh['newline'] . $_josh['newline'] . $html);
+	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . NEWLINE . NEWLINE . $html);
 
 	//add fancy error element
 	$title = '<div style="background-color:#59c;color:#fff;height:36px;line-height:36px;padding:0px 20px 0px 20px;position:absolute;top:-36px;left:0px;">Error</div>' . $title;

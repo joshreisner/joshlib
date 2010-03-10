@@ -4,18 +4,16 @@ error_debug('including email.php', __file__, __line__);
 function email($to, $message, $subject='Email from Your Website', $from=false) {
 	global $_josh;
 	error_debug('<b>email </b> sending message to <i>' . $to . '</i> with subject ' . $subject, __file__, __line__);
-	$headers  = 'MIME-Version: 1.0' . $_josh['newline'];
-	$headers .= 'Content-type: text/html; charset=iso-8859-1' . $_josh['newline'];
+	$headers  = 'MIME-Version: 1.0' . NEWLINE;
+	$headers .= 'Content-type: text/html; charset=iso-8859-1' . NEWLINE;
 	if ($from) {
-		$headers .= 'From: ' . format_email($from) . $_josh['newline'];
+		$headers .= 'From: ' . format_email($from) . NEWLINE;
 	} else {
-		if (!isset($_josh['email_default'])) error_handle('email from address missing', 'please call this function with a from address, or specify one in the config file.', true);
-		$headers .= 'From: ' . $_josh['email_default'] . $_josh['newline'];
+		if (!isset($_josh['email_default'])) error_handle('email from address missing', 'please call ' . __FUNCTION__ . ' with a from address, or specify one in the config file.', true);
+		$headers .= 'From: ' . $_josh['email_default'] . NEWLINE;
 	}
 	$to = format_email($to);
-	if (!@mail($to, $subject, $message, $headers)) {
-		error_handle('email not sent', 'sorry, an unexpected error occurred while sending your mail to ' . $to, true);
-	}
+	if (!@mail($to, $subject, $message, $headers)) error_handle('email not sent', 'sorry, an unexpected error occurred while sending your mail to ' . $to, true);
 	return true;
 }
 

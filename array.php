@@ -76,7 +76,7 @@ function array_csv($content, $delimiter=',') {
 	//assumes first line is header
 	//written by josh on 5/15/09 for work mgmt: harvest import
 	
-	$rows = array_separated($content, $_josh['newline']);
+	$rows = array_separated($content, NEWLINE);
 	
 	//parse header
 	$columns = array();

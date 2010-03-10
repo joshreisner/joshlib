@@ -60,11 +60,11 @@ class table {
 				if ($counter == $count_rows) $return .= ' last_row';
 				$return .= '"';
 				if (isset($v['link'])) $return .= ' onclick="location.href=\'' . $v['link'] . '\';"';
-				$return .= '>' . $_josh['newline'];
+				$return .= '>';
 				
 				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class'], 'style'=>(($c['width']) ? 'width:' . $c['width'] . 'px;': false)), $v[$c['name']]);
 				
-				$return .= '</tr>' . $_josh['newline'];
+				$return .= '</tr>';
 				
 				$row = ($row == 'even') ? 'odd' : 'even';
 			}
@@ -82,9 +82,9 @@ class table {
 				} else {
 					$return .= '&nbsp;';
 				}
-				$return .= '</td>' . $_josh['newline'];
+				$return .= '</td>';
 			}
-			$return .= '</tr></tfoot>' . $_josh['newline'];
+			$return .= '</tr></tfoot>';
 		}
 		
 		$class .= ' table'; //temp for intranet
