@@ -21,6 +21,12 @@ function array_ajax($required=false) {
 	return $array;
 }
 
+function array_arguments($arguments=false) {
+	if (!$arguments) return array();
+	if (is_string($arguments)) return array('class'=>$arguments);
+	return $arguments;
+}
+
 function array_chunk_html($string, $length) {
 	//split an html string into smaller chunks while not breaking inside an HTML tag
 	//used by language_translate
@@ -241,6 +247,11 @@ function array_separated($content, $separator=',') {
 		if (!empty($f)) $return[] = $f;
 	}
 	return $return;
+}
+
+function array_slice_assoc($array, $start=false, $length=false) {
+	$keys = array_slice(array_keys($array), $start, $length);
+    return array_intersect_key($array, array_2d($keys));
 }
 
 function array_sort($array, $direction='asc', $key=false) {

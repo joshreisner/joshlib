@@ -62,7 +62,7 @@ class table {
 				if (isset($v['link'])) $return .= ' onclick="location.href=\'' . $v['link'] . '\';"';
 				$return .= '>' . $_josh['newline'];
 				
-				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class']), $v[$c['name']]);
+				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class'], 'style'=>(($c['width']) ? 'width:' . $c['width'] . 'px;': false)), $v[$c['name']]);
 				
 				$return .= '</tr>' . $_josh['newline'];
 				

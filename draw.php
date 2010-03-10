@@ -1,23 +1,22 @@
 <?php
 error_debug('including draw.php', __file__, __line__);
 
-function draw_arg($name, $value=false) {
+function draw_argument($name, $value=false) {
 	if ($value === false) return;
 	return ' ' . strToLower($name) . '="' . str_replace('"', format_ascii('"'), $value) . '"';
 }
 
-function draw_args($array) {
+function draw_arguments($arguments=false) {
+	$arguments = array_arguments($arguments);
 	$return = '';
-	foreach ($array as $key=>$value) $return .= draw_arg($key, $value);
+	foreach ($arguments as $key=>$value) $return .= draw_argument($key, $value);
 	return $return;
 }
 
 function draw_array($array, $nice=false) {
 	global $_josh;
 	if (!is_array($array)) return false;
-	$return = '
-
-<table border="1">';
+	$return = '<table border="1">';
 	//if (!$nice) ksort($array);
 	while(list($key, $value) = each($array)) {
 		$key = urldecode($key);
@@ -25,8 +24,7 @@ function draw_array($array, $nice=false) {
 		$value = format_quotes($value);
 		if (strToLower($key) == 'email') $value = '<a href="mailto:' . $value . '">' . $value . '</a>';
 		if (is_array($value)) $value = draw_array($value, $nice);
-		$return  .= '
-			<tr><td bgcolor="#eeeeee"><b>';
+		$return  .= '<tr><td bgcolor="#eeeeee"><b>';
 		$return .= ($nice) ? format_text_human($key)  : $key;
 		$return .= '&nbsp;</b></td><td>';
 		$return .= is_object($value) ? 'object value' : $value;
@@ -160,37 +158,41 @@ function draw_css_src($location='/styles/screen.css', $media=false) {
 	return $return;
 }
 
-function draw_container($tag, $innerhtml, $args=false) {
+function draw_container($tag, $innerhtml, $arguments=false) {
 	//convenience function for draw_tag if you're just writing a simple container tag
-	return draw_tag($tag, $args, $innerhtml);
+	return draw_tag($tag, $arguments, $innerhtml);
 }
 
-function draw_div($id, $innerhtml='', $args=false) {
+function draw_definition_list($array, $arguments=false) {
+	$return = '';
+	foreach ($array as $key=>$value) $return .= draw_container('dt', $key) . draw_container('dd', $value);
+	return draw_container('dl', $return, $arguments);
+}
+
+function draw_div($id, $innerhtml='', $arguments=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	//todo deprecate this in favor of draw_div_id
-	return draw_div_id($id, $innerhtml, $args);
+	return draw_div_id($id, $innerhtml, $arguments);
 }
 
-function draw_div_class($class, $innerhtml='', $args=false) {
+function draw_div_class($class, $innerhtml='', $arguments=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
-	if (!$args) $args = array();
-	$args['class'] = $class;
-	if (empty($innerhtml)) $args['class'] .= ' empty';
-	return draw_tag('div', $args, $innerhtml);
+	$arguments = array_arguments($arguments);
+	$arguments['class'] = $class;
+	if (empty($innerhtml)) $arguments['class'] .= ' empty';
+	return draw_tag('div', $arguments, $innerhtml);
 }
 
-function draw_div_id($id, $innerhtml='', $args=false) {
+function draw_div_id($id, $innerhtml='', $arguments=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
-	if (!$args) $args = array();
-	$args['id'] = $id;
-	return draw_tag('div', $args, $innerhtml);
+	$arguments = array_arguments($arguments);
+	$arguments['id'] = $id;
+	return draw_tag('div', $arguments, $innerhtml);
 }
 
 function draw_dl($array, $class=false) {
 	$return = '';
-	foreach ($array as $key=>$value) {
-		$return .= draw_container('dt', $key) . draw_container('dd', $value);
-	}
+	foreach ($array as $key=>$value) $return .= draw_container('dt', $key) . draw_container('dd', $value);
 	return draw_container('dl', $return, array('class'=>$class));
 }
 
@@ -216,6 +218,7 @@ function draw_focus($form_element) {
 }
 
 function draw_form_button($text, $location=false, $class=false, $disabled=false, $javascript=false) {
+	//todo deprecate
 	global $_josh;
 	$class = ($class) ? $class . ' button' : 'button';
 	$return  = '<input type="button" value="' . $text . '" id="' . $text . '" class="' . $class . '" onclick="';
@@ -230,14 +233,14 @@ function draw_form_button($text, $location=false, $class=false, $disabled=false,
 	return $return;
 }
 
-function draw_form_checkbox($name, $checked=false, $class=false, $javascript=false) {
-	global $_josh;
-	$class = ($class) ? $class . ' checkbox' : 'checkbox';
-	$return  = '<input type="checkbox" name="' . $name . '" id="' . $name . '" class="' . $class . '"';
-	if ($javascript) $return .= ' onclick="javascript:' . $javascript . '"';
-	if ($checked) $return .= ' checked="checked"';
-	$return .= '/>';
-	return $return;
+function draw_form_checkbox($name, $checked=false, $arguments=false, $javascript=false) {
+	$arguments = array_arguments($arguments);
+	$arguments['class'] = (empty($arguments['class'])) ? 'checkbox' : $arguments['class'] . ' checkbox';
+	$arguments['type'] = 'checkbox';
+	$arguments['name'] = $arguments['id'] = $name;
+	if ($javascript) $arguments['onclick'] = 'javascript:' . $javascript;
+	if ($checked) $arguments['checked'] = 'checked';
+	return draw_tag('input', $arguments);
 }
 
 function draw_form_checkboxes($name, $linking_table=false, $object_col=false, $option_col=false, $id=false) {
@@ -539,23 +542,23 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	if (!$image) return '';
 	
 	//assemble tag
-	$args = array('src'=>url_base() . $path, 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
+	$arguments = array('src'=>url_base() . $path, 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
 	if (is_array($alt)) {
 		//values of alt can overwrite width, height, border, even src
-		$args = array_merge($args, $alt);
+		$arguments = array_merge($arguments, $alt);
 	} else {
-		$args['alt'] = $alt;
-		$args['name'] = $args['class'] = $args['id'] = $name;
+		$arguments['alt'] = $alt;
+		$arguments['name'] = $arguments['class'] = $arguments['id'] = $name;
 		$alt = false; //this was passed as a string, needs to be nulled so it doesn't go to draw_link
 	}
 	
 	//force alt text for w3 validation
-	if (empty($args['alt'])) {
+	if (empty($arguments['alt'])) {
 		list($name, $ext, $path) = file_name($path);
-		$args['alt'] = format_text_human($name);
+		$arguments['alt'] = format_text_human($name);
 	}
 
-	$image = draw_tag('img', $args);
+	$image = draw_tag('img', $arguments);
 	if ($link) return draw_link($link, $image, $linknewwindow, $alt);
 	return $image;
 }
@@ -620,39 +623,39 @@ function draw_javascript_src($filename=false) {
 	return $_josh['newline'] . '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
 
-function draw_link($href=false, $str=false, $newwindow=false, $args=false) {
-	if (!$args)	{
-		$args = array();
-	} elseif (!is_array($args)) {
-		//if args is a string, make it the link's class
-		$args = array('class'=>$args);
+function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) {
+	if (!$arguments)	{
+		$arguments = array();
+	} elseif (!is_array($arguments)) {
+		//if arguments is a string, make it the link's class
+		$arguments = array('class'=>$arguments);
 	}
 	if (!$href) return $str;
 	
 	//obfuscate email
 	if (format_text_starts('mailto:', $href)) {
 		if (!$str) $str = format_ascii(format_string(str_replace('mailto:', '', $href), 60));
-		$args['href'] = format_ascii($href);
+		$arguments['href'] = format_ascii($href);
 	} else {
 		if (!$str) $str = format_string($href, 60);
-		$args['href'] = htmlentities($href);
+		$arguments['href'] = htmlentities($href);
 	}
-	if ($newwindow) $args['target'] = '_blank';
+	if ($newwindow) $arguments['target'] = '_blank';
 	
-	return draw_tag('a', $args, $str);
+	return draw_tag('a', $arguments, $str);
 }
 
-function draw_link_ajax_set($table, $column, $id, $value, $str, $args=false) {
+function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false) {
 	if (!$id) $Id = 'session';
-	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $args);
+	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $arguments);
 }
 
-function draw_list($options, $args_or_class=false, $type='ul', $selected=false) {
+function draw_list($options, $arguments_or_class=false, $type='ul', $selected=false) {
 	//make a ul or an ol out of a one-dimensional array
 	
 	global $_josh;
 	if (!is_array($options) || (!$count = count($options))) return false;
-	if (!is_array($args_or_class)) $args_or_class = array('class'=>$args_or_class); //if args is a string, it's legacy class
+	if (!is_array($arguments_or_class)) $arguments_or_class = array('class'=>$arguments_or_class); //if arguments is a string, it's legacy class
 		
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
@@ -664,16 +667,16 @@ function draw_list($options, $args_or_class=false, $type='ul', $selected=false) 
 		$options[$i] = draw_tag('li', array('class'=>$liclass), $options[$i]);
 		$counter++;
 	}
-	return draw_tag($type, $args_or_class, implode($options,  "\t"));
+	return draw_tag($type, $arguments_or_class, implode($options,  "\t"));
 }
 
-function draw_list_db($table_or_sql, $linkprefix='', $args_or_class=false, $type='ul', $selected=false) {
+function draw_list_db($table_or_sql, $linkprefix='', $arguments_or_class=false, $type='ul', $selected=false) {
 	//experiment.  draw_list_table('blog_categories', '/c/?id=') will return a UL with a list of links
 	//todo: add better behaviors like if id column dne, or something
 	if (!stristr($table_or_sql, ' ')) $table_or_sql = 'SELECT id, title FROM ' . $table_or_sql . ' t WHERE t.is_active = 1 ORDER BY t.precedence';
 	$result = db_table($table_or_sql);
 	foreach ($result as &$r) $r = draw_link($linkprefix . $r['id'], $r['title']);
-	return draw_list($result, $args_or_class, $type, $selected);
+	return draw_list($result, $arguments_or_class, $type, $selected);
 }
 
 function draw_meta_description($string) {
@@ -817,10 +820,10 @@ function draw_table_rows($array, $columns=2) {
 	return $return;
 }
 
-function draw_tag($tag, $args=false, $innerhtml=false) {
+function draw_tag($tag, $arguments=false, $innerhtml=false) {
 	$tag = strToLower($tag);
 	$return = '<' . $tag;
-	$return .= (is_array($args)) ? draw_args($args) : draw_arg('class', $args);
+	$return .= (is_array($arguments)) ? draw_arguments($arguments) : draw_argument('class', $arguments);
 	if ($innerhtml === false) {
 		$return .= '/>';
 	} else {
