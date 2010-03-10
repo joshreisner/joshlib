@@ -87,7 +87,6 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 									't','u','v','w','x','y','z',''); //ignore these words when making search indexes
 
 	//etc
-	$_josh['newline']				= "\n"; //default
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
 	$_josh['queries']				= 0;	//for counting trips to the database
 	
@@ -141,15 +140,21 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 				
 		//special set $_GET['id']
 		if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
-			
+		
+		define('TAB', "\t");
+		
 		//platform-specific info
 		if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) { //platform is PC
 			$_josh['newline']			= "\r\n";
+			define('NEWLINE', "\r\n");
+			define('PLATFORM', 'win');
 			//$_josh['root']				= str_replace(str_replace('/', '\\', $_josh['request']['path']), '', str_replace('\\\\', '\\foo', $_SERVER['PATH_TRANSLATED']));
 			$_josh['root']				= str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']);
 			$_josh['slow']				= true;
 		} else { //platform is UNIX or Mac
-			$_josh['newline']			= "\n"; //has to be double-quotes for some reason
+			$_josh['newline']			= "\n";
+			define('NEWLINE', "\n");
+			define('PLATFORM', 'unix');
 			$_josh['root']				= $_SERVER['DOCUMENT_ROOT'];
 			if (!isset($_josh['slow']))	$_josh['slow'] = false;
 		}
