@@ -171,7 +171,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 //get configuration variables
 	if (!isset($_josh['dir']['write'])) $_josh['dir']['write'] = '/_' . $_josh['request']['sanswww']; //eg /_example.com
 	if (!isset($_josh['config'])) $_josh['config'] = $_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
-	if (file_is($_josh['config'])) {
+	if (file_check($_josh['config'])) {
 		error_debug('<b>configure</b> found file', __file__, __line__);
 		require($_josh['dir']['root'] . $_josh['config']);
 	} else {
