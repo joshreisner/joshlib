@@ -5,29 +5,21 @@ WELCOME TO JOSHLIB!
 	http://joshlib.joshreisner.com/ (eventual website)
 
 LICENSE
-	all files other than lib.zip are authored by josh reisner and provided to the public under the terms of the LGPL
+	all files other than lib.zip are written by josh reisner and are made available to the public under the terms of the LGPL
 	
 THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
-	--title-------------lang----url---------------------------------------------license-------------------------
-	> ckeditor			(js)	http://ckeditor.com/							GPL, LGPL and MPL
-	> codepress			(js)	http://sourceforge.net/projects/codepress/		LGPL
-	> fpdf				(php)	http://www.fpdf.org/							no license
-	> lightbox2			(js)	http://www.lokeshdhakar.com/projects/lightbox2/	Creative Commons Attribution 2.5
-	> prototype			(js)	http://prototypejs.org/							MIT
-	> salesforce		(php)	http://developer.force.com/						~ not sure.  this is just an API
-	> scriptaculous		(js)	http://script.aculo.us/							MIT (I think)
-	> simple_html_dom	(php)	http://sourceforge.net/projects/simplehtmldom/	MIT
-	> tinymce			(js)	http://tinymce.moxiecode.com/					LGPL
-
-VARIABLES THAT JOSHLIB TRIES TO GET FROM THE WEBSERVER -- IF YOU'RE RUNNING FROM THE COMMAND LINE YOU MIGHT NEED TO PASS THEM
-	$_josh['request']			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)
-	$_josh['referrer']			same as request
-	$_josh['newline']			\n or \r\n
-	$_josh['dir']['root']				path to the site, eg /Users/yourusername/Sites/thissite
-	$_josh['slow']				true or false; whether to use javascript when redirecting (true) or header variables (false)
-	$_josh['mobile']			true or false
+	~~title~~~~~~~~~~~~~lang~~~~url~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~license~~~~~~~~~~~~~~~~~~~~~~~~~
+	> ckeditor			js		http://ckeditor.com/							GPL, LGPL and MPL
+	> codepress			js		http://sourceforge.net/projects/codepress/		LGPL
+	> fpdf				php		http://www.fpdf.org/							no license
+	> lightbox2			js		http://www.lokeshdhakar.com/projects/lightbox2/	Creative Commons Attribution 2.5
+	> prototype			js		http://prototypejs.org/							MIT
+	> salesforce		php		http://developer.force.com/						~ not sure.  this is just an API
+	> scriptaculous		js		http://script.aculo.us/							MIT (I think)
+	> simple_html_dom	php		http://sourceforge.net/projects/simplehtmldom/	MIT
+	> tinymce			js		http://tinymce.moxiecode.com/					LGPL
 
 USING THE DEBUGGER
 	you can run the debug() function after joshlib has been included to see output of various processes
@@ -42,7 +34,7 @@ RUNNING ON THE CLI
 */
 define('TIME_START', microtime(true));	//start the processing time stopwatch -- use format_time_exec() to access this
 
-//set up error handling.  needs to go first to handle any subsequent errors
+//set up error handling.  this needs to go first to handle any subsequent errors
 	error_reporting(E_ALL);
 	ini_set('display_errors', TRUE);
 	ini_set('display_startup_errors', TRUE);
@@ -72,22 +64,23 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 //ignore these words when making search indexes
 //todo make this local to search function
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
-									'as','at','be','because','been','before','being','between','both','but','by','came','can','come',
-									'could','did','do','does','each','else','for','from','get','got','has','had','he','have','her','here',
-									'him','himself','his','how','if','in','into','is','it','its','just','like','make','many','me','might',
-									'more','most','much','must','my','never','now','of','on','only','or','other','our','out','over','re',
-									'said','same','see','should','since','so','some','still','such','take','than','that','the','their',
-									'them','then','there','these','they','this','those','through','to','too','under','up','use','very',
-									'want','was','way','we','well','were','what','when','where','which','while','who','will','with',
-									'would','you','your','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s',
-									't','u','v','w','x','y','z','');
+										'as','at','be','because','been','before','being','between','both','but','by','came','can','come',
+										'could','did','do','does','each','else','for','from','get','got','has','had','he','have','her','here',
+										'him','himself','his','how','if','in','into','is','it','its','just','like','make','many','me','might',
+										'more','most','much','must','my','never','now','of','on','only','or','other','our','out','over','re',
+										'said','same','see','should','since','so','some','still','such','take','than','that','the','their',
+										'them','then','there','these','they','this','those','through','to','too','under','up','use','very',
+										'want','was','way','we','well','were','what','when','where','which','while','who','will','with',
+										'would','you','your','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s',
+										't','u','v','w','x','y','z',''
+									);
 
 //etc
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
 	$_josh['queries']				= 0;	//for counting trips to the database
 	define('TAB', "\t");
 	
-//used by cms, db_column_add, and form::set_field
+//used by cms, db_column_add, and form::set_field, db_save
 	$_josh['field_types']			= array(
 										'checkbox'=>'Checkbox',
 										'date'=>'Date',
@@ -100,10 +93,9 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'textarea'=>'Textarea',
 										'url'=>'URL'
 									);
-//used by cms and db_save
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
 
-//get includes
+//get the rest of the library
 	require(DIRECTORY_JOSHLIB . 'array.php');
 	require(DIRECTORY_JOSHLIB . 'cache.php');
 	require(DIRECTORY_JOSHLIB . 'db.php');
@@ -160,7 +152,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 //set defaults for configuration for variables
 	if (!isset($_josh['db']['location']))	$_josh['db']['location']	= 'localhost';
 	if (!isset($_josh['db']['language']))	$_josh['db']['language']	= 'mysql';
-	if (!isset($_josh['db']['database']))	$_josh['db']['database']	= '';
+	if (!isset($_josh['db']['database']))	$_josh['db']['database']	= $_josh['request']['domainname'];
 	if (!isset($_josh['db']['username']))	$_josh['db']['username']	= '';
 	if (!isset($_josh['db']['password']))	$_josh['db']['password']	= '';
 	if (!isset($_josh['basedblanguage']))	$_josh['basedblanguage']	= $_josh['db']['language'];

@@ -57,7 +57,7 @@ function db_backup($limit=false) {
 	if ($language != 'mysql') error_handle('only mysql supported', 'db_backup is a mysql-only function right now');
 
 	//build command, socket hack, execute
-	$command = 'mysqldump --opt --host="' . $location . '" --user="' . $username . '" --password="' . $password . '" "' . $database . '" | gzip > ' . $_josh['dir']['root'] . $target;
+	$command = 'mysqldump --opt --host="' . $location . '" --user="' . $username . '" --password="' . $password . '" "' . $database . '" | gzip > ' . DIRECTORY_ROOT . $target;
 	if (isset($_josh['mysqldump_path'])) $command = $_josh['mysqldump_path'] . $command;
 	$command = str_replace(':', '" --socket="', $command);
 	system($command);

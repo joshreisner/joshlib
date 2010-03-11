@@ -24,12 +24,12 @@ function file_array($content, $filename=false) {
 
 function file_check($filename) {
 	global $_josh;
-	return @filesize($_josh['dir']['root'] . $filename);
+	return @filesize(DIRECTORY_ROOT . $filename);
 }
 
 function file_delete($filename) {
 	global $_josh;
-	if (file_exists($_josh['dir']['root'] . $filename)) unlink($_josh['dir']['root'] . $filename);
+	if (file_exists(DIRECTORY_ROOT . $filename)) unlink(DIRECTORY_ROOT . $filename);
 	return true;
 }
 
@@ -69,9 +69,9 @@ function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
 	//function file_dynamic($filename, $lastmod, $query);
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
 	file_dir_writable('dynamic');
-	$filename = $_josh['dir']['write'] . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
+	$filename = DIRECTORY_WRITE . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
 	error_debug('<b>' . __function__ . '</b> running with filename = ' . $filename, __file__, __line__);
-	if (!$lastmod || !file_exists($_josh['dir']['root'] . $filename) || (strToTime($lastmod) > filemtime($_josh['dir']['root'] . $filename))) {
+	if (!$lastmod || !file_exists(DIRECTORY_ROOT . $filename) || (strToTime($lastmod) > filemtime(DIRECTORY_ROOT . $filename))) {
 		//die('file_dynamic executive on ' . $filename . ' lastmod was ' . $lastmod);
 		if ($content = db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id)) {
 			file_put($filename, $content);
@@ -107,7 +107,7 @@ function file_folder($folder, $endfilter=false) {
 	error_debug('<b>file folder</b> running with ' . $folder, __file__, __line__);
 	
 	//check to make sure folder exists
-	if (!is_dir($_josh['dir']['root'] . $folder)) {
+	if (!is_dir(DIRECTORY_ROOT . $folder)) {
 		error_debug('<b>file folder</b> ' . $folder . ' is not a directory, exiting', __file__, __line__);
 		return false;
 	}
@@ -117,7 +117,7 @@ function file_folder($folder, $endfilter=false) {
 	if ($endfilter) $endfilter = explode(',', $endfilter);
 
 	//open it
-	if ($handle = opendir($_josh['dir']['root'] . $folder)) {
+	if ($handle = opendir(DIRECTORY_ROOT . $folder)) {
 		$return = array();
 		while (($name = readdir($handle)) !== false) {
 			if (($name == '.') || ($name == '..') || ($name == '.DS_Store')) continue;
@@ -127,9 +127,9 @@ function file_folder($folder, $endfilter=false) {
 				'ext'=>array_pop($nameparts),
 				'human'=>format_text_human(implode(' ', $nameparts)), 
 				'path_name'=>$folder . $name,
-				'type'=>@filetype($_josh['dir']['root'] . $folder . $name),
-				'fmod'=>@filemtime($_josh['dir']['root'] . $folder . $name),
-				'size'=>@filesize($_josh['dir']['root'] . $folder . $name)
+				'type'=>@filetype(DIRECTORY_ROOT . $folder . $name),
+				'fmod'=>@filemtime(DIRECTORY_ROOT . $folder . $name),
+				'size'=>@filesize(DIRECTORY_ROOT . $folder . $name)
 			);
 			if ($thisfile['type'] == 'dir') $thisfile['path_name'] .= '/';
 			error_debug('<b>file folder</b> found ' . $thisfile['name'] . ' of type ' . $thisfile['type'], __file__, __line__);
@@ -152,7 +152,7 @@ function file_folder($folder, $endfilter=false) {
 function file_get($filename) {
 	global $_josh;
 	if (!$file = @fopen($filename, 'r')) {
-		$filename = $_josh['dir']['root'] . $filename;
+		$filename = DIRECTORY_ROOT . $filename;
 		if (!$file = @fopen($filename, 'r')) return false;
 	}
 	error_debug('<b>file_get</b> filename is ' . $filename, __file__, __line__);
@@ -179,10 +179,8 @@ function file_get_type_id($filename, $table='documents_types') {
 }
 
 function file_get_uploaded($fieldname, $types_table=false) {
-	global $_FILES;
 	if (!isset($_FILES[$fieldname])) return false;
 	if ($_FILES[$fieldname]['error'] && ($_FILES[$fieldname]['error'] == 4)) return false;
-	
 	if ($_FILES[$fieldname]['error']) error_handle('file_get_uploaded upload error', 'file max is ' . file_get_max() . draw_array($_FILES));
 	$content = file_get($_FILES[$fieldname]['tmp_name']);
 	error_debug('<b>file_get_uploaded</b> running ~ user is uploading a file of ' . $_FILES[$fieldname]['size'], __file__, __line__);
@@ -195,7 +193,7 @@ function file_icon($filename, $link=true, $type='16x16') {
 	//show the icon for a given filename
 	global $_josh;
 	if (!$ext = strToLower(file_ext($filename))) return false;
-	if ($return = draw_img($_josh['dir']['write'] . '/lib/file_icons/' . $type . '/' . $ext . '.png')) return $return;
+	if ($return = draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/' . $ext . '.png')) return $return;
 	error_handle('file type not added yet', 'the file type ' . $ext . ' was not found in the file_icons library.  this has been noted.');
 	return false;
 }
@@ -218,7 +216,7 @@ function file_import_fixedlength($content, $definitions) {
 function file_is($filename) {
 	error_deprecated(__FUNCTION__ . ' is deprecated now in favor of using file_check');
 	global $_josh;
-	return file_exists($_josh['dir']['root'] . $filename);
+	return file_exists(DIRECTORY_ROOT . $filename);
 }
 
 function file_name($filepath) {
@@ -250,9 +248,9 @@ function file_put($filename, $content) {
 	global $_josh;
 	file_delete($filename);
 	//arguments should be reversed?
-	$file = @fopen($_josh['dir']['root'] . $filename, 'w');
+	$file = @fopen(DIRECTORY_ROOT . $filename, 'w');
 	if ($file === false) {
-		error_handle('could not open file', 'the file ' . $_josh['dir']['root'] . $filename . ' could not be opened for writing.  perhaps it is a permissions problem.');
+		error_handle('could not open file', 'the file ' . DIRECTORY_ROOT . $filename . ' could not be opened for writing.  perhaps it is a permissions problem.');
 	} else {
 		if (is_array($content)) $content = implode($content);
 		$bytes = fwrite($file, $content);
@@ -343,7 +341,7 @@ function file_rss($title, $link, $items, $filename=false, $limit=false) {
 
 	//we're going to put it in the special write_folder rss folder
 	file_dir_writable('rss');
-	return file_put($_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'rss' . DIRECTORY_SEPARATOR . $filename, utf8_encode($return));
+	return file_put(DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'rss' . DIRECTORY_SEPARATOR . $filename, utf8_encode($return));
 }
 
 function file_sister($filename, $ext) {
@@ -368,7 +366,7 @@ function file_unzip($source, $target) {
 	global $_josh;
 	
 	//check to see if the ZIP library is installed
-	if (!function_exists('zip_open')) return error_handle('ZIP library missing', 'trying to unzip a file but the library is not installed.  if you don\'t want to install it, you must manually unzip lib.zip and put the resulting folder inside ' . $_josh['dir']['write'] . ' for joshlib to run.');
+	if (!function_exists('zip_open')) return error_handle('ZIP library missing', 'trying to unzip a file but the library is not installed.  if you don\'t want to install it, you must manually unzip lib.zip and put the resulting folder inside ' . DIRECTORY_WRITE . ' for joshlib to run.');
 	
     $zip = zip_open($source);
 
@@ -387,13 +385,13 @@ function file_unzip($source, $target) {
 		if (format_text_starts('.', $folder)) continue;
 		if (format_text_starts('__MACOSX', $folder)) continue;
 
-        $completePath = $_josh['dir']['root'] . $target . DIRECTORY_SEPARATOR . $folder;
-        $completeName = $_josh['dir']['root'] . $target . DIRECTORY_SEPARATOR . zip_entry_name($zip_entry);
+        $completePath = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $folder;
+        $completeName = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . zip_entry_name($zip_entry);
         if (!file_exists($completeName)) {
             $tmp = '';
             foreach(explode(DIRECTORY_SEPARATOR, $folder) as $k) {
                 $tmp .= $k . DIRECTORY_SEPARATOR;
-                if(!is_dir($_josh['dir']['root'] . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir($_josh['dir']['root'] . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
+                if(!is_dir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
             }
         }
         

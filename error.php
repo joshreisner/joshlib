@@ -18,8 +18,8 @@ function error_debug($message, $file, $line) {
 		error_debug('<b>error_debug</b> welcome to joshlib!', __file__, __line__);
 	}
 	
-	if (isset($_josh['dir']['root']) && stristr($file, $_josh['dir']['root'])) $file = str_replace($_josh['dir']['root'], "", $file);
-	if (isset($_josh['dir']['joshlib']) && stristr($file, $_josh['dir']['joshlib'])) $file = str_replace($_josh['dir']['joshlib'], "/joshlib", $file);
+	if (defined('DIRECTORY_ROOT') && stristr($file, DIRECTORY_ROOT)) $file = str_replace(DIRECTORY_ROOT, "", $file);
+	if (defined('DIRECTORY_JOSHLIB') && stristr($file, DIRECTORY_JOSHLIB)) $file = str_replace(DIRECTORY_JOSHLIB, "/joshlib", $file);
 
 	//timer
 	$time = round(microtime(true) - $_josh['time_lastdebug'], 3);
@@ -91,8 +91,8 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	}
 
 	//take out full path -- security hazard and decreases readability
-	if (isset($_josh['dir']['root'])) $message = str_replace($_josh['dir']['root'], "", $message);
-	if (isset($_josh['dir']['joshlib'])) $message = str_replace($_josh['dir']['joshlib'], "/joshlib", $message);
+	if (defined('DIRECTORY_ROOT'))		$message = str_replace(DIRECTORY_ROOT, "", $message);
+	if (defined('DIRECTORY_JOSHLIB'))	$message = str_replace(DIRECTORY_JOSHLIB, "/joshlib", $message);
 	
 	//add more stuff to admin message, set from and subject
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
@@ -107,7 +107,7 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	$message .= "<p>Backtrace:";
 	foreach ($backtrace as $b) {
 		if (isset($b['args'])) unset($b['args']);
-		if (isset($b['file'])) $b['file'] = str_replace($_josh['dir']['root'], "", $b['file']);
+		if (isset($b['file'])) $b['file'] = str_replace(DIRECTORY_ROOT, "", $b['file']);
 		$message .= draw_array($b, true) . "<br>";
 	}
 	

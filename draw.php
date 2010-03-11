@@ -197,8 +197,7 @@ function draw_dl($array, $class=false) {
 }
 
 function draw_doctype() {
-	return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
+	return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
 }
 
 function draw_favicon($location='/images/favicon.png') {
@@ -537,7 +536,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	
 	//get width and height
 	$image = @getimagesize($path);
-	if (!$image) $image = @getimagesize($_josh['dir']['root'] . $path);
+	if (!$image) $image = @getimagesize(DIRECTORY_ROOT . $path);
 	//if (!$image) die('could not find' . $path);
 	if (!$image) return '';
 	
@@ -565,13 +564,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 
 function draw_javascript($javascript=false) {
 	if (!$javascript) return draw_javascript_src();
-	return 	'
-	<script language="javascript" type="text/javascript">
-		<!--
-		' . $javascript . '
-		//-->
-	</script>
-	';
+	return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);
 }
 
 function draw_javascript_ckeditor() {
@@ -642,14 +635,12 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) 
 }
 
 function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false) {
-	if (!$id) $Id = 'session';
+	if (!$id) $id = 'session';
 	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $arguments);
 }
 
 function draw_list($options, $arguments_or_class=false, $type='ul', $selected=false) {
 	//make a ul or an ol out of a one-dimensional array
-	
-	global $_josh;
 	if (!is_array($options) || (!$count = count($options))) return false;
 	if (!is_array($arguments_or_class)) $arguments_or_class = array('class'=>$arguments_or_class); //if arguments is a string, it's legacy class
 		
@@ -666,13 +657,15 @@ function draw_list($options, $arguments_or_class=false, $type='ul', $selected=fa
 	return draw_tag($type, $arguments_or_class, implode($options, ''));
 }
 
-function draw_list_db($table_or_sql, $linkprefix='', $arguments_or_class=false, $type='ul', $selected=false) {
-	//experiment.  draw_list_table('blog_categories', '/c/?id=') will return a UL with a list of links
+function draw_list_db($table_or_sql, $linkprefix='', $arguclass=false, $type='ul', $selected=false) {
+	//experiment.  eg draw_list_table('blog_categories', '/c/?id=') will return a UL with a list of links
 	//todo: add better behaviors like if id column dne, or something
+	//03-11-2010 jr: interesting, is this being used?  example sounds like harvard
+	//03-11-2010 jr: should this be draw_navigation_db or something?  draw_nav?
 	if (!stristr($table_or_sql, ' ')) $table_or_sql = 'SELECT id, title FROM ' . $table_or_sql . ' t WHERE t.is_active = 1 ORDER BY t.precedence';
 	$result = db_table($table_or_sql);
 	foreach ($result as &$r) $r = draw_link($linkprefix . $r['id'], $r['title']);
-	return draw_list($result, $arguments_or_class, $type, $selected);
+	return draw_list($result, $arguclass, $type, $selected);
 }
 
 function draw_meta_description($string) {
