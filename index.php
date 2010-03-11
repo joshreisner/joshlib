@@ -40,7 +40,7 @@ RUNNING ON THE CLI
 	$_SERVER['DOCUMENT_ROOT']	= '/home/livingcities/www/backend';
 	
 */
-$_josh['time_start'] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
+define('TIME_START', microtime(true));	//start the processing time stopwatch -- use format_time_exec() to access this
 
 //set up error handling.  needs to go first to handle any subsequent errors
 	error_reporting(E_ALL);
@@ -151,6 +151,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		$_josh['dir']['root']				= $_SERVER['DOCUMENT_ROOT'];
 		if (!isset($_josh['slow']))	$_josh['slow'] = false;
 	}
+	if (!defined('DIRECTORY_ROOT')) define('DIRECTORY_ROOT', $_josh['dir']['root']);
 	
 	//only checking for iphone right now
 	$_josh['request']['mobile']		= (isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone'));
@@ -170,6 +171,7 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 		
 //get configuration variables
 	if (!isset($_josh['dir']['write'])) $_josh['dir']['write'] = '/_' . $_josh['request']['sanswww']; //eg /_example.com
+	if (!defined('DIRECTORY_WRITE')) define('DIRECTORY_WRITE', $_josh['dir']['write']);
 	if (!isset($_josh['config'])) $_josh['config'] = $_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
 	if (file_check($_josh['config'])) {
 		error_debug('<b>configure</b> found file', __file__, __line__);

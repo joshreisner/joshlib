@@ -693,8 +693,8 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	global $_josh;
 	
 	//this is so you can have several sets of rollovers in the same page eg the smarter toddler site
-	if (!isset($_josh['drawn_navigation'])) $_josh['drawn_navigation'] = 0;
-	$_josh['drawn_navigation']++;
+	if (!isset($_josh['drawn']['navigation'])) $_josh['drawn']['navigation'] = 0;
+	$_josh['drawn']['navigation']++;
 	
 	//skip if empty
 	if (!is_array($options) || !count($options)) return false;
@@ -708,26 +708,26 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 		//to take care of a common / . folder . / scenario
 		$match = '/';
 	}
-	error_debug('<b>draw_navigation</b> match is ' . $match, __file__, __line__);
+	error_debug('<b>' . __function__ . '</b> match is ' . $match, __file__, __line__);
 	$selected = false;
 	$counter = 1;
 	$javascript = NEWLINE;
 	foreach ($options as $url=>$title) {
-		$name = 'option_' . $_josh['drawn_navigation'] . '_' . $counter;
-		$thisoption = '<a href="' . $url . '" class="' . $name;
+		$args = array('name'=>'option_' . $_josh['drawn']['navigation'] . '_' . $counter, 'class'=>'option_' . $_josh['drawn']['navigation'] . '_' . $counter);
+
 		if (str_replace(url_base(), '', $url) == $match) {
 			$img_state = '_on';
-			$thisoption .= ' selected';
+			$args['class'] .= ' selected';
 			$selected = $counter;
 		} else {
 			$img_state = '_off';
 			if ($type == 'rollovers') {
-				$thisoption .= '" onmouseover="javascript:img_roll(\'' . $name . '\',\'on\');" onmouseout="javascript:img_roll(\'' . $name . '\',\'off\');';
+				$args['onmouseover'] = 'javascript:img_roll(\'' . $name . '\',\'on\');"';
+				$args['onmouseout'] = 'javascript:img_roll(\'' . $name . '\',\'off\');';
 			}
 		}
-		$thisoption .= '">';
 		if ($type == 'text') {
-			$thisoption .= $title;
+			$inner = $title;
 		} elseif (($type == 'images') || ($type == 'rollovers')) {
 			if ($useid) {
 				$img = substr($url, strpos($url, 'id=') + 3);
@@ -742,10 +742,9 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 				$javascript .= $name . '_on.src	 = "' . $folder . $img . '_on.png";' . NEWLINE;
 				$javascript .= $name . '_off.src = "' . $folder . $img . '_off.png";' . NEWLINE;
 			}
-			$thisoption .= draw_img($folder . $img . $img_state . '.png', false, false, $name);
+			$inner = draw_img($folder . $img . $img_state . '.png', false, false, $name);
 		}
-		$thisoption .= '</a>';
-		$return[] = $thisoption;
+		$return[] = draw_link($url, $inner, false, $args);
 		$counter++;
 	}
 	$return = 	draw_javascript_src() . draw_list($return, $class, 'ul', $selected);

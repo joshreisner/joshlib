@@ -289,7 +289,7 @@ class form {
 	}
 	
 	function set_order($strorder='') {
-		$fields = array_post_fields($strorder);
+		$fields = array_separated($strorder);
 		$return = array();
 		foreach ($fields as $f) {
 			if (isset($this->fields[$f])) {
@@ -381,7 +381,7 @@ class form {
 	}
 	
 	function unset_fields($fields) {
-		if (!is_array($fields)) $fields = array_post_fields($fields);
+		if (!is_array($fields)) $fields = array_separated($fields);
 		foreach ($fields as $f) unset($this->fields[$f]);
 	}
 }

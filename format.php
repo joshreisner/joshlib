@@ -494,6 +494,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 }
 
 function format_js_desanitize() {
+	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because css should be used for rollovers from now on');
 	//javascript function for decoding sanitized strings
 	return '
 	function desanitize(string) {
@@ -503,6 +504,7 @@ function format_js_desanitize() {
 }
 
 function format_js_sanitize($string) {
+	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because css should be used for rollovers from now on');
 	//return javascript-sanitized key
 	//need for rollover script for seedco financial and phoebe murer
 	$string = 'a' . $string; //doesn't like variables that start with numbers
@@ -595,7 +597,7 @@ function format_pluralize($entity) {
 function format_post_bits($fieldnames) {
 	//takes a comma-separated list of POST keys (checkboxes) and sets bit values in their places
 	global $_POST;
-	$fields = array_post_fields($fieldnames);
+	$fields = array_separated($fieldnames);
 	foreach ($fields as $field) $_POST[$field] = (isset($_POST[$field])) ? 1 : 0;
 }
 
@@ -626,7 +628,7 @@ function format_post_date($str, $array=false) {
 function format_post_float($fieldnames) {
 	//takes a comma-separated list of POST keys and replaces them with monetary values or NULLs if they're empty
 	global $_POST;
-	$fields = array_post_fields($fieldnames);
+	$fields = array_separated($fieldnames);
 	foreach ($fields as $field) {
 		$_POST[$field] = format_numeric($_POST[$field]);
 		if ($_POST[$field] === false) $_POST[$field] = 'NULL';
@@ -636,7 +638,7 @@ function format_post_float($fieldnames) {
 function format_post_html($fieldnames) {
 	//takes a comma-separated list of POST keys and formats the html in them
 	global $_POST;
-	$fields = array_post_fields($fieldnames);
+	$fields = array_separated($fieldnames);
 	foreach ($fields as $field) {
 		$return = format_html($_POST[$field]);
 		$_POST[$field] = (empty($return)) ? 'NULL' : '"' . $_POST[$field] . '"';
@@ -647,7 +649,7 @@ function format_post_nulls($fieldnames) {
 	//takes a comma-separated list of POST keys and replaces them with NULLs if they're empty
 	global $_POST;
 	error_debug('<b>format_post_nulls</b> for ' . $fieldnames, __file__, __line__);
-	$fields = array_post_fields($fieldnames);
+	$fields = array_separated($fieldnames);
 	foreach ($fields as $field) {
 		if (!isset($_POST[$field]) || !strlen($_POST[$field])) {
 			error_debug('<b>format_post_nulls</b> nullifying ' . $field, __file__, __line__);
@@ -660,11 +662,12 @@ function format_post_urls($fieldnames) {
 	//takes a comma-separated list of POST keys and formats them as NULLs or urls
 	global $_POST;
 	error_debug('<b>format_post_urls</b> for ' . $fieldnames, __file__, __line__);
-	$fields = array_post_fields($fieldnames);
+	$fields = array_separated($fieldnames);
 	foreach ($fields as $field) $_POST[$field] = format_null(format_url($_POST[$field]));
 }
 
 function format_q($quantity, $entity, $capitalize=true) {
+	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because alias not useful enough to warrant bloat');
 	//alias for format_quantitize
 	return format_quantitize($quantity, $entity, $capitalize);
 }
@@ -856,26 +859,24 @@ function format_time_business($start, $end=false) {
 	} else {
 		return implode(', ', $return);
 	}
-}
-
-//don't know how to categorize these - they only belong to the function above
-function isBusinessHours($udate) {
-	$hourOfDay = date('G', $udate);
-	return (($hourOfDay > 9) && ($hourOfDay < 17)) ? true : false;
-}
-
-function isWeekDay($udate) {
-	$dayOfWeek = date('w', $udate);
-	return (($dayOfWeek > 0) && ($dayOfWeek < 6)) ? true : false;
-}
 	
+	if (!function_exists('isBusinessHours')) {
+		function isBusinessHours($udate) {
+			$hourOfDay = date('G', $udate);
+			return (($hourOfDay > 9) && ($hourOfDay < 17));
+		}
+	}
+	
+	if (!function_exists('isWeekDay')) {
+		function isWeekDay($udate) {
+			$dayOfWeek = date('w', $udate);
+			return (($dayOfWeek > 0) && ($dayOfWeek < 6));
+		}	
+	}
+}
 
 function format_time_exec($start_time=false, $descriptor=' seconds') {
-	if (!$start_time) {
-		global $_josh;
-		if (isset($_josh['time_start'])) $start_time = $_josh['time_start'];
-	}
-	return round(microtime(true) - $start_time, 2) . $descriptor;
+	return round(microtime(true) - TIME_START, 2) . $descriptor;
 }
 
 function format_times($num) {
@@ -948,11 +949,10 @@ function format_verify($variable, $type='int') {
 }
 
 function format_zip($string, $error=false) { //format a ZIP (5-digit)
-	$number = '';
-	for ($i = 0; $i < strlen($string); $i++) if (is_numeric($string[$i])) $number .= $string[$i];
-	if (strlen($number) >= 5) return substr($number, 0, 5);
+	$return = '';
+	for ($i = 0; $i < strlen($string); $i++) if (is_numeric($string[$i])) $return .= $string[$i];
+	if (strlen($return) > 4) return substr($return, 0, 5);
 	return $error;
 }
-
 
 ?>

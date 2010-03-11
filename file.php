@@ -33,6 +33,20 @@ function file_delete($filename) {
 	return true;
 }
 
+function file_dir_writable($subdirectory=false) {
+	//make sure there's a writable folder where you said.  defaults to write_folder
+	$directory = DIRECTORY_ROOT . DIRECTORY_WRITE;
+	if ($subdirectory) $directory .= DIRECTORY_SEPARATOR . $subdirectory;
+	
+	//make folder
+	if (!is_dir($directory) && !@mkdir($directory)) error_handle('couldn\'t create folder', 'file_dir_writable tried to create a folder at ' . format_ascii($directory) . ' but could not.  please create a folder there and make it writable.');
+
+	//set permissions
+	if (!is_writable($directory) && !@chmod($directory, 0755)) error_handle('couldn\'t set permissions', 'file_dir_writable needs the ' . $directory . ' to be writable by the webserver (755).');
+	
+	return true;
+}
+
 function file_download($content, $filename, $extension) {
 	//header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	//header('Cache-Control: public');
@@ -406,22 +420,6 @@ function file_uploaded_image_orientation($fieldname) {
 	list($width, $height) = getimagesize($_FILES[$fieldname]['tmp_name']);
 	if ($width > $height) return "landscape";
 	return "portrait";
-}
-
-function file_dir_writable($subdirectory=false) {
-	//make sure there's a writable folder where you said.  defaults to write_folder
-	global $_josh;
-	
-	$directory = $_josh['dir']['root'] . $_josh['dir']['write'];
-	if ($subdirectory) $directory .= DIRECTORY_SEPARATOR . $subdirectory;
-	
-	//make folder
-	if (!is_dir($directory) && !@mkdir($directory)) error_handle('couldn\'t create folder', 'file_dir_writable tried to create a folder at ' . $directory . ' but could not.  please create a folder there and make it writable.');
-
-	//set permissions
-	if (!is_writable($directory) && !@chmod($directory, 0755)) error_handle('couldn\'t set permissions', 'file_dir_writable needs the ' . $directory . ' to be writable by the webserver (755).');
-	
-	return true;
 }
 
 ?>
