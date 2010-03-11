@@ -18,8 +18,8 @@ function error_debug($message, $file, $line) {
 		error_debug('<b>error_debug</b> welcome to joshlib!', __file__, __line__);
 	}
 	
-	if (isset($_josh['root']) && stristr($file, $_josh['root'])) $file = str_replace($_josh['root'], "", $file);
-	if (isset($_josh['joshlib_folder']) && stristr($file, $_josh['joshlib_folder'])) $file = str_replace($_josh['joshlib_folder'], "/joshlib", $file);
+	if (isset($_josh['dir']['root']) && stristr($file, $_josh['dir']['root'])) $file = str_replace($_josh['dir']['root'], "", $file);
+	if (isset($_josh['dir']['joshlib']) && stristr($file, $_josh['dir']['joshlib'])) $file = str_replace($_josh['dir']['joshlib'], "/joshlib", $file);
 
 	//timer
 	$time = round(microtime(true) - $_josh['time_lastdebug'], 3);
@@ -34,10 +34,12 @@ function error_debug($message, $file, $line) {
 	$_josh['time_lastdebug'] = microtime(true);
 }
 
-function error_deprecated($date=false) {
+function error_deprecated($message) {
+	global $_josh;
 	//use this to deprecate use of various functions
-	//$date says when it was deprecated
-	//todo
+	$message = error_draw('use of deprecated function', $message);
+	if (isset($_josh['mode']) && ($_josh['mode'] == 'dev')) die($message);
+	email($_josh['email_admin'], $message, 'use of deprecated function');
 }
 
 function error_draw($title, $html) {	
@@ -89,8 +91,8 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	}
 
 	//take out full path -- security hazard and decreases readability
-	if (isset($_josh['root'])) $message = str_replace($_josh['root'], "", $message);
-	if (isset($_josh['joshlib_folder'])) $message = str_replace($_josh['joshlib_folder'], "/joshlib", $message);
+	if (isset($_josh['dir']['root'])) $message = str_replace($_josh['dir']['root'], "", $message);
+	if (isset($_josh['dir']['joshlib'])) $message = str_replace($_josh['dir']['joshlib'], "/joshlib", $message);
 	
 	//add more stuff to admin message, set from and subject
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
@@ -105,7 +107,7 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	$message .= "<p>Backtrace:";
 	foreach ($backtrace as $b) {
 		if (isset($b['args'])) unset($b['args']);
-		if (isset($b['file'])) $b['file'] = str_replace($_josh['root'], "", $b['file']);
+		if (isset($b['file'])) $b['file'] = str_replace($_josh['dir']['root'], "", $b['file']);
 		$message .= draw_array($b, true) . "<br>";
 	}
 	

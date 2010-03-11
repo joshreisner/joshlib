@@ -25,7 +25,7 @@ VARIABLES THAT JOSHLIB TRIES TO GET FROM THE WEBSERVER -- IF YOU'RE RUNNING FROM
 	$_josh['request']			this is an array, easiest way to set this is doing url_parse(http://www.yoursite.com/yourfolder/yourpage.php?query=whatever)
 	$_josh['referrer']			same as request
 	$_josh['newline']			\n or \r\n
-	$_josh['root']				path to the site, eg /Users/yourusername/Sites/thissite
+	$_josh['dir']['root']				path to the site, eg /Users/yourusername/Sites/thissite
 	$_josh['slow']				true or false; whether to use javascript when redirecting (true) or header variables (false)
 	$_josh['mobile']			true or false
 
@@ -42,24 +42,19 @@ RUNNING ON THE CLI
 */
 $_josh['time_start'] = microtime(true);	//start the processing time stopwatch -- use format_time_exec() to access this
 
-//set up error handling.  needs to go first to handle subsequent errors
+//set up error handling.  needs to go first to handle any subsequent errors
 	error_reporting(E_ALL);
 	ini_set('display_errors', TRUE);
 	ini_set('display_startup_errors', TRUE);
-	$_josh['joshlib_folder'] = dirname(__file__);
+	$_josh['dir']['joshlib'] = dirname(__file__);
 	if (!isset($_josh['debug'])) $_josh['debug'] = false;
-	require($_josh['joshlib_folder'] . '/error.php');
+	require($_josh['dir']['joshlib'] . '/error.php');
 	set_error_handler('error_handle_php');
 	set_exception_handler('error_handle_exception');
 	error_debug('<b>index</b> error handling is set up', __file__, __line__);
 	
-//suddenly this is an issue
-	//todo, make settable
+//date stuff
 	date_default_timezone_set('America/New_York');
-	
-//set static variables todo, limit these
-
-	//date
 	$_josh['days']					= array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
 	$_josh['month']					= date('n');
 	$_josh['months']				= array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
@@ -68,13 +63,14 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	$_josh['year']					= date('Y');
 	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
 
-	//status
+//page draw status
 	$_josh['drawn']['ckeditor']		= false;	//only include ckeditor js once
 	$_josh['drawn']['focus']		= false;	//only autofocus on one form element
 	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
 	$_josh['drawn']['tinymce']		= false;	//only include tinymce js once
 
-	//search -- perhaps make this local to search function?
+//ignore these words when making search indexes
+//todo make this local to search function
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
 									'as','at','be','because','been','before','being','between','both','but','by','came','can','come',
 									'could','did','do','does','each','else','for','from','get','got','has','had','he','have','her','here',
@@ -84,13 +80,14 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 									'them','then','there','these','they','this','those','through','to','too','under','up','use','very',
 									'want','was','way','we','well','were','what','when','where','which','while','who','will','with',
 									'would','you','your','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s',
-									't','u','v','w','x','y','z',''); //ignore these words when making search indexes
+									't','u','v','w','x','y','z','');
 
-	//etc
+//etc
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
 	$_josh['queries']				= 0;	//for counting trips to the database
+	define('TAB', "\t");
 	
-	//used by cms, db_column_add, and form::set_field
+//used by cms, db_column_add, and form::set_field
 	$_josh['field_types']			= array(
 										'checkbox'=>'Checkbox',
 										'date'=>'Date',
@@ -103,75 +100,61 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 										'textarea'=>'Textarea',
 										'url'=>'URL'
 									);
-	//used by cms and db_save
+//used by cms and db_save
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
 
 //get includes
-	require($_josh['joshlib_folder'] . '/array.php');
-	require($_josh['joshlib_folder'] . '/cache.php');
-	require($_josh['joshlib_folder'] . '/db.php');
-	require($_josh['joshlib_folder'] . '/draw.php');
-	require($_josh['joshlib_folder'] . '/email.php');
-	require($_josh['joshlib_folder'] . '/file.php');
-	require($_josh['joshlib_folder'] . '/form.php');
-	require($_josh['joshlib_folder'] . '/format.php');
-	require($_josh['joshlib_folder'] . '/table.php');
-	require($_josh['joshlib_folder'] . '/url.php');
+	require($_josh['dir']['joshlib'] . '/array.php');
+	require($_josh['dir']['joshlib'] . '/cache.php');
+	require($_josh['dir']['joshlib'] . '/db.php');
+	require($_josh['dir']['joshlib'] . '/draw.php');
+	require($_josh['dir']['joshlib'] . '/email.php');
+	require($_josh['dir']['joshlib'] . '/file.php');
+	require($_josh['dir']['joshlib'] . '/form.php');
+	require($_josh['dir']['joshlib'] . '/format.php');
+	require($_josh['dir']['joshlib'] . '/table.php');
+	require($_josh['dir']['joshlib'] . '/url.php');
 
 //parse environment variables
-	if (isset($_SERVER) && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['SCRIPT_NAME'])) { //this would not be set if this were running from the command line (eg by a cron)
-		//build request as string, then set it to array with url_parse
-		$_josh['request'] = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) ? 'https' : 'http';
-		$_josh['request'] .= '://' . $_SERVER['HTTP_HOST'];
-		
-		//sometimes getting this error http://www.example.com./
-		if (substr($_josh['request'], -1) == '.') $_josh['request'] = substr($_josh['request'], 0, -1);
-		
-		//check if we're using mod_rewrite
-		if (isset($_SERVER['REDIRECT_URL'])) {
-			$_josh['request'] .= str_ireplace($_josh['request'], '', $_SERVER['REQUEST_URI']); //sometimes REQUEST_URI contains full http://www.example.com when it should not, due (i think) to redirection with url_query_add() or the like
-			$_GET = array_merge($_GET, url_query_parse($_josh['request']));
-		} else {
-			$_josh['request'] .= $_SERVER['SCRIPT_NAME'];
-			if (isset($_SERVER['QUERY_STRING'])) $_josh['request'] .= '?' . $_SERVER['QUERY_STRING'];
-		}
-		
-		$_josh['request'] = url_parse($_josh['request']);
-				
-		//special set $_GET['id']
-		if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
-		
-		define('TAB', "\t");
-		
-		//platform-specific info
-		if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) { //platform is PC
-			$_josh['newline']			= "\r\n";
-			define('NEWLINE', "\r\n");
-			define('PLATFORM', 'win');
-			//$_josh['root']				= str_replace(str_replace('/', '\\', $_josh['request']['path']), '', str_replace('\\\\', '\\foo', $_SERVER['PATH_TRANSLATED']));
-			$_josh['root']				= str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']);
-			$_josh['slow']				= true;
-		} else { //platform is UNIX or Mac
-			$_josh['newline']			= "\n";
-			define('NEWLINE', "\n");
-			define('PLATFORM', 'unix');
-			$_josh['root']				= $_SERVER['DOCUMENT_ROOT'];
-			if (!isset($_josh['slow']))	$_josh['slow'] = false;
-		}
-		
-		//only checking for iphone right now
-		$_josh['request']['mobile']		= (isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone'));
-	 	$_josh['referrer']				= (isset($_SERVER['HTTP_REFERER']))	? url_parse($_SERVER['HTTP_REFERER']) : false;
+	if (!isset($_SERVER['DOCUMENT_ROOT']) || !isset($_SERVER['HTTP_HOST']) || !isset($_SERVER['SCRIPT_NAME'])) error_handle('environment variables not set', 'joshlib requires $_SERVER[\'DOCUMENT_ROOT\'], $_SERVER[\'HTTP_HOST\'] and $_SERVER[\'SCRIPT_NAME\'] to function properly.  please define these before proceeding.');
+
+	//build request as string, then set it to array with url_parse
+	$_josh['request'] = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) ? 'https' : 'http';
+	$_josh['request'] .= '://' . $_SERVER['HTTP_HOST'];
+	
+	//sometimes getting this error http://www.example.com./
+	if (substr($_josh['request'], -1) == '.') $_josh['request'] = substr($_josh['request'], 0, -1);
+	
+	//check if we're using mod_rewrite
+	if (isset($_SERVER['REDIRECT_URL'])) {
+		$_josh['request'] .= str_ireplace($_josh['request'], '', $_SERVER['REQUEST_URI']); //sometimes REQUEST_URI contains full http://www.example.com when it should not, due (i think) to redirection with url_query_add() or the like
+		$_GET = array_merge($_GET, url_query_parse($_josh['request']));
 	} else {
-		//probably running from command line -- set defaults
-		if (!isset($_josh['debug']))	$_josh['debug']		= false;
-		if (!isset($_josh['request']))	$_josh['request']	= false;
-		if (!isset($_josh['newline']))	$_josh['newline']	= '\n';
-		if (!isset($_josh['root']))		$_josh['root']		= false;
-		if (!isset($_josh['slow']))		$_josh['slow']		= false;
-		if (!isset($_josh['mobile']))	$_josh['mobile']	= false;
-		if (!isset($_josh['referrer']))	$_josh['referrer']	= false;
+		$_josh['request'] .= $_SERVER['SCRIPT_NAME'];
+		if (isset($_SERVER['QUERY_STRING'])) $_josh['request'] .= '?' . $_SERVER['QUERY_STRING'];
 	}
+	
+	$_josh['request'] = url_parse($_josh['request']);
+			
+	//special set $_GET['id']
+	if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
+			
+	//platform-specific info
+	if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) {
+		define('PLATFORM', 'win');
+		define('NEWLINE', "\r\n");
+		$_josh['dir']['root']				= str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']);
+		$_josh['slow']				= true;
+	} else { //platform is UNIX or Mac
+		define('PLATFORM', 'unix');
+		define('NEWLINE', "\n");
+		$_josh['dir']['root']				= $_SERVER['DOCUMENT_ROOT'];
+		if (!isset($_josh['slow']))	$_josh['slow'] = false;
+	}
+	
+	//only checking for iphone right now
+	$_josh['request']['mobile']		= (isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone'));
+ 	$_josh['referrer']				= (isset($_SERVER['HTTP_REFERER']))	? url_parse($_SERVER['HTTP_REFERER']) : false;
 	
 //set defaults for configuration for variables
 	if (!isset($_josh['db']['location']))	$_josh['db']['location']	= 'localhost';
@@ -186,21 +169,21 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 	if (!isset($_josh['error_log_api']))	$_josh['error_log_api']		= false;
 		
 //get configuration variables
-	if (!isset($_josh['write_folder'])) $_josh['write_folder'] = '/_' . $_josh['request']['sanswww']; //eg /_example.com
-	if (!isset($_josh['config'])) $_josh['config'] = $_josh['write_folder'] . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
+	if (!isset($_josh['dir']['write'])) $_josh['dir']['write'] = '/_' . $_josh['request']['sanswww']; //eg /_example.com
+	if (!isset($_josh['config'])) $_josh['config'] = $_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
 	if (file_is($_josh['config'])) {
 		error_debug('<b>configure</b> found file', __file__, __line__);
-		require($_josh['root'] . $_josh['config']);
+		require($_josh['dir']['root'] . $_josh['config']);
 	} else {
 		//if it doesn't exist, create one
 		error_debug('couldn\'t find config file, attempting to create one', __file__, __line__);
-		file_write_folder();
+		file_dir_writable();
 		file_put_config();
-		require($_josh['root'] . $_josh['config']);
+		require($_josh['dir']['root'] . $_josh['config']);
 	}
 	
 //ensure lib exists--todo autogen lib folder when lib.zip has been updated
-	if (!is_dir($_josh['root'] . $_josh['write_folder'] . DIRECTORY_SEPARATOR . 'lib')) file_unzip($_josh['joshlib_folder'] . DIRECTORY_SEPARATOR . 'lib.zip', $_josh['write_folder']);
+	if (!is_dir($_josh['dir']['root'] . $_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'lib')) file_unzip($_josh['dir']['joshlib'] . DIRECTORY_SEPARATOR . 'lib.zip', $_josh['dir']['write']);
 
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_SERVER['HTTP_HOST']) && (format_text_starts('dev-', $_SERVER['HTTP_HOST']) || format_text_starts('beta.', $_SERVER['HTTP_HOST']) || format_text_ends('.site', $_SERVER['HTTP_HOST']))) {
@@ -297,29 +280,23 @@ $_josh['time_start'] = microtime(true);	//start the processing time stopwatch --
 
 //special functions that don't yet fit into a category
 
-function browser_gzip() {
-    return in_array('gzip', array_separated($_SERVER['HTTP_ACCEPT_ENCODING']));
-}
-
 function browser_output($html) {
+	//todo rename url.php to http.php and make this http_output 
 	//one easy way to employ this is with ob_start('browser_output')
-    if (!browser_gzip() || headers_sent()) return $html;
+    if (!in_array('gzip', array_separated($_SERVER['HTTP_ACCEPT_ENCODING'])) || headers_sent()) return $html;
     header('Content-Encoding: gzip');
     return gzencode($html);
 }
 
 function cookie($name=false, $value=false, $session=false) {
-	global $_josh, $_COOKIE, $_SERVER;
+	global $_josh;
 
-	//need to output something to page for cookie to take -- if it's a redirect do it with javascript
+	//in order for the cookie to take, there needs to be page output.  don't allow fast redirecting.
 	$_josh['slow'] = true;
 
 	if ($_josh['debug']) {
 		error_debug('not actually setting cookie (' . $name . ', ' . $value . ') because buffer is already broken by debugger.', __file__, __line__);
-		return false;
-	}
-
-	if ($name) {
+	} elseif ($name) {
 		$time = ($value) ? mktime(0, 0, 0, 1, 1, 2030) : time()-3600;
 		if ($session) $time = 0; //expire at the end of the session
 		if (!$value) $value = '';
@@ -339,7 +316,6 @@ function cookie($name=false, $value=false, $session=false) {
 function cookie_get($key) {
 	//return a cookie value and format its quotes -- important for security!
 	//started for bb cms
-	global $_COOKIE;
 	if (!isset($_COOKIE[$key]) || empty($_COOKIE[$key])) return false;
 	return format_quotes($_COOKIE[$key]);
 }
@@ -404,39 +380,27 @@ function lib_location($string) {
 	//i'm thinking i'll start a lib.php file
 	switch ($string) {
 		case 'fpdf' :
-		return $_josh['write_folder'] . '/lib/fpdf/fpdf-1.6.php';
+		return $_josh['dir']['write'] . '/lib/fpdf/fpdf-1.6.php';
 		
 		case 'prototype' :
-		return $_josh['write_folder'] . '/lib/prototype/prototype-1.5.0.js';
+		return $_josh['dir']['write'] . '/lib/prototype/prototype-1.5.0.js';
 		
 		case 'scriptaculous' :
-		return $_josh['write_folder'] . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js';
+		return $_josh['dir']['write'] . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js';
 		
 		case 'simple_html_dom' :
-		return $_josh['root'] . $_josh['write_folder'] . '/lib/simple_html_dom/simple_html_dom-1.11.php';
+		return $_josh['dir']['root'] . $_josh['dir']['write'] . '/lib/simple_html_dom/simple_html_dom-1.11.php';
 
 		case 'tinymce' :
-		return $_josh['write_folder'] . '/lib/tinymce/tinymce-3.3rc1/tiny_mce.js';
+		return $_josh['dir']['write'] . '/lib/tinymce/tinymce-3.3rc1/tiny_mce.js';
 	}
 }
 
 function user($return=false) {
-	//shortcut to say if a session exists and what the id is, or return $return
+	//shortcut to say if a session exists and what the id is, or return $return eg NULL for sql
 	if (empty($_SESSION['user_id'])) return $return;
 	return $_SESSION['user_id'];
 }
 
-function var_name(&$iVar, &$aDefinedVars) {
-	//get the name of the variable you are passing in
-	//via http://mach13.com/how-to-get-a-variable-name-as-a-string-in-php
-	//was considering it for auto-classing draw_list
-	foreach ($aDefinedVars as $k=>$v) $aDefinedVars_0[$k] = $v;
-	$iVarSave	= $iVar;
-	$iVar		= !$iVar;
-	$aDiffKeys	= array_keys(array_diff_assoc($aDefinedVars_0, $aDefinedVars));
-	$iVar		= $iVarSave;
-	return $aDiffKeys[0];
-}
-
-if ($_josh['debug']) error_debug('joshlib has finished loading and self-debugging in ' . format_time_exec(), __file__, __line__);
+if ($_josh['debug']) error_debug('joshlib finished loading and self-debugging in ' . format_time_exec(), __file__, __line__);
 ?>

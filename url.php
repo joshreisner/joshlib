@@ -1,6 +1,7 @@
 <?php
 /*
 should this be called http instead of url?  i could include cookie, and url_header would make more sense.
+potentially just need to add http.php
 */
 
 error_debug('including url.php', __file__, __line__);
@@ -77,30 +78,27 @@ function url_drop($deletes=false, $go=true) {
 }
 
 function url_header_utf8() {
-	header('Content-Type: text/html; charset=utf-8');
+	//todo rename http_header_utf8
+	if (!headers_sent()) header('Content-Type: text/html; charset=utf-8');
 }
 
-function url_get($address) {
-	if (function_exists('curl_init')) {
-		$useragent	= "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)";
-		$referrer	= "http://www.google.com/";
-		
-		$ch = curl_init($address);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
-		curl_setopt($ch, CURLOPT_REFERER, $referrer);
-		
-		$return = curl_exec($ch);
-		curl_close($ch);
-		//$return = $tmp;
-	} else {
-		$return = @implode('', @file($address));
-	}
+function url_get($url) {
+	//retrieve remote pagedata
+	
+	//curl_init is the preferred method.  if it's not available, try file()
+	if (!function_exists('curl_init')) return @implode('', @file($url));
+
+	//run curl
+	$ch = curl_init($url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)');
+	curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
+	$return = curl_exec($ch);
+	curl_close($ch);
 	return $return;
 }
 
 function url_id($index='id') {
-	global $_GET;
 	//check to see whether there's an id and if so, if it's an integer
 	if (isset($_GET[$index]) && format_check($_GET[$index])) return $_GET[$index];
 	unset($_GET[$index]);
@@ -112,6 +110,7 @@ function url_id_add($id=false, $go=false) {
 }
 
 function url_parse($url) {
+	//todo rename array_url
 	global $_josh;
 	error_debug('<b>url_parse</b> running for  ' . $url, __file__, __line__);
 	
@@ -204,21 +203,6 @@ function url_parse($url) {
 	//get full browser address
 	$return['url'] = $return['protocol'] . '://' . $return['host'] . $return['path_query'];
 	
-	/*handle possible mod_rewrite slots (i don't think we need this anymore 8/22/09
-	if (isset($_GET['slot1'])) {
-		$return['folder'] = $_GET['slot1'];
-		$return['path'] = '/' . $_GET['slot1'] . '/';
-		if (isset($_GET['slot2'])) {
-			$return['subfolder'] = $_GET['slot2'];
-			$return['path'] .= $_GET['slot2'] . '/';
-			if (isset($_GET['slot3'])) {
-				$return['subsubfolder'] = $_GET['slot3'];
-				$return['path'] .= $_GET['slot3'] . '/';
-			}
-		}
-		$return['path_query'] = $return['path'];
-	}*/
-	
 	//output for debugging ~ testing for debug since it takes some processing
 	if ($_josh['debug']) {
 		ksort($return);
@@ -237,7 +221,6 @@ function url_query_add($adds=false, $go=true, $path=false) { //add specified que
 	global $_josh;
 	if (!$adds) $adds = array();
 	$target = url_base() . (($path) ? $path : $_josh['request']['path']);
-	//$adds = array_unique(array_merge($_GET, $adds));
 	$adds = array_merge($_GET, $adds);
 	$pairs = array();
 	if (count($adds)) foreach ($adds as $key=>$value) if ($value) $pairs[] = $key . '=' . urlencode($value);
@@ -248,11 +231,10 @@ function url_query_add($adds=false, $go=true, $path=false) { //add specified que
 }
 
 function url_query_drop($deletes=false, $go=true) {
-	//purpose: clear specified query arguments, or clear everything if unspecified
-	//called by: lots of pages on the intranet, eg /staff/view.php
+	//clear specified query arguments, or clear everything if unspecified
 	//accepts: $deletes is a one-dimensional array of keys, eg array('id', 'action', 'chicken'), $go is boolean
 	//deletes could also be a comma-separated list
-	global $_josh, $_GET;
+	global $_josh;
 	$get = $_GET;
 	$target = url_base() . $_josh['request']['path'];
 	if ($deletes) {

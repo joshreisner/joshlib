@@ -537,7 +537,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	
 	//get width and height
 	$image = @getimagesize($path);
-	if (!$image) $image = @getimagesize($_josh['root'] . $path);
+	if (!$image) $image = @getimagesize($_josh['dir']['root'] . $path);
 	//if (!$image) die('could not find' . $path);
 	if (!$image) return '';
 	
@@ -576,7 +576,7 @@ function draw_javascript($javascript=false) {
 
 function draw_javascript_ckeditor() {
 	global $_josh;
-	return draw_javascript_src($_josh['write_folder'] . '/lib/ckeditor/ckeditor.js');
+	return draw_javascript_src($_josh['dir']['write'] . '/lib/ckeditor/ckeditor.js');
 }
 
 function draw_javascript_lib() {
@@ -600,24 +600,23 @@ function draw_javascript_link($target, $text, $id=false, $class=false) {
 }
 
 function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='/_site/tiny_mce/tiny_mce.js') {
-	//todo deprecated
-	error_handle(__FUNCTION__ . ' is deprecated', __file__, __line__);
+	error_deprecated(__FUNCTION__ . ' is deprecated as of 3/11/2010 in favor of using table class');
 	return draw_javascript_src() . draw_javascript_src($path_script) . draw_javascript('form_tinymce_init("' . $path_css . '");');
 }
 
 function draw_javascript_src($filename=false) {
 	global $_josh;
-	if (!$filename && isset($_josh['write_folder'])) {
+	if (!$filename && isset($_josh['dir']['write'])) {
 		if ($_josh['drawn']['javascript']) return false; //only draw this file once per page
 		$_josh['drawn']['javascript'] = true;
-		$filename = $_josh['write_folder'] . '/javascript.js';
-		$joshlibf = $_josh['joshlib_folder'] . '/javascript.js';
-		if (!file_is($filename) || (filemtime($joshlibf) > filemtime($_josh['root'] . $filename))) {
+		$filename = $_josh['dir']['write'] . '/javascript.js';
+		$joshlibf = $_josh['dir']['joshlib'] . '/javascript.js';
+		if (!file_check($filename) || (filemtime($joshlibf) > filemtime($_josh['dir']['root'] . $filename))) {
 			//either doesn't exist or is out-of-date
 			if (!file_put($filename, file_get($joshlibf))) return error_handle(__FUNCTION__ . ' can\'t write the js file.', __file__, __line__);
 		}
 	} elseif (!$filename) {
-		return error_handle(__FUNCTION__ . ' needs the variable _josh[\'write_folder\'] to be set.', __file__, __line__);
+		return error_handle(__FUNCTION__ . ' needs the variable _josh[\'dir\'][\'write\'] to be set.', __file__, __line__);
 	}
 	return '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
 }
@@ -788,13 +787,6 @@ function draw_span($class, $inner) {
 function draw_swf($path, $width, $height, $border=0) {
 	//standards-compliant satay method (http://www.alistapart.com/articles/flashsatay)
 	return '<object type="application/x-shockwave-flash" data="' . $path . '" width="' . $width . '" height="' . $height . '"><param name="movie" value="' . $path . '" /></object>';
-
-	//adobe method, deprecated
-	return '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0" width="' . $width . '" height="' . $height . '">
-		<param name="movie" value="' . $path . '" />
-		<param name="quality" value="high" />
-		<embed src="' . $path . '" quality="high" pluginspage="http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="' . $width . '" height="' . $height . '" border="' . $border . '"></embed>
-	  </object>';
 }
 
 function draw_table_rows($array, $columns=2) {

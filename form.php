@@ -1,7 +1,4 @@
 <?php
-/*
-this whole file is just the form class
-*/
 error_debug('including form.php', __file__, __line__);
 
 class form { 
@@ -198,8 +195,8 @@ class form {
 				case 'textarea':
 					if (!$_josh['drawn']['tinymce'] && ($class == 'tinymce')) {
 						//todo: we might need a folder for this -- also these names are a bit too generic
-						file_write_folder('images');
-						file_write_folder('files');
+						file_dir_writable('images');
+						file_dir_writable('files');
 						$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
 						$_josh['drawn']['tinymce'] = true;
 					} elseif (!$_josh['drawn']['ckeditor'] && ($class == 'ckeditor')) {

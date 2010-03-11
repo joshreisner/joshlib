@@ -1,7 +1,4 @@
 <?php
-/*
-table class
-*/
 error_debug('including table.php', __file__, __line__);
 
 class table {

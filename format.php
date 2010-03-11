@@ -1,9 +1,5 @@
 <?php
-/*
-this section is all formatting functions, usually to format strings into special configurations
-
-todo ~ deprecate this entire library and start a string library?
-*/
+//todo ~ deprecate this entire library and start a string library?
 error_debug('including format.php', __file__, __line__);
 
 function format_accents_encode($string) {
@@ -342,7 +338,7 @@ function format_html_trim($text) {
 	global $_josh;
 	$text = format_html($text);
 	
-	require_once($_josh['root'] . $_josh['write_folder'] . '/lib/simple_html_dom.php');
+	require_once($_josh['dir']['root'] . $_josh['dir']['write'] . '/lib/simple_html_dom.php');
 
 	//find td, div or body with longest text block
 	$html = str_get_html($text);
@@ -412,9 +408,9 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 			global $_josh;
 			//resize an image and save to the $target_name
 			$tmp = imagecreatetruecolor($new_width, $new_height);
-			if (!$image = imagecreatefromjpeg($_josh['root'] . $source_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name);
+			if (!$image = imagecreatefromjpeg($_josh['dir']['root'] . $source_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name);
 			imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-			imagejpeg($tmp, $_josh['root'] . $target_name, 100);
+			imagejpeg($tmp, $_josh['dir']['root'] . $target_name, 100);
 			imagedestroy($tmp);
 			imagedestroy($image);
 		}
@@ -422,30 +418,30 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		function crop($new_width, $new_height, $target_name) {
 			global $_josh;
 			//crop an image and save to the $target_name
-			list($width, $height) = getimagesize($_josh['root'] . $target_name);
+			list($width, $height) = getimagesize($_josh['dir']['root'] . $target_name);
 			$tmp = imagecreatetruecolor($new_width, $new_height);
-			if (!$image = @imagecreatefromjpeg($_josh['root'] . $target_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name);
+			if (!$image = @imagecreatefromjpeg($_josh['dir']['root'] . $target_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name);
 			imagecopyresized($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $new_width, $new_height);
-			imagejpeg($tmp, $_josh['root'] . $target_name, 100);
+			imagejpeg($tmp, $_josh['dir']['root'] . $target_name, 100);
 			imagedestroy($tmp);
 			imagedestroy($image);
 		}	
 	}
 
 	//save to file, is file-based operation, unfortunately
-	$source_name = $_josh['write_folder'] . '/temp-source.jpg';
-	$target_name = $_josh['write_folder'] . '/temp-target.jpg';
+	$source_name = $_josh['dir']['write'] . '/temp-source.jpg';
+	$target_name = $_josh['dir']['write'] . '/temp-target.jpg';
 	file_put($source_name, $source);
 
 	//get source image dimensions
-	list($width, $height) = getimagesize($_josh['root'] . $source_name);
+	list($width, $height) = getimagesize($_josh['dir']['root'] . $source_name);
 	
 	//execute differently depending on target parameters	
 	if ($max_width && $max_height) {
 		//resizing both
 		if (($width == $max_width) && ($height == $max_height)) {
 			//already exact width and height, skip resizing
-			copy($_josh['root'] . $source_name, $_josh['root'] . $target_name);
+			copy($_josh['dir']['root'] . $source_name, $_josh['dir']['root'] . $target_name);
 		} else {
 			//this was for the scenario where your target was a long landscape and you got a squarish image.
 			//this doesn't work if your target is squarish and you get a long landscape
@@ -470,7 +466,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		//only resizing width
 		if ($width == $max_width) {
 			//already exact width, skip resizing
-			copy($_josh['root'] . $source_name, $_josh['root'] . $target_name);
+			copy($_josh['dir']['root'] . $source_name, $_josh['dir']['root'] . $target_name);
 		} else {
 			//resize width
 			$new_height = ($height / $width) * $max_width;
@@ -481,7 +477,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		//only resizing height	
 		if ($height == $max_height) {
 			//already exact height, skip resizing
-			copy($_josh['root'] . $source_name, $_josh['root'] . $target_name);
+			copy($_josh['dir']['root'] . $source_name, $_josh['dir']['root'] . $target_name);
 		} else {
 			//resize height
 			$new_width = ($width / $height) * $max_height;
@@ -532,7 +528,7 @@ function format_money($value, $dollarsign=true, $comma=true, $error='') {
 
 function format_nobr($string='') {
 	//should have been draw_nobr anyway
-	error_handle('function deprecated', 'format_nobr was deprecated on 10/28/2009 because it\'s invalid html -- use table width instead, or white-space: nowrap;', __file__, __line__);
+	error_deprecated(__FUNCTION__ . ' was deprecated on 10/28/2009 because it\'s invalid html -- use table width instead, or white-space: nowrap');
 	return '<nobr>' . $string . '</nobr>';
 }
 
@@ -784,8 +780,7 @@ function format_text_human($str, $convertdashes=true) {
 }
 
 function format_text_shorten($text, $length=30, $append='&#8230;', $appendlength=1) {
-	//this function is deprecated
-	error_handle('deprecated format_text_shorten', 'this function was deprecated 10/3/2009.  use format_string instead');
+	error_deprecated(__FUNCTION__ . ' was deprecated on 10/3/2009 use format_string instead');
 	if ($append) $length = $length - $appendlength;
 	if (strlen($text) > $length) return substr($text, 0, $length) . $append;
 	return $text;

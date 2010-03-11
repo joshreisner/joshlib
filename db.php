@@ -40,7 +40,7 @@ function db_backup($limit=false) {
 	global $_josh;
 	
 	//default filename is /_site/backups/YYYY-MM-DD.sql -- delete any existing file of that name
-	$folder = $_josh['write_folder'] . '/backups/';
+	$folder = $_josh['dir']['write'] . '/backups/';
 	$target = $folder . date('Y-m-d') . '.gz';
 	file_delete($target);
 	
@@ -57,7 +57,7 @@ function db_backup($limit=false) {
 	if ($language != 'mysql') error_handle('only mysql supported', 'db_backup is a mysql-only function right now');
 
 	//build command, socket hack, execute
-	$command = 'mysqldump --opt --host="' . $location . '" --user="' . $username . '" --password="' . $password . '" "' . $database . '" | gzip > ' . $_josh['root'] . $target;
+	$command = 'mysqldump --opt --host="' . $location . '" --user="' . $username . '" --password="' . $password . '" "' . $database . '" | gzip > ' . $_josh['dir']['root'] . $target;
 	if (isset($_josh['mysqldump_path'])) $command = $_josh['mysqldump_path'] . $command;
 	$command = str_replace(':', '" --socket="', $command);
 	system($command);
