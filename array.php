@@ -212,9 +212,7 @@ function array_remove($needle, $haystack) {
 function array_send($array, $target) {
 	//POST an array as a JSON post request to a remote site
 	global $_josh;
-	
-	debug();
-	
+		
 	//prepare POSTdata
 	if (is_array($array)) {
 		//must have JSON

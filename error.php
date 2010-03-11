@@ -129,7 +129,7 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	//try to post to work website
 	//i don't like to squash variables, but need to here because an error could occur between setting error handler and getting the config vars
 	if (!isset($_SESSION['email']) || ($_SESSION['email'] != $_josh['email_admin'])) {
-		if (@$_josh['error_log_api'] && array_send(array('subject'=>$subject, 'message'=>$message, 'url'=>$_josh['request']['url'], 'email'=>$from), $_josh['error_log_api'])) {
+		if (!empty($_josh['error_log_api']) && array_send(array('subject'=>$subject, 'message'=>$message, 'url'=>$_josh['request']['url'], 'email'=>$_josh['email_admin']), $_josh['error_log_api'])) {
 			//cool, we sent the request via json and fsockopen!
 		} elseif (@$_josh['email_admin']) {
 			//send email to admin

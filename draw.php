@@ -606,19 +606,17 @@ function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='
 
 function draw_javascript_src($filename=false) {
 	global $_josh;
-	if (!$filename && isset($_josh['dir']['write'])) {
+	if (!$filename) {
 		if ($_josh['drawn']['javascript']) return false; //only draw this file once per page
 		$_josh['drawn']['javascript'] = true;
-		$filename = $_josh['dir']['write'] . '/javascript.js';
-		$joshlibf = $_josh['dir']['joshlib'] . '/javascript.js';
-		if (!file_check($filename) || (filemtime($joshlibf) > filemtime($_josh['dir']['root'] . $filename))) {
+		$filename = DIRECTORY_WRITE . '/javascript.js';
+		$joshlibf = DIRECTORY_JOSHLIB . 'javascript.js';
+		if (!file_check($filename) || (filemtime($joshlibf) > filemtime(DIRECTORY_ROOT . $filename))) {
 			//either doesn't exist or is out-of-date
 			if (!file_put($filename, file_get($joshlibf))) return error_handle(__FUNCTION__ . ' can\'t write the js file.', __file__, __line__);
 		}
-	} elseif (!$filename) {
-		return error_handle(__FUNCTION__ . ' needs the variable _josh[\'dir\'][\'write\'] to be set.', __file__, __line__);
 	}
-	return '<script language="javascript" src="' . $filename . '" type="text/javascript"></script>';
+	return draw_tag('script', array('language'=>'javascript', 'src'=>$filename, 'type'=>'text/javascript'), '');
 }
 
 function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) {
@@ -678,12 +676,14 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguments_or_class=false, 
 }
 
 function draw_meta_description($string) {
-	global $_josh;
 	return draw_tag('meta', array('name'=>'description', 'content'=>$string));
 }
 
+function draw_meta_keywords($string) {
+	return draw_tag('meta', array('name'=>'keywords', 'content'=>$string));
+}
+
 function draw_meta_utf8() {
-	global $_josh;
 	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
 }
 
@@ -713,7 +713,8 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	$counter = 1;
 	$javascript = NEWLINE;
 	foreach ($options as $url=>$title) {
-		$args = array('name'=>'option_' . $_josh['drawn']['navigation'] . '_' . $counter, 'class'=>'option_' . $_josh['drawn']['navigation'] . '_' . $counter);
+		$name = 'option_' . $_josh['drawn']['navigation'] . '_' . $counter;
+		$args = array('name'=>$name, 'class'=>$name);
 
 		if (str_replace(url_base(), '', $url) == $match) {
 			$img_state = '_on';
@@ -722,7 +723,7 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 		} else {
 			$img_state = '_off';
 			if ($type == 'rollovers') {
-				$args['onmouseover'] = 'javascript:img_roll(\'' . $name . '\',\'on\');"';
+				$args['onmouseover'] = 'javascript:img_roll(\'' . $name . '\',\'on\');';
 				$args['onmouseout'] = 'javascript:img_roll(\'' . $name . '\',\'off\');';
 			}
 		}

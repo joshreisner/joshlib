@@ -46,9 +46,9 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	error_reporting(E_ALL);
 	ini_set('display_errors', TRUE);
 	ini_set('display_startup_errors', TRUE);
-	$_josh['dir']['joshlib'] = dirname(__file__);
+	define('DIRECTORY_JOSHLIB', dirname(__file__) . DIRECTORY_SEPARATOR);
 	if (!isset($_josh['debug'])) $_josh['debug'] = false;
-	require($_josh['dir']['joshlib'] . '/error.php');
+	require(DIRECTORY_JOSHLIB . 'error.php');
 	set_error_handler('error_handle_php');
 	set_exception_handler('error_handle_exception');
 	error_debug('<b>index</b> error handling is set up', __file__, __line__);
@@ -104,16 +104,16 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
 
 //get includes
-	require($_josh['dir']['joshlib'] . '/array.php');
-	require($_josh['dir']['joshlib'] . '/cache.php');
-	require($_josh['dir']['joshlib'] . '/db.php');
-	require($_josh['dir']['joshlib'] . '/draw.php');
-	require($_josh['dir']['joshlib'] . '/email.php');
-	require($_josh['dir']['joshlib'] . '/file.php');
-	require($_josh['dir']['joshlib'] . '/form.php');
-	require($_josh['dir']['joshlib'] . '/format.php');
-	require($_josh['dir']['joshlib'] . '/table.php');
-	require($_josh['dir']['joshlib'] . '/url.php');
+	require(DIRECTORY_JOSHLIB . 'array.php');
+	require(DIRECTORY_JOSHLIB . 'cache.php');
+	require(DIRECTORY_JOSHLIB . 'db.php');
+	require(DIRECTORY_JOSHLIB . 'draw.php');
+	require(DIRECTORY_JOSHLIB . 'email.php');
+	require(DIRECTORY_JOSHLIB . 'file.php');
+	require(DIRECTORY_JOSHLIB . 'form.php');
+	require(DIRECTORY_JOSHLIB . 'format.php');
+	require(DIRECTORY_JOSHLIB . 'table.php');
+	require(DIRECTORY_JOSHLIB . 'url.php');
 
 //parse environment variables
 	if (!isset($_SERVER['DOCUMENT_ROOT']) || !isset($_SERVER['HTTP_HOST']) || !isset($_SERVER['SCRIPT_NAME'])) error_handle('environment variables not set', 'joshlib requires $_SERVER[\'DOCUMENT_ROOT\'], $_SERVER[\'HTTP_HOST\'] and $_SERVER[\'SCRIPT_NAME\'] to function properly.  please define these before proceeding.');
@@ -185,7 +185,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	}
 	
 //ensure lib exists--todo autogen lib folder when lib.zip has been updated
-	if (!is_dir($_josh['dir']['root'] . $_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'lib')) file_unzip($_josh['dir']['joshlib'] . DIRECTORY_SEPARATOR . 'lib.zip', $_josh['dir']['write']);
+	if (!is_dir($_josh['dir']['root'] . $_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'lib')) file_unzip(DIRECTORY_JOSHLIB . DIRECTORY_SEPARATOR . 'lib.zip', $_josh['dir']['write']);
 
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_SERVER['HTTP_HOST']) && (format_text_starts('dev-', $_SERVER['HTTP_HOST']) || format_text_starts('beta.', $_SERVER['HTTP_HOST']) || format_text_ends('.site', $_SERVER['HTTP_HOST']))) {
