@@ -167,7 +167,7 @@ function array_post_checkboxes($field_name) {
 }
 
 function array_post_fields($fieldnames, $delimiter=',') {
-	//legacy alias, todo deprecate
+	error_deprecated(__function__ . ' was deprecated on 3/11/2010.  use array_separated instead');
 	return array_separated($fieldnames, $delimiter);
 }
 
@@ -186,6 +186,18 @@ function array_range($start, $end, $increment=1) {
 			$return[] = $start;
 			$start -= $increment;
 		}
+	}
+	return $return;
+}
+
+function array_query_string($str, $defaults=false, $separator='&') {
+	//takes a key/pair string in the form you'd find in a query string and returns an array
+	//separator is an argument because cookie strings are separated with semicolons
+	$return = array();
+	$pairs = explode($separator, $str);
+	foreach ($pairs as $p) {
+		list($key, $value) = explode('=', trim($p));
+		$return[urldecode($key)] = urldecode($value);
 	}
 	return $return;
 }
@@ -298,22 +310,14 @@ function array_to_lower($array) {
 }
 
 function array_url($str, $defaults=false, $separator='&') {
-	//takes a key/pair string in the form you'd find in a query string and returns an array
-	//separator is an argument because cookie strings are separated with semicolons
-	$return = array();
-	$pairs = explode($separator, $str);
-	foreach ($pairs as $p) {
-		list($key, $value) = explode('=', trim($p));
-		$return[urldecode($key)] = urldecode($value);
-	}
-	return $return;
+	error_deprecated(__function__ . ' was deprecated on 3/11/2010.  use array_query_string instead.  this one\'s going to go fast because url_parse is going to fill this spot.');
+	return array_query_string($str, $defaults, $separator);
 }
 
 function array_xml($stringxml) {
 	//for harvest import -- take data in string xml format and return it as an associative array
+	//todo verify this works
 	$data = new SimpleXMLElement($stringxml);
-	if (is_object($data)) {
-		return array_object($data->children());
-	}
+	if (is_object($data)) return array_object($data->children());
 }
 ?>
