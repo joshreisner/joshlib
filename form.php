@@ -193,13 +193,14 @@ class form {
 					$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
 					break;
 				case 'textarea':
-					if (!$_josh['drawn']['tinymce'] && ($class == 'tinymce')) {
+				case 'textarea-plain':
+					if (($class == 'tinymce') && !$_josh['drawn']['tinymce']) {
 						//todo: we might need a folder for this -- also these names are a bit too generic
 						file_dir_writable('images');
 						file_dir_writable('files');
 						$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
 						$_josh['drawn']['tinymce'] = true;
-					} elseif (!$_josh['drawn']['ckeditor'] && ($class == 'ckeditor')) {
+					} elseif (($class == 'ckeditor') && !$_josh['drawn']['ckeditor']) {
 						$return .= draw_javascript_ckeditor();
 						$_josh['drawn']['ckeditor'] = true;
 					}

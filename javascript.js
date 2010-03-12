@@ -173,7 +173,7 @@ function form_tinymce_init(cssLocation, showplugins) {
 		tinyMCE.init({
 			mode : "textareas",
 			theme : "advanced",
-			theme_advanced_buttons1 : "bold,italic,underline,strikethrough,separator,justifyleft,justifycenter,blockquote,separator,bullist,numlist,separator,undo,redo,separator,link,unlink,insertimage,|,code",
+			theme_advanced_buttons1 : "bold,italic,underline,strikethrough,separator,justifyleft,justifycenter,blockquote,separator,bullist,numlist,outdent,indent,separator,undo,redo,separator,link,unlink,insertimage,|,code",
 			theme_advanced_buttons2 : "",
 			theme_advanced_buttons3 : "",
 			theme_advanced_resizing : true,		
@@ -181,12 +181,13 @@ function form_tinymce_init(cssLocation, showplugins) {
 			theme_advanced_toolbar_location : "top",
 			extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[align|style],p[align]",
 			content_css : cssLocation + "?" + new Date().getTime(),
-			plugins : "imagemanager,filemanager",
+			plugins : "imagemanager,filemanager,paste",
 			editor_selector : "tinymce",
 			editor_deselector : "mceNoEditor",
 			relative_urls : false,
 			remove_script_host : false
 		});
+		tinyMCE.get('elm1').addShortcut("ctrl+1","nix","Dummy");
 	} else {
 		tinyMCE.init({
 			mode : "textareas",
@@ -204,6 +205,7 @@ function form_tinymce_init(cssLocation, showplugins) {
 			relative_urls : false,
 			remove_script_host : false
 		});
+		
 	}
 }
 

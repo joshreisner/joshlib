@@ -91,6 +91,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'image-alt'=>'Image (Alt)',
 										'text'=>'Text',
 										'textarea'=>'Textarea',
+										'textarea-plain'=>'Textarea (Plain)',
 										'url'=>'URL'
 									);
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');

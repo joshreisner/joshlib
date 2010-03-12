@@ -68,7 +68,7 @@ function format_code($code) {
 	return '<p style="font-family:courier; font-size:13px;">' . nl2br(str_replace('\t', '&nbsp;', htmlentities($code))) . '</p>';
 }
 
-function format_date($timestamp=false, $error='', $format='%b %d, %Y', $relativetime=true) {
+function format_date($timestamp=false, $error='', $format='%b %d, %Y', $relativetime=true, $todaytime=false) {
 	global $_josh;
 
 	if ($timestamp === false) $timestamp = time();
@@ -93,7 +93,7 @@ function format_date($timestamp=false, $error='', $format='%b %d, %Y', $relative
 		//setup return date
 		$datediff = ($returndate - $todaysdate) / 86400;
 		if ($datediff == 0) {
-			$return = $_josh['date']['strings'][1];
+			$return = ($todaytime) ? format_time($timestamp) : $_josh['date']['strings'][1];
 		} elseif ($datediff == -1) {
 			$return = $_josh['date']['strings'][0];
 		} elseif ($datediff == 1) {
