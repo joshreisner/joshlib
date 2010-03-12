@@ -691,7 +691,7 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	
 	//skip if empty
 	if (!is_array($options) || !count($options)) return false;
-	
+		
 	$return = array();
 	if ($match === false) {
 		$match = $_josh['request']['path'];
@@ -720,9 +720,7 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 				$args['onmouseout'] = 'javascript:img_roll(\'' . $name . '\',\'off\');';
 			}
 		}
-		if ($type == 'text') {
-			$inner = $title;
-		} elseif (($type == 'images') || ($type == 'rollovers')) {
+		if (($type == 'images') || ($type == 'rollovers')) {
 			if ($useid) {
 				$img = substr($url, strpos($url, 'id=') + 3);
 			} else {
@@ -737,6 +735,8 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 				$javascript .= $name . '_off.src = "' . $folder . $img . '_off.png";' . NEWLINE;
 			}
 			$inner = draw_img($folder . $img . $img_state . '.png', false, false, $name);
+		} else { //type == text
+			$inner = $title;		
 		}
 		$return[] = draw_link($url, $inner, false, $args);
 		$counter++;

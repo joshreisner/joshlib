@@ -18,8 +18,8 @@ function error_debug($message, $file, $line) {
 		error_debug('<b>error_debug</b> welcome to joshlib!', __file__, __line__);
 	}
 	
-	if (defined('DIRECTORY_ROOT') && stristr($file, DIRECTORY_ROOT)) $file = str_replace(DIRECTORY_ROOT, "", $file);
-	if (defined('DIRECTORY_JOSHLIB') && stristr($file, DIRECTORY_JOSHLIB)) $file = str_replace(DIRECTORY_JOSHLIB, "/joshlib", $file);
+	if (defined('DIRECTORY_ROOT') && stristr($file, DIRECTORY_ROOT)) $file = str_replace(DIRECTORY_ROOT, '', $file);
+	if (defined('DIRECTORY_JOSHLIB') && stristr($file, DIRECTORY_JOSHLIB)) $file = str_replace(DIRECTORY_JOSHLIB, '/joshlib/', $file);
 
 	//timer
 	$time = round(microtime(true) - $_josh['time_lastdebug'], 3);
@@ -91,8 +91,8 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	}
 
 	//take out full path -- security hazard and decreases readability
-	if (defined('DIRECTORY_ROOT'))		$message = str_replace(DIRECTORY_ROOT, "", $message);
-	if (defined('DIRECTORY_JOSHLIB'))	$message = str_replace(DIRECTORY_JOSHLIB, "/joshlib", $message);
+	if (defined('DIRECTORY_ROOT'))		$message = str_replace(DIRECTORY_ROOT, '', $message);
+	if (defined('DIRECTORY_JOSHLIB'))	$message = str_replace(DIRECTORY_JOSHLIB, '/joshlib/', $message);
 	
 	//add more stuff to admin message, set from and subject
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
