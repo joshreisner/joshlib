@@ -16,7 +16,7 @@ function draw_arguments($arguments=false) {
 function draw_array($array, $nice=false) {
 	global $_josh;
 	if (!is_array($array)) return false;
-	$return = '<table border="1">';
+	$return = '<table cellspacing="1" style="background-color:#ccc;color:#333;border:0px;">';
 	//if (!$nice) ksort($array);
 	while(list($key, $value) = each($array)) {
 		$key = urldecode($key);
@@ -24,9 +24,9 @@ function draw_array($array, $nice=false) {
 		$value = format_quotes($value);
 		if (strToLower($key) == 'email') $value = '<a href="mailto:' . $value . '">' . $value . '</a>';
 		if (is_array($value)) $value = draw_array($value, $nice);
-		$return  .= '<tr><td bgcolor="#eeeeee"><b>';
+		$return  .= '<tr><td style="background-color:#eee;"><b>';
 		$return .= ($nice) ? format_text_human($key)  : $key;
-		$return .= '&nbsp;</b></td><td>';
+		$return .= '&nbsp;</b></td><td style="background-color:#fff;">';
 		$return .= is_object($value) ? 'object value' : $value;
 		$return .= '</td></tr>';
 	}
@@ -780,6 +780,46 @@ function draw_span($class, $inner) {
 function draw_swf($path, $width, $height, $border=0) {
 	//standards-compliant satay method (http://www.alistapart.com/articles/flashsatay)
 	return '<object type="application/x-shockwave-flash" data="' . $path . '" width="' . $width . '" height="' . $height . '"><param name="movie" value="' . $path . '" /></object>';
+}
+
+function draw_table($array, $name='untitled_table', $css=false) {
+	//array should be an array of associative arrays or a table name
+	
+	//if it's a table name, get table data	
+	if (!is_array($array)) $array = db_table('SELECT * FROM ' . $array);
+	
+	//if it's still not an array, exit
+	if (!isset($array[0]) || !is_array($array[0])) return false;
+
+	//create a new table class, fill it with keys from the array
+	$t = new table($name);
+	$columns = array_keys($array[0]);
+	foreach ($columns as $c) $t->set_column($c);
+	$return = $t->draw($array);
+	
+	//if css is set, prepend css
+	if ($css) $return = draw_css('
+		table				{ font-family:Verdana; font-size:12px; color:#444; border:1px solid #bbb; }
+		table td, table th	{ padding:4px 11px 4px 7px; border-bottom:1px solid #bbb; }
+		th					{ text-align:left; font-weight:normal; background-color:#ddd; }
+		table td.delete, table th.delete		{ width:20px; min-width:20px; }
+		table td.icon, table th.icon			{ width:20px; min-width:20px; }
+		table td.checkbox, table th.checkbox	{ width:20px; min-width:20px; }
+		table td.group							{ height:40px; vertical-align:bottom; text-transform:uppercase; font-weight:bold; font-size:11px;	 }
+		table td.empty							{ height:180px; background-color:#f3f3f3; text-align:center; font-style:italic; }
+		table td.d								{ text-align:center; cursor:move; }
+		
+		div.dropmarker {
+			height:2px;
+			background-color:black;
+			width:650px;
+			color:transparent;
+			z-index:1000;
+			margin:0px;		      
+		}
+	') . $return;
+	
+	return $return;
 }
 
 function draw_table_rows($array, $columns=2) {

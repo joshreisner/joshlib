@@ -36,24 +36,28 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 
 //set up error handling.  this needs to go first to handle any subsequent errors
 	error_reporting(E_ALL);
-	ini_set('display_errors', TRUE);
-	ini_set('display_startup_errors', TRUE);
-	define('DIRECTORY_JOSHLIB', dirname(__file__) . DIRECTORY_SEPARATOR);
+	ini_set('display_errors', true);
+	ini_set('display_startup_errors', true);
 	if (!isset($_josh['debug'])) $_josh['debug'] = false;
+	define('DIRECTORY_JOSHLIB', dirname(__file__) . DIRECTORY_SEPARATOR);
 	require(DIRECTORY_JOSHLIB . 'error.php');
 	set_error_handler('error_handle_php');
 	set_exception_handler('error_handle_exception');
 	error_debug('<b>index</b> error handling is set up', __file__, __line__);
 	
-//date stuff
+//strings
 	date_default_timezone_set('America/New_York');
 	$_josh['days']					= array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
-	$_josh['month']					= date('n');
 	$_josh['months']				= array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
 	$_josh['mos']					= array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
+	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
+
+//constants
+	define('TAB', "\t");
+	$_josh['month']					= date('n');
 	$_josh['today']					= date('j');
 	$_josh['year']					= date('Y');
-	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
 
 //page draw status
 	$_josh['drawn']['ckeditor']		= false;	//only include ckeditor js once
@@ -61,8 +65,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
 	$_josh['drawn']['tinymce']		= false;	//only include tinymce js once
 
-//ignore these words when making search indexes
-//todo make this local to search function
+//ignore these words when making search indexes | todo make this local to search function
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
 										'as','at','be','because','been','before','being','between','both','but','by','came','can','come',
 										'could','did','do','does','each','else','for','from','get','got','has','had','he','have','her','here',
@@ -74,16 +77,12 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'would','you','your','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s',
 										't','u','v','w','x','y','z',''
 									);
-
-//etc
-	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
-	$_josh['queries']				= 0;	//for counting trips to the database
-	define('TAB', "\t");
 	
 //used by cms, db_column_add, and form::set_field, db_save
 	$_josh['field_types']			= array(
 										'checkbox'=>'Checkbox',
 										'date'=>'Date',
+										'datetime'=>'Date & Time',
 										'select'=>'Dropdown',
 										'file'=>'File',
 										'image'=>'Image',
@@ -94,7 +93,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'textarea-plain'=>'Textarea (Plain)',
 										'url'=>'URL'
 									);
-	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'deleted_date', 'deleted_user', 'is_active');
+	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'publish_date', 'publish_user', 'is_published', 'deleted_date', 'deleted_user', 'is_active', 'precedence');
 
 //get the rest of the library
 	require(DIRECTORY_JOSHLIB . 'array.php');
@@ -218,7 +217,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['editing']	= url_id();
 	
 //handle some ajax calls automatically -- requires user to be logged in
-	if (user() && url_action('ajax_delete,ajax_reorder,ajax_set,flushcache,debug,phpinfo')) {
+	if (user() && url_action('ajax_delete,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,phpinfo')) {
 		$array = array_ajax();
 		
 		//quick thing for sessions -- why do we need this?
@@ -257,6 +256,43 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 					echo 'ERROR';
 				}
 				exit;
+			case 'db_check':
+				$tables = db_tables();
+				foreach ($tables as &$t) {
+					//debug();
+					error_debug('looking at ' . $t['Tables_in_' . $_josh['db']['database']], __file__, __line__);
+					$lookingfor = $_josh['system_columns'];
+					$columns = db_columns($t['Tables_in_' . $_josh['db']['database']]);
+					foreach ($columns as $c) $lookingfor = array_remove($c['name'], $lookingfor);
+					$t['missing']	= ($count = count($lookingfor)) ? $count : 0;
+					$t['details']	= ($count) ? implode(' &amp; ', $lookingfor) : 'All Good';
+					$t['fix']		= ($count) ? draw_link(url_query_add(array('action'=>'db_fix', 'table'=>$t['Tables_in_' . $_josh['db']['database']]), false), ' FIX ') : '';
+				}
+				echo draw_table($tables, 'name', true);
+				exit;
+			case 'db_fix':
+				$lookingfor = $_josh['system_columns'];
+				$columns = db_columns($_GET['table']);
+				foreach ($columns as $c) $lookingfor = array_remove($c['name'], $lookingfor);
+				foreach ($lookingfor as $l) {
+					$type = false;
+					if (($l == 'created_date') || ($l == 'updated_date') || ($l == 'deleted_date') || ($l == 'publish_date')) {
+						$type = 'datetime';
+					} elseif (($l == 'created_user') || ($l == 'updated_user') || ($l == 'deleted_user') || ($l == 'publish_user') || ($l == 'precedence')) {
+						$type = 'int';
+					} elseif (($l == 'is_published') || ($l == 'is_active')) {
+						$type = 'checkbox';
+					}
+					
+					//todo handle id
+					
+					if ($type) db_column_add($_GET['table'], $l, $type);
+					
+					//todo handle deprecated names such as createdOn or updatedOn etc
+				}
+				//echo 'ok!';
+				url_action_add('db_check', true);
+				exit;
 			case 'debug':
 				debug();
 				break;
@@ -268,9 +304,6 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				phpinfo();
 				exit;
 		}
-	} elseif (url_action('validate')) {
-		//validate redirect
-		url_change('http://validator.w3.org/check?uri=' . urlencode(url_query_drop('action', false)));
 	}
 
 //special functions that don't yet fit into a category
@@ -397,5 +430,5 @@ function user($return=false) {
 	return $_SESSION['user_id'];
 }
 
-if ($_josh['debug']) error_debug('joshlib finished loading and self-debugging in ' . format_time_exec(), __file__, __line__);
+if ($_josh['debug']) error_debug('joshlib finished loading and self-debugging in ' . format_time_exec(), __file__, __line__, '#def');
 ?>

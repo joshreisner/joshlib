@@ -302,6 +302,12 @@ function function_run(name, argument) {
 	}
 } 
 
+function google_search(form) {
+	//for psa
+	location.href = 'http://www.google.com/search?q=' + url_encode('site:' + window.location.hostname + ' ' + form.q.value);
+	return false;
+}
+
 /*img*/
 function img_roll(what, how) { 
 	eval("document." + what + ".src = " + what + "_" + how + ".src;"); 
@@ -397,6 +403,10 @@ function scroll_to(newPallet, dont_clear_interval) {
 /* url */
 function url_action_add(value, returnval) {
 	return url_query_set('action', value, returnval);
+}
+
+function url_encode(str) {
+	return escape(str).replace(/\+/g,'%2B').replace(/%20/g, '+').replace(/\*/g, '%2A').replace(/\//g, '%2F').replace(/@/g, '%40');
 }
 
 function url_id() {

@@ -9,12 +9,12 @@ function error_break() {
 	exit;
 }
 
-function error_debug($message, $file, $line) {
+function error_debug($message, $file, $line, $bgcolor='#fff') {
 	global $_josh;	
 	if (!$_josh['debug']) return;
 	
 	if (!isset($_josh['time_lastdebug'])) {
-		$_josh['time_lastdebug'] = $_josh['time_start'];
+		$_josh['time_lastdebug'] = TIME_START;
 		error_debug('<b>error_debug</b> welcome to joshlib!', __file__, __line__);
 	}
 	
@@ -24,7 +24,7 @@ function error_debug($message, $file, $line) {
 	//timer
 	$time = round(microtime(true) - $_josh['time_lastdebug'], 3);
 	$time = ($time < .001) ? '' : $time . 's';
-	echo '<div style="background-color:#fff;text-align:left;width:400px;margin:10px;padding:10px;border:2px dashed #6699cc;font-family:verdana;font-size:15px;min-height:70px;">
+	echo '<div style="background-color:' . $bgcolor . ';text-align:left;float:left;clear:left;margin:10px;padding:10px;border:2px dashed #6699cc;font-family:verdana;color:#000;font-size:15px;min-height:70px;">
 			<div style="font-weight:normal;font-size:12px;margin-bottom:7px;color:#888;">', $file, ' line ', $line, '
 				<div style="float:right;color:#ccc;">', $time, '</div>
 			</div>', 

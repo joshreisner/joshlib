@@ -102,7 +102,7 @@ function db_clear($tables=false) { //cant find where this is called from.  obsol
 
 function db_close($keepalive=false) { //close connection and quit
 	global $_josh;
-	error_debug('<b>db_close</b> there were a total of ' . $_josh['queries'] . ' queries.', __file__, __line__);
+	error_debug('<b>' . __function__ . '</b>', __file__, __line__);
 	if (db_connected()) {
 		if ($_josh['db']['language'] == 'mysql') {
 			@mysql_close($_josh['db']['pointer']);
@@ -137,6 +137,7 @@ function db_column_add($table, $column, $type) {
 		break;
 	
 		case 'date': 
+		case 'datetime': 
 		$datatype = 'datetime';
 		break;
 	
@@ -168,7 +169,7 @@ function db_column_add($table, $column, $type) {
 		$datatype = 'varchar';
 		break;
 	}
-	
+
 	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype) . ' ' . $default)) return $column;
 	return false;
 }
@@ -474,7 +475,6 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 	db_open();
 	$query = trim($sql);
 	if (isset($_josh['basedblanguage']) && ($_josh['basedblanguage'] != $_josh['db']['language'])) $query = db_translate($query, $_josh['basedblanguage'], $_josh['db']['language']);
-	$_josh['queries']++;
 	
 	if ($_josh['db']['language'] == 'mysql') {
 		if ($limit) $query .= ' LIMIT ' . $limit;
@@ -491,13 +491,13 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 		
 		//report error
 		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-		error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__);
+		error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__, '#fed');
 		if ($suppress_error) return false;
 		error_handle('sql error', format_code($query) . $error);
 	} else {
 		//handle success
 		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-		error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned', __file__, __line__);
+		error_debug('<b>db_query</b> <i>' . $query . '</i>, ' . db_found($result) . ' results returned', __file__, __line__, '#ffe');
 		if (format_text_starts('insert', $query)) return db_id();
 		return $result;
 	}
@@ -640,6 +640,31 @@ function db_save($table, $id='get', $array=false) {
 		}
 	}
 
+	//new is_published date / user
+	if (empty($array[$c['name']])) {
+		if ($id) {
+			$query1[] = 'is_published = 1';
+			$query1[] = 'publish_date = ' .  db_date();
+			$query1[] = 'publish_user = ' . ((isset($array['publish_user'])) ? $array['publish_user'] : $userID);
+		} else {
+			$query1[] = 'publish_date';
+			$query2[] = db_date();
+			$query1[] = 'publish_user';
+			$query2[] = ((isset($array['publish_user'])) ? $array['publish_user'] : $userID);
+			$query1[] = 'is_published';
+			$query2[] = 1;
+		}
+	} else {
+		if ($id) {
+			$query1[] = 'is_published = 0';
+			$query1[] = 'publish_date = NULL';
+			$query1[] = 'publish_user = NULL';
+		} else {
+			$query1[] = 'is_published';
+			$query2[] = 0;
+		}
+	}
+	
 	if ($id) {
 		$query1[] = 'updated_date = ' .  db_date();
 		$query1[] = 'updated_user = ' . ((isset($array['updated_user'])) ? $array['updated_user'] : $userID);
@@ -678,6 +703,7 @@ function db_switch($target=false) {
 }
 
 function db_table($sql, $limit=false, $suppress_error=false) {
+	//todo - rename db_arrays()?
 	$return = array();
 	$result = db_query($sql, $limit, $suppress_error);
 	while ($r = db_fetch($result)) $return[] = $r;
@@ -697,11 +723,15 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 		  ' . $columns . '
 		  `created_date` datetime NOT NULL,
 		  `created_user` int(11) NOT NULL,
+		  `publish_date` datetime DEFAULT NULL,
+		  `publish_user` int(11) DEFAULT NULL,
+		  `is_published` tinyint(4) NOT NULL,
 		  `updated_date` datetime DEFAULT NULL,
 		  `updated_user` int(11) DEFAULT NULL,
 		  `deleted_date` datetime DEFAULT NULL,
 		  `deleted_user` int(11) DEFAULT NULL,
 		  `is_active` tinyint(4) NOT NULL,
+		  `precedence` int(11) DEFAULT NULL,
 		  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;', false, false, $rechecking)) return $tablename;
 	
 	//or not
@@ -712,9 +742,18 @@ function db_table_exists($name) {
 	global $_josh;
 	if ($_josh['db']['language'] == 'mssql') {
 		//not implemented yet
-		error_handle('db_table_exists', 'this function is not yet implemented for mssql');
+		error_handle(__function__, 'this function is not yet implemented for mssql');
 	} elseif ($_josh['db']['language'] == 'mysql') {
 		return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding massive db repition with dbCheck
+	}
+}
+
+function db_tables() {
+	global $_josh;
+	if ($_josh['db']['language'] == 'mysql') {
+		return db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
+	} elseif ($_josh['db']['language'] == 'mssql') {
+		error_handle(__function__, 'this function is not yet implemented for mssql');
 	}
 }
 
