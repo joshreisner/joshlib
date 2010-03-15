@@ -641,7 +641,7 @@ function db_save($table, $id='get', $array=false) {
 	}
 
 	//new is_published date / user
-	if (empty($array[$c['name']])) {
+	if (!empty($array['is_published'])) {
 		if ($id) {
 			$query1[] = 'is_published = 1';
 			$query1[] = 'publish_date = ' .  db_date();

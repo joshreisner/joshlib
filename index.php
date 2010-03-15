@@ -217,7 +217,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['editing']	= url_id();
 	
 //handle some ajax calls automatically -- requires user to be logged in
-	if (user() && url_action('ajax_delete,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,phpinfo')) {
+	if (user() && url_action('ajax_delete,ajax_publish,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,phpinfo')) {
 		$array = array_ajax();
 		
 		//quick thing for sessions -- why do we need this?
@@ -225,17 +225,22 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		
 		switch ($_GET['action']) {
 			case 'ajax_delete':
+				//todo implement
+				exit;
+			case 'ajax_publish':
+				//todo implement
+				if ($array['checked']) {
+					db_query('UPDATE ' . $array['table'] . ' SET is_published = 1, publish_user = ' . user() . ', publish_date = ' . db_date() . ' WHERE id = ' . $array['id']);
+				} else {
+					db_query('UPDATE ' . $array['table'] . ' SET is_published = 0, publish_user = NULL, publish_date = NULL WHERE id = ' . $array['id']);
+				}
 				exit;
 			case 'ajax_reorder':
 				db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = NULL');
-				
-				//email('josh@joshreisner.com', draw_array($array));
-				
 				foreach ($array as $key=>$value) {
 					$key = urldecode($key);
 					if (format_text_starts($array['table'], $key)) db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . (format_numeric($key, true) + 1) . ' WHERE id = ' . $value);
 				}
-				
 				echo 'reordered';
 				exit;
 			case 'ajax_draw_select':
@@ -269,6 +274,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 					$t['fix']		= ($count) ? draw_link(url_query_add(array('action'=>'db_fix', 'table'=>$t['Tables_in_' . $_josh['db']['database']]), false), ' FIX ') : '';
 				}
 				echo draw_table($tables, 'name', true);
+				echo draw_link(url_action_add(false), 'Exit');
 				exit;
 			case 'db_fix':
 				$lookingfor = $_josh['system_columns'];
@@ -291,7 +297,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 					//todo handle deprecated names such as createdOn or updatedOn etc
 				}
 				//echo 'ok!';
-				url_action_add('db_check', true);
+				url_query_add(array('action'=>'db_check', 'table'=>false));
 				exit;
 			case 'debug':
 				debug();

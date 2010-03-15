@@ -355,7 +355,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 	if (is_array($sql_options)) {
 		while (@list($key, $val, $group) = each($sql_options)) {
 			if (is_array($val)) @list($key, $val, $group) = array_values($val); //possible db_table optgroup situation
-			$val = format_string($val);
+			$val = format_string($val, 60);
 			
 			//new optgroup code
 			if (!isset($grouped)) {

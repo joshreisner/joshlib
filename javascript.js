@@ -18,6 +18,21 @@
 */
 
 /*ajax*/
+function ajax_publish(which) {
+	//which.name eg chk_news_12
+	var action = which.name.split("_");
+
+	//send request		
+	new Ajax.Request(url_action_add('ajax_publish', true), {
+		method: 'post',
+		parameters: { 'table':action[1].replace("-", "_"), 'id':action[2], 'checked':which.checked },
+		onSuccess: function(transport) {
+			//feedback here
+			//alert(transport.responseText);
+		}
+	});	
+}
+
 function ajax_set(table, column, id, value, update) {
 	//success = false;
 	//used by intranet helptext toggle
