@@ -344,7 +344,7 @@ function draw_form_radio($name, $value='', $checked=false, $class=false) {
 	return $return;
 }
 
-function draw_form_select($name, $sql_options, $value=false, $required=true, $class=false, $action=false, $nullvalue='', $maxlength=false) {
+function draw_form_select($name, $sql_options, $value=false, $required=true, $class=false, $action=false, $nullvalue='', $maxlength=60) {
 	global $_josh;
 	$class = ($class) ? $class . ' select' : 'select';
 	$return  = '<select name="' . $name . '" id="' . $name . '" class="' . $class . '"';
@@ -355,7 +355,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 	if (is_array($sql_options)) {
 		while (@list($key, $val, $group) = each($sql_options)) {
 			if (is_array($val)) @list($key, $val, $group) = array_values($val); //possible db_table optgroup situation
-			$val = format_string($val, 60);
+			$val = format_string($val, $maxlength);
 			
 			//new optgroup code
 			if (!isset($grouped)) {
