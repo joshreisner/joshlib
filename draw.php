@@ -680,8 +680,9 @@ function draw_meta_utf8() {
 	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
 }
 
-function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $useid=false) {
+function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $override=false) {
 	//useid is for rollover navigation -- use everything after id= instead of slashless url
+	//2010 03 15 jr: useid is changed now to override -- can be 'id' or 'folder'
 	//type could be text, images or rollovers
 	global $_josh;
 	
@@ -700,6 +701,8 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	} elseif ($match == '//') {
 		//to take care of a common / . folder . / scenario
 		$match = '/';
+	} elseif ($match == 'folder') {
+		//new option
 	}
 	error_debug('<b>' . __function__ . '</b> match is ' . $match, __file__, __line__);
 	$selected = false;
@@ -708,8 +711,16 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	foreach ($options as $url=>$title) {
 		$name = 'option_' . $_josh['drawn']['navigation'] . '_' . $counter;
 		$args = array('name'=>$name, 'class'=>$name);
-
-		if (str_replace(url_base(), '', $url) == $match) {
+		
+		if ($match == 'folder') {
+			//eg /about/page1/ and /about/page2/ will match
+			$urlparts = explode('/', $url);
+			$matching = (@$urlparts[1] == $_josh['request']['folder']);
+		} else {
+			$matching = (str_replace(url_base(), '', $url) == $match);
+		}
+		
+		if ($matching) {
 			$img_state = '_on';
 			$args['class'] .= ' selected';
 			$selected = $counter;
@@ -721,8 +732,14 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 			}
 		}
 		if (($type == 'images') || ($type == 'rollovers')) {
-			if ($useid) {
-				$img = substr($url, strpos($url, 'id=') + 3);
+			if ($override) {
+				if ($override == 'id') {
+					$img = substr($url, strpos($url, 'id=') + 3);
+				} elseif ($override == 'folder') {
+					$urlparts = explode('/', $url);
+					$img = @$urlparts[1];
+					//die('img is ~' . $img . '~');
+				}
 			} else {
 				$img = str_replace('/', '', $url);
 				if ($pos = strpos($img, '?')) $img = substr($img, 0, $pos);

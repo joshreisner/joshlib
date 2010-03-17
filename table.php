@@ -7,6 +7,7 @@ class table {
 	var $dragcolumn	= false;
 	var $name		= false;
 	var $title		= false;
+	var $bodycounter = 1;
 
 	public function __construct($name='table', $title=false) {
 		$this->name = format_text_code($name);
@@ -34,7 +35,7 @@ class table {
 			
 			foreach ($values as $v) {
 				if (isset($v['group']) && ($group != $v['group'])) {
-					$return .= draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $v['group']));
+					$return .= '</tbody><tbody id="' . $this->name . format_text_code($v['group']) . '">' . draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $v['group']));
 					$row = 'odd'; //reset even/odd at the beginning of groups
 					$group = $v['group'];
 				}

@@ -25,10 +25,10 @@ function ajax_publish(which) {
 	//send request		
 	new Ajax.Request(url_action_add('ajax_publish', true), {
 		method: 'post',
-		parameters: { 'table':action[1].replace("-", "_"), 'id':action[2], 'checked':which.checked },
+		parameters: { 'table':action[1].replace(/-/g, "_"), 'id':action[2], 'checked':which.checked },
 		onSuccess: function(transport) {
 			//feedback here
-			//alert(transport.responseText);
+			alert(transport.responseText);
 		}
 	});	
 }
