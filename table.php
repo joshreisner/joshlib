@@ -7,7 +7,6 @@ class table {
 	var $dragcolumn	= false;
 	var $name		= false;
 	var $title		= false;
-	var $bodycounter = 1;
 
 	public function __construct($name='table', $title=false) {
 		$this->name = format_text_code($name);
@@ -22,6 +21,9 @@ class table {
 		$counter		= 1; //to determine first_row and last_row
 		$totals			= array(); //var to hold totals, if applicable
 		$return			= ''; //hold the output
+		$bodies			= array();
+		$bodycounter	= -1;
+		
 		if (!$count_columns) {
 			//there were no columns defined.  no columns, no table
 			$return .= $this->draw_header(false) . $this->draw_empty('Sorry, no columns defined!');
@@ -31,14 +33,18 @@ class table {
 		} else {
 			$row	= 'odd';
 			$group	= '';
-			$return .= $this->draw_header() . '<tbody id="' . $this->name . '">';
-			
+
 			foreach ($values as $v) {
 				if (isset($v['group']) && ($group != $v['group'])) {
-					$return .= '</tbody><tbody id="' . $this->name . format_text_code($v['group']) . '">' . draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $v['group']));
+					$bodycounter++;
+					$bodies[$bodycounter] = array();
+					$bodies[$bodycounter][] = draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $v['group']));
 					$row = 'odd'; //reset even/odd at the beginning of groups
 					$group = $v['group'];
+				} elseif ($bodycounter = -1) {
+					$bodycounter++;
 				}
+				
 				if ($total) {
 					//must be array
 					foreach ($total as $t) {
@@ -50,24 +56,26 @@ class table {
 				}
 				
 				//row and arguments
-				$return .= '<tr';
-				if (isset($v['id'])) $return .= ' id="item_' . $v['id'] . '"';				
-				$return .= ' class="' . $row;
-				if (isset($v['class']) && !empty($v['class'])) $return .= ' ' . $v['class'] . ' ' . $row . '_' . $v['class'];
-				if ($counter == 1) $return .= ' first_row';
-				if ($counter == $count_rows) $return .= ' last_row';
-				$return .= '"';
-				if (isset($v['link'])) $return .= ' onclick="location.href=\'' . $v['link'] . '\';"';
-				$return .= '>';
+				$id = (isset($v['id'])) ? 'item_' . $v['id'] : false;
+				$class = $row;
+				if (isset($v['class']) && !empty($v['class'])) $class .= ' ' . $v['class'] . ' ' . $row . '_' . $v['class'];
+				if ($counter == 1) $class .= ' first_row';
+				if ($counter == $count_rows) $class .= ' last_row';
+				$onclick = (isset($v['link'])) ? 'location.href=\'' . $v['link'] . '\';' : false;
+				$inner = '';
+				foreach ($this->columns as $c) $inner .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class'], 'style'=>(($c['width']) ? 'width:' . $c['width'] . 'px;': false)), $v[$c['name']]);
 				
-				foreach ($this->columns as $c) $return .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class'], 'style'=>(($c['width']) ? 'width:' . $c['width'] . 'px;': false)), $v[$c['name']]);
-				
-				$return .= '</tr>';
+				$bodies[$bodycounter][] = draw_tag('tr', array('id'=>$id, 'class'=>$class, 'onclick'=>$onclick), $inner);
 				
 				$row = ($row == 'even') ? 'odd' : 'even';
+				$counter++;
 			}
-			$return .= '</tbody>';
-			$counter++;
+			
+			//assemble rows into tbody tags
+			for ($i = 0; $i <= $bodycounter; $i++) {
+				$return .= draw_tag('tbody', array('id'=>$this->name . $i), implode(NEWLINE, $bodies[$i]));
+			}
+
 		}
 		if ($total) {
 			$return .= '<tfoot><tr class="total">';
@@ -90,17 +98,19 @@ class table {
 		
 		//drag and drop table
 		if ($this->draggable && $count_rows) {
-			$return .= draw_javascript('
-				function reorder() {
-					var ampcharcode= "%26";
-					var serializeOpts = Sortable.serialize("' . $this->name . '") + unescape(ampcharcode) + "table=' . $this->name . '" + unescape(ampcharcode) + "column=' . $this->dragcolumn . '";
-					var options = { method:"post", parameters:serializeOpts, onSuccess:function(transport) {
-						//alert(transport.responseText);
-					} };
-					new Ajax.Request("' . url_action_add('ajax_reorder') . '", options);
-				}
-				Sortable.create("' . $this->name . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
-				');
+			for ($i = 0; $i <= $bodycounter; $i++) {
+				$return .= draw_javascript('
+					function reorder() {
+						var ampcharcode= "%26";
+						var serializeOpts = Sortable.serialize("' . $this->name . $i . '") + unescape(ampcharcode) + "table=' . $this->name . '" + unescape(ampcharcode) + "column=' . $this->dragcolumn . '";
+						var options = { method:"post", parameters:serializeOpts, onSuccess:function(transport) {
+							//alert(transport.responseText);
+						} };
+						new Ajax.Request("' . url_action_add('ajax_reorder') . '", options);
+					}
+					Sortable.create("' . $this->name . $i . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
+					');
+			}
 		}
 		return $return;
 	}

@@ -28,7 +28,7 @@ function ajax_publish(which) {
 		parameters: { 'table':action[1].replace(/-/g, "_"), 'id':action[2], 'checked':which.checked },
 		onSuccess: function(transport) {
 			//feedback here
-			alert(transport.responseText);
+			//alert(transport.responseText);
 		}
 	});	
 }
