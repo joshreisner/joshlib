@@ -15,6 +15,7 @@ THIRD PARTY SOFTWARE
 	> codepress			js		http://sourceforge.net/projects/codepress/		LGPL
 	> fpdf				php		http://www.fpdf.org/							no license
 	> lightbox2			js		http://www.lokeshdhakar.com/projects/lightbox2/	Creative Commons Attribution 2.5
+	> lorem_ipsum		js		http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
 	> prototype			js		http://prototypejs.org/							MIT
 	> salesforce		php		http://developer.force.com/						~ not sure.  this is just an API
 	> scriptaculous		js		http://script.aculo.us/							MIT (I think)
@@ -63,6 +64,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['drawn']['ckeditor']		= false;	//only include ckeditor js once
 	$_josh['drawn']['focus']		= false;	//only autofocus on one form element
 	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
+	$_josh['drawn']['lorem_ipsum'] 	= false;	//only include lorem_ipsum.js once
 	$_josh['drawn']['tinymce']		= false;	//only include tinymce js once
 
 //ignore these words when making search indexes | todo make this local to search function
@@ -314,6 +316,11 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 
 //special functions that don't yet fit into a category
 
+function admin() {
+	//shortcut to say if a session has the is_admin bit set	
+	return (isset($_SESSION['is_admin']) && $_SESSION['is_admin']);
+}
+
 function browser_output($html) {
 	//todo rename url.php to http.php and make this http_output 
 	//one easy way to employ this is with ob_start('browser_output')
@@ -409,24 +416,26 @@ function language_translate($string, $from, $to) {
 }
 
 function lib_location($string) {
-	global $_josh;
 	
 	//i'm thinking i'll start a lib.php file
 	switch ($string) {
 		case 'fpdf' :
-		return $_josh['dir']['write'] . '/lib/fpdf/fpdf-1.6.php';
+		return DIRECTORY_WRITE . '/lib/fpdf/fpdf-1.6.php';
+		
+		case 'lorem_ipsum' :
+		return DIRECTORY_WRITE . '/lib/lorem_ipsum/lorem_ipsum.js';
 		
 		case 'prototype' :
-		return $_josh['dir']['write'] . '/lib/prototype/prototype-1.5.0.js';
+		return DIRECTORY_WRITE . '/lib/prototype/prototype-1.5.0.js';
 		
 		case 'scriptaculous' :
-		return $_josh['dir']['write'] . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js';
+		return DIRECTORY_WRITE . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js';
 		
 		case 'simple_html_dom' :
-		return $_josh['dir']['root'] . $_josh['dir']['write'] . '/lib/simple_html_dom/simple_html_dom-1.11.php';
+		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/simple_html_dom/simple_html_dom-1.11.php';
 
 		case 'tinymce' :
-		return $_josh['dir']['write'] . '/lib/tinymce/tinymce-3.3rc1/tiny_mce.js';
+		return DIRECTORY_WRITE . '/lib/tinymce/tinymce-3.3rc1/tiny_mce.js';
 	}
 }
 

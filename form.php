@@ -108,6 +108,19 @@ class form {
 		} else {
 			if ($label) {
 				if ($additional && (($type == 'checkboxes') || ($type == 'textarea'))) $label .= $additional;
+				
+				//add lorem ipsum generator to tinymce
+				if (admin() && ($type == 'textarea')) {
+					if (!$_josh['drawn']['lorem_ipsum']) {
+						$return .= draw_javascript_src(lib_location('lorem_ipsum'));
+						$_josh['drawn']['lorem_ipsum'] = true;
+					}
+					if ($class == 'tinymce') {
+						$label .= '<br/>' . draw_link('javascript:tinyMCE.activeEditor.setContent(LoremIpsum.paragraphs((2 + Math.floor(Math.random()*2)), "<p>%s</p>"));', 'Lorem Ipsum');
+					}
+				}
+						
+
 				$return .= draw_tag('label', array('for'=>$name), $label);
 			}
 			switch ($type) {
