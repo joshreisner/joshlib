@@ -38,8 +38,8 @@ class table {
 			foreach ($values as $v) {
 				if (isset($v['group']) && ($group != $v['group'])) {
 					$bodycounter++;
-					$bodies[$bodycounter] = array();
-					$bodies[$bodycounter][] = draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $v['group']));
+					$bodies[$bodycounter]['rows'] = array();
+					$bodies[$bodycounter]['title'] = $v['group'];
 					$row = 'odd'; //reset even/odd at the beginning of groups
 					$group = $v['group'];
 				} elseif ($bodycounter == -1) {
@@ -66,7 +66,7 @@ class table {
 				$inner = '';
 				foreach ($this->columns as $c) $inner .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class'], 'style'=>(($c['width']) ? 'width:' . $c['width'] . 'px;': false)), $v[$c['name']]);
 				
-				$bodies[$bodycounter][] = draw_tag('tr', array('id'=>$id, 'class'=>$class, 'onclick'=>$onclick), $inner);
+				$bodies[$bodycounter]['rows'][] = draw_tag('tr', array('id'=>$id, 'class'=>$class, 'onclick'=>$onclick), $inner);
 				
 				$row = ($row == 'even') ? 'odd' : 'even';
 				$counter++;
@@ -74,7 +74,8 @@ class table {
 			
 			//assemble rows into tbody tags
 			for ($i = 0; $i <= $bodycounter; $i++) {
-				$return .= draw_tag('tbody', array('id'=>$this->name . $i), implode(NEWLINE, $bodies[$i]));
+				if (isset($bodies[$i]['title'])) $return .= draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $bodies[$i]['title']));
+				$return .= draw_tag('tbody', array('id'=>$this->name . $i), implode(NEWLINE, $bodies[$i]['rows']));
 			}
 
 		}

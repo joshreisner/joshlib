@@ -669,7 +669,7 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguclass=false, $type='ul
 }
 
 function draw_meta_description($string) {
-	return draw_tag('meta', array('name'=>'description', 'content'=>$string));
+	return draw_tag('meta', array('name'=>'description', 'content'=>strip_tags($string)));
 }
 
 function draw_meta_keywords($string) {
