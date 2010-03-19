@@ -31,6 +31,7 @@ class table {
 			//no rows, return errmsg
 			$return .= $this->draw_header(false) . $this->draw_empty($errmsg);
 		} else {
+			$return .= $this->draw_header();
 			$row	= 'odd';
 			$group	= '';
 
@@ -41,7 +42,7 @@ class table {
 					$bodies[$bodycounter][] = draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $v['group']));
 					$row = 'odd'; //reset even/odd at the beginning of groups
 					$group = $v['group'];
-				} elseif ($bodycounter = -1) {
+				} elseif ($bodycounter == -1) {
 					$bodycounter++;
 				}
 				

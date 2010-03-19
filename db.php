@@ -161,7 +161,8 @@ function db_column_add($table, $column, $type) {
 		$datatype = 'varchar';		
 		break;
 	
-		case 'textarea': 
+		case 'textarea':
+		case 'textarea-plain': 
 		$datatype = 'text';
 		break;
 		
