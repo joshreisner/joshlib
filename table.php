@@ -94,7 +94,7 @@ class table {
 			$return .= '</tr></tfoot>';
 		}
 		
-		$class .= ' table'; //temp for intranet
+		$class = $this->name . ' table'; //temp for intranet
 		$return = draw_container('table', $return, array('cellspacing'=>0, 'class'=>$class));
 		
 		//drag and drop table
