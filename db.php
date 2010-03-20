@@ -175,6 +175,16 @@ function db_column_add($table, $column, $type) {
 	return false;
 }
 
+function db_column_drop($table, $column) {
+	global $_josh;
+	if ($_josh['db']['language'] == 'mysql') {
+		$result = db_query('ALTER TABLE ' . $table . ' DROP COLUMN ' . $column);
+	} else {
+		error_handle(__function__ . ' not yet supported for mssql');
+	}
+	return db_found($result);
+}
+
 function db_column_exists($table, $column) {
 	global $_josh;
 	if ($_josh['db']['language'] == 'mysql') {
@@ -195,7 +205,7 @@ function db_column_type($datatype) {
 	return $datatype;
 }
 
-function db_columns($tablename, $omitSystemFields=false) {
+function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) {
 	global $_josh;
 	error_debug('<b>db_columns</b> running', __file__, __line__);
 	if (!db_table_exists($tablename)) return false;
@@ -211,7 +221,7 @@ function db_columns($tablename, $omitSystemFields=false) {
 			$required = ($r['Null'] == 'YES') ? false : true;
 			$default = $r['Default'];
 			$comments = $r['Comment'];
-			$return[] = compact('name','type','required','default','comments','length');
+			$return[] = ($includeMetaData) ? compact('name','type','required','default','comments','length') : $name;
 		}
 	} else {
 		$result = db_table('SELECT 
@@ -716,7 +726,7 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 	
 	//config columns
 	$columns = '';
-	if ($fields) foreach ($fields as $field=>$type) $columns .= '`' . $field . '` ' . db_column_type($type) . ' DEFAULT NULL, ';
+	if ($fields) foreach ($fields as $field=>$type) $columns .= '`' . strToLower($field) . '` ' . db_column_type($type) . ' DEFAULT NULL, ';
 	
 	//run sql
 	if (db_query('CREATE TABLE `' . $tablename . '` (
@@ -739,6 +749,16 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 	error_handle('could not create table' . $tablename);
 }
 
+function db_table_drop($tablename) {
+	global $_josh;
+	if ($_josh['db']['language'] == 'mssql') {
+		//not implemented yet
+		error_handle(__function__, 'this function is not yet implemented for mssql');
+	} elseif ($_josh['db']['language'] == 'mysql') {
+		return db_query('DROP TABLE ' . $tablename);
+	}
+}
+
 function db_table_exists($name) {
 	global $_josh;
 	if ($_josh['db']['language'] == 'mssql') {
@@ -749,13 +769,25 @@ function db_table_exists($name) {
 	}
 }
 
+function db_table_rename($before, $after) {
+	global $_josh;
+	if ($_josh['db']['language'] == 'mssql') {
+		//not implemented yet
+		error_handle(__function__, 'this function is not yet implemented for mssql');
+	} elseif ($_josh['db']['language'] == 'mysql') {
+		return db_query('RENAME TABLE ' . $before . ' TO ' . $after);
+	}
+}
+
 function db_tables() {
 	global $_josh;
 	if ($_josh['db']['language'] == 'mysql') {
-		return db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
+		$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
+		foreach ($tables as &$t) $t = $t['Tables_in_' . $_josh['db']['database']];
 	} elseif ($_josh['db']['language'] == 'mssql') {
 		error_handle(__function__, 'this function is not yet implemented for mssql');
 	}
+	return $tables;
 }
 
 function db_translate($sql, $from, $to) {

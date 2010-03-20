@@ -83,6 +83,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 //used by cms, db_column_add, and form::set_field, db_save
 	$_josh['field_types']			= array(
 										'checkbox'=>'Checkbox',
+										'checkboxes'=>'Checkboxes',
 										'date'=>'Date',
 										'datetime'=>'Date & Time',
 										'select'=>'Dropdown',
@@ -267,10 +268,11 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				$tables = db_tables();
 				foreach ($tables as &$t) {
 					//debug();
-					error_debug('looking at ' . $t['Tables_in_' . $_josh['db']['database']], __file__, __line__);
+					error_debug('looking at ' . $t, __file__, __line__);
 					$lookingfor = $_josh['system_columns'];
-					$columns = db_columns($t['Tables_in_' . $_josh['db']['database']]);
+					$columns = db_columns($t);
 					foreach ($columns as $c) $lookingfor = array_remove($c['name'], $lookingfor);
+					$t = array('name'=>$t);
 					$t['missing']	= ($count = count($lookingfor)) ? $count : 0;
 					$t['details']	= ($count) ? implode(' &amp; ', $lookingfor) : 'All Good';
 					$t['fix']		= ($count) ? draw_link(url_query_add(array('action'=>'db_fix', 'table'=>$t['Tables_in_' . $_josh['db']['database']]), false), ' FIX ') : '';

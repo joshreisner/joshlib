@@ -321,6 +321,11 @@ function format_html($text) {
 	//reset html to get rid of artifacts and compress
 	$text = trim($html->save());
 	$html->clear();
+	
+	//special josh function to replace email addresses with obfuscated ones via format_ascii
+	preg_match_all("/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i", $text, $matches);
+	foreach ($matches[0] as $m) $text = str_replace($m, format_ascii($m), $text);
+	
 	return $text;
 }
 
