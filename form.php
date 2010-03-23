@@ -84,6 +84,8 @@ class form {
 		extract($field);
 		$return = '';
 
+		if (($type == 'image-alt') || ($type == 'file-type')) return false; //not fields you show in a form	
+
 		//value is being set manually		
 		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
 		
@@ -241,7 +243,6 @@ class form {
 
 		//type is required
 		if (!$type) return error_handle('type not set');
-
 		if ((($type == 'text') || ($type == 'password')) && !isset($array['additional']) && $required) $additional = '(required)';
 
 		if (!$name)	$name	= format_text_code($label);

@@ -88,6 +88,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'datetime'=>'Date & Time',
 										'select'=>'Dropdown',
 										'file'=>'File',
+										'file-type'=>'File (Type)',
 										'image'=>'Image',
 										'int'=>'Integer',
 										'image-alt'=>'Image (Alt)',

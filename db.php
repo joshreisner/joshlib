@@ -128,7 +128,7 @@ function db_column_add($table, $column, $type) {
 	if (!in_array($type, array_keys($_josh['field_types']))) error_handle('unknown data type', __function__ . ' received a request for ' . $type . ' which is not handled.');
 	
 	//handle single-field translations.  multi-field and linked tables are todo
-	$datatype = false;
+	$datatype = $length = false;
 	$default = 'DEFAULT NULL';
 	switch ($type) {
 		case 'checkbox': 
@@ -143,6 +143,11 @@ function db_column_add($table, $column, $type) {
 	
 		case 'file': 
 		$datatype = 'mediumblob';
+		break;
+	
+		case 'file-type': 
+		$datatype = 'varchar';
+		$length = 5;
 		break;
 	
 		case 'image': 
@@ -171,7 +176,7 @@ function db_column_add($table, $column, $type) {
 		break;
 	}
 
-	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype) . ' ' . $default)) return $column;
+	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype, $length) . ' ' . $default)) return $column;
 	return false;
 }
 
@@ -195,14 +200,17 @@ function db_column_exists($table, $column) {
 	}
 }
 
-function db_column_type($datatype) {
+function db_column_type($datatype, $length=false) {
 	//edit $datatype declaration in sql statement
 	//$datatype in this case is a mysql datatype
 	$datatype = strToUpper($datatype);
-	if ($datatype == 'INT') $datatype .= '(11)';
-	if ($datatype == 'TINYINT') $datatype .= '(4)';
-	if ($datatype == 'VARCHAR') $datatype .= '(255)';
-	return $datatype;
+	
+	//these have no max
+	if (in_array($datatype, array('DATETIME', 'MEDIUMBLOB', 'TEXT'))) return $datatype;
+	
+	//otherwise max
+	$maxes = array('INT'=>11, 'TINYINT'=>4, 'VARCHAR'=>255);
+	return $datatype . '(' . ($length ? $length : $maxes[$datatype]) . ')';
 }
 
 function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) {

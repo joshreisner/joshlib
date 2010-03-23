@@ -91,12 +91,10 @@ function file_ext($filename) {
 	switch ($info['extension']) {
 		//correct horrible filenames
 		case 'htm' :
-		$info['extension'] = 'html';
-		break;
+		return 'html';
 
 		case 'jpeg' :
-		$info['extension'] = 'jpg';
-		break;
+		return 'jpg';
 	}
 		
 	return $info['extension'];
@@ -179,6 +177,7 @@ function file_get_type_id($filename, $table='documents_types') {
 }
 
 function file_get_uploaded($fieldname, $types_table=false) {
+	//todo deprecate types_table / type system
 	if (!isset($_FILES[$fieldname])) return false;
 	if ($_FILES[$fieldname]['error'] && ($_FILES[$fieldname]['error'] == 4)) return false;
 	if ($_FILES[$fieldname]['error']) error_handle('file_get_uploaded upload error', 'file max is ' . file_get_max() . draw_array($_FILES));
