@@ -33,6 +33,18 @@ function file_delete($filename) {
 	return true;
 }
 
+/* recursive delete, not ready yet
+function file_delete($str) {
+	if (!stristr($str, DIRECTORY_ROOT)) $str = DIRECTORY_ROOT . $str;
+	echo 'attempting to delete' . str_replace(DIRECTORY_ROOT, '', $str) . '<br/>';
+    if (is_dir($str)) { 
+	    foreach (glob(rtrim($str, '/') . '/*') as $file) file_delete($file);
+		rmdir($str . '/');
+    } else {
+		unlink($str);
+    }
+}*/
+
 function file_dir_writable($subdirectory=false) {
 	//make sure there's a writable folder where you said.  defaults to write_folder
 	$directory = DIRECTORY_ROOT . DIRECTORY_WRITE;

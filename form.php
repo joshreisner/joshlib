@@ -286,6 +286,22 @@ class form {
 		$this->set_field_property($name, 'label', $value);
 	}
 	
+	function set_field_type($names, $value='') {
+		$names = array_separated($names, ',');
+		foreach ($names as $name) {
+			if (($value == 'readonly') && (isset($this->fields[$name]['type']) && (isset($this->fields[$name]['value'])))) { 
+				if (($this->fields[$name]['type'] == 'date') || ($this->fields[$name]['type'] == 'datetime')) {
+					//$this->fields[$name]['value'] = format_date($this->fields[$name]['value'], 'N/A', '%b %d, %Y', false);
+				} elseif ($this->fields[$name]['type'] == 'checkbox') {
+					$this->fields[$name]['label'] = $this->fields[$name]['additional'];
+					$this->fields[$name]['additional'] = false;
+					//$this->fields[$name]['value'] = format_boolean($this->fields[$name]['value']);
+				}
+			}
+			$this->set_field_property($name, 'type', $value);
+		}
+	}
+	
 	function set_field_labels($pairs) {
 		foreach ($pairs as $name=>$value) $this->set_field_label($name, $value);
 	}

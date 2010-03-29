@@ -250,6 +250,9 @@ function array_send($array, $target) {
 
 function array_separated($content, $separator=',') {
 	//like explode, but strips empty spaces and null content
+	
+	if (is_array($content)) return $content; //might not need splitting
+
 	$return = array();
 	$fields = explode($separator, $content);
 	foreach ($fields as $f) {

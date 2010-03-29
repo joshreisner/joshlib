@@ -221,7 +221,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['editing']	= url_id();
 	
 //handle some ajax calls automatically -- requires user to be logged in
-	if (user() && url_action('ajax_delete,ajax_publish,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,phpinfo')) {
+	if (user() && url_action('ajax_delete,ajax_publish,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,lib_refresh,phpinfo')) {
 		$array = array_ajax();
 		
 		//quick thing for sessions -- why do we need this?
@@ -276,7 +276,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 					$t = array('name'=>$t);
 					$t['missing']	= ($count = count($lookingfor)) ? $count : 0;
 					$t['details']	= ($count) ? implode(' &amp; ', $lookingfor) : 'All Good';
-					$t['fix']		= ($count) ? draw_link(url_query_add(array('action'=>'db_fix', 'table'=>$t['Tables_in_' . $_josh['db']['database']]), false), ' FIX ') : '';
+					$t['fix']		= ($count) ? draw_link(url_query_add(array('action'=>'db_fix', 'table'=>$t['name']), false), ' FIX ') : '';
 				}
 				echo draw_table($tables, 'name', true);
 				echo draw_link(url_action_add(false), 'Exit');
@@ -310,6 +310,10 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 			case 'flushcache':
 				cache_clear();
 				echo 'caches cleared';
+				exit;
+			case 'lib_refresh':
+				lib_refresh();
+				url_drop('action');
 				exit;
 			case 'phpinfo':
 				phpinfo();
@@ -440,6 +444,11 @@ function lib_location($string) {
 		case 'tinymce' :
 		return DIRECTORY_WRITE . '/lib/tinymce/tinymce-3.3rc1/tiny_mce.js';
 	}
+}
+
+function lib_refresh() {
+	file_delete(DIRECTORY_WRITE . '/lib');
+	exit;
 }
 
 function user($return=false) {

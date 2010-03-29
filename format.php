@@ -52,9 +52,9 @@ function format_binary($blob) {
 }
 
 function format_boolean($value, $options='Yes|No') {
-	$options = explode('|', $options);
-	if ($value) return $options[0];
-	return $options[1];
+	list($yes, $no) = explode('|', $options);
+	if ($value) return $yes;
+	return $no;
 }
 
 function format_check($variable, $type='int') {
@@ -79,6 +79,9 @@ function format_date($timestamp=false, $error='', $format='%b %d, %Y', $relative
 	
 	//special thing to format for sql
 	if (stristr($format, 'sql')) return date('Y-m-d H:i:00', $timestamp);
+
+	//special thing to format for sql
+	if ($format == 'unix') return date('U', $timestamp);
 
 	if ($relativetime) {
 		//get timestamp for today
@@ -506,7 +509,7 @@ function format_js_desanitize() {
 }
 
 function format_js_sanitize($string) {
-	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because css should be used for rollovers from now on');
+	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because css or drawnavigation should be used for rollovers from now on');
 	//return javascript-sanitized key
 	//need for rollover script for seedco financial and phoebe murer
 	$string = 'a' . $string; //doesn't like variables that start with numbers
