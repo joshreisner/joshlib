@@ -10,17 +10,19 @@ LICENSE
 THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
-	~~title~~~~~~~~~~~~~lang~~~~url~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~license~~~~~~~~~~~~~~~~~~~~~~~~~
-	> ckeditor			js		http://ckeditor.com/							GPL, LGPL and MPL
-	> codepress			js		http://sourceforge.net/projects/codepress/		LGPL
-	> fpdf				php		http://www.fpdf.org/							no license
-	> lightbox2			js		http://www.lokeshdhakar.com/projects/lightbox2/	Creative Commons Attribution 2.5
-	> lorem_ipsum		js		http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
-	> prototype			js		http://prototypejs.org/							MIT
-	> salesforce		php		http://developer.force.com/						~ not sure.  this is just an API
-	> scriptaculous		js		http://script.aculo.us/							MIT (I think)
-	> simple_html_dom	php		http://sourceforge.net/projects/simplehtmldom/	MIT
-	> tinymce			js		http://tinymce.moxiecode.com/					LGPL
+	~~TITLE~~~~~~~~~~~~~LANG~~~~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~LICENSE~~~~~~~~~~~~~~~~~~~~
+	> ckeditor			js		http://ckeditor.com/								GPL, LGPL and MPL
+	> codepress			js		http://sourceforge.net/projects/codepress/			LGPL
+	> fpdf				php		http://www.fpdf.org/								
+	> lightbox2			js		http://www.lokeshdhakar.com/projects/lightbox2/		CC Attribution 2.5
+	> lorem_ipsum		js		http://tinyurl.com/yjrmlcy
+	> prototype			js		http://prototypejs.org/								MIT
+	> salesforce		php		http://developer.force.com/							
+	> sasl				php		http://www.phpclasses.org/browse/package/1888.html	BSD
+	> scriptaculous		js		http://script.aculo.us/								MIT
+	> simple_html_dom	php		http://sourceforge.net/projects/simplehtmldom/		MIT
+	> smtp				php		http://www.phpclasses.org/browse/package/14.html	BSD
+	> tinymce			js		http://tinymce.moxiecode.com/						LGPL
 
 USING THE DEBUGGER
 	you can run the debug() function after joshlib has been included to see output of various processes
@@ -435,12 +437,18 @@ function lib_location($string) {
 		case 'prototype' :
 		return DIRECTORY_WRITE . '/lib/prototype/prototype-1.5.0.js';
 		
+		case 'sasl' :
+		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/sasl/sasl-2005-10-31/sasl.php';
+		
 		case 'scriptaculous' :
 		return DIRECTORY_WRITE . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js';
 		
 		case 'simple_html_dom' :
 		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/simple_html_dom/simple_html_dom-1.11.php';
 
+		case 'smtp' :
+		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/smtp/smtpclass-2009-04-11/smtp.php';
+		
 		case 'tinymce' :
 		return DIRECTORY_WRITE . '/lib/tinymce/tinymce-3.3rc1/tiny_mce.js';
 	}

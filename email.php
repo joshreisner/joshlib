@@ -3,18 +3,46 @@ error_debug('including email.php', __file__, __line__);
 
 function email($to, $message, $subject='Email from Your Website', $from=false) {
 	global $_josh;
-	error_debug('<b>email </b> sending message to <i>' . $to . '</i> with subject ' . $subject, __file__, __line__);
-	$headers  = 'MIME-Version: 1.0' . NEWLINE;
-	$headers .= 'Content-type: text/html; charset=iso-8859-1' . NEWLINE;
+	$to = format_email($to);
 	if ($from) {
-		$headers .= 'From: ' . format_email($from) . NEWLINE;
+		$from = format_email($from);
 	} else {
 		if (!isset($_josh['email_default'])) error_handle('email from address missing', 'please call ' . __FUNCTION__ . ' with a from address, or specify one in the config file.', true);
-		$headers .= 'From: ' . $_josh['email_default'] . NEWLINE;
+		$from = $_josh['email_default'];
 	}
-	$to = format_email($to);
-	if (!@mail($to, $subject, $message, $headers)) error_handle('email not sent', 'sorry, an unexpected error occurred while sending your mail to ' . $to, true);
-	return true;
+	
+	if (!empty($_josh['smtp']['location']) && !empty($_josh['smtp']['username']) && !empty($_josh['smtp']['password'])) {
+		
+		include(lib_location('smtp'));
+		include(lib_location('sasl'));
+	
+		//use smtp server if credentials are found in config
+		$smtp = new smtp_class;
+		$smtp->host_name	= $_josh['smtp']['location'];
+		$smtp->user			= $_josh['smtp']['username'];
+		$smtp->password		= $_josh['smtp']['password'];
+
+		if ($smtp->SendMessage(
+				$from,
+				array($to),
+				array('From: ' . $from, 'To: ' . $to, 'Subject: ' . $subject, 'Date: ' . strftime('%a, %d %b %Y %H:%M:%S %Z'), 'MIME-Version: 1.0', 'Content-type: text/html; charset=iso-8859-1'), 
+				$message
+			)) {
+			echo 'sent ok homie';
+			return true;
+		} else {
+			error_handle('SMTP Not Working', 'Sorry, an unexpected error of ' . $smtp->error . ' occurred while sending your mail to ' . $to, true);
+			return false;
+		}
+	} else {
+		//use regular php mechanism
+		error_debug('<b>email </b> sending message to <i>' . $to . '</i> with subject ' . $subject, __file__, __line__);
+		$headers  = 'MIME-Version: 1.0' . NEWLINE;
+		$headers .= 'Content-type: text/html; charset=iso-8859-1' . NEWLINE;
+		$headers .= 'From: ' . format_email($from) . NEWLINE;
+		if (!@mail($to, $subject, $message, $headers)) error_handle('email not sent', 'sorry, an unexpected error occurred while sending your mail to ' . $to, true);
+		return true;
+	}
 }
 
 function email_address_parse($address) {
