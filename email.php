@@ -28,7 +28,6 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 				array('From: ' . $from, 'To: ' . $to, 'Subject: ' . $subject, 'Date: ' . strftime('%a, %d %b %Y %H:%M:%S %Z'), 'MIME-Version: 1.0', 'Content-type: text/html; charset=iso-8859-1'), 
 				$message
 			)) {
-			echo 'sent ok homie';
 			return true;
 		} else {
 			error_handle('SMTP Not Working', 'Sorry, an unexpected error of ' . $smtp->error . ' occurred while sending your mail to ' . $to, true);
