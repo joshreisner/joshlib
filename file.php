@@ -295,6 +295,12 @@ function file_put_config() {
 	$return .= '$_josh[\'is_secure\']			= ' . (($_josh['is_secure']) ? $_josh['is_secure'] : 'false') . '; //indicates whether it should use https (true) or not (false)' . NEWLINE;
 	$return .= NEWLINE;
 
+	//smtp variables
+	$return .= '//$_josh[\'smtp\'][\'location\']		= \'mail.' . $_josh['request']['domain'] . '\';' . NEWLINE;
+	$return .= '//$_josh[\'smtp\'][\'username\']		= \'\';' . NEWLINE;
+	$return .= '//$_josh[\'smtp\'][\'password\']		= \'\';' . NEWLINE;
+	$return .= NEWLINE;
+	
 	$return .= '?>';
 	
 	return file_put($_josh['config'], $return);
