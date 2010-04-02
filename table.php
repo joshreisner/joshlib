@@ -103,9 +103,7 @@ class table {
 			for ($i = 0; $i <= $bodycounter; $i++) {
 				$return .= draw_javascript('
 					function reorder() {
-						var ampcharcode= "%26";
-						var serializeOpts = Sortable.serialize("' . $this->name . $i . '") + unescape(ampcharcode) + "table=' . $this->name . '" + unescape(ampcharcode) + "column=' . $this->dragcolumn . '";
-						var options = { method:"post", parameters:serializeOpts, onSuccess:function(transport) {
+						var options = { method:"post", parameters:Sortable.serialize("' . $this->name . $i . '") + unescape("%26") + "table=' . $this->name . '" + unescape("%26") + "column=' . $this->dragcolumn . '", onSuccess:function(transport) {
 							//alert(transport.responseText);
 						} };
 						new Ajax.Request("' . url_action_add('ajax_reorder') . '", options);

@@ -424,9 +424,17 @@ function language_translate($string, $from, $to) {
 	return format_quotes($string);
 }
 
-function lib_location($string) {
+function lib_get($string) {
+	//experiment
 	
-	//i'm thinking i'll start a lib.php file
+	switch ($string) {
+		case 'salesforce' :
+		return include_once(lib_location($string));
+	}
+	
+}
+
+function lib_location($string) {
 	switch ($string) {
 		case 'fpdf' :
 		return DIRECTORY_WRITE . '/lib/fpdf/fpdf-1.6.php';
@@ -442,6 +450,9 @@ function lib_location($string) {
 		
 		case 'scriptaculous' :
 		return DIRECTORY_WRITE . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js';
+
+		case 'salesforce' :
+		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/salesforce/phptoolkit-13_1/soapclient/SforceEnterpriseClient.php';
 		
 		case 'simple_html_dom' :
 		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/simple_html_dom/simple_html_dom-1.11.php';

@@ -10,9 +10,10 @@ class form {
 	var $table			= false;
 	var $values			= array();
 	var $submit			= false;
+	var $readonly		= false;
 	var $focus			= false;
 	
-	function __construct($name, $id=false, $submit=true, $cancel=false) {
+	function __construct($name, $id=false, $submit=true, $cancel=false, $readonly=false) {
 		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
 		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		//$submit is a boolean, and indicates whether you should auto-add a submit button at the bottom
@@ -22,6 +23,8 @@ class form {
 		$this->submit	= $submit;
 		$this->cancel	= $cancel;
 		$this->id		= $id;
+		$this->readonly	= $readonly;
+		
 		if ($name) $this->set_table($name);
 		if ($submit === true) {
 			$this->title = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($name));
@@ -91,10 +94,7 @@ class form {
 		
 		//values has default
 		if (!$value && $default) $value = $default;
-		
-		//this is a bad idea
-		//if (!$value && !$required && !$additional) $additional = 'optional';
-		
+				
 		//won't always need this
 		if (!$options_table) $options_table = 'options_' . str_replace('_id', '', $name);
 		if (!$option_title) $option_title = 'title';
@@ -121,13 +121,16 @@ class form {
 						$label .= '<br/>' . draw_link('javascript:tinyMCE.activeEditor.setContent(LoremIpsum.paragraphs((2 + Math.floor(Math.random()*2)), "<p>%s</p>"));', 'Lorem Ipsum');
 					}
 				}
-						
 
 				$return .= draw_tag('label', array('for'=>$name), $label);
 			}
 			switch ($type) {
-				case 'checkbox':	
-					$return .= draw_div_class('checkbox_option', draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span>');
+				case 'checkbox':
+					if ($allow_changes) {
+						$return .= draw_div_class('checkbox_option', draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span>');
+					} else {
+						$return .= format_boolean($value);
+					}
 					break;
 				case 'checkboxes':
 					if (!$option_title) {
@@ -153,11 +156,19 @@ class form {
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
-					$return .= draw_form_date($name, $value, false, false, $required) . $additional;
+					if ($allow_changes) {
+						$return .= draw_form_date($name, $value, false, false, $required) . $additional;
+					} else {
+						$return .= format_date($value);
+					}
 					//return .= draw_form_date_cal($name, $value) . $additional;
 					break;
 				case 'datetime':
-					$return .= draw_form_date($name, $value, true, false, $required) . $additional;
+					if ($allow_changes) {
+						$return .= draw_form_date($name, $value, true, false, $required) . $additional;
+					} else {
+						$return .= format_date_time($value);
+					}
 					break;
 				case 'file':
 					$return .= draw_form_file($name, $class, $onchange) . $additional;
@@ -185,9 +196,6 @@ class form {
 					}
 					$return .= '</div>';
 					break;
-				case 'readonly':
-					$return .= $value . ' ' . $additional;
-					break;
 				case 'select':
 					if (!$options) {
 						if (!$sql) $sql = 'SELECT id, ' . $option_title . ' FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title;
@@ -205,25 +213,37 @@ class form {
 					}
 					break;
 				case 'text':
-					$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+					if ($allow_changes) {
+						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+					} else {
+						$return .= ($name == 'url') ? draw_link($value) : $value;
+					}
 					break;
 				case 'textarea':
 				case 'textarea-plain':
-					if (($class == 'tinymce') && !$_josh['drawn']['tinymce']) {
-						//todo: we might need a folder for this -- also these names are a bit too generic
-						file_dir_writable('images');
-						file_dir_writable('files');
-						$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
-						$_josh['drawn']['tinymce'] = true;
-					} elseif (($class == 'ckeditor') && !$_josh['drawn']['ckeditor']) {
-						$return .= draw_javascript_ckeditor();
-						$_josh['drawn']['ckeditor'] = true;
+					if ($allow_changes) {
+						if (($class == 'tinymce') && !$_josh['drawn']['tinymce']) {
+							//todo: we might need a folder for this -- also these names are a bit too generic
+							file_dir_writable('images');
+							file_dir_writable('files');
+							$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
+							$_josh['drawn']['tinymce'] = true;
+						} elseif (($class == 'ckeditor') && !$_josh['drawn']['ckeditor']) {
+							$return .= draw_javascript_ckeditor();
+							$_josh['drawn']['ckeditor'] = true;
+						}
+						$return .= draw_form_textarea($name, $value, $class);
+					} else {
+						$return .= $value;
 					}
-					$return .= draw_form_textarea($name, $value, $class);
 					break;
 				case 'url':
-					if (!$value) $value = 'http://';
-					$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+					if ($allow_changes) {
+						if (!$value) $value = 'http://';
+						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+					} else {
+						$return .= draw_link($value);
+					}
 					break;
 			}
 						
@@ -235,7 +255,8 @@ class form {
 	
 	function set_field($array) {
 		//defaults
-		$type = $value = $class = $default = $name = $label = $required = $append = $position = $allow_changes = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $option_title = $object_id = $options = $linking_table = false;
+		$type = $value = $class = $default = $name = $label = $required = $append = $position = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $option_title = $object_id = $options = $linking_table = false;
+		$allow_changes = true;
 		
 		//load inputs
 		if (!is_array($array)) return error_handle('array not set');
@@ -258,11 +279,14 @@ class form {
 		if (!$option_id) $option_id	= 'option_id';
 		if (!$object_id) $object_id	= 'object_id';
 		
-		if ($type == 'checkbox') {
+		//form is read-only
+		if ($this->readonly) $allow_changes = false;
+		
+		if (($type == 'checkbox') && $allow_changes) {
 			$additional = $label;
 			$label = '&nbsp;';
 		}
-
+		
 		error_debug('<b>' . __function__ . '</b> adding ' . $name . ' of type ' . $type, __file__, __line__);
 
 		//package and save
@@ -288,18 +312,7 @@ class form {
 	
 	function set_field_type($names, $value='') {
 		$names = array_separated($names, ',');
-		foreach ($names as $name) {
-			if (($value == 'readonly') && (isset($this->fields[$name]['type']) && (isset($this->fields[$name]['value'])))) { 
-				if (($this->fields[$name]['type'] == 'date') || ($this->fields[$name]['type'] == 'datetime')) {
-					//$this->fields[$name]['value'] = format_date($this->fields[$name]['value'], 'N/A', '%b %d, %Y', false);
-				} elseif ($this->fields[$name]['type'] == 'checkbox') {
-					$this->fields[$name]['label'] = $this->fields[$name]['additional'];
-					$this->fields[$name]['additional'] = false;
-					//$this->fields[$name]['value'] = format_boolean($this->fields[$name]['value']);
-				}
-			}
-			$this->set_field_property($name, 'type', $value);
-		}
+		foreach ($names as $name) $this->set_field_property($name, 'type', $value);
 	}
 	
 	function set_field_labels($pairs) {
@@ -317,6 +330,10 @@ class form {
 	
 	function set_group($string='', $position=false) {
 		$this->set_field(array('name'=>'group' . (($position) ? $position : count($this->fields)), 'type'=>'group', 'value'=>$string, 'position'=>$position, 'label'=>''));
+	}
+	
+	function set_hidden($name, $value=false) {
+		$this->set_field(array('name'=>$name, 'value'=>$value, 'type'=>'hidden'));
 	}
 	
 	function set_order($strorder='') {
