@@ -758,8 +758,8 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 		$return[] = draw_link($url, $inner, false, $args);
 		$counter++;
 	}
-	$return = 	draw_javascript_src() . draw_list($return, $class, 'ul', $selected);
-	if ($type == 'rollovers') $return = draw_javascript('if (document.images) {' . $javascript . '}') . $return;
+	$return = draw_list($return, $class, 'ul', $selected);
+	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
 	return $return;
 }
 
