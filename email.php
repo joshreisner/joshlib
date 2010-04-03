@@ -13,8 +13,8 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 	
 	if (!empty($_josh['smtp']['location']) && !empty($_josh['smtp']['username']) && !empty($_josh['smtp']['password'])) {
 		
-		include(lib_location('smtp'));
-		include(lib_location('sasl'));
+		lib_get('smtp');
+		lib_get('sasl');
 	
 		//use smtp server if credentials are found in config
 		$smtp = new smtp_class;

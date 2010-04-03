@@ -428,7 +428,10 @@ function lib_get($string) {
 	//experiment
 	
 	switch ($string) {
+		//php libraries
 		case 'salesforce' :
+		case 'sasl' :
+		case 'smtp' :
 		return include_once(lib_location($string));
 	}
 	

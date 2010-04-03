@@ -152,7 +152,7 @@ class form {
 						$chkname = 'chk-' . $name . '-' . $o['id'];
 						$o = draw_form_checkbox($chkname, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $chkname . '\');">' . $o[$option_title] . '</span>';
 					}
-					if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
+					//if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
