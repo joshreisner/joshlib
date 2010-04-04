@@ -113,6 +113,21 @@ function css_set(object, what) {
 	object.className = what;
 }
 
+/* event */
+function event_add(fn, object, event) { 
+	//eg event_add(sideBarInit);
+	if (!object) object = window;
+	if (!event) event = 'load';
+	if (object.addEventListener) { 
+		object.addEventListener(event, fn, false); 
+		return true; 
+	} else if (object.attachEvent) { 
+		var r = object.attachEvent("on" + event, fn); 
+		return r; 
+	} else { 
+		return false; 
+	} 
+}
 
 /* form */
 function form_checkbox_toggle(which) {
@@ -452,6 +467,7 @@ function url_query(key) {
 function url_query_set(key, value, returnval) {
 	//sets a query string value.  leaves other query elements alone
 	var query	= window.location.search.substring(1);
+	
 	var pairs	= query.split("&");
 	var found	= false;
 	var ret		= Array();
@@ -466,8 +482,15 @@ function url_query_set(key, value, returnval) {
     }
     if (!found) ret.push(key + "=" + encodeURIComponent(value));
     ret.sort();
-    var target = (query) ? location.href.replace(query, ret.join("&")) : location.href + '?' + ret.join("&");
+    
+    var target = location.href;
+   	if (location.hash) target = target.substring(0, target.length - location.hash.length);
+    target = (query) ? target.replace(query, ret.join("&")) : target + '?' + ret.join("&");
+    if (location.hash) target += location.hash;
+    
     //alert(target);
+	//return;
+	
     if (returnval) return target;
 	location.href = target;
 }

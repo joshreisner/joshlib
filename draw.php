@@ -211,7 +211,7 @@ function draw_file_icon($filename, $link=true) {
 
 function draw_focus($form_element) {
 	global $_josh;
-	if ($_josh['drawn']['focus']) return false;
+	if (isset($_josh['drawn']['focus'])) return false;
 	$_josh['drawn']['focus'] = $form_element;
 	return draw_javascript('document.getElementById("' . $form_element . '").focus();');
 }
@@ -311,7 +311,7 @@ function draw_form_file($name, $class=false, $onchange=false) {
 
 function draw_form_focus($name) {
 	global $_josh;
-	if (!$_josh['drawn']['focus']) {
+	if (!isset($_josh['drawn']['focus'])) {
 		//only draw focus once -- don't want competition
 		$_josh['drawn']['focus'] = $name;
 		return draw_javascript('document.getElementById("' . $name . '").focus();');
@@ -568,8 +568,8 @@ function draw_javascript($javascript=false) {
 }
 
 function draw_javascript_ckeditor() {
-	global $_josh;
-	return draw_javascript_src($_josh['dir']['write'] . '/lib/ckeditor/ckeditor.js');
+	error_deprecated(__FUNCTION__ . ' was deprecated on 4/3/2010 - use lib_get');
+	return draw_javascript_src(DIRECTORY_WRITE . '/lib/ckeditor/ckeditor.js');
 }
 
 function draw_javascript_lib() {
@@ -593,14 +593,15 @@ function draw_javascript_link($target, $text, $id=false, $class=false) {
 }
 
 function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='/_site/tiny_mce/tiny_mce.js') {
-	error_deprecated(__FUNCTION__ . ' is deprecated as of 3/11/2010 in favor of using table class');
+	error_deprecated(__FUNCTION__ . ' is deprecated as of 3/11/2010 use lib_get');
 	return draw_javascript_src() . draw_javascript_src($path_script) . draw_javascript('form_tinymce_init("' . $path_css . '");');
 }
 
 function draw_javascript_src($filename=false) {
 	global $_josh;
 	if (!$filename) {
-		if ($_josh['drawn']['javascript']) return false; //only draw this file once per page
+		//default is to draw joshlib's own javascript library
+		if (isset($_josh['drawn']['javascript'])) return false; //only draw this file once per page
 		$_josh['drawn']['javascript'] = true;
 		$filename = DIRECTORY_WRITE . '/javascript.js';
 		$joshlibf = DIRECTORY_JOSHLIB . 'javascript.js';

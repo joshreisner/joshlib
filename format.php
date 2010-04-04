@@ -245,10 +245,8 @@ function format_hilite($haystack, $needles, $style='background-color:#FFFFBB;pad
 }
 
 function format_html($text) {
-	global $_josh;
-	require_once(lib_location('simple_html_dom'));
+	lib_get('simple_html_dom');
 	$html = str_get_html($text);
-
 	$html->set_callback('cleanup');
 	
 	if (!function_exists('tag_unset')) {
@@ -281,7 +279,7 @@ function format_html($text) {
 			//certain tags we are wary of
 			if ($e->tag == 'a') {
 				//no in-page links or anchors
-				if (!$e->href || (substr($e->href, 0, 1) == '#')) $e->outertext = '';
+				if (!$e->href) $e->outertext = '';
 			} elseif ($e->tag == 'div') {
 				//no empty divs
 				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = '';
@@ -346,7 +344,7 @@ function format_html_trim($text) {
 	global $_josh;
 	$text = format_html($text);
 	
-	require_once(DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/simple_html_dom.php');
+	lib_get('simple_html_dom');
 
 	//find td, div or body with longest text block
 	$html = str_get_html($text);
@@ -509,7 +507,7 @@ function format_js_desanitize() {
 }
 
 function format_js_sanitize($string) {
-	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because css or drawnavigation should be used for rollovers from now on');
+	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because css or draw_navigation should be used for rollovers from now on');
 	//return javascript-sanitized key
 	//need for rollover script for seedco financial and phoebe murer
 	$string = 'a' . $string; //doesn't like variables that start with numbers
@@ -765,6 +763,13 @@ function format_string($string, $target=30, $append='&hellip;') {
 
 function format_text_code($str) {
 	$return = strToLower(trim($str));
+	
+	//translate accents	
+	$from	= 'áàäâçéèëêíìïîóòöôøúùüû';
+	$to		= 'aaaaceeeeiiiiooooouuuu';
+    $return = strtr(utf8_decode($return), utf8_decode($from), $to);
+	
+	//remove special characters
 	$return = str_replace("'",	'',		$return);
 	$return = str_replace(',',	'',		$return);
 	$return = str_replace('.',	'',		$return);
@@ -773,6 +778,7 @@ function format_text_code($str) {
 	$return = str_replace(' ',	'_',	$return);
 	$return = str_replace('&',	'and',	$return);
 	$return = str_replace('?',	'',	$return);
+	
 	return $return;
 }
 

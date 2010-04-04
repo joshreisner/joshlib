@@ -110,18 +110,6 @@ class form {
 		} else {
 			if ($label) {
 				if ($additional && (($type == 'checkboxes') || ($type == 'textarea'))) $label .= $additional;
-				
-				//add lorem ipsum generator to tinymce
-				if (admin() && ($type == 'textarea')) {
-					if (!$_josh['drawn']['lorem_ipsum']) {
-						$return .= draw_javascript_src(lib_location('lorem_ipsum'));
-						$_josh['drawn']['lorem_ipsum'] = true;
-					}
-					if ($class == 'tinymce') {
-						$label .= '<br/>' . draw_link('javascript:tinyMCE.activeEditor.setContent(LoremIpsum.paragraphs((2 + Math.floor(Math.random()*2)), "<p>%s</p>"));', 'Lorem Ipsum');
-					}
-				}
-
 				$return .= draw_tag('label', array('for'=>$name), $label);
 			}
 			switch ($type) {
@@ -222,15 +210,10 @@ class form {
 				case 'textarea':
 				case 'textarea-plain':
 					if ($allow_changes) {
-						if (($class == 'tinymce') && !$_josh['drawn']['tinymce']) {
-							//todo: we might need a folder for this -- also these names are a bit too generic
-							file_dir_writable('images');
-							file_dir_writable('files');
-							$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
-							$_josh['drawn']['tinymce'] = true;
-						} elseif (($class == 'ckeditor') && !$_josh['drawn']['ckeditor']) {
-							$return .= draw_javascript_ckeditor();
-							$_josh['drawn']['ckeditor'] = true;
+						if ($class == 'tinymce') {
+							$return .= lib_get('tinymce');
+						} elseif ($class == 'ckeditor') {
+							$return .= lib_get('ckeditor');
 						}
 						$return .= draw_form_textarea($name, $value, $class);
 					} else {

@@ -74,7 +74,7 @@ class table {
 			
 			//assemble rows into tbody tags
 			for ($i = 0; $i <= $bodycounter; $i++) {
-				if (isset($bodies[$i]['title'])) $return .= draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), $bodies[$i]['title']));
+				if (isset($bodies[$i]['title'])) $return .= draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), '<a name="' . format_text_code($bodies[$i]['title']) . '"></a>' . $bodies[$i]['title']));
 				$return .= draw_tag('tbody', array('id'=>$this->name . $i), implode(NEWLINE, $bodies[$i]['rows']));
 			}
 

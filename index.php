@@ -63,11 +63,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['year']					= date('Y');
 
 //page draw status
-	$_josh['drawn']['ckeditor']		= false;	//only include ckeditor js once
-	$_josh['drawn']['focus']		= false;	//only autofocus on one form element
-	$_josh['drawn']['javascript'] 	= false;	//only include javascript.js once
-	$_josh['drawn']['lorem_ipsum'] 	= false;	//only include lorem_ipsum.js once
-	$_josh['drawn']['tinymce']		= false;	//only include tinymce js once
+	$_josh['drawn']					= array();	//array for including javascript only once, eg $_josh['drawn']['tinymce'] = true;
 
 //ignore these words when making search indexes | todo make this local to search function
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
@@ -425,22 +421,46 @@ function language_translate($string, $from, $to) {
 }
 
 function lib_get($string) {
-	//experiment
+	global $_josh;
 	
 	switch ($string) {
 		//php libraries
+		case 'fpdf' :
 		case 'salesforce' :
 		case 'sasl' :
+		case 'simple_html_dom' :
 		case 'smtp' :
 		return include_once(lib_location($string));
+		
+		//javascript libraries
+		case 'ckeditor' :
+		case 'lorem_ipsum' :
+		case 'prototype' :
+		case 'scriptaculous' :
+		case 'tinymce' :
+		if (isset($_josh['drawn'][$string])) return false;
+		
+		$_josh['drawn'][$string] = true;
+		$return = draw_javascript_src(lib_location($string));
+		
+		if ($string == 'tinymce') {
+			//special statements for tinymce
+			file_dir_writable('images');
+			file_dir_writable('files');
+			$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
+		}
+		
+		return $return;
 	}
-	
 }
 
 function lib_location($string) {
 	switch ($string) {
+		case 'ckeditor' :
+		return DIRECTORY_WRITE . '/lib/ckeditor/ckeditor.js';
+		
 		case 'fpdf' :
-		return DIRECTORY_WRITE . '/lib/fpdf/fpdf-1.6.php';
+		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/fpdf/fpdf-1.6.php';
 		
 		case 'lorem_ipsum' :
 		return DIRECTORY_WRITE . '/lib/lorem_ipsum/lorem_ipsum.js';
@@ -469,6 +489,7 @@ function lib_location($string) {
 }
 
 function lib_refresh() {
+	//this doesn't work yet, unfortunately
 	file_delete(DIRECTORY_WRITE . '/lib');
 	exit;
 }
