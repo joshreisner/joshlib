@@ -1,23 +1,6 @@
-/*	joshlib js functions
+//joshlib javascript functions
+//this file is generated automatically, only edit through joshlib SVN
 
-	this file is generated automatically -- only edit through joshlib SVN
-	
-	contains the following sections
-	
-	ajax
-	cookie
-	css
-	form
-	format
-	function
-	img
-	map
-	scroll
-	url
-	window
-*/
-
-/*ajax*/
 function ajax_publish(which) {
 	//which.name eg chk_news_12
 	var action = which.name.split("_");
@@ -51,7 +34,6 @@ function ajax_reorder() {
 	//eg Sortable.create("photos_uws", { tag:"tr", handle:"draggy", ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
 }
 
-/* cookie */
 function cookie_get(name) {
 	var nameEQ = name + "=";
 	var ca = document.cookie.split(';');
@@ -74,7 +56,6 @@ function cookie_set(name, value, days) {
 	document.cookie = name + "=" + value + expires + "; path=/";
 }
 
-/* css */
 function css_add(object, what) {
 	if ((object == null) || (typeof(object) != "object")) return false;
 	if (!css_check(object, what)) object.className += (object.className) ? " " + what : what;
@@ -113,23 +94,6 @@ function css_set(object, what) {
 	object.className = what;
 }
 
-/* event */
-function event_add(fn, object, event) { 
-	//eg event_add(sideBarInit);
-	if (!object) object = window;
-	if (!event) event = 'load';
-	if (object.addEventListener) { 
-		object.addEventListener(event, fn, false); 
-		return true; 
-	} else if (object.attachEvent) { 
-		var r = object.attachEvent("on" + event, fn); 
-		return r; 
-	} else { 
-		return false; 
-	} 
-}
-
-/* form */
 function form_checkbox_toggle(which) {
 	document.getElementById(which).checked = !document.getElementById(which).checked;
 }
@@ -303,9 +267,9 @@ function form_validate(form) {
 	if (eval("typeof validate_" + form.name + " == 'function'")) {
 		return eval("validate_" + form.name + "(form);");
 	}
+	return true;
 }
 
-/* format */
 function format_title(string) {
 	string = string.replace(/_/g, " ");
 	string = string.replace(/-/g, " ");
@@ -323,8 +287,21 @@ function format_title(string) {
 	return words.join(" ");
 }
 
+function function_attach(fn, object, event) { 
+	//eg function_attach(sideBarInit);
+	if (!object) object = window;
+	if (!event) event = 'load';
+	if (object.addEventListener) { 
+		object.addEventListener(event, fn, false); 
+		return true; 
+	} else if (object.attachEvent) { 
+		var r = object.attachEvent("on" + event, fn); 
+		return r; 
+	} else { 
+		return false; 
+	} 
+}
 
-/*function*/
 function function_run(name, argument) {
 	if (typeof(argument) == 'string') argument = "'" + argument + "'";
 	if (eval("typeof " + name + " == 'function'")) {
@@ -338,12 +315,10 @@ function google_search(form) {
 	return false;
 }
 
-/*img*/
 function img_roll(what, how) { 
 	eval("document." + what + ".src = " + what + "_" + how + ".src;"); 
 }
 
-/* map */
 function map_marker(latitude, longitude, html, icon) {
 	var point	= new GLatLng(latitude, longitude);
 	var marker	= new GMarker(point, icon);
@@ -353,13 +328,9 @@ function map_marker(latitude, longitude, html, icon) {
 	return marker;
 }
 
-/* object */
 function object_exists(obj) {
 	return (typeof(obj) == 'object');
 }
-
-/* scroll*/
-//this should really be a class, sorry
 
 function scroll_auto() {
 	scroll_direction('right', true);
@@ -429,8 +400,6 @@ function scroll_to(newPallet, dont_clear_interval) {
 	scrollvars.timer	= setInterval("scroll_horizontally();", 15);
 }
 
-
-/* url */
 function url_action_add(value, returnval) {
 	return url_query_set('action', value, returnval);
 }
@@ -495,8 +464,6 @@ function url_query_set(key, value, returnval) {
 	location.href = target;
 }
 	
-
-/* window */
 function window_scroll_top() {
 	if (navigator.platform != "Win32") {
 		scrollTo(0,0);

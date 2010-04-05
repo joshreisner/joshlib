@@ -344,13 +344,9 @@ function draw_form_radio($name, $value='', $checked=false, $class=false) {
 	return $return;
 }
 
-function draw_form_select($name, $sql_options, $value=false, $required=true, $class=false, $action=false, $nullvalue='', $maxlength=60) {
-	global $_josh;
-	$class = ($class) ? $class . ' select' : 'select';
-	$return  = '<select name="' . $name . '" id="' . $name . '" class="' . $class . '"';
-	if ($action) $return .= ' onchange="javascript:' . $action . '"';
-	$return .= '>';
-	if (!$required) $return .= '<option value="">' . $nullvalue . '</option>';
+function draw_form_select($name, $sql_options, $value=false, $not_nullable=true, $class=false, $onchange=false, $nullvalue='', $maxlength=60) {
+	//2010 04 04: changed $required to $not_nullable because it could still be required and have a null value at the top
+	$return = ($not_nullable) ? '' : '<option value="">' . $nullvalue . '</option>';
 	$lastgroup = '';
 	if (is_array($sql_options)) {
 		while (@list($key, $val, $group) = each($sql_options)) {
@@ -370,10 +366,7 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 				$lastgroup = $group;
 				$return .= '</optgroup><optgroup label="' . $lastgroup . '">';
 			}
-			
-			$return .= '<option value="' . $key . '" id="' . $name . $key . '"';
-			if ($key == $value) $return .= ' selected="selected"';
-			$return .= '>' . $val . '</option>';
+			$return .= draw_tag('option', array('value'=>$key, 'id'=>$name . $key, 'selected'=>($key == $value) ? 'selected' : false), $val);
 		}
 	} else {
 		$result = db_query($sql_options);
@@ -394,15 +387,14 @@ function draw_form_select($name, $sql_options, $value=false, $required=true, $cl
 				$lastgroup = $r['optgroup'];
 				$return .= '</optgroup><optgroup label="' . $lastgroup . '">';
 			}
-			$r[$key[1]] = format_string($r[$key[1]]);
-			$return .= '<option value="' . $r[$key[0]] . '" id="' . $name . $r[$key[0]] . '"';
-			if ($r[$key[0]] == $value) $return .= ' selected="selected"';
-			$return .= '>' . $r[$key[1]] . '</option>';
+			$return .= draw_tag('option', array('value'=>$r[$key[0]], 'id'=>$name . $r[$key[0]], 'selected'=>($r[$key[0]] == $value) ? 'selected' : false), format_string($r[$key[1]]));
 		}
 	}
 	if (isset($grouped) && $grouped) $return .= '</optgroup>';
-	$return .= '</select>';
-	return $return;
+
+	$class = ($class) ? $class . ' select' : 'select';
+	if ($onchange) $onchange = 'javascript:' . $onchange;
+	return draw_tag('select', array('name'=>$name, 'id'=>$name, 'class'=>$class, 'onchange'=>$onchange), $return);
 }
 
 function draw_form_select_month($name, $start, $default=false, $length=false, $class=false, $js=false, $nullable=false) {

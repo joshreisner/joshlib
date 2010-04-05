@@ -765,8 +765,8 @@ function format_text_code($str) {
 	$return = strToLower(trim($str));
 	
 	//translate accents	
-	$from	= 'áàäâçéèëêíìïîóòöôøúùüû';
-	$to		= 'aaaaceeeeiiiiooooouuuu';
+	$from	= 'áàäâçéèëêíìïîóòöôøúùüûñ';
+	$to		= 'aaaaceeeeiiiiooooouuuun';
     $return = strtr(utf8_decode($return), utf8_decode($from), $to);
 	
 	//remove special characters

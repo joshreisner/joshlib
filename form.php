@@ -190,7 +190,8 @@ class form {
 						$options = (stristr($sql, 'optgroup')) ? db_table($sql) : db_array($sql);
 					}
 					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
-					$return .= draw_form_select($name, $options, $value, $required, $class, $action) . $additional;
+					if ($null_value) $required = false;
+					$return .= draw_form_select($name, $options, $value, $required, $class, $action, $null_value) . $additional;
 					break;
 				case 'submit':
 					if (substr($value, 0, 1) == '/') {
@@ -238,7 +239,9 @@ class form {
 	
 	function set_field($array) {
 		//defaults
-		$type = $value = $class = $default = $name = $label = $required = $append = $position = $sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = $option_title = $object_id = $options = $linking_table = false;
+		$type = $value = $class = $default = $name = $label = $required = $append = $position = false;
+		$sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = false;
+		$option_title = $object_id = $options = $linking_table = $null_value = false;
 		$allow_changes = true;
 		
 		//load inputs
@@ -274,7 +277,7 @@ class form {
 
 		//package and save
 		if ($position === false) {
-			$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength');
+			$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength', 'null_value');
 		} else {
 			if (isset($this->fields[$name])) unset($this->fields[$name]);
 			$this->fields = array_insert_assoc($this->fields, $position, $name, compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength'));
