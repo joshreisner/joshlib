@@ -762,7 +762,7 @@ function format_string($string, $target=30, $append='&hellip;') {
 }
 
 function format_text_code($str) {
-	$return = strToLower(trim($str));
+	$return = strToLower(trim(strip_tags($str)));
 	
 	//translate accents	
 	$from	= 'áàäâçéèëêíìïîóòöôøúùüûñ';
