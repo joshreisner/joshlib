@@ -3,9 +3,8 @@ error_debug('including db.php', __file__, __line__);
 
 function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $limit=false) {
 	//exec a sql query and return an array of the results
-	//need more description of purpose for prepend_id, prepend_value
-	//what's the difference between this and db_table?
-	
+
+	//db_array vs db_table
 	//db_table returns resultsets like $array[0] = array('name'=>'josh', 'role'=>'coder', 'gender'=>'m');
 	//db_array can return either $array = array('foo', 'bar', 'baz') or $array = array('name'=>'josh', 'role'=>'coder', 'gender'=>'m');
 	
@@ -40,7 +39,7 @@ function db_backup($limit=false) {
 	global $_josh;
 	
 	//default filename is /_site/backups/YYYY-MM-DD.sql -- delete any existing file of that name
-	$folder = $_josh['dir']['write'] . '/backups/';
+	$folder = DIRECTORY_WRITE . '/backups/';
 	$target = $folder . date('Y-m-d') . '.gz';
 	file_delete($target);
 	

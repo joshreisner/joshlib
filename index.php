@@ -2,10 +2,9 @@
 /* 
 WELCOME TO JOSHLIB!
 	http://code.google.com/p/joshlib/ (wiki / documentation / report issues here)
-	http://joshlib.joshreisner.com/ (eventual website)
 
 LICENSE
-	all files other than lib.zip are written by josh reisner and are made available to the public under the terms of the LGPL
+	all files other than lib.zip are written by josh reisner and are available to the public under the terms of the LGPL
 	
 THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
@@ -137,15 +136,14 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) {
 		define('PLATFORM', 'win');
 		define('NEWLINE', "\r\n");
-		$_josh['dir']['root']				= str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']);
+		define('DIRECTORY_ROOT', str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']));
 		$_josh['slow']				= true;
 	} else { //platform is UNIX or Mac
 		define('PLATFORM', 'unix');
 		define('NEWLINE', "\n");
-		$_josh['dir']['root']				= $_SERVER['DOCUMENT_ROOT'];
+		define('DIRECTORY_ROOT', $_SERVER['DOCUMENT_ROOT']);
 		if (!isset($_josh['slow']))	$_josh['slow'] = false;
 	}
-	if (!defined('DIRECTORY_ROOT')) define('DIRECTORY_ROOT', $_josh['dir']['root']);
 	
 	//only checking for iphone right now
 	$_josh['request']['mobile']		= (isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone'));
@@ -164,22 +162,18 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (!isset($_josh['error_log_api']))	$_josh['error_log_api']		= false;
 		
 //get configuration variables
-	if (!isset($_josh['dir']['write'])) $_josh['dir']['write'] = '/_' . $_josh['request']['sanswww']; //eg /_example.com
-	if (!defined('DIRECTORY_WRITE')) define('DIRECTORY_WRITE', $_josh['dir']['write']);
-	if (!isset($_josh['config'])) $_josh['config'] = $_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
-	if (file_check($_josh['config'])) {
-		error_debug('<b>configure</b> found file', __file__, __line__);
-		require($_josh['dir']['root'] . $_josh['config']);
-	} else {
-		//if it doesn't exist, create one
+	if (!defined('DIRECTORY_WRITE')) define('DIRECTORY_WRITE', '/_' . $_josh['request']['sanswww']);
+	if (!isset($_josh['config'])) $_josh['config'] = DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
+	if (!file_check($_josh['config'])) {
+		//if config file doesn't exist, create one
 		error_debug('couldn\'t find config file, attempting to create one', __file__, __line__);
 		file_dir_writable();
 		file_put_config();
-		require($_josh['dir']['root'] . $_josh['config']);
 	}
+	require(DIRECTORY_ROOT . $_josh['config']);
 	
 //ensure lib exists--todo autogen lib folder when lib.zip has been updated
-	if (!is_dir($_josh['dir']['root'] . $_josh['dir']['write'] . DIRECTORY_SEPARATOR . 'lib')) file_unzip(DIRECTORY_JOSHLIB . DIRECTORY_SEPARATOR . 'lib.zip', $_josh['dir']['write']);
+	if (!is_dir(DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib')) file_unzip(DIRECTORY_JOSHLIB . DIRECTORY_SEPARATOR . 'lib.zip', DIRECTORY_WRITE);
 
 //set error reporting level by determining whether this is a dev or live situation
 	if (isset($_SERVER['HTTP_HOST']) && (format_text_starts('dev-', $_SERVER['HTTP_HOST']) || format_text_starts('beta.', $_SERVER['HTTP_HOST']) || format_text_ends('.site', $_SERVER['HTTP_HOST']))) {

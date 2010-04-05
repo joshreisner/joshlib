@@ -3,7 +3,7 @@ error_debug('including cache.php', __file__, __line__);
 
 function cache_clear($match=false) {
 	global $_josh;
-	if ($files = file_folder($_josh['dir']['write'] . '/caches/')) {
+	if ($files = file_folder(DIRECTORY_WRITE . '/caches/')) {
 		foreach ($files as $f) {
 			if ($match) {
 				//delete only certain files
@@ -45,7 +45,7 @@ function cache_start($filename=false) {
 	if ($userID = user()) $filename .= ((stristr('?', $filename)) ? '?' : '&') . 'user_id=' . $userID;
 	
 	//finalize
-	$filename = $_josh['dir']['write'] . '/caches/' . urlencode($filename) . '.html';
+	$filename = DIRECTORY_WRITE . '/caches/' . urlencode($filename) . '.html';
 
 	if (file_check($filename)) {
 		//get cache file
