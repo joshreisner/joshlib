@@ -565,10 +565,8 @@ function draw_javascript_ckeditor() {
 }
 
 function draw_javascript_lib() {
-	global $_josh;
-	return draw_javascript_src() .
-		draw_javascript_src(lib_location('prototype')) .
-		draw_javascript_src(lib_location('scriptaculous'));
+	error_deprecated(__FUNCTION__ . ' was deprecated on 4/5/2010 - use lib_get');
+	return draw_javascript_src() . lib_get('prototype') . lib_get('scriptaculous');
 }
 
 function draw_javascript_link($target, $text, $id=false, $class=false) {

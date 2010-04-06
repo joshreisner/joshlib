@@ -428,6 +428,7 @@ function lib_get($string) {
 		
 		//javascript libraries
 		case 'ckeditor' :
+		case 'jquery' :
 		case 'lorem_ipsum' :
 		case 'prototype' :
 		case 'scriptaculous' :
@@ -442,6 +443,8 @@ function lib_get($string) {
 			file_dir_writable('images');
 			file_dir_writable('files');
 			$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
+		} elseif ($string == 'scriptaculous') {
+			$return = lib_get('prototype') . $return;
 		}
 		
 		return $return;
@@ -449,36 +452,42 @@ function lib_get($string) {
 }
 
 function lib_location($string) {
+
+	$lib = DIRECTORY_WRITE . '/lib/' . $string . '/';
+
 	switch ($string) {
 		case 'ckeditor' :
-		return DIRECTORY_WRITE . '/lib/ckeditor/ckeditor.js';
+		return $lib . 'ckeditor.js';
 		
 		case 'fpdf' :
-		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/fpdf/fpdf-1.6.php';
+		return DIRECTORY_ROOT . $lib . 'fpdf-1.6.php';
+		
+		case 'jquery' :
+		return $lib . 'jquery-1.4.2.min.js';
 		
 		case 'lorem_ipsum' :
-		return DIRECTORY_WRITE . '/lib/lorem_ipsum/lorem_ipsum.js';
+		return $lib . 'lorem_ipsum.js';
 		
 		case 'prototype' :
-		return DIRECTORY_WRITE . '/lib/prototype/prototype-1.5.0.js';
+		return $lib . 'prototype-1.5.0.js';
 		
 		case 'sasl' :
-		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/sasl/sasl-2005-10-31/sasl.php';
+		return DIRECTORY_ROOT . $lib . 'sasl-2005-10-31/sasl.php';
 		
 		case 'scriptaculous' :
-		return DIRECTORY_WRITE . '/lib/scriptaculous/scriptaculous-1.6.5/scriptaculous.js';
+		return $lib . 'scriptaculous-1.6.5/scriptaculous.js';
 
 		case 'salesforce' :
-		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/salesforce/phptoolkit-13_1/soapclient/SforceEnterpriseClient.php';
+		return DIRECTORY_ROOT . $lib . 'phptoolkit-13_1/soapclient/SforceEnterpriseClient.php';
 		
 		case 'simple_html_dom' :
-		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/simple_html_dom/simple_html_dom-1.11.php';
+		return DIRECTORY_ROOT . $lib . 'simple_html_dom-1.11.php';
 
 		case 'smtp' :
-		return DIRECTORY_ROOT . DIRECTORY_WRITE . '/lib/smtp/smtpclass-2009-04-11/smtp.php';
+		return DIRECTORY_ROOT . $lib . 'smtpclass-2009-04-11/smtp.php';
 		
 		case 'tinymce' :
-		return DIRECTORY_WRITE . '/lib/tinymce/tinymce-3.3rc1/tiny_mce.js';
+		return $lib . 'tinymce-3.3rc1/tiny_mce.js';
 	}
 }
 
