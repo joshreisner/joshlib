@@ -35,11 +35,7 @@ function error_debug($message, $file, $line, $bgcolor='#fff') {
 }
 
 function error_deprecated($message) {
-	global $_josh;
-	//use this to deprecate use of various functions
-	$message = error_draw('use of deprecated function', $message);
-	if (isset($_josh['mode']) && ($_josh['mode'] == 'dev')) die($message);
-	email($_josh['email_admin'], $message, 'use of deprecated function');
+	$message = error_handle('use of deprecated function', $message);
 }
 
 function error_draw($title, $html) {	
