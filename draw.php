@@ -169,9 +169,10 @@ function draw_definition_list($array, $arguments=false) {
 	return draw_container('dl', $return, $arguments);
 }
 
-function draw_div($id, $innerhtml='', $arguments=false) {
+function draw_div($id, $innerhtml=false, $arguments=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	//todo deprecate this in favor of draw_div_id
+	if (!$innerhtml) $innerhtml = '&nbsp;';
 	return draw_div_id($id, $innerhtml, $arguments);
 }
 
@@ -671,7 +672,72 @@ function draw_meta_utf8() {
 	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
 }
 
+function draw_nav($options, $type='text', $class='nav', $match='path') {
+	global $_josh;
+	//2009 04 07 trying to come up with a simpler, better version of this function
+	//type can be text, images or rollovers
+	//match can be path, path_query or folder
+	
+	if (!is_array($options) || !count($options)) return false; //skip if empty
+	$return = array();
+		
+	//this is so you can have several sets of rollovers in the same page eg the smarter toddler site
+	if (!isset($_josh['drawn']['navigation'])) $_josh['drawn']['navigation'] = 0;
+	$_josh['drawn']['navigation']++;
+	
+	//determine matching target
+	if ($match == 'path') {
+		$match = $_josh['request']['path'];
+	} elseif ($match == 'path_query') {
+		$match = $_josh['request']['path_query'];
+	}
+	error_debug('<b>' . __function__ . '</b> match is ' . $match, __file__, __line__);
+	
+	$selected = false;
+	$counter = 1;
+	$javascript = NEWLINE;
+	foreach ($options as $url=>$title) {
+		$name = 'option_' . $_josh['drawn']['navigation'] . '_' . $counter;
+		$args = array('name'=>$name, 'class'=>$name);
+		
+		if ($match == 'folder') {
+			//eg /about/page1/ and /about/page2/ will match
+			$urlparts = explode('/', $url);
+			$matching = (@$urlparts[1] == $_josh['request']['folder']);
+			if (substr($url, 0, 5) == 'http:') $matching = false;
+		} else {
+			$matching = (str_replace(url_base(), '', $url) == $match);
+		}
+		
+		if ($matching) {
+			$img_state = '_on';
+			$args['class'] .= ' selected';
+			$selected = $counter;
+		} else {
+			$img_state = '_off';
+			if ($type == 'rollovers') {
+				$args['onmouseover'] = 'javascript:img_roll(\'' . $name . '\',\'on\');';
+				$args['onmouseout'] = 'javascript:img_roll(\'' . $name . '\',\'off\');';
+			}
+		}
+		
+		if (($type == 'images') || ($type == 'rollovers')) {
+			$img = '/images/' . $class . '/' . format_text_code($title);
+			if ($type == 'rollovers') $javascript .= $name . '_on		 = new Image;' . NEWLINE . $name . '_off	 = new Image;' . NEWLINE . $name . '_on.src	 = "' . $img . '_on.png";' . NEWLINE . $name . '_off.src = "' . $img . '_off.png";' . NEWLINE;
+			$inner = draw_img($img . $img_state . '.png', false, false, $name);
+		} else { //type == text
+			$inner = $title;		
+		}
+		$return[] = draw_link($url, $inner, false, $args);
+		$counter++;
+	}
+	$return = draw_list($return, $class, 'ul', $selected);
+	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
+	return $return;
+}
+
 function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $override=false) {
+	//2009 04 07 soon to deprecate this function
 	//useid is for rollover navigation -- use everything after id= instead of slashless url
 	//2010 03 15 jr: useid is changed now to override -- can be 'id' or 'folder'
 	//type could be text, images or rollovers

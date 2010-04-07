@@ -77,9 +77,9 @@ function url_drop($deletes=false, $go=true) {
 	return url_query_drop($deletes, $go);
 }
 
-function url_header_utf8() {
-	//todo rename http_header_utf8
-	if (!headers_sent()) header('Content-Type: text/html; charset=utf-8');
+function url_folder($empty='home') {
+	global $_josh;
+	return (empty($_josh['request']['folder'])) ? $empty : $_josh['request']['folder'];
 }
 
 function url_get($url) {
@@ -96,6 +96,11 @@ function url_get($url) {
 	$return = curl_exec($ch);
 	curl_close($ch);
 	return $return;
+}
+
+function url_header_utf8() {
+	//todo rename http_header_utf8
+	if (!headers_sent()) header('Content-Type: text/html; charset=utf-8');
 }
 
 function url_id($index='id') {
