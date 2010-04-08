@@ -287,6 +287,12 @@ function format_title(string) {
 	return words.join(" ");
 }
 
+function format_zeropad(num, len) {
+	var str = num + '';
+	while (str.length < len) str = "0" + str;
+	return str;
+}
+
 function function_attach(fn, object, event) { 
 	//eg function_attach(sideBarInit);
 	if (!object) object = window;
@@ -344,6 +350,11 @@ function scroll_init(which, count, width, hashes, auto_interval) {
 	scroll_initialized	= true;
 	scrolling			= false;
 	leave_hashes		= (typeof(hashes) == 'undefined');
+	interval = false;
+	
+	//set inner element width, if it's a UL
+	var uls = scroll_element.getElementsByTagName('ul');
+	if (uls.length) uls[0].style.width = scroll_width * scroll_count + 'px';
 	
 	if (leave_hashes && window.location.hash) {
 		if (parseInt(window.location.hash.substr(1)) <= scroll_count) {
@@ -355,8 +366,6 @@ function scroll_init(which, count, width, hashes, auto_interval) {
 	
 	if (auto_interval) {
 		interval = setInterval("scroll_auto()", auto_interval);
-	} else {
-		interval = false;
 	}
 }
 

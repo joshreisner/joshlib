@@ -531,11 +531,11 @@ function format_money($value, $dollarsign=true, $comma=true, $error='') {
 	return $value;
 }
 
-function format_nobr($string='') {
+/* function format_nobr($string='') {
 	//should have been draw_nobr anyway
 	error_deprecated(__FUNCTION__ . ' was deprecated on 10/28/2009 because it\'s invalid html -- use table width instead, or white-space: nowrap');
 	return '<nobr>' . $string . '</nobr>';
-}
+}*/
 
 function format_null($value='') {
 	//could also be a db function?
@@ -794,12 +794,12 @@ function format_text_human($str, $convertdashes=true) {
 	return format_title($return);
 }
 
-function format_text_shorten($text, $length=30, $append='&#8230;', $appendlength=1) {
+/* function format_text_shorten($text, $length=30, $append='&#8230;', $appendlength=1) {
 	error_deprecated(__FUNCTION__ . ' was deprecated on 10/3/2009 use format_string instead');
 	if ($append) $length = $length - $appendlength;
 	if (strlen($text) > $length) return substr($text, 0, $length) . $append;
 	return $text;
-}
+}*/
 
 function format_text_starts($needle, $haystack) {
 	//function to see if a $haystack starts with $needle

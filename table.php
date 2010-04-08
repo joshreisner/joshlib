@@ -143,7 +143,7 @@ class table {
 	}
 	
 	function col($name, $class=false, $title=false, $width=false) {
-		//legacy alias, todo ~ deprecate
+		error_deprecated(__function__ . ' is deprecated as of 4/7/2010, use set_column instead');
 		$this->set_column($name, $class, $title, $width);
 	}
 	

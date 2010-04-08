@@ -560,10 +560,10 @@ function draw_javascript($javascript=false) {
 	return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);
 }
 
-function draw_javascript_ckeditor() {
+/* function draw_javascript_ckeditor() {
 	error_deprecated(__FUNCTION__ . ' was deprecated on 4/3/2010 - use lib_get');
 	return draw_javascript_src(DIRECTORY_WRITE . '/lib/ckeditor/ckeditor.js');
-}
+} */
 
 function draw_javascript_lib() {
 	error_deprecated(__FUNCTION__ . ' was deprecated on 4/5/2010 - use lib_get');
@@ -737,7 +737,9 @@ function draw_nav($options, $type='text', $class='nav', $match='path') {
 }
 
 function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $override=false) {
-	//2009 04 07 soon to deprecate this function
+	//2009 04 07 deprecated
+	error_deprecated(__function__ . ' was deprecated on 4/7/2010.  use draw_nav instead');
+	
 	//useid is for rollover navigation -- use everything after id= instead of slashless url
 	//2010 03 15 jr: useid is changed now to override -- can be 'id' or 'folder'
 	//type could be text, images or rollovers

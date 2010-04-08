@@ -224,11 +224,11 @@ function file_import_fixedlength($content, $definitions) {
 	return $return;
 }
 
-function file_is($filename) {
+/* function file_is($filename) {
 	error_deprecated(__FUNCTION__ . ' is deprecated now in favor of using file_check');
 	global $_josh;
 	return file_exists(DIRECTORY_ROOT . $filename);
-}
+}*/
 
 function file_name($filepath) {
 	global $_josh;

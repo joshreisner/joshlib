@@ -166,10 +166,10 @@ function array_post_checkboxes($field_name) {
 	return $return;
 }
 
-function array_post_fields($fieldnames, $delimiter=',') {
+/* function array_post_fields($fieldnames, $delimiter=',') {
 	error_deprecated(__function__ . ' was deprecated on 3/11/2010.  use array_separated instead');
 	return array_separated($fieldnames, $delimiter);
-}
+}*/
 
 function array_range($start, $end, $increment=1) {
 	//numeric, sequential arrays for draw_form_date
@@ -310,10 +310,10 @@ function array_to_lower($array) {
 	return $return;
 }
 
-function array_url($str, $defaults=false, $separator='&') {
+/* function array_url($str, $defaults=false, $separator='&') {
 	error_deprecated(__function__ . ' was deprecated on 3/11/2010.  use array_query_string instead.  this one\'s going to go fast because url_parse is going to fill this spot.');
 	return array_query_string($str, $defaults, $separator);
-}
+} */
 
 function array_xml($stringxml) {
 	//for harvest import -- take data in string xml format and return it as an associative array
