@@ -38,6 +38,15 @@ function draw_autorefresh($minutes=5) {
 	return draw_tag('meta', array('http-equiv'=>'refresh', 'content'=>$minutes * 60));
 }
 
+function draw_body_open() {
+	//draw the opening body tag, in, say, drawTop()
+	global $_josh;
+	$classes = array(url_folder());
+	if ($_josh['editing']) $classes[] = 'query';
+	if ($_josh['request']['subfolder']) $classes[] = $_josh['request']['subfolder'];
+	return '<body class="' . implode(' ', $classes) . '">';
+}
+
 function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar', $linknumbers=false, $type='div', $toggling=false) {
 	/*
 		for livingcities roundup & events page, soon intranet
@@ -189,6 +198,10 @@ function draw_div_id($id, $innerhtml='', $arguments=false) {
 	$arguments = array_arguments($arguments);
 	$arguments['id'] = $id;
 	return draw_tag('div', $arguments, $innerhtml);
+}
+
+function draw_div_open($id=false) {
+	return draw_tag('div', array('id'=>$id), false, false); 
 }
 
 function draw_dl($array, $class=false) {
@@ -910,12 +923,12 @@ function draw_table_rows($array, $columns=2) {
 	return $return;
 }
 
-function draw_tag($tag, $arguments=false, $innerhtml=false) {
+function draw_tag($tag, $arguments=false, $innerhtml=false, $open=false) {
 	$tag = strToLower($tag);
 	$return = '<' . $tag;
 	$return .= (is_array($arguments)) ? draw_arguments($arguments) : draw_argument('class', $arguments);
 	if ($innerhtml === false) {
-		$return .= '/>';
+		$return .= ($open) ? '>' : '/>';
 	} else {
 		if (is_numeric($innerhtml) && ($innerhtml == 0)) $innerhtml = '&#48;';
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
