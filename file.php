@@ -112,9 +112,12 @@ function file_ext($filename) {
 	return $info['extension'];
 }
 
-function file_folder($folder, $endfilter=false) {
+function file_folder($folder=false, $endfilter=false, $simple=false) {
 	global $_josh;
 	error_debug('<b>file folder</b> running with ' . $folder, __file__, __line__);
+	
+	//default to current folder
+	if (!$folder) $folder = $_josh['request']['directory'];
 	
 	//check to make sure folder exists
 	if (!is_dir(DIRECTORY_ROOT . $folder)) {
@@ -124,37 +127,45 @@ function file_folder($folder, $endfilter=false) {
 	error_debug('<b>file folder</b> $folder is a directory!', __file__, __line__);
 
 	//set up filter
-	if ($endfilter) $endfilter = explode(',', $endfilter);
+	if ($endfilter && is_string($endfilter)) $endfilter = array_separated($endfilter);
 
 	//open it
 	if ($handle = opendir(DIRECTORY_ROOT . $folder)) {
 		$return = array();
 		while (($name = readdir($handle)) !== false) {
-			if (($name == '.') || ($name == '..') || ($name == '.DS_Store')) continue;
-			$nameparts = explode('.', $name);
+			if (substr($name, 0, 1) == '.') continue;
+			$file = pathinfo($folder . $name);
 			$thisfile = array(
 				'name'=>$name,
-				'ext'=>array_pop($nameparts),
-				'human'=>format_text_human(implode(' ', $nameparts)), 
+				'ext'=>@$file['extension'],
+				'human'=>format_text_human(@$file['filename']), 
 				'path_name'=>$folder . $name,
 				'type'=>@filetype(DIRECTORY_ROOT . $folder . $name),
 				'fmod'=>@filemtime(DIRECTORY_ROOT . $folder . $name),
 				'size'=>@filesize(DIRECTORY_ROOT . $folder . $name)
 			);
+
+			error_debug('<b>file folder</b> found ' . $name . ' of type ' . $thisfile['type'], __file__, __line__);
 			if ($thisfile['type'] == 'dir') $thisfile['path_name'] .= '/';
-			error_debug('<b>file folder</b> found ' . $thisfile['name'] . ' of type ' . $thisfile['type'], __file__, __line__);
 			if ($endfilter) {
 				$oneFound = false;
-				foreach ($endfilter as $e) if (format_text_ends(trim($e), $thisfile['path_name']) || (($e == 'dir') && ($thisfile['type'] == 'dir'))) $oneFound = true;
-				if ($oneFound) $return[] = $thisfile;
+				foreach ($endfilter as $e) if (format_text_ends($e, $thisfile['path_name']) || (($e == 'dir') && ($thisfile['type'] == 'dir'))) $oneFound = true;
+				if ($oneFound) $return[] = ($simple) ? $thisfile['path_name'] : $thisfile;
 			} else {
-				$return[] = $thisfile;
+				$return[] = ($simple) ? $thisfile['path_name'] : $thisfile;
 			}
 		}
 		error_debug('<b>file folder</b> closing handle', __file__, __line__);
 		closedir($handle);
-		if (count($return)) return array_sort($return);
 	}
+	if (!count($return)) return false;
+	if ($simple) {
+		sort($return);
+		return $return;
+	} else {
+		return array_sort($return);
+	}
+	
 	error_debug('<b>file folder</b> no return count', __file__, __line__);
 	return false;
 }

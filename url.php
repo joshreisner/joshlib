@@ -166,6 +166,7 @@ function url_parse($url) {
 	$return['usingwww']		= (substr($return['host'], 0, 4) == 'www.') ? 1 : 0;
 	$return['sanswww']		= ($return['usingwww']) ? substr($return['host'], 4) : $return['host'];
 	$return['subdomain']	= substr($subs, 1);
+	$return['directory']	= dirname($return['path']) . '/';
 	$return['path']			= str_replace('index.php', '', $return['path']);
 	
 	//get folder, subfolder, subsubfolder (there must be a smoother way)
