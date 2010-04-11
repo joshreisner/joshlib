@@ -581,10 +581,11 @@ function draw_javascript($javascript=false) {
 
 function draw_javascript_lib() {
 	error_deprecated(__FUNCTION__ . ' was deprecated on 4/5/2010 - use lib_get');
-	return draw_javascript_src() . lib_get('prototype') . lib_get('scriptaculous');
+	return draw_javascript_src() . lib_get('scriptaculous');
 }
 
 function draw_javascript_link($target, $text, $id=false, $class=false) {
+	error_deprecated(__FUNCTION__ . ' was deprecated on 4/10/2010 - you can use draw_link now instead');
 	//so as to avoid return false;
 	$id = ($id) ? ' id="' . $id . '"' : '';
 	$class = ($class) ? ' class="' . $class . '"' : '';
@@ -632,6 +633,7 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) 
 		if (!$str) $str = format_ascii(format_string(str_replace('mailto:', '', $href), 60));
 		$arguments['href'] = format_ascii($href);
 	} elseif (format_text_starts('javascript:', $href)) {
+		//correct link for javascript
 		$arguments['onclick'] = $href;
 	} else {
 		if (!$str) $str = format_string($href, 60);
@@ -643,6 +645,7 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) 
 }
 
 function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false) {
+	//what's this for?
 	if (!$id) $id = 'session';
 	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $arguments);
 }

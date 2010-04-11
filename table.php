@@ -101,7 +101,7 @@ class table {
 		//drag and drop table
 		if ($this->draggable && $count_rows) {
 			for ($i = 0; $i <= $bodycounter; $i++) {
-				$return .= draw_javascript('
+				$return .= lib_get('scriptaculous') . draw_javascript('
 					function reorder() {
 						var options = { method:"post", parameters:Sortable.serialize("' . $this->name . $i . '") + unescape("%26") + "table=' . $this->name . '" + unescape("%26") + "column=' . $this->dragcolumn . '", onSuccess:function(transport) {
 							//alert(transport.responseText);
