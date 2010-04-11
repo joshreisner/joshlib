@@ -620,12 +620,14 @@ function draw_javascript_src($filename=false) {
 }
 
 function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) {
-	if (!$arguments)	{
+	/*if (!$arguments)	{
 		$arguments = array();
 	} elseif (!is_array($arguments)) {
 		//if arguments is a string, make it the link's class
 		$arguments = array('class'=>$arguments);
-	}
+	}*/
+	$arguments = array_arguments($arguments);
+	
 	if (!$href) return $str;
 	
 	//obfuscate email
@@ -645,15 +647,16 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) 
 }
 
 function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false) {
-	//what's this for?
+	//for setting single value ala show/hide intranet helptext ~ todo deprecate
 	if (!$id) $id = 'session';
 	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $arguments);
 }
 
-function draw_list($options, $arguments_or_class=false, $type='ul', $selected=false) {
+function draw_list($options, $arguments=false, $type='ul', $selected=false) {
 	//make a ul or an ol out of a one-dimensional array
 	if (!is_array($options) || (!$count = count($options))) return false;
-	if (!is_array($arguments_or_class)) $arguments_or_class = array('class'=>$arguments_or_class); //if arguments is a string, it's legacy class
+	//if (!is_array($arguments)) $arguments = array('class'=>$arguments); //if arguments is a string, it's legacy class
+	$arguments = array_arguments($arguments);
 		
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
@@ -665,10 +668,18 @@ function draw_list($options, $arguments_or_class=false, $type='ul', $selected=fa
 		$options[$i] = draw_tag('li', array('class'=>$liclass), $options[$i]);
 		$counter++;
 	}
-	return draw_tag($type, $arguments_or_class, implode($options, ''));
+	return draw_tag($type, $arguments, implode($options, ''));
 }
 
-function draw_list_db($table_or_sql, $linkprefix='', $arguclass=false, $type='ul', $selected=false) {
+function draw_list_columns($options, $columns=2, $arguments=false) {
+	//experiment
+	$return = array();
+	$length = ceil(count($options) / $columns);
+	for ($i = 0; $i < $columns; $i++) $return[] = draw_list(array_slice($options, $i * $length, $length));
+	return draw_list($return, $arguments);
+}
+
+function draw_list_db($table_or_sql, $linkprefix='', $arguments=false, $type='ul', $selected=false) {
 	//experiment.  eg draw_list_table('blog_categories', '/c/?id=') will return a UL with a list of links
 	//todo: add better behaviors like if id column dne, or something
 	//03-11-2010 jr: interesting, is this being used?  example sounds like harvard
@@ -676,7 +687,7 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguclass=false, $type='ul
 	if (!stristr($table_or_sql, ' ')) $table_or_sql = 'SELECT id, title FROM ' . $table_or_sql . ' t WHERE t.is_active = 1 ORDER BY t.precedence';
 	$result = db_table($table_or_sql);
 	foreach ($result as &$r) $r = draw_link($linkprefix . $r['id'], $r['title']);
-	return draw_list($result, $arguclass, $type, $selected);
+	return draw_list($result, $arguments, $type, $selected);
 }
 
 function draw_meta_description($string) {
