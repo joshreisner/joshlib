@@ -117,7 +117,7 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 	error_debug('<b>file folder</b> running with ' . $folder, __file__, __line__);
 	
 	//default to current folder
-	if (!$folder) $folder = $_josh['request']['directory'];
+	if (!$folder) $folder = $_josh['request']['path'];
 	
 	//check to make sure folder exists
 	if (!is_dir(DIRECTORY_ROOT . $folder)) {

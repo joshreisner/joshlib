@@ -173,6 +173,7 @@ function draw_container($tag, $innerhtml, $arguments=false) {
 }
 
 function draw_definition_list($array, $arguments=false) {
+	error_deprecated('use draw_dl');
 	$return = '';
 	foreach ($array as $key=>$value) $return .= draw_container('dt', $key) . draw_container('dd', $value);
 	return draw_container('dl', $return, $arguments);
@@ -630,6 +631,8 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) 
 	if (format_text_starts('mailto:', $href)) {
 		if (!$str) $str = format_ascii(format_string(str_replace('mailto:', '', $href), 60));
 		$arguments['href'] = format_ascii($href);
+	} elseif (format_text_starts('javascript:', $href)) {
+		$arguments['onclick'] = $href;
 	} else {
 		if (!$str) $str = format_string($href, 60);
 		$arguments['href'] = htmlentities($href);

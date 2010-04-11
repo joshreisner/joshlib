@@ -121,11 +121,22 @@ function form_checkbox_add(options_table, target) {
 	}
 }
 
+function form_checkboxes_toggle(form, checked) {
+	if (!object_exists(form)) {
+		alert('form dne');
+		return false;
+	}
+	for (var i = 0; i < form.elements.length; i++) {
+		var chkParts = form.elements[i].name.split('_');
+		if ((chkParts.length == 3) && (chkParts[0] == 'chk')) form.elements[i].checked = checked;
+	}
+}
+
 function form_checkboxes_checked(form, filter) {
 	//returns all the checkboxes checked in the form.  the name must be in the format chk_type_id, eg chk_topics_12
 	returnArray = new Array();
 	if (!object_exists(form)) {
-		alert('form den');
+		alert('form dne');
 		return false;
 	}
 	for (var i = 0; i < form.elements.length; i++) {
@@ -137,6 +148,15 @@ function form_checkboxes_checked(form, filter) {
 		}
 	}
 	return returnArray;
+}
+
+function form_checkboxes_empty(form, name) {
+	oneFound = false;
+	for (var i = 0; i < form.elements.length; i++) {
+		var checkParts = form.elements[i].name.split("-");
+		if ((checkParts[0] == "chk") && (checkParts[1] == name) && (form.elements[i].checked)) oneFound = true;
+	}
+	return !oneFound;
 }
 
 function form_errors(errors) {
@@ -201,15 +221,6 @@ function form_tinymce_init(cssLocation, showplugins) {
 		});
 		
 	}
-}
-
-function form_checkboxes_empty(form, name) {
-	oneFound = false;
-	for (var i = 0; i < form.elements.length; i++) {
-		var checkParts = form.elements[i].name.split("-");
-		if ((checkParts[0] == "chk") && (checkParts[1] == name) && (form.elements[i].checked)) oneFound = true;
-	}
-	return !oneFound;
 }
 
 function form_field_email(obj) {
