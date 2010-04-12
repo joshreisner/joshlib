@@ -569,6 +569,10 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	return $image;
 }
 
+function draw_img_random($folder, $link=false, $class=false) {
+	return draw_img(array_random(file_folder('/images/random/', 'jpg,jpeg,gif,png', true)));
+}
+
 function draw_javascript($javascript=false) {
 	if (!$javascript) return draw_javascript_src();
 	return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);

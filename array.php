@@ -315,6 +315,11 @@ function array_to_lower($array) {
 	return array_query_string($str, $defaults, $separator);
 } */
 
+function array_random($array) {
+	//return a random value from a one-dimensional array
+	return $array[rand(0, count($array)-1)];
+}
+
 function array_xml($stringxml) {
 	//for harvest import -- take data in string xml format and return it as an associative array
 	//todo verify this works
