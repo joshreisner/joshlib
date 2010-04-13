@@ -54,7 +54,7 @@ function file_dir_writable($subdirectory=false) {
 	if (!is_dir($directory) && !@mkdir($directory)) error_handle('couldn\'t create folder', 'file_dir_writable tried to create a folder at ' . format_ascii($directory) . ' but could not.  please create a folder there and make it writable.');
 
 	//set permissions
-	if (!is_writable($directory) && !@chmod($directory, 0755)) error_handle('couldn\'t set permissions', 'file_dir_writable needs the ' . $directory . ' to be writable by the webserver (755).');
+	if (!is_writable($directory) && !@chmod($directory, 0777)) error_handle('couldn\'t set permissions', 'file_dir_writable needs the ' . $directory . ' to be writable by the webserver.');
 	
 	return true;
 }

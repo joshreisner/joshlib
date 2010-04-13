@@ -694,6 +694,14 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguments=false, $type='ul
 	return draw_list($result, $arguments, $type, $selected);
 }
 
+function draw_list_sets($options, $length=2, $arguments=false) {
+	//experiment
+	$return = array();
+	$columns = ceil(count($options) / $length);
+	for ($i = 0; $i < $columns; $i++) $return[] = draw_list(array_slice($options, $i * $length, $length));
+	return draw_list($return, $arguments);
+}
+
 function draw_meta_description($string) {
 	return draw_tag('meta', array('name'=>'description', 'content'=>strip_tags($string)));
 }
