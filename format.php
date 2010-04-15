@@ -777,6 +777,7 @@ function format_text_code($str) {
 	$return = str_replace('/',	'_',	$return);
 	$return = str_replace(' ',	'_',	$return);
 	$return = str_replace('&',	'and',	$return);
+	$return = str_replace('+',	'and',	$return);
 	$return = str_replace('?',	'',	$return);
 	
 	return $return;

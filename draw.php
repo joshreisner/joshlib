@@ -766,7 +766,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path') {
 		if (($type == 'images') || ($type == 'rollovers')) {
 			$img = '/images/' . $class . '/' . format_text_code($title);
 			if ($type == 'rollovers') $javascript .= $name . '_on		 = new Image;' . NEWLINE . $name . '_off	 = new Image;' . NEWLINE . $name . '_on.src	 = "' . $img . '_on.png";' . NEWLINE . $name . '_off.src = "' . $img . '_off.png";' . NEWLINE;
-			$inner = draw_img($img . $img_state . '.png', false, false, $name);
+			$inner = draw_img($img . (($type == 'rollovers') ? $img_state : false) . '.png', false, false, $name);
 		} else { //type == text
 			$inner = $title;		
 		}
