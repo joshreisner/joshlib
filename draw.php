@@ -202,7 +202,7 @@ function draw_div_id($id, $innerhtml='', $arguments=false) {
 }
 
 function draw_div_open($id=false) {
-	return draw_tag('div', array('id'=>$id), false, false); 
+	return draw_tag('div', array('id'=>$id), false, true); 
 }
 
 function draw_dl($array, $class=false) {
@@ -675,12 +675,12 @@ function draw_list($options, $arguments=false, $type='ul', $selected=false) {
 	return draw_tag($type, $arguments, implode($options, ''));
 }
 
-function draw_list_columns($options, $columns=2, $arguments=false) {
+function draw_list_columns($options, $columns=2, $arguments=false, $type='ul', $selected=false) {
 	//experiment
 	$return = array();
 	$length = ceil(count($options) / $columns);
 	for ($i = 0; $i < $columns; $i++) $return[] = draw_list(array_slice($options, $i * $length, $length));
-	return draw_list($return, $arguments);
+	return draw_list($return, $arguments, $type, $selected);
 }
 
 function draw_list_db($table_or_sql, $linkprefix='', $arguments=false, $type='ul', $selected=false) {
@@ -694,12 +694,12 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguments=false, $type='ul
 	return draw_list($result, $arguments, $type, $selected);
 }
 
-function draw_list_sets($options, $length=2, $arguments=false) {
-	//experiment
+function draw_list_sets($options, $length=2, $arguments=false, $type='ul', $selected=false) {
+	//return a list broken into sublists by the number of options, eg draw_list_sets with 2 is 
 	$return = array();
 	$columns = ceil(count($options) / $length);
 	for ($i = 0; $i < $columns; $i++) $return[] = draw_list(array_slice($options, $i * $length, $length));
-	return draw_list($return, $arguments);
+	return draw_list($return, $arguments, $type, $selected);
 }
 
 function draw_meta_description($string) {
@@ -714,7 +714,7 @@ function draw_meta_utf8() {
 	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
 }
 
-function draw_nav($options, $type='text', $class='nav', $match='path') {
+function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false) {
 	global $_josh;
 	//2009 04 07 trying to come up with a simpler, better version of this function
 	//type can be text, images or rollovers
@@ -773,7 +773,11 @@ function draw_nav($options, $type='text', $class='nav', $match='path') {
 		$return[] = draw_link($url, $inner, false, $args);
 		$counter++;
 	}
-	$return = draw_list($return, $class, 'ul', $selected);
+	if ($sets) {
+		$return = draw_list_sets($return, $sets, $class, 'ul', $selected);
+	} else {
+		$return = draw_list($return, $class, 'ul', $selected);
+	}
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
 	return $return;
 }
