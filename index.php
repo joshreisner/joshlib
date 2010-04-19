@@ -132,6 +132,9 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	//special set $_GET['id']
 	if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
 			
+	//cwd
+	define('DIRECTORY', dirname($_SERVER['SCRIPT_FILENAME']));
+
 	//platform-specific info
 	if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) {
 		define('PLATFORM', 'win');
@@ -141,7 +144,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	} else { //platform is UNIX or Mac
 		define('PLATFORM', 'unix');
 		define('NEWLINE', "\n");
-		define('DIRECTORY_ROOT', $_SERVER['DOCUMENT_ROOT']);
+		define('DIRECTORY_ROOT', $_SERVER['DOCUMENT_ROOT']); //eg 
 		if (!isset($_josh['slow']))	$_josh['slow'] = false;
 	}
 	

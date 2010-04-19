@@ -541,14 +541,15 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	//alt could also be an array of arguments
 	global $_josh;
 	
+	//$path can be relative
+	if (!$realpath = realpath($path)) $realpath = realpath(DIRECTORY_ROOT . $path);
+	
 	//get width and height
-	$image = @getimagesize($path);
-	if (!$image) $image = @getimagesize(DIRECTORY_ROOT . $path);
-	//if (!$image) die('could not find' . $path);
+	$image = @getimagesize($realpath);
 	if (!$image) return '';
 	
 	//assemble tag
-	$arguments = array('src'=>url_base() . $path, 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
+	$arguments = array('src'=>url_base() . str_replace(DIRECTORY_ROOT, '', $realpath), 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
 	if (is_array($alt)) {
 		//values of alt can overwrite width, height, border, even src
 		$arguments = array_merge($arguments, $alt);

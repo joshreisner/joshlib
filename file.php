@@ -117,11 +117,14 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 	error_debug('<b>file folder</b> running with ' . $folder, __file__, __line__);
 	
 	//default to current folder
-	if (!$folder) $folder = $_josh['request']['path'];
-	
+	if (!$folder) $folder = DIRECTORY;
+
+	//could be relative
+	$folder = realpath($folder);
+
 	//check to make sure folder exists
-	if (!is_dir(DIRECTORY_ROOT . $folder)) {
-		error_debug('<b>file folder</b> ' . $folder . ' is not a directory, exiting', __file__, __line__);
+	if (!is_dir($folder)) {
+		error_debug('<b>file folder</b> ' . htmlspecialchars($folder) . ' is not a directory, exiting', __file__, __line__);
 		return false;
 	}
 	error_debug('<b>file folder</b> $folder is a directory!', __file__, __line__);
@@ -130,7 +133,7 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 	if ($endfilter && is_string($endfilter)) $endfilter = array_separated($endfilter);
 
 	//open it
-	if ($handle = opendir(DIRECTORY_ROOT . $folder)) {
+	if ($handle = opendir($folder)) {
 		$return = array();
 		while (($name = readdir($handle)) !== false) {
 			if (substr($name, 0, 1) == '.') continue;
@@ -139,10 +142,10 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 				'name'=>$name,
 				'ext'=>@$file['extension'],
 				'human'=>format_text_human(@$file['filename']), 
-				'path_name'=>$folder . $name,
-				'type'=>@filetype(DIRECTORY_ROOT . $folder . $name),
-				'fmod'=>@filemtime(DIRECTORY_ROOT . $folder . $name),
-				'size'=>@filesize(DIRECTORY_ROOT . $folder . $name)
+				'path_name'=>str_replace(DIRECTORY_ROOT, '', $folder) . '/' . $name,
+				'type'=>@filetype($folder . $name),
+				'fmod'=>@filemtime($folder . $name),
+				'size'=>@filesize($folder . $name)
 			);
 
 			error_debug('<b>file folder</b> found ' . $name . ' of type ' . $thisfile['type'], __file__, __line__);
