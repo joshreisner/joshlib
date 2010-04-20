@@ -119,15 +119,18 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 	//default to current folder
 	if (!$folder) $folder = DIRECTORY;
 
-	//could be relative
-	$folder = realpath($folder);
-
 	//check to make sure folder exists
-	if (!is_dir($folder)) {
-		error_debug('<b>file folder</b> ' . htmlspecialchars($folder) . ' is not a directory, exiting', __file__, __line__);
-		return false;
+	if (is_dir($folder)) {
+		//could be relative
+		$folder = realpath($folder);
+	} else {
+		if (is_dir(DIRECTORY_ROOT . $folder)) {
+			$folder = realpath(DIRECTORY_ROOT . $folder);
+		} else {
+			error_handle('<b>file folder</b> ' . htmlspecialchars($folder) . ' is not a directory, exiting', __file__, __line__);
+			return false;
+		}
 	}
-	error_debug('<b>file folder</b> $folder is a directory!', __file__, __line__);
 
 	//set up filter
 	if ($endfilter && is_string($endfilter)) $endfilter = array_separated($endfilter);
@@ -158,7 +161,7 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 				$return[] = ($simple) ? $thisfile['path_name'] : $thisfile;
 			}
 		}
-		error_debug('<b>file folder</b> closing handle', __file__, __line__);
+		error_debug('<b>' . __function__ . '</b> grabbed ' . count($return) . ' files from ' . $folder, __file__, __line__);
 		closedir($handle);
 	}
 	if (!count($return)) return false;
