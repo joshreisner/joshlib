@@ -381,6 +381,11 @@ function geocode($address, $zip) {
 	return false;
 }
 
+function home($match='/') {
+	global $_josh;
+	return ($_josh['request']['path'] == $match);
+}
+
 function language_translate($string, $from, $to) {
 	global $_josh;
 	
