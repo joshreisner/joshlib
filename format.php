@@ -4,16 +4,27 @@ error_debug('including format.php', __file__, __line__);
 
 function format_accents_encode($string) {
 	//not sure if this is necessary anymore with the conversion to utf8
+	//update it is, email not supporting utf8
 	$string = str_replace('“', '&ldquo;',	$string);
 	$string = str_replace('”', '&rdquo;',	$string);
 	$string = str_replace('‘', '&lsquo;',	$string);
 	$string = str_replace('’', '&rsquo;',	$string);
-	$string = str_replace('–', '&mdash;',	$string);
+	$string = str_replace('–', '&ndash;',	$string);
+	$string = str_replace('—', '&mdash;',	$string);
 	$string = str_replace('ä', '&auml;',	$string);
-	$string = str_replace('ç', '&ccedil;',	$string);
-	$string = str_replace('é', '&eacute;',	$string);
-	$string = str_replace('ñ', '&ntilde;',	$string);
+	$string = str_replace('ï', '&iuml;',	$string);
+	$string = str_replace('ö', '&ouml;',	$string);
 	$string = str_replace('ü', '&uuml;',	$string);
+	$string = str_replace('ç', '&ccedil;',	$string);
+	$string = str_replace('á', '&aacute;',	$string);
+	$string = str_replace('é', '&eacute;',	$string);
+	$string = str_replace('í', '&iacute;',	$string);
+	$string = str_replace('ú', '&uacute;',	$string);
+	$string = str_replace('à', '&agrave;',	$string);
+	$string = str_replace('è', '&egrave;',	$string);
+	$string = str_replace('ì', '&igrave;',	$string);
+	$string = str_replace('ù', '&ugrave;',	$string);
+	$string = str_replace('ñ', '&ntilde;',	$string);
 	return $string;
 }
 

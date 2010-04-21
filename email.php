@@ -21,7 +21,9 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 		$smtp->host_name	= $_josh['smtp']['location'];
 		$smtp->user			= $_josh['smtp']['username'];
 		$smtp->password		= $_josh['smtp']['password'];
-
+		
+		$message = format_accents_encode($message);
+		
 		if ($smtp->SendMessage(
 				$from,
 				array($to),
