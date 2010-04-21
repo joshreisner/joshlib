@@ -11,19 +11,26 @@ function format_accents_encode($string) {
 	$string = str_replace('’', '&rsquo;',	$string);
 	$string = str_replace('–', '&ndash;',	$string);
 	$string = str_replace('—', '&mdash;',	$string);
+
 	$string = str_replace('ä', '&auml;',	$string);
+	$string = str_replace('ë', '&euml;',	$string);
 	$string = str_replace('ï', '&iuml;',	$string);
 	$string = str_replace('ö', '&ouml;',	$string);
 	$string = str_replace('ü', '&uuml;',	$string);
-	$string = str_replace('ç', '&ccedil;',	$string);
+
 	$string = str_replace('á', '&aacute;',	$string);
 	$string = str_replace('é', '&eacute;',	$string);
 	$string = str_replace('í', '&iacute;',	$string);
+	$string = str_replace('ó', '&oacute;',	$string);
 	$string = str_replace('ú', '&uacute;',	$string);
+
 	$string = str_replace('à', '&agrave;',	$string);
 	$string = str_replace('è', '&egrave;',	$string);
 	$string = str_replace('ì', '&igrave;',	$string);
+	$string = str_replace('ò', '&ograve;',	$string);
 	$string = str_replace('ù', '&ugrave;',	$string);
+
+	$string = str_replace('ç', '&ccedil;',	$string);
 	$string = str_replace('ñ', '&ntilde;',	$string);
 	return $string;
 }
