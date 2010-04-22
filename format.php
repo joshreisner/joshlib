@@ -37,6 +37,7 @@ function format_accents_encode($string) {
 
 function format_accents_remove($string) {
 	//translate accents	
+	$string = html_entity_decode($string);
 	$from	= 'áàäâçéèëêíìïîóòöôøúùüûñ';
 	$to		= 'aaaaceeeeiiiiooooouuuun';
     return strtr(utf8_decode($string), utf8_decode($from), $to);
