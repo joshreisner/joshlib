@@ -35,6 +35,13 @@ function format_accents_encode($string) {
 	return $string;
 }
 
+function format_accents_remove($string) {
+	//translate accents	
+	$from	= 'áàäâçéèëêíìïîóòöôøúùüûñ';
+	$to		= 'aaaaceeeeiiiiooooouuuun';
+    return strtr(utf8_decode($string), utf8_decode($from), $to);
+}
+
 function format_array_text($array) {
 	if (!is_array($array)) {
 		//string
@@ -779,26 +786,21 @@ function format_string($string, $target=30, $append='&hellip;') {
 	return $return . $append;
 }
 
-function format_text_code($str) {
-	$return = strToLower(trim(strip_tags($str)));
-	
-	//translate accents	
-	$from	= 'áàäâçéèëêíìïîóòöôøúùüûñ';
-	$to		= 'aaaaceeeeiiiiooooouuuun';
-    $return = strtr(utf8_decode($return), utf8_decode($from), $to);
+function format_text_code($string) {
+	$string = format_accents_remove(strToLower(trim(strip_tags($string))));
 	
 	//remove special characters
-	$return = str_replace("'",	'',		$return);
-	$return = str_replace(',',	'',		$return);
-	$return = str_replace('.',	'',		$return);
-	$return = str_replace(':',	'',		$return);
-	$return = str_replace('/',	'_',	$return);
-	$return = str_replace(' ',	'_',	$return);
-	$return = str_replace('&',	'and',	$return);
-	$return = str_replace('+',	'and',	$return);
-	$return = str_replace('?',	'',	$return);
+	$string = str_replace("'",	'',		$string);
+	$string = str_replace(',',	'',		$string);
+	$string = str_replace('.',	'',		$string);
+	$string = str_replace(':',	'',		$string);
+	$string = str_replace('/',	'_',	$string);
+	$string = str_replace(' ',	'_',	$string);
+	$string = str_replace('&',	'and',	$string);
+	$string = str_replace('+',	'and',	$string);
+	$string = str_replace('?',	'',	$string);
 	
-	return $return;
+	return $string;
 }
 
 function format_text_ends($needle, $haystack) {

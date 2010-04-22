@@ -12,7 +12,7 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 	}
 	
 	if (!empty($_josh['smtp']['location']) && !empty($_josh['smtp']['username']) && !empty($_josh['smtp']['password'])) {
-		
+
 		lib_get('smtp');
 		lib_get('sasl');
 	
@@ -22,6 +22,8 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 		$smtp->user			= $_josh['smtp']['username'];
 		$smtp->password		= $_josh['smtp']['password'];
 		
+		//this has a problem with encoding
+		$subject = format_accents_remove($subject);
 		$message = format_accents_encode($message);
 		
 		if ($smtp->SendMessage(

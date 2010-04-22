@@ -386,6 +386,13 @@ function home($match='/') {
 	return ($_josh['request']['path'] == $match);
 }
 
+function increment() {
+	global $_josh;
+	if (!isset($_josh['increment'])) $_josh['increment'] = 0;
+	$_josh['increment']++;
+	return $_josh['increment'];
+}
+
 function language_translate($string, $from, $to) {
 	global $_josh;
 	
