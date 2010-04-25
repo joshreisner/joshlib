@@ -514,6 +514,7 @@ function lib_refresh() {
 
 function user($return=false) {
 	//shortcut to say if a session exists and what the id is, or return $return eg NULL for sql
+	if (!isset($_SESSION)) session_start();
 	if (empty($_SESSION['user_id'])) return $return;
 	return $_SESSION['user_id'];
 }
