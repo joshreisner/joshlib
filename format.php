@@ -321,10 +321,10 @@ function format_html($text) {
 			} elseif ($e->tag == 'span') {
 				if ($e->src) {
 					//nytimes has this -- i'm not sure yet if it's good or not
-				} elseif ($e->children || $e->plaintext) {
-					//ditch the span, keep the contents
+				} elseif (!$e->children && !$e->plaintext) {
+					/*ditch the span, keep the contents
 					$e->outertext = $e->innertext;
-				} else {
+				} else {*/
 					//ditch the empty span
 					$e->outertext = '';
 				}
