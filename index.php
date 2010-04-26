@@ -235,7 +235,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				}
 				exit;
 			case 'ajax_reorder':
-				db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = NULL');
+				//db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = NULL');
 				foreach ($array as $key=>$value) {
 					$key = urldecode($key);
 					if (format_text_starts($array['table'], $key)) db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . (format_numeric($key, true) + 1) . ' WHERE id = ' . $value);
@@ -243,8 +243,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				echo 'reordered';
 				exit;
 			case 'ajax_draw_select':
-			//draw_form_select($name, $sql_options, $value=false, $required=true, $class=false, $action=false, $nullvalue='', $maxlength=false) {
-
+				//when would this happen?  kthxbai
 				echo draw_form_select($array['name'], 'SELECT id, value FROM ' . $array['table'] . ' WHERE is_active = 1', $array['value'], $array['required']);
 				exit;
 			case 'ajax_set':
