@@ -559,6 +559,9 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 		$alt = false; //this was passed as a string, needs to be nulled so it doesn't go to draw_link
 	}
 	
+	//fix slashes on windows
+	$arguments['src'] = str_replace('\\', '/', $arguments['src']);
+	
 	//force alt text for w3 validation
 	if (empty($arguments['alt'])) {
 		list($name, $ext, $path) = file_name($path);
