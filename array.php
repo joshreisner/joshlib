@@ -320,6 +320,10 @@ function array_random($array) {
 	return $array[rand(0, count($array)-1)];
 }
 
+function array_rss($url) {
+	return array_xml(url_get($url));
+}
+
 function array_xml($stringxml) {
 	//for harvest import -- take data in string xml format and return it as an associative array
 	//todo verify this works
