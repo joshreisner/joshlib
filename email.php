@@ -69,7 +69,12 @@ function email_address_parse($address) {
 function email_post($to=false, $subject=false, $from=false) {
 	global $_josh, $_POST;
 	if (!$to) $to = $_josh['email_default'];
-	if (!$subject) $subject = 'Form Submission from ' . $_josh['request']['domain'];
-	email($to, draw_page($subject, draw_array($_POST), false, true), $subject, $from);
+	if (!$subject) $subject = 'Form Submission from ' . $_josh['request']['sanswww'];
+	
+	//form submit image produces these, which are confusing to users
+	if (isset($_POST['x'])) unset($_POST['x']);
+	if (isset($_POST['y'])) unset($_POST['y']);
+	
+	email($to, draw_page($subject, draw_array($_POST, true), false, true), $subject, $from);
 }
 ?>
