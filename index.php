@@ -56,6 +56,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
 
 //constants
+	define('BR', '<br/>');
 	define('TAB', "\t");
 	$_josh['month']					= date('n');
 	$_josh['today']					= date('j');

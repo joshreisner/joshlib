@@ -92,7 +92,10 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	
 	//add more stuff to admin message, set from and subject
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
-	if ($_josh['mode'] != 'dev') $message .= draw_container('p', 'Page: ' . draw_link($_josh['request']['url']));
+	if ($_josh['mode'] != 'dev') {
+		$message .= draw_container('p', 'Page: ' . draw_link($_josh['request']['url']));
+		$message .= draw_container('p', 'File: ' . $_SERVER['SCRIPT_FILENAME']);
+	}
 	if (isset($_SESSION['email']) && isset($_SESSION['full_name'])) {
 		$message .= "<p>User: <a href='mailto:" . $_SESSION['email'] . "'>" . $_SESSION['full_name'] . "</a></p>";
 		$from	= $_SESSION['full_name'] . " <" . $_SESSION['email'] . ">";

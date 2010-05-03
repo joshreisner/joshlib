@@ -636,7 +636,7 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) 
 	}*/
 	$arguments = array_arguments($arguments);
 	
-	if (!$href) return $str;
+	//if (!$href) return $str;
 	
 	//obfuscate email
 	if (format_text_starts('mailto:', $href)) {
@@ -645,9 +645,11 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) 
 	} elseif (format_text_starts('javascript:', $href)) {
 		//correct link for javascript
 		$arguments['onclick'] = $href;
-	} else {
+	} elseif ($href) {
 		if (!$str) $str = format_string($href, 60);
 		$arguments['href'] = htmlentities($href);
+	} else {
+		$arguments['class'] = (isset($arguments['class'])) ? $arguments['class'] . ' empty' : 'empty';
 	}
 	if ($newwindow) $arguments['target'] = '_blank';
 	
