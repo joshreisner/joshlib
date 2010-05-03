@@ -175,11 +175,14 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	}
 	require(DIRECTORY_ROOT . $_josh['config']);
 	
+//check to make sure we're on the correct domain, might have read host variable from config file
+	if (isset($_josh['host']) && ($_josh['host'] != $_josh['request']['host'])) url_change($_josh['request']['protocol'] . '://' . $_josh['host'] . $_josh['request']['path_query']);
+
 //ensure lib exists--todo autogen lib folder when lib.zip has been updated
 	if (!is_dir(DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib')) file_unzip(DIRECTORY_JOSHLIB . DIRECTORY_SEPARATOR . 'lib.zip', DIRECTORY_WRITE);
 
 //set error reporting level by determining whether this is a dev or live situation
-	if (isset($_SERVER['HTTP_HOST']) && (format_text_starts('dev-', $_SERVER['HTTP_HOST']) || format_text_starts('beta.', $_SERVER['HTTP_HOST']) || format_text_ends('.site', $_SERVER['HTTP_HOST']))) {
+	if (format_text_starts('dev-', $_josh['request']['host']) || format_text_starts('beta.', $_josh['request']['host']) || format_text_ends('.site', $_josh['request']['host'])) {
 		$_josh['mode'] = 'dev';
 		//error reporting already set above
 	} else {

@@ -691,7 +691,6 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguments=false, $type='ul
 	//experiment.  eg draw_list_table('blog_categories', '/c/?id=') will return a UL with a list of links
 	//todo: add better behaviors like if id column dne, or something
 	//03-11-2010 jr: interesting, is this being used?  example sounds like harvard
-	//03-11-2010 jr: should this be draw_navigation_db or something?  draw_nav?
 	if (!stristr($table_or_sql, ' ')) $table_or_sql = 'SELECT id, title FROM ' . $table_or_sql . ' t WHERE t.is_active = 1 ORDER BY t.precedence';
 	$result = db_table($table_or_sql);
 	foreach ($result as &$r) $r = draw_link($linkprefix . $r['id'], $r['title']);

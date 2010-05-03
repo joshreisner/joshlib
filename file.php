@@ -309,6 +309,7 @@ function file_put_config() {
 	$return .= NEWLINE;
 	
 	//url variables
+	$return .= '$_josh[\'host\']				= \'' . $_josh['request']['host'] . '\'; //preferred domain for site' . NEWLINE;
 	$return .= '$_josh[\'is_secure\']			= ' . (($_josh['is_secure']) ? $_josh['is_secure'] : 'false') . '; //indicates whether it should use https (true) or not (false)' . NEWLINE;
 	$return .= NEWLINE;
 
