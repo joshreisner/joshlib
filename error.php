@@ -99,6 +99,8 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	}
 	if (isset($_SESSION['HTTP_USER_AGENT'])) $message .= '<p>Browser: ' . $_SESSION['HTTP_USER_AGENT'] . '</p>';
 	
+	$message .= '<p style="color:#fff;">filter_joshlib_error</p>';
+	
 	/*backtrace
 	$message .= "<p>Backtrace:";
 	foreach ($backtrace as $b) {
