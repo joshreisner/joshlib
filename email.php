@@ -2,50 +2,40 @@
 error_debug('including email.php', __file__, __line__);
 
 function email($to, $message, $subject='Email from Your Website', $from=false) {
+	//todo: rewrite this whole function to use swiftmailer
 	global $_josh;
-	$to = format_email($to);
-	if ($from) {
-		$from = format_email($from);
-	} else {
-		if (!isset($_josh['email_default'])) error_handle('email from address missing', 'please call ' . __FUNCTION__ . ' with a from address, or specify one in the config file.', true);
-		$from = $_josh['email_default'];
-	}
-	
-	if (!empty($_josh['smtp']['location']) && !empty($_josh['smtp']['username']) && !empty($_josh['smtp']['password'])) {
 
-		lib_get('smtp');
-		lib_get('sasl');
+	//set the sender	
+	if (!$from) $from = (isset($_josh['email_default'])) ? $from : array('joshlib@joshreisner.com'=>'Joshlib');
 	
-		//use smtp server if credentials are found in config
-		$smtp = new smtp_class;
-		$smtp->host_name	= $_josh['smtp']['location'];
-		$smtp->user			= $_josh['smtp']['username'];
-		$smtp->password		= $_josh['smtp']['password'];
-		
-		//this has a problem with encoding
-		$subject = format_accents_remove($subject);
-		$message = format_accents_encode($message);
-		
-		if ($smtp->SendMessage(
-				$from,
-				array($to),
-				array('From: ' . $from, 'To: ' . $to, 'Subject: ' . $subject, 'Date: ' . strftime('%a, %d %b %Y %H:%M:%S %Z'), 'MIME-Version: 1.0', 'Content-type: text/html; charset=iso-8859-1'), 
-				$message
-			)) {
-			return true;
-		} else {
-			error_handle('SMTP Not Working', 'Sorry, an unexpected error of ' . $smtp->error . ' occurred while sending your mail to ' . $to, true);
-			return false;
-		}
+	//fix up the recipient list
+	if (!is_array($to)) $to = array($to);
+	$to = array_unique($to);
+	$tocount = count($to);
+	for ($i = 0; $i < $tocount; $i++) if (empty($to[$i])) unset($to[$i]); //make sure they're non-null
+	if (!count($to)) return false; //quit if now is empty array
+
+	//use swiftmailer class
+	lib_get('swiftmailer');
+
+	//establish transport
+	if (empty($_josh['smtp']['location']) || empty($_josh['smtp']['username'])) {
+		//have to use PHP's mail function, bad!!
+		$transport = Swift_MailTransport::newInstance();
 	} else {
-		//use regular php mechanism
-		error_debug('<b>email </b> sending message to <i>' . $to . '</i> with subject ' . $subject, __file__, __line__);
-		$headers  = 'MIME-Version: 1.0' . NEWLINE;
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . NEWLINE;
-		$headers .= 'From: ' . format_email($from) . NEWLINE;
-		if (!@mail($to, $subject, $message, $headers)) error_handle('email not sent', 'sorry, an unexpected error occurred while sending your mail to ' . $to, true);
-		return true;
+		$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], 25)->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
 	}
+	$mailer		= Swift_Mailer::newInstance($transport);
+	$message	= Swift_Message::newInstance()
+		->setSubject($subject)
+		->setFrom($from)
+		->setTo($to)
+		->setBody(strip_tags(nl2br($message)))
+		->addPart($message, 'text/html')
+		//->attach(Swift_Attachment::fromPath('my-document.pdf'))
+	;
+	if (!$count = $mailer->batchSend($message, $failures)) error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures));
+	return $count;
 }
 
 function email_address_parse($address) {

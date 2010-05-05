@@ -187,7 +187,7 @@ function form_tinymce_init(cssLocation, showplugins) {
 		tinyMCE.init({
 			mode : "textareas",
 			theme : "advanced",
-			theme_advanced_buttons1 : "styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,|,bullist,numlist,outdent,indent,|,undo,redo,|,link,unlink,insertimage,|,code",
+			theme_advanced_buttons1 : "styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,|,bullist,numlist,outdent,indent,|,link,unlink,insertimage,|,code",
 			theme_advanced_buttons2 : "",
 			theme_advanced_buttons3 : "",
 			theme_advanced_resizing : true,		

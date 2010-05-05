@@ -98,7 +98,7 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	}
 	if (isset($_SESSION['email']) && isset($_SESSION['full_name'])) {
 		$message .= "<p>User: <a href='mailto:" . $_SESSION['email'] . "'>" . $_SESSION['full_name'] . "</a></p>";
-		$from	= $_SESSION['full_name'] . " <" . $_SESSION['email'] . ">";
+		$from	= array($_SESSION['email']=>$_SESSION['full_name']);
 	}
 	if (isset($_SESSION['HTTP_USER_AGENT'])) $message .= '<p>Browser: ' . $_SESSION['HTTP_USER_AGENT'] . '</p>';
 	
@@ -111,31 +111,21 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 		if (isset($b['file'])) $b['file'] = str_replace(DIRECTORY_ROOT, "", $b['file']);
 		$message .= draw_array($b, true) . "<br>";
 	}
-	
-	//cookies
-	if (isset($_SERVER['HTTP_COOKIE'])) $message .= "Cookies: " . draw_array(array_url($_SERVER['HTTP_COOKIE'], false, ";")) . "</p>";
-	$message .= "</p>";
 	*/
-	$subject = 'Error: ' . $type;
-	
-	//render
-	$message = error_draw($type, $message);
 
-	//quit if it's dev
+	//render
+	$subject = 'Error: ' . $type;
+	$message = error_draw($type, $message);
+	
+	//notify
 	if ($_josh['mode'] == 'dev') {
 		echo $message;	
 		db_close();
-	}
-	
-	//try to post to work website
-	//i don't like to squash variables, but need to here because an error could occur between setting error handler and getting the config vars
-	if (!isset($_SESSION['email']) || ($_SESSION['email'] != $_josh['email_admin'])) {
-		if (!empty($_josh['error_log_api']) && array_send(array('subject'=>$subject, 'message'=>$message, 'url'=>$_josh['request']['url'], 'email'=>$_josh['email_admin']), $_josh['error_log_api'])) {
-			//cool, we sent the request via json and fsockopen!
-		} elseif (@$_josh['email_admin']) {
-			//send email to admin
-			email($_josh['email_admin'], $message, $subject, $from);
-		}
+	} elseif (!empty($_josh['error_log_api']) && array_send(array('subject'=>$subject, 'message'=>$message, 'url'=>$_josh['request']['url'], 'sanswww'=>$_josh['request']['sanswww']), $_josh['error_log_api'])) {
+		//cool, we sent the request via json and fsockopen!
+	} elseif (!empty($_josh['email_admin'])) {
+		//send email to admin
+		email($_josh['email_admin'], $message, $subject, $from);
 	}
 }
 

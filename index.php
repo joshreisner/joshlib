@@ -438,10 +438,12 @@ function lib_get($string) {
 	switch ($string) {
 		//php libraries
 		case 'fpdf' :
+		case 'phpmailer' :
 		case 'salesforce' :
 		case 'sasl' :
 		case 'simple_html_dom' :
 		case 'smtp' :
+		case 'swiftmailer' :
 		return include_once(lib_location($string));
 		
 		//javascript libraries
@@ -486,6 +488,9 @@ function lib_location($string) {
 		case 'lorem_ipsum' :
 		return $lib . 'lorem_ipsum.js';
 		
+		case 'phpmailer' :
+		return DIRECTORY_ROOT . $lib . 'PHPMailer_v5.1/class.phpmailer.php';
+		
 		case 'prototype' :
 		return $lib . 'prototype-1.5.0.js';
 		
@@ -503,6 +508,9 @@ function lib_location($string) {
 
 		case 'smtp' :
 		return DIRECTORY_ROOT . $lib . 'smtpclass-2009-04-11/smtp.php';
+		
+		case 'swiftmailer' :
+		return DIRECTORY_ROOT . $lib . 'swift_required.php';
 		
 		case 'tinymce' :
 		return $lib . 'tinymce-3.3rc1/tiny_mce.js';

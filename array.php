@@ -190,6 +190,10 @@ function array_range($start, $end, $increment=1) {
 	return $return;
 }
 
+function array_receive() {
+	return json_decode(file_get_contents('php://input'), true);
+}
+
 function array_query_string($str, $defaults=false, $separator='&') {
 	//takes a key/pair string in the form you'd find in a query string and returns an array
 	//separator is an argument because cookie strings are separated with semicolons
