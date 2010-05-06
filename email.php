@@ -6,7 +6,7 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 	global $_josh;
 
 	//set the sender	
-	if (!$from) $from = (isset($_josh['email_default'])) ? $from : array('joshlib@joshreisner.com'=>'Joshlib');
+	if (empty($from)) $from = (!empty($_josh['email_default'])) ? $_josh['email_default'] : 'joshlib@joshreisner.com';
 	
 	//fix up the recipient list
 	if (!is_array($to)) $to = array($to);
@@ -25,6 +25,7 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 	} else {
 		$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], 25)->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
 	}
+		
 	$mailer		= Swift_Mailer::newInstance($transport);
 	$message	= Swift_Message::newInstance()
 		->setSubject($subject)
