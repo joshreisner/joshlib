@@ -455,6 +455,18 @@ function draw_form_textarea($name, $value='', $class=false) {
 	//return '<textarea name='' . $name . '' id='' . $name . '' class='' . $class . ''>' . $value . '</textarea>';
 }
 
+function draw_google_analytics($id) {
+	global $_josh;
+	error_debug('drawing google tracker', __file__, __line__);
+	return draw_javascript_src((($_josh['request']['protocol'] == 'https') ? 'https://ssl' : 'http://www') . 'google-analytics.com/ga.js') . draw_javascript('try {
+			var pageTracker = _gat._getTracker("' . $id. '");
+			pageTracker._setDomainName(".' . $_josh['request']['domain'] . '");
+			pageTracker._setAllowLinker(true);
+			pageTracker._setAllowHash(false);
+			pageTracker._trackPageview(); 
+		} catch(err) {}</script>');
+}
+
 function draw_google_chart($data, $type='line', $colors=false, $width=250, $height=100) {
 	//example http://chart.apis.google.com/chart?cht=p3&chd=t:60,40&chs=250x100&chl=Hello|World
 	//example http://chart.apis.google.com/chart?cht=p3&chd=t:60,40&chs=200x150&chl=Hello|World
@@ -522,19 +534,8 @@ function draw_google_map($markers, $center=false) {
 }
 
 function draw_google_tracker($id) {
-	error_debug('drawing google tracker', __file__, __line__);
-	//this is google's code, so restraining myself from draw_javascript and single-quote encapsulation
-	return "
-	<script type='text/javascript'>
-	var gaJsHost = (('https:' == document.location.protocol) ? 'https://ssl.' : 'http://www.');
-	document.write(unescape('%3Cscript src=\'' + gaJsHost + 'google-analytics.com/ga.js\' type=\'text/javascript\'%3E%3C/script%3E'));
-	</script>
-	<script type='text/javascript'>
-	try {
-	var pageTracker = _gat._getTracker('$id');
-	pageTracker._setDomainName('none');
-	pageTracker._trackPageview();
-	} catch(err) {}</script>";
+	//todo deprecate
+	return draw_google_analytics($id);
 }
 
 function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=false) {
@@ -581,11 +582,6 @@ function draw_javascript($javascript=false) {
 	if (!$javascript) return draw_javascript_src();
 	return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);
 }
-
-/* function draw_javascript_ckeditor() {
-	error_deprecated(__FUNCTION__ . ' was deprecated on 4/3/2010 - use lib_get');
-	return draw_javascript_src(DIRECTORY_WRITE . '/lib/ckeditor/ckeditor.js');
-} */
 
 function draw_javascript_lib() {
 	error_deprecated(__FUNCTION__ . ' was deprecated on 4/5/2010 - use lib_get');
