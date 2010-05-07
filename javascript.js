@@ -194,7 +194,7 @@ function form_tinymce_init(cssLocation, showplugins) {
 			//theme_advanced_statusbar_location : "bottom",
 			theme_advanced_blockformats : "p,h1,h2,h3,h4,blockquote",
 			theme_advanced_toolbar_location : "top",
-			extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align]",
+			extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align]",
 			content_css : cssLocation + "?" + new Date().getTime(),
 			plugins : "imagemanager,filemanager,paste",
 			editor_selector : "tinymce",

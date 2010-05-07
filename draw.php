@@ -624,22 +624,14 @@ function draw_javascript_src($filename=false) {
 }
 
 function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) {
-	/*if (!$arguments)	{
-		$arguments = array();
-	} elseif (!is_array($arguments)) {
-		//if arguments is a string, make it the link's class
-		$arguments = array('class'=>$arguments);
-	}*/
 	$arguments = array_arguments($arguments);
-	
-	//if (!$href) return $str;
-	
-	//obfuscate email
 	if (format_text_starts('mailto:', $href)) {
+		//obfuscate email
 		if (!$str) $str = format_ascii(format_string(str_replace('mailto:', '', $href), 60));
 		$arguments['href'] = format_ascii($href);
 	} elseif (format_text_starts('javascript:', $href)) {
 		//correct link for javascript
+		$arguments['href'] = '#';
 		$arguments['onclick'] = $href;
 	} elseif ($href) {
 		if (!$str) $str = format_string($href, 60);
@@ -647,8 +639,7 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) 
 	} else {
 		$arguments['class'] = (isset($arguments['class'])) ? $arguments['class'] . ' empty' : 'empty';
 	}
-	if ($newwindow) $arguments['target'] = '_blank';
-	
+	if ($newwindow) $arguments['target'] = '_blank'; //todo deprecate?
 	return draw_tag('a', $arguments, $str);
 }
 
