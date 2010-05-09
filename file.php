@@ -127,7 +127,7 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 		if (is_dir(DIRECTORY_ROOT . $folder)) {
 			$folder = realpath(DIRECTORY_ROOT . $folder);
 		} else {
-			error_handle('<b>file folder</b> ' . htmlspecialchars($folder) . ' is not a directory, exiting', __file__, __line__);
+			error_debug('<b>file folder</b> ' . htmlspecialchars($folder) . ' is not a directory, exiting', __file__, __line__);
 			return false;
 		}
 	}
