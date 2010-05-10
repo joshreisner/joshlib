@@ -359,7 +359,7 @@ function draw_form_radio($name, $value='', $checked=false, $class=false) {
 	return $return;
 }
 
-function draw_form_select($name, $sql_options, $value=false, $not_nullable=true, $class=false, $onchange=false, $nullvalue='', $maxlength=60) {
+function draw_form_select($name, $sql_options, $value=false, $not_nullable=true, $class=false, $onchange=false, $nullvalue='', $maxlength=60, $disabled=false) {
 	//2010 04 04: changed $required to $not_nullable because it could still be required and have a null value at the top
 	$return = ($not_nullable) ? '' : '<option value="">' . $nullvalue . '</option>';
 	$lastgroup = '';
@@ -409,7 +409,7 @@ function draw_form_select($name, $sql_options, $value=false, $not_nullable=true,
 
 	$class = ($class) ? $class . ' select' : 'select';
 	if ($onchange) $onchange = 'javascript:' . $onchange;
-	return draw_tag('select', array('name'=>$name, 'id'=>$name, 'class'=>$class, 'onchange'=>$onchange), $return);
+	return draw_tag('select', array('name'=>$name, 'id'=>$name, 'class'=>$class, 'onchange'=>$onchange, 'disabled'=>$disabled), $return);
 }
 
 function draw_form_select_month($name, $start, $default=false, $length=false, $class=false, $js=false, $nullable=false) {

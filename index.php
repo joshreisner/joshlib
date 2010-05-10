@@ -90,6 +90,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'image'=>'Image',
 										'image-alt'=>'Image (Alt)',
 										'int'=>'Integer',
+										'object'=>'Ordered Object',
 										'text'=>'Text',
 										'textarea'=>'Textarea',
 										'textarea-plain'=>'Textarea (Plain)',
