@@ -10,17 +10,15 @@ THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
 	~~TITLE~~~~~~~~~~~~~LANG~~~~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~LICENSE~~~~~~~~~~~~~~~~~~~~
-	> ckeditor			js		http://ckeditor.com/								GPL, LGPL and MPL
 	> codepress			js		http://sourceforge.net/projects/codepress/			LGPL
 	> fpdf				php		http://www.fpdf.org/								
 	> lightbox2			js		http://www.lokeshdhakar.com/projects/lightbox2/		CC Attribution 2.5
 	> lorem_ipsum		js		http://tinyurl.com/yjrmlcy
 	> prototype			js		http://prototypejs.org/								MIT
 	> salesforce		php		http://developer.force.com/							
-	> sasl				php		http://www.phpclasses.org/browse/package/1888.html	BSD
 	> scriptaculous		js		http://script.aculo.us/								MIT
 	> simple_html_dom	php		http://sourceforge.net/projects/simplehtmldom/		MIT
-	> smtp				php		http://www.phpclasses.org/browse/package/14.html	BSD
+	> swiftmailer		php		http://swiftmailer.org/								LGPL
 	> tinymce			js		http://tinymce.moxiecode.com/						LGPL
 
 USING THE DEBUGGER
@@ -439,16 +437,12 @@ function lib_get($string) {
 	switch ($string) {
 		//php libraries
 		case 'fpdf' :
-		case 'phpmailer' :
 		case 'salesforce' :
-		case 'sasl' :
 		case 'simple_html_dom' :
-		case 'smtp' :
 		case 'swiftmailer' :
 		return include_once(lib_location($string));
 		
 		//javascript libraries
-		case 'ckeditor' :
 		case 'jquery' :
 		case 'lorem_ipsum' :
 		case 'prototype' :
@@ -463,7 +457,7 @@ function lib_get($string) {
 			//special statements for tinymce
 			file_dir_writable('images');
 			file_dir_writable('files');
-			$return .= draw_javascript_src(lib_location('tinymce')) . draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
+			$return .= draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
 		} elseif ($string == 'scriptaculous') {
 			$return = lib_get('prototype') . $return;
 		}
@@ -477,9 +471,6 @@ function lib_location($string) {
 	$lib = DIRECTORY_WRITE . '/lib/' . $string . '/';
 
 	switch ($string) {
-		case 'ckeditor' :
-		return $lib . 'ckeditor.js';
-		
 		case 'fpdf' :
 		return DIRECTORY_ROOT . $lib . 'fpdf-1.6.php';
 		
@@ -488,15 +479,9 @@ function lib_location($string) {
 		
 		case 'lorem_ipsum' :
 		return $lib . 'lorem_ipsum.js';
-		
-		case 'phpmailer' :
-		return DIRECTORY_ROOT . $lib . 'PHPMailer_v5.1/class.phpmailer.php';
-		
+				
 		case 'prototype' :
 		return $lib . 'prototype-1.5.0.js';
-		
-		case 'sasl' :
-		return DIRECTORY_ROOT . $lib . 'sasl-2005-10-31/sasl.php';
 		
 		case 'scriptaculous' :
 		return $lib . 'scriptaculous-1.6.5/scriptaculous.js';
@@ -507,9 +492,6 @@ function lib_location($string) {
 		case 'simple_html_dom' :
 		return DIRECTORY_ROOT . $lib . 'simple_html_dom-1.11.php';
 
-		case 'smtp' :
-		return DIRECTORY_ROOT . $lib . 'smtpclass-2009-04-11/smtp.php';
-		
 		case 'swiftmailer' :
 		return DIRECTORY_ROOT . $lib . 'swift_required.php';
 		
