@@ -12,6 +12,7 @@ class form {
 	var $submit			= false;
 	var $readonly		= false;
 	var $focus			= false;
+	var $counter		= 1;
 	
 	function __construct($name, $id=false, $submit=true, $cancel=false, $readonly=false) {
 		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
@@ -163,10 +164,12 @@ class form {
 					//todo -- this is wonky -- presupposes it's a jpg
 					if ($value) $return .= draw_img(file_dynamic($this->table, $name, $this->id, 'jpg'));
 					break;
+				case 'html':
 				case 'group':
 					$return .= $value;
 					break;
 				case 'note':
+					//todo deprecate
 					$return .= '<div class="note">' . $additional . '</div>';
 					break;
 				case 'password':
@@ -232,7 +235,8 @@ class form {
 			}
 						
 			//wrap it up
-			$return = draw_div_class('field ' . $type . ' ' . $name . (($class) ? ' ' . $class : ''), $return);
+			$return = draw_div_class('field field_' . $this->counter . ' ' . $type . ' ' . $name . (($class) ? ' ' . $class : ''), $return);
+			$this->counter++;
 		}
 		return $return;
 	}

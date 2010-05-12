@@ -202,7 +202,7 @@ function form_tinymce_init(cssLocation, showplugins) {
 			relative_urls : false,
 			remove_script_host : false
 		});
-		tinyMCE.get('elm1').addShortcut("ctrl+1","nix","Dummy");
+		//tinyMCE.get('elm1').addShortcut("ctrl+1","nix","Dummy");
 	} else {
 		tinyMCE.init({
 			mode : "textareas",

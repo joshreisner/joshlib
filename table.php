@@ -102,13 +102,13 @@ class table {
 		if ($this->draggable && $count_rows) {
 			for ($i = 0; $i <= $bodycounter; $i++) {
 				$return .= lib_get('scriptaculous') . draw_javascript('
-					function reorder() {
+					function reorder' . $this->name . $i . '() {
 						var options = { method:"post", parameters:Sortable.serialize("' . $this->name . $i . '") + unescape("%26") + "table=' . $this->name . '" + unescape("%26") + "column=' . $this->dragcolumn . '", onSuccess:function(transport) {
 							//alert(transport.responseText);
 						} };
 						new Ajax.Request("' . url_action_add('ajax_reorder') . '", options);
 					}
-					Sortable.create("' . $this->name . $i . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
+					Sortable.create("' . $this->name . $i . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder' . $this->name . $i . ', tree:true });
 					');
 			}
 		}
@@ -156,6 +156,10 @@ class table {
 		$this->draggable = true;
 		$this->draghandle = $draghandle;
 		$this->dragcolumn = $dragcolumn;
+	}
+	
+	function unset_draggable() {
+		$this->draggable = $this->draghandle = $this->dragcolumn = false;
 	}
 	
 	function set_title($html) {
