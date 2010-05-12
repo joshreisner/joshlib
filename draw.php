@@ -464,7 +464,7 @@ function draw_google_analytics($id) {
 			pageTracker._setAllowLinker(true);
 			pageTracker._setAllowHash(false);
 			pageTracker._trackPageview(); 
-		} catch(err) {}</script>');
+		} catch(err) {}');
 }
 
 function draw_google_chart($data, $type='line', $colors=false, $width=250, $height=100) {
