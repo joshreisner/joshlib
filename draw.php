@@ -458,7 +458,7 @@ function draw_form_textarea($name, $value='', $class=false) {
 function draw_google_analytics($id) {
 	global $_josh;
 	error_debug('drawing google tracker', __file__, __line__);
-	return draw_javascript_src((($_josh['request']['protocol'] == 'https') ? 'https://ssl' : 'http://www') . 'google-analytics.com/ga.js') . draw_javascript('try {
+	return draw_javascript_src((($_josh['request']['protocol'] == 'https') ? 'https://ssl' : 'http://www') . '.google-analytics.com/ga.js') . draw_javascript('try {
 			var pageTracker = _gat._getTracker("' . $id. '");
 			pageTracker._setDomainName(".' . $_josh['request']['domain'] . '");
 			pageTracker._setAllowLinker(true);
@@ -492,45 +492,54 @@ function draw_google_chart($data, $type='line', $colors=false, $width=250, $heig
 	
 }
 
-function draw_google_map($markers, $center=false) {
+function draw_google_map($markers=false, $center=false) {
 	//haven't figured out the appropriate place to store all this stuff.  this calls a javascript function which should be local
 	//markers must be an array with latitude, longitude, title, description, color
 	global $_josh;
+	
+	if (!isset($_josh['google']['mapkey'])) error_handle(__function__ . ' requires a google maps api key', 'you can go here to get one');
+	
+	//markers
 	$markerstr = '';
-	$return = '
-	function map_load() {
-		if (GBrowserIsCompatible()) {
-			var map = new GMap2(document.getElementById("map"));
-			';
-	$count = count($markers);
-	$lat = 0;
-	$lon = 0;
-	foreach ($markers as $m) {
-		$lat += $m['latitude'];
-		$lon += $m['longitude'];
-		$markerstr .= NEWLINE . '
-			var marker = draw_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "' . $m['title'] . '", "' . $m['description'] . '", "' . $m['color'] . '");
-			map.addOverlay(marker);
-			';
+	if ($markers) {
+		$count = count($markers);
+		$lat = 0;
+		$lon = 0;
+		foreach ($markers as $m) {
+			$lat += $m['latitude'];
+			$lon += $m['longitude'];
+			$markerstr .= NEWLINE . '
+				var marker = draw_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "' . $m['title'] . '", "' . $m['description'] . '", "' . $m['color'] . '");
+				map.addOverlay(marker);';
+		}
 	}
+	
+	//set an arbitrary center or center auto
 	if ($center) {
 		list($lat, $lon) = $center;
-	} else {
+	} elseif (isset($count)) {
 		$lat = $lat / $count;
 		$lon = $lon / $count;
+	} else {
+		$lat = 37.4419;
+		$lon = -122.1419;
 	}
+
+	//todo determine zoom automatically
 	$zoom = 11;
-	$return .= '
-			map.setCenter(new GLatLng(' . $lat . ', ' . $lon . '), ' . $zoom . ');
-			map.addControl(new GLargeMapControl());
-			' . $markerstr . '
+
+	return '<div id="map"></div>' . draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . draw_javascript('
+		function map_load() {
+			if (GBrowserIsCompatible()) {
+				var map = new GMap2(document.getElementById("map"));
+				map.setCenter(new GLatLng(' . $lat . ', ' . $lon . '), ' . $zoom . ');
+				map.addControl(new GLargeMapControl());
+				' . $markerstr . '
+			}
+			window.onunload = GUnload;
 		}
-		window.onunload = GUnload;
-	}
-	window.onload = map_load;
-	';
-	
-	return draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . draw_javascript($return) . '<div id="map"></div>';
+		window.onload = map_load;
+		');
 }
 
 function draw_google_tracker($id) {
@@ -706,13 +715,17 @@ function draw_meta_utf8() {
 	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
 }
 
-function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false) {
+function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false) {
 	global $_josh;
 	//2009 04 07 trying to come up with a simpler, better version of this function
 	//type can be text, images or rollovers
 	//match can be path, path_query or folder
 	
-	if (!is_array($options) || !count($options)) return false; //skip if empty
+	if (is_string($options)) $options = array_key_promote(db_table($options)); //might be sql	
+	
+	if ($add_home) $options = array_merge(array('/'=>'Home'), $options);
+	
+	if (!count($options)) return false; //skip if empty
 	$return = array();
 		
 	//this is so you can have several sets of rollovers in the same page eg the smarter toddler site
@@ -724,6 +737,8 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		$match = $_josh['request']['path'];
 	} elseif ($match == 'path_query') {
 		$match = $_josh['request']['path_query'];
+	} elseif (($match == '//') || ($match == '')) {
+		$match = '/';
 	}
 	error_debug('<b>' . __function__ . '</b> match is ' . $match, __file__, __line__);
 	

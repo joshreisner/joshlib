@@ -150,6 +150,25 @@ function array_key_filter($array, $key, $value) {
 	return $return;
 }
 
+function array_key_promote($array) {
+	/*takes an array of format 
+		array(
+			0=>array('key'=>'value', 'key1'=>'value1'),
+			1=>array('key2'=>'value2', 'key3'=>'value3')
+		)
+	and converts it to 
+		array('value'=>'value1, 'value2'=>'value3')
+	for db navigation
+	*/
+	$return = array();
+	foreach ($array as $a) {
+		$keys = array_keys($a);
+		$return[$a[$keys[0]]] = $a[$keys[1]];
+	}
+	//die(draw_array($return));
+	return $return;
+}
+
 function array_object($object) {
 	//convert object to associative array
     if (is_object($object)) $object = get_object_vars($object);
