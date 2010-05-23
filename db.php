@@ -522,8 +522,6 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 
 }
 
-
-
 function db_save($table, $id='get', $array=false) {
 	global $_josh;
 		
@@ -572,6 +570,7 @@ function db_save($table, $id='get', $array=false) {
 				}
 			} elseif (($c['type'] == 'mediumblob') || ($c['type'] == 'image')) { //document
 				$value = format_binary($array[$c['name']]);
+				//die('length is ' . strlen($array[$c['name']]));
 			} elseif ($c['type'] == 'varchar') { //text
 				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
 				$value = "'" . $array[$c['name']] . "'";

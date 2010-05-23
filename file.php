@@ -146,12 +146,12 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 				'ext'=>@$file['extension'],
 				'human'=>format_text_human(@$file['filename']), 
 				'path_name'=>str_replace(DIRECTORY_ROOT, '', $folder) . '/' . $name,
-				'type'=>@filetype($folder . $name),
-				'fmod'=>@filemtime($folder . $name),
-				'size'=>@filesize($folder . $name)
+				'type'=>@filetype($folder . '/' . $name),
+				'fmod'=>@filemtime($folder . '/' . $name),
+				'size'=>@filesize($folder . '/' . $name)
 			);
 
-			error_debug('<b>file folder</b> found ' . $name . ' of type ' . $thisfile['type'], __file__, __line__);
+			error_debug('<b>file folder</b> found ' . $thisfile['name'] . ' of type ' . $thisfile['type'], __file__, __line__);
 			if ($thisfile['type'] == 'dir') $thisfile['path_name'] .= '/';
 			if ($endfilter) {
 				$oneFound = false;
@@ -178,6 +178,7 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 
 function file_get($filename) {
 	global $_josh;
+	$filename = urldecode($filename);
 	if (!$file = @fopen($filename, 'r')) {
 		$filename = DIRECTORY_ROOT . $filename;
 		if (!$file = @fopen($filename, 'r')) return false;
