@@ -496,12 +496,12 @@ function draw_google_chart($data, $type='line', $colors=false, $width=250, $heig
 	
 }
 
-function draw_google_map($markers=false, $center=false) {
+function draw_google_map($markers=false, $center=false, $zoom=false) {
 	//haven't figured out the appropriate place to store all this stuff.  this calls a javascript function which should be local
 	//markers must be an array with latitude, longitude, title, description, color
 	global $_josh;
 	
-	if (!isset($_josh['google']['mapkey'])) error_handle(__function__ . ' requires a google maps api key', 'you can go here to get one');
+	if (!isset($_josh['google']['mapkey'])) error_handle(__function__ . ' requires a google maps api key', 'you can ' . draw_link('http://code.google.com/apis/maps/signup.html', 'go here') . ' to get one');
 	
 	//markers
 	$markerstr = '';
@@ -530,7 +530,7 @@ function draw_google_map($markers=false, $center=false) {
 	}
 
 	//todo determine zoom automatically
-	$zoom = 11;
+	if (!$zoom) $zoom = 11;
 
 	return '<div id="map"></div>' . draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . draw_javascript('
 		function map_load() {

@@ -337,12 +337,13 @@ function img_roll(what, how) {
 	eval("document." + what + ".src = " + what + "_" + how + ".src;"); 
 }
 
-function map_marker(latitude, longitude, html, icon) {
+function map_marker(latitude, longitude, html, icon, autoclick) {
 	var point	= new GLatLng(latitude, longitude);
 	var marker	= new GMarker(point, icon);
 	GEvent.addListener(marker, 'click', function() {
 		marker.openInfoWindowHtml(html);
 	});
+	if (autoclick) marker.openInfoWindowHtml(html);
 	return marker;
 }
 
