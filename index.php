@@ -412,7 +412,7 @@ function language_translate($string, $from, $to) {
 	foreach ($chunks as $c) {
 		error_debug('<b>lanuage_translate</b> running query for a string that is ' . strlen($c) . ' characters long', __file__, __line__);
 	
-		if (!isset($_josh['google_search_api_key'])) error_handle('api key not set', 'this script needs a google search api key');
+		if (!isset($_josh['google_search_api_key'])) error_handle('api key not set', __function__ . ' needs a ' . draw_link('http://code.google.com/apis/ajaxsearch/signup.html', 'Google AJAX search API key'));
 		
 		$ch = curl_init();
 		$url = 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&langpair=' . $from . '%7C' . $to;
