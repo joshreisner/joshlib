@@ -156,7 +156,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (!isset($_josh['db']['location']))	$_josh['db']['location']	= 'localhost';
 	if (!isset($_josh['db']['language']))	$_josh['db']['language']	= 'mysql';
 	if (!isset($_josh['db']['database']))	$_josh['db']['database']	= $_josh['request']['domainname'];
-	if (!isset($_josh['db']['username']))	$_josh['db']['username']	= '';
+	if (!isset($_josh['db']['username']))	$_josh['db']['username']	= 'root';
 	if (!isset($_josh['db']['password']))	$_josh['db']['password']	= '';
 	if (!isset($_josh['basedblanguage']))	$_josh['basedblanguage']	= $_josh['db']['language'];
 	if (!isset($_josh['is_secure']))		$_josh['is_secure']			= false;
@@ -444,6 +444,7 @@ function lib_get($string) {
 		
 		//javascript libraries
 		case 'jquery' :
+		case 'jquery-latest' :
 		case 'lorem_ipsum' :
 		case 'prototype' :
 		case 'scriptaculous' :
@@ -476,6 +477,9 @@ function lib_location($string) {
 		
 		case 'jquery' :
 		return $lib . 'jquery-1.4.2.min.js';
+		
+		case 'jquery-hosted' :
+		return 'http://code.jquery.com/jquery-1.4.2.min.js';
 		
 		case 'lorem_ipsum' :
 		return $lib . 'lorem_ipsum.js';
