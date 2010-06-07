@@ -199,6 +199,7 @@ function file_get_max($pretty=true) {
 }
 
 function file_get_type_id($filename, $table='documents_types') {
+	//2010 06 07 jr – think we should deprecate in favor of extension columns like pdf, html, doc, xlsx etc
 	list($filename, $extension) = file_name($filename);
 	if (!$type_id = db_grab('SELECT id FROM ' . $table . ' WHERE extension = "' . $extension . '"')) {
 		return db_query('INSERT INTO ' . $table . ' ( extension ) VALUES ( "' . $extension . '" )');
@@ -218,11 +219,11 @@ function file_get_uploaded($fieldname, $types_table=false) {
 	return $content;
 }
 
-function file_icon($filename, $link=true, $type='16x16') {
+function file_icon($filename_or_ext, $link=false, $type='16x16') {
 	//show the icon for a given filename
 	global $_josh;
-	if (!$ext = strToLower(file_ext($filename))) return false;
-	if ($return = draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/' . $ext . '.png')) return $return;
+	if ((stristr($filename_or_ext, '.')) && (!$filename_or_ext = strToLower(file_ext($filename_or_ext)))) return false;
+	if ($return = draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/' . $filename_or_ext . '.png', $link)) return $return;
 	error_handle('file type not added yet', 'the file type ' . $ext . ' was not found in the file_icons library.  this has been noted.');
 	return false;
 }
