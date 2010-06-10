@@ -476,7 +476,12 @@ function url_query_set(key, value, returnval) {
     
     var target = location.href;
    	if (location.hash) target = target.substring(0, target.length - location.hash.length);
-    target = (query) ? target.replace(query, ret.join("&")) : target + '?' + ret.join("&");
+   	if (ret.length) {
+	    target = (query) ? target.replace(query, ret.join("&")) : target + '?' + ret.join("&");
+   	} else {
+   		//clear query
+   		target = target.replace("?" + query, "");
+   	}
     if (location.hash) target += location.hash;
     
     //alert(target);
