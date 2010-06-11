@@ -129,6 +129,8 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	
 	$_josh['request'] = url_parse($_josh['request']);
 			
+	//die(draw_array($_josh['request']));
+
 	//special set $_GET['id']
 	if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
 			
