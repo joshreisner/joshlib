@@ -794,7 +794,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 }
 
 function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $override=false) {
-	//2009 04 07 deprecated
+	//2010 04 07 deprecated
 	error_deprecated(__function__ . ' was deprecated on 4/7/2010.  use draw_nav instead');
 	
 	//useid is for rollover navigation -- use everything after id= instead of slashless url
