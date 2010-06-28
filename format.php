@@ -224,18 +224,48 @@ function format_date_xml($timestamp=false) {
 }
 
 function format_email($address) {
-	//simple patch to prevent email form hijacking
+	//clean up email address or return false if invalid
+
 	$address = trim($address);
-	$address = strToLower($address);
+	$address = strToLower($address); //technically, local part could be case-sensitive, but i don't think this happens enough to be significant
 	$address = str_replace("'", '', $address);
 	$address = str_replace('"', '', $address);
 	$address = preg_replace('/\r/', '', $address);
 	$address = preg_replace('/\n/', '', $address);
 	
-	if (!stristr($address, '@')) return false;
-	if (!stristr($address, '.')) return false;	
+	//this section of code adapted from http://www.linuxjournal.com/article/9585
+	$atIndex = strrpos($address, "@");
+	if (is_bool($atIndex) && !$atIndex) {
+		return false; //no @ symbol
+	} else {
+		$domain = substr($address, $atIndex+1);
+		$local = substr($address, 0, $atIndex);
+		$localLen = strlen($local);
+		$domainLen = strlen($domain);
+		if ($localLen < 1 || $localLen > 64) {
+			return false; //local part length wrong
+		} elseif ($domainLen < 1 || $domainLen > 255) {
+			return false; //domain part length wrong
+		} elseif ($local[0] == '.' || $local[$localLen-1] == '.') {
+			return false; //local part starts or ends with '.'
+		} elseif (preg_match('/\\.\\./', $local)) {
+			return false; //local part has two consecutive dots
+		} elseif (!preg_match('/^[A-Za-z0-9\\-\\.]+$/', $domain)) {
+			return false; //character not valid in domain part
+		} else if (preg_match('/\\.\\./', $domain)) {
+			return false; //domain part has two consecutive dots
+		} elseif (!preg_match('/^(\\\\.|[A-Za-z0-9!#%&`_=\\/$\'*+?^{}|~.-])+$/', str_replace("\\\\", '', $local))) {
+			//character not valid in local part unless local part is quoted (and we just stripped the quotes, so)
+			if (!preg_match('/^"(\\\\"|[^"])+"$/', str_replace("\\\\","",$local))) return false;
+		}
+		//todo enable dns lookup
+		//if ($isValid && !(checkdnsrr($domain,"MX") || checkdnsrr($domain,"A"))) return false; //domain not found in DNS
+	}
+
 	return $address;
 }
+
+
 
 function format_file_name($str, $ext) {
 	//formatting for downloaded files

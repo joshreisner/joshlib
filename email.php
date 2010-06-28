@@ -6,14 +6,23 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 	global $_josh;
 
 	//set the sender	
-	if (empty($from)) $from = (!empty($_josh['email_default'])) ? $_josh['email_default'] : 'joshlib@joshreisner.com';
+	if (empty($from)) $from = (!empty($_josh['email_default'])) ? $_josh['email_default'] : 'josh@joshreisner.com';
 	
 	//fix up the recipient list
 	if (!is_array($to)) $to = array($to);
 	$to = array_unique($to);
-	$tocount = count($to);
-	for ($i = 0; $i < $tocount; $i++) if (empty($to[$i])) unset($to[$i]); //make sure they're non-null
-	if (!count($to)) return false; //quit if now is empty array
+	//$tocount = count($to);
+	//for ($i = 0; $i < $tocount; $i++) if (empty($to[$i])) unset($to[$i]); //make sure they're non-null
+	
+	$good = $bad = array();
+	foreach ($to as $e) {
+		if (!$good[] = format_email($e)) {
+			array_pop($good);
+			$bad[] = $e;
+		}
+	}
+
+	if (!count($good)) return false; //quit if now is empty array
 
 	//use swiftmailer class
 	lib_get('swiftmailer');
@@ -30,12 +39,14 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 	$message	= Swift_Message::newInstance()
 		->setSubject($subject)
 		->setFrom($from)
-		->setTo($to)
+		->setTo($good)
 		->setBody(strip_tags(nl2br($message)))
 		->addPart($message, 'text/html')
 		//->attach(Swift_Attachment::fromPath('my-document.pdf'))
 	;
 	if (!$count = $mailer->batchSend($message, $failures)) error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures));
+	
+	if (count($bad)) error_handle('email addresses rejected', 'the email with subject ' . $subject . ' was rejected for the following recipients ' . draw_list($bad) . ' and was successfully sent to ' . count($good) . ' recipients');
 	return $count;
 }
 
