@@ -48,7 +48,8 @@ function draw_body_open() {
 	$classes = array(url_folder());
 	if ($_josh['editing']) $classes[] = 'query';
 	if ($_josh['request']['subfolder']) $classes[] = $_josh['request']['subfolder'];
-	return '<body class="' . implode(' ', $classes) . '">';
+	$string = implode(' ', $classes);
+	return '<body class="' . $string . '" id="' . $string . '">';
 }
 
 function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar', $linknumbers=false, $type='div', $toggling=false) {

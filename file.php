@@ -224,7 +224,7 @@ function file_icon($filename_or_ext, $link=false, $type='16x16') {
 	global $_josh;
 	if ((stristr($filename_or_ext, '.')) && (!$filename_or_ext = strToLower(file_ext($filename_or_ext)))) return false;
 	if ($return = draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/' . $filename_or_ext . '.png', $link)) return $return;
-	error_handle('file type not added yet', 'the file type ' . $ext . ' was not found in the file_icons library.  this has been noted.');
+	error_handle('file type not added yet', 'the file type "' . $filename_or_ext . '" was not found in the file_icons library.  this has been noted.');
 	return false;
 }
 
