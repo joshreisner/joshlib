@@ -628,7 +628,7 @@ function db_save($table, $id='get', $array=false) {
 				$query1[] = $c['name'];
 				$query2[] = $value;
 			}
-		} elseif ($c['name'] == 'secret_key') {
+		} elseif (($c['type'] == 'varchar') && ($c['name'] == 'secret_key')) {
 			if ($id && empty($values['secret_key'])) {
 				$query1[] = 'secret_key = ' . db_key();
 			} elseif (!$id) {
