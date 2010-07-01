@@ -216,8 +216,12 @@ function draw_dl($array, $class=false) {
 	return draw_container('dl', $return, array('class'=>$class));
 }
 
-function draw_doctype() {
-	return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
+function draw_doctype($version=false) {
+	if (!$version) {
+		return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
+	} elseif ($version == 5) {
+		return '<!DOCTYPE html><html>';
+	}
 }
 
 function draw_favicon($location='/images/favicon.png') {
