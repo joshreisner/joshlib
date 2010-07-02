@@ -123,7 +123,7 @@ class form {
 					break;
 				case 'checkboxes':
 					if (!$option_title) {
-						if (!$options_table) error_handle('options table not set', 'please specify your options table', __file__, __line__, __function__);
+						if (empty($options_table)) error_handle('options table not set', 'please specify your options table', __file__, __line__, __function__);
 						//$option_title = 'title';
 						if ($options_columns = db_columns($options_table)) {
 							$option_title = $options_columns[1]['name'];
@@ -132,7 +132,11 @@ class form {
 						}
 					}
 					if ($this->id) {
-						$options = db_table('SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $this->id . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title);
+						if (!$sql) {
+							if (empty($linking_table)) error_handle('linking_table not set', 'please specify your linking table for a form checkboxes field', __file__, __line__, __function__);
+							$sql = 'SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $this->id . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title;
+						}
+						$options = db_table($sql);
 					} else {
 						$value = (strToLower($value) == 'all') ? 1 : 0;
 						$options = db_table('SELECT id, ' . $option_title . ', ' . $value . ' checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title);
