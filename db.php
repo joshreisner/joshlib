@@ -688,6 +688,7 @@ function db_save($table, $id='get', $array=false) {
 	}
 	
 	if ($id) {
+		if (isset($array['created_user'])) $query1[] = 'created_user = ' .  $array['created_user']; //could be changing created_user (eg intranet)
 		$query1[] = 'updated_date = ' .  db_date();
 		$query1[] = 'updated_user = ' . ((isset($array['updated_user'])) ? $array['updated_user'] : $userID);
 		if (!db_query('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id)) return false;
