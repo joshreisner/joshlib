@@ -376,7 +376,6 @@ function draw_form_select($name, $sql_options, $value=false, $not_nullable=true,
 		while (@list($key, $val, $group) = each($sql_options)) {
 			if (is_array($val)) @list($key, $val, $group) = array_values($val); //possible db_table optgroup situation
 			$val = format_string($val, $maxlength);
-			
 			//new optgroup code
 			if (!isset($grouped)) {
 				if ($group) {
@@ -979,7 +978,8 @@ function draw_tag($tag, $arguments=false, $innerhtml=false, $open=false) {
 	if ($innerhtml === false) {
 		$return .= ($open) ? '>' : '/>';
 	} else {
-		if (is_numeric($innerhtml) && ($innerhtml == 0)) $innerhtml = '&#48;';
+		//2010 07 08 jr why?  removing because of minutes in draw_form_date_time
+		//if (is_numeric($innerhtml) && ($innerhtml == 0)) $innerhtml = '&#48;';
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
 		$return .= '>' . $innerhtml . '</' . $tag . '>';
 	}
