@@ -142,6 +142,7 @@ class form {
 						$options = db_table('SELECT id, ' . $option_title . ', ' . $value . ' checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title);
 					}
 					foreach ($options as &$o) {
+						if ($maxlength) $o[$option_title] = format_string($o[$option_title], $maxlength);
 						$chkname = 'chk-' . $name . '-' . $o['id'];
 						$o = draw_form_checkbox($chkname, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $chkname . '\');">' . $o[$option_title] . '</span>';
 					}
