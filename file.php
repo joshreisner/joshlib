@@ -458,8 +458,8 @@ function file_uploaded_image_orientation($fieldname) {
 	global $_FILES;
 	error_debug('<b>file_uploaded_image_orientation</b>', __file__, __line__);
 	list($width, $height) = getimagesize($_FILES[$fieldname]['tmp_name']);
-	if ($width > $height) return "landscape";
-	return "portrait";
+	if ($width > $height) return 'landscape';
+	return 'portrait';
 }
 
 ?>

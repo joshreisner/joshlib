@@ -595,6 +595,23 @@ function draw_img_random($folder, $link=false, $class=false) {
 	return draw_img(array_random(file_folder('/images/random/', 'jpg,jpeg,gif,png', true)));
 }
 
+function draw_img_thumbnail($path, $link, $max) {
+	//$max is maximum width or height
+	
+	//$path can be relative
+	if (!$realpath = realpath($path)) $realpath = realpath(DIRECTORY_ROOT . $path);
+	
+	//get width and height
+	if (!@list($width, $height, $type, $attr) = @getimagesize($realpath)) return '';
+		
+	if ($width >= $height) {
+		return draw_img($path, $link, array('width'=>$max, 'height'=>$height*($max/$width)));
+	} else {
+		return 'tall';
+	}
+	
+}
+
 function draw_javascript($javascript=false) {
 	if (!$javascript) return draw_javascript_src();
 	return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);
