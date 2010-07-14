@@ -59,7 +59,8 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['month']					= date('n');
 	$_josh['today']					= date('j');
 	$_josh['year']					= date('Y');
-
+	$_josh['html']					= 4; //default
+	
 //page draw status
 	$_josh['drawn']					= array();	//array for including javascript only once, eg $_josh['drawn']['tinymce'] = true;
 
@@ -105,6 +106,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	require(DIRECTORY_JOSHLIB . 'file.php');
 	require(DIRECTORY_JOSHLIB . 'form.php');
 	require(DIRECTORY_JOSHLIB . 'format.php');
+	require(DIRECTORY_JOSHLIB . 'html.php');
 	require(DIRECTORY_JOSHLIB . 'table.php');
 	require(DIRECTORY_JOSHLIB . 'url.php');
 

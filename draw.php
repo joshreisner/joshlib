@@ -217,7 +217,13 @@ function draw_dl($array, $class=false) {
 }
 
 function draw_doctype($version=false) {
-	if (!$version) {
+	global $_josh;
+	if ($version) { //set version
+		$version = $_josh['html'];	
+	} else { //get version
+		$_josh['html'] = $version;
+	}
+	if ($version == 4) {
 		return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
 	} elseif ($version == 5) {
 		return '<!DOCTYPE html><html>';
@@ -741,6 +747,8 @@ function draw_meta_utf8() {
 }
 
 function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false) {
+	if (html() == 5) return html_nav($options, $match, $class);
+	
 	global $_josh;
 	//2009 04 07 trying to come up with a simpler, better version of this function
 	//type can be text, images or rollovers
@@ -993,9 +1001,9 @@ function draw_tag($tag, $arguments=false, $innerhtml=false, $open=false) {
 	$return = '<' . $tag;
 	$return .= (is_array($arguments)) ? draw_arguments($arguments) : draw_argument('class', $arguments);
 	if ($innerhtml === false) {
-		$return .= ($open) ? '>' : '/>';
+		$return .= ($open || (html() == 5)) ? '>' : '/>';
 	} else {
-		//2010 07 08 jr why?  removing because of minutes in draw_form_date_time
+		//2010 07 08 jr -- removing line below because of minutes in draw_form_date_time
 		//if (is_numeric($innerhtml) && ($innerhtml == 0)) $innerhtml = '&#48;';
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
 		$return .= '>' . $innerhtml . '</' . $tag . '>';
