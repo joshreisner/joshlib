@@ -106,7 +106,6 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	require(DIRECTORY_JOSHLIB . 'file.php');
 	require(DIRECTORY_JOSHLIB . 'form.php');
 	require(DIRECTORY_JOSHLIB . 'format.php');
-	require(DIRECTORY_JOSHLIB . 'html.php');
 	require(DIRECTORY_JOSHLIB . 'table.php');
 	require(DIRECTORY_JOSHLIB . 'url.php');
 
@@ -390,6 +389,17 @@ function geocode($address, $zip) {
 function home($match='/') {
 	global $_josh;
 	return ($_josh['request']['path'] == $match);
+}
+
+function html($version=false) {
+	//set or get html version
+	global $_josh;
+	if ($version) {
+		$_josh['html'] = $version;
+	} else {
+		$version = $_josh['html'];
+	}
+	return $version;
 }
 
 function increment() {
