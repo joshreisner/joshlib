@@ -23,6 +23,7 @@ function array_ajax($required=false) {
 
 function array_argument(&$array, $value, $key='class', $separator=' ') {
 	//for appending class values, eg class="foo bar".  you don't need to know if it exists when you array_argument it
+	if (empty($value)) return false;
 	if (empty($array[$key])) {
 		$array[$key] = $value;
 	} else { 

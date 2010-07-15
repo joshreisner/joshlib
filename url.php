@@ -276,4 +276,9 @@ function url_query_parse($querystring) {
 	return $return;
 }
 
+function url_subfolder($empty=false) {
+	global $_josh;
+	return (empty($_josh['request']['subfolder'])) ? $empty : $_josh['request']['subfolder'];
+}
+
 ?>

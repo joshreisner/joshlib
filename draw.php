@@ -45,11 +45,11 @@ function draw_autorefresh($minutes=5) {
 function draw_body_open() {
 	//draw the opening body tag, in, say, drawTop()
 	global $_josh;
-	$classes = array(url_folder());
-	if ($_josh['editing']) $classes[] = 'query';
-	if ($_josh['request']['subfolder']) $classes[] = $_josh['request']['subfolder'];
-	$string = implode(' ', $classes);
-	return '<body class="' . $string . '" id="' . $string . '">';
+	$args = array();
+	array_argument($args, url_folder());
+	array_argument($args, url_subfolder());
+	if ($_josh['editing']) array_argument($args, 'query');
+	return '<body' . draw_arguments($args) . '>';
 }
 
 function draw_calendar($month=false, $year=false, $events=false, $divclass='calendar', $linknumbers=false, $type='div', $toggling=false) {
@@ -697,12 +697,13 @@ function draw_list($options, $arguments=false, $type='ul', $selected=false) {
 		
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
-		$liclass = 'option' . ($i + 1);
-		if ($counter == 1) $liclass .= ' first';
-		if ($counter == $count) $liclass .= ' last';
-		if ($selected == ($i + 1)) $liclass .= ' selected';
-		if ($options[$i] == false) $options[$i] = '';
-		$options[$i] = draw_tag('li', array('class'=>$liclass), $options[$i]);
+		$li_args = array('class'=>'option' . ($i + 1));
+		if ($counter == 1)			array_argument($li_args, 'first');
+		if ($counter == $count)		array_argument($li_args, 'last');
+		if ($selected == ($i + 1))	array_argument($li_args, 'selected');
+		if (empty($options[$i]))	array_argument($li_args, 'empty');
+		if ($options[$i] == false)	$options[$i] = ''; //don't pass a false value, li must be a container
+		$options[$i] = draw_tag('li', $li_args, $options[$i]);
 		$counter++;
 	}
 	return draw_tag($type, $arguments, implode($options, ''));
@@ -746,9 +747,7 @@ function draw_meta_utf8() {
 	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
 }
 
-function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false) {
-	if (html() == 5) return html_nav($options, $match, $class);
-	
+function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false) {	
 	global $_josh;
 	//2009 04 07 trying to come up with a simpler, better version of this function
 	//type can be text, images or rollovers
