@@ -262,14 +262,14 @@ function draw_form_button($text, $location=false, $class=false, $disabled=false,
 	return $return;
 }
 
-function draw_form_checkbox($name, $checked=false, $arguments=false, $javascript=false) {
+function draw_form_checkbox($name, $checked=false, $arguments=false, $javascript=false, $title=false) {
 	$arguments = array_arguments($arguments);
 	$arguments['class'] = (empty($arguments['class'])) ? 'checkbox' : $arguments['class'] . ' checkbox';
 	$arguments['type'] = 'checkbox';
 	$arguments['name'] = $arguments['id'] = $name;
 	if ($javascript) $arguments['onclick'] = 'javascript:' . $javascript;
 	if ($checked) $arguments['checked'] = 'checked';
-	return draw_tag('input', $arguments);
+	return draw_tag('input', $arguments) . ($title ? draw_tag('label', array('for'=>$name, 'class'=>$arguments['class']), $title) : false);
 }
 
 function draw_form_checkboxes($name, $linking_table=false, $object_col=false, $option_col=false, $id=false) {
