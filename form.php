@@ -131,16 +131,16 @@ class form {
 							error_handle('options_table does not exist', 'form checkboxes ' . $name . ' is looking for ' . $options_table . ' which does not exist');
 						}
 					}
-					if ($this->id) {
-						if (!$sql) {
+					if (!$sql) {
+						if ($this->id) {
 							if (empty($linking_table)) error_handle('linking_table not set', 'please specify your linking table for a form checkboxes field', __file__, __line__, __function__);
 							$sql = 'SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $this->id . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title;
+						} else {
+							$value = (strToLower($value) == 'all') ? 1 : 0;
+							$sql = 'SELECT id, ' . $option_title . ', ' . $value . ' checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title;
 						}
-						$options = db_table($sql);
-					} else {
-						$value = (strToLower($value) == 'all') ? 1 : 0;
-						$options = db_table('SELECT id, ' . $option_title . ', ' . $value . ' checked FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title);
 					}
+					$options = db_table($sql);					
 					foreach ($options as &$o) {
 						if ($maxlength) $o[$option_title] = format_string($o[$option_title], $maxlength);
 						$chkname = 'chk-' . $name . '-' . $o['id'];
