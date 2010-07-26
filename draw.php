@@ -219,9 +219,9 @@ function draw_dl($array, $class=false) {
 function draw_doctype($version=false) {
 	global $_josh;
 	if ($version) { //set version
-		$version = $_josh['html'];	
-	} else { //get version
 		$_josh['html'] = $version;
+	} else { //get version
+		$version = $_josh['html'];
 	}
 	if ($version == 4) {
 		return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
