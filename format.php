@@ -644,7 +644,9 @@ function format_phone($string, $fail=false) { //format a phone number to (123) 4
 	return '(' . substr($number, 0, 3) . ') ' . substr($number, 3, 3) . '-' . substr($number, 6, 4);
 }
 
-function format_pluralize($entity) {
+function format_pluralize($entity, $count=2) {
+	if ($count == 1) return $entity;
+	
 	$length = strlen($entity);
 	if (substr($entity, -1) == 'y') {
 		return substr($entity, 0, ($length - 1)) . 'ies';
