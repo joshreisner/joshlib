@@ -796,28 +796,32 @@ function format_ssn($str) {
 }
 
 function format_string($string, $target=30, $append='&hellip;') {
-	//shorten a $string to $target length
-	//difference between this and format_text_shorten?
-	//modifying to only break on words for harvard and livingcities
-	$string = strip_tags(trim(html_entity_decode($string, ENT_QUOTES, 'UTF-8')));
-	$string = str_replace(NEWLINE, ' ', $string);
-	if (strlen($string) < $target) return $string;
-	$words = explode(' ', $string);
-	$length = 0;
-	$return = '';
-	foreach ($words as $w) {
-		if ($length == 0) {
-			//first word -- add it no matter what.
-			$return .= $w;
-			$length += strlen($w);
-		} else {
-			$wordlength = strlen($w) + 1; //add one for the space
-			if ($length + $wordlength > $target) break;
-			$return .= ' ' . $w;
-			$length += $wordlength;
+	//shorten a $string to $target length, breaking on the ends of words
+	$str_new = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+	$encoded = ($str_new != $string);
+	$str_new = str_replace(NEWLINE, ' ', strip_tags(trim($str_new)));
+	if (strlen($str_new) > $target) {
+		$words = explode(' ', $str_new);
+		$length = 0;
+		$return = '';
+		foreach ($words as $w) {
+			if ($wordlength = strlen($w)) { //skip empty words
+				if ($length == 0) {
+					//first word -- add it no matter what.
+					$return .= $w;
+				} else {
+					$wordlength++; //add one for the space
+					if ($length + $wordlength > $target) break;
+					$return .= ' ' . $w;
+				}
+				$length += $wordlength;
+			}
 		}
 	}
-	return $return . $append;
+	//die('the length is ' . strlen($return));
+	$return .= $append;
+	if ($encoded) $return = htmlentities($return, ENT_QUOTES, 'UTF-8');
+	return $return;
 }
 
 function format_text_code($string) {

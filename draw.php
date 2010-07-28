@@ -737,8 +737,7 @@ function draw_list_sets($options, $length=2, $arguments=false, $type='ul', $sele
 
 function draw_meta_description($string) {
 	//this strips tags and sets length at 150, which is the max
-	$string = format_string($string, 150, '');
-	$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+	$string = html_entity_decode(format_string($string, 150, ''), ENT_QUOTES, 'UTF-8');
 	if (!strlen($string)) return false;
 	return draw_tag('meta', array('name'=>'description', 'content'=>$string));
 }
