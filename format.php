@@ -799,7 +799,8 @@ function format_string($string, $target=30, $append='&hellip;') {
 	//shorten a $string to $target length
 	//difference between this and format_text_shorten?
 	//modifying to only break on words for harvard and livingcities
-	$string = strip_tags(trim(str_replace('&nbsp;', ' ', $string)));
+	$string = strip_tags(trim(html_entity_decode($string, ENT_QUOTES, 'UTF-8')));
+	$string = str_replace(NEWLINE, ' ', $string);
 	if (strlen($string) < $target) return $string;
 	$words = explode(' ', $string);
 	$length = 0;
