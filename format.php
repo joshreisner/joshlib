@@ -817,9 +817,11 @@ function format_string($string, $target=30, $append='&hellip;') {
 				$length += $wordlength;
 			}
 		}
+		$return .= $append;
+	} else {
+		$return = $str_new;
 	}
 	//die('the length is ' . strlen($return));
-	$return .= $append;
 	if ($encoded) $return = htmlentities($return, ENT_QUOTES, 'UTF-8');
 	return $return;
 }
