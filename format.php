@@ -178,7 +178,7 @@ function format_date_sql($month, $day=false, $year=false, $hour=false, $minute=f
 	return '"' . date('Y-m-d H:i:00', $date) . '"';
 }
 
-function format_date_time($timestamp=false, $error='', $separator='&nbsp;', $suppressMidnight=true, $relativetime=true) {
+function format_date_time($timestamp=false, $error='', $separator=' ', $suppressMidnight=true, $relativetime=true) {
 	//string_datetime?
 	if ($timestamp === false) $timestamp = time();
 	$return = format_date($timestamp, $error, '%b %d, %Y', $relativetime);
