@@ -144,6 +144,10 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		define('NEWLINE', "\r\n");
 		define('DIRECTORY_ROOT', str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']));
 		$_josh['slow']				= true;
+
+		//IIS handles 404s differently than apache--not sure if this should go above the request-path
+		if (!empty($_SERVER['QUERY_STRING']) && ($url = format_text_starts('404;', $_SERVER['QUERY_STRING']))) $_josh['request'] = url_parse(str_replace(':80', '', $url));
+
 	} else { //platform is UNIX or Mac
 		define('PLATFORM', 'unix');
 		define('NEWLINE', "\n");
