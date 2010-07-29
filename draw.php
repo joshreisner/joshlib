@@ -576,6 +576,18 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	$arguments = array('src'=>url_base() . str_replace(DIRECTORY_ROOT, '', $realpath), 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
 	if (is_array($alt)) {
 		//values of alt can overwrite width, height, border, even src
+		if (isset($alt['maxwidth']) && !isset($alt['maxheight'])) {
+			//simple horiz resize if necessary
+			if ($alt['maxwidth'] < $arguments['width']) {
+				$arguments['height'] *= $alt['maxwidth'] / $arguments['width'];
+				$arguments['width'] = $alt['maxwidth'];
+			}
+			unset($alt['maxwidth']);
+		} elseif (!isset($alt['maxwidth']) && isset($alt['maxheight'])) {
+			//todo simple vert resize if necessary
+		} elseif (isset($alt['maxwidth']) && isset($alt['maxheight'])) {
+			//todo more complex resize both
+		}
 		$arguments = array_merge($arguments, $alt);
 	} else {
 		$arguments['alt'] = $alt;
@@ -747,7 +759,12 @@ function draw_meta_keywords($string) {
 }
 
 function draw_meta_utf8() {
-	return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
+	if (html() == 5) {
+		return draw_tag('meta', array('charset'=>'utf-8'));
+	} else {
+		return draw_tag('meta', array('http-equiv'=>'Content-Type', 'content'=>'text/html; charset=utf-8'));
+	}
+	
 }
 
 function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false) {	
@@ -821,6 +838,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		$return = draw_list($return, $class, 'ul', $selected);
 	}
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
+	if (html() == 5) $return = draw_tag('nav', array('id'=>$class), $return);
 	return $return;
 }
 
