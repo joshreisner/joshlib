@@ -1031,4 +1031,9 @@ function draw_tag($tag, $arguments=false, $innerhtml=false, $open=false) {
 	return $return;
 }
 
+function draw_time($timestamp, $format=false, $is_pubdate=false) {
+	if (!$format) $format = '%b %d, %Y';
+	return '<time datetime="' . format_date_iso8601($timestamp) . '"' . (($is_pubdate) ? ' pubdate' : '') . '>' . format_date($timestamp, '', $format) . '</time>';
+}
+
 ?>

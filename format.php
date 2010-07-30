@@ -140,6 +140,7 @@ function format_date($timestamp=false, $error='', $format='%b %d, %Y', $relative
 	}
 	
 	if ($return === 1) return $error;
+	
 	return $return;
 }
 
@@ -856,13 +857,6 @@ function format_text_human($str, $convertdashes=true) {
 	if ($convertdashes) $return = str_replace('-', ' ', $return);
 	return format_title($return);
 }
-
-/* function format_text_shorten($text, $length=30, $append='&#8230;', $appendlength=1) {
-	error_deprecated(__FUNCTION__ . ' was deprecated on 10/3/2009 use format_string instead');
-	if ($append) $length = $length - $appendlength;
-	if (strlen($text) > $length) return substr($text, 0, $length) . $append;
-	return $text;
-}*/
 
 function format_text_starts($needle, $haystack) {
 	//function to see if a $haystack starts with $needle
