@@ -398,7 +398,7 @@ function file_sister($filename, $ext) {
 		$sister = $path . DIRECTORY_SEPARATOR . $file . '.' . $ext;
 		if (file_exists($sister)) {
 			error_debug('file sister file exists', __file__, __line__);
-			return $sister;
+			return str_replace(DIRECTORY_ROOT, '', $sister);
 		} else {
 			error_debug('file sister ' . $sister . ' does not exist', __file__, __line__);
 		}

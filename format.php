@@ -274,14 +274,20 @@ function format_file_name($str, $ext) {
 	
 	$str = html_entity_decode($str);
 	
-	$str = str_replace('  ',	' ',	$str);
 	$str = str_replace('"',		'', 	$str);
 	$str = str_replace("'",		'', 	$str);
 	$str = str_replace('.',		'', 	$str);
 	$str = str_replace(':',		'',		$str);
-	$str = str_replace(' ',		'_',	$str);
-	$str = substr($str, 0, 30);
+	$str = str_replace('/',		'',		$str);
+	$str = str_replace('\\',	'',		$str);
 	
+	$str = str_replace('  ',	' ',	$str);
+	$str = str_replace('  ',	' ',	$str);
+
+	//$str = str_replace(' ',		'_',	$str);
+	$str = substr($str, 0, 60);
+
+	return $str . '.' . $ext;
 	return strtolower($str . '.' . $ext);
 }  
 
