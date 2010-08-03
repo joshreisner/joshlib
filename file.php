@@ -389,16 +389,18 @@ function file_rss($title, $link, $items, $filename=false, $limit=false) {
 function file_sister($filename, $ext) {
 	//this will tell you if there's a 'sister file' in the same directory, eg picture.jpg && picture.html
 	//todo - rename to file_sibling
-	//developed for jeffrey monteiro
-	global $_josh;
-	if (file_check($filename)) {
-		list ($file, $extension, $path) = file_name($filename);
+	//developed for jeffrey monteiro, modified for brad ascalon 2010-08-03
+	//debug();
+	if (!$realpath = realpath($filename)) $realpath = realpath(DIRECTORY_ROOT . $filename);
+	error_debug('given ' . $realpath, __file__, __line__);
+	if ($realpath) {
+		list($file, $extension, $path) = file_name($realpath);
 		$sister = $path . DIRECTORY_SEPARATOR . $file . '.' . $ext;
-		if (file_check($sister)) {
+		if (file_exists($sister)) {
 			error_debug('file sister file exists', __file__, __line__);
 			return $sister;
 		} else {
-			error_debug('file sister $sister does not exist', __file__, __line__);
+			error_debug('file sister ' . $sister . ' does not exist', __file__, __line__);
 		}
 	}
 	return false;
