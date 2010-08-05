@@ -453,20 +453,29 @@ function draw_form_submit($message='Submit Form', $class=false) {
 	return draw_tag('input', array('type'=>'submit', 'value'=>$message, 'class'=>$class));
 }
 
-function draw_form_text($name, $value='', $class=false, $maxlength=255, $style=false) {
-	$class			= ($class) ? $class . ' text' : 'text';
-	$type			= 'text';
-	$id				= $name;
-	return draw_tag('input', compact('type', 'name', 'id', 'value', 'class', 'maxlength', 'style'));
+function draw_form_text($name, $value='', $args=false, $maxlength=255, $style=false) {
+	$args = array_arguments($args);
+	array_argument($args, 'text');
+	array_argument($args, 'text', 'type');
+	array_argument($args, $name, 'id');
+	array_argument($args, $value, 'value');
+	array_argument($args, $maxlength, 'maxlength'); //todo deprecate?
+	array_argument($args, $style, 'style'); //todo deprecate?
+	return draw_tag('input', $args);
 }
 
-function draw_form_textarea($name, $value='', $class=false) {
-	error_debug('drawing textarea', __file__, __line__);
-	global $_josh;
+function draw_form_textarea($name, $value='', $args=false) {
+	$args = array_arguments($args);
+	array_argument($args, 'textarea');
+	array_argument($args, $name, 'name');
+	array_argument($args, $name, 'id');
+	
+	//legacy, remove?
+	if (empty($args['rows'])) $args['rows'] = 5;
+	if (empty($args['cols'])) $args['cols'] = 50;
 	if (!$value) $value = '';
-	$class = ($class) ? $class . ' textarea' : 'textarea';
-	return draw_container('textarea', $value, array('name'=>$name, 'id'=>$name, 'class'=>$class, 'rows'=>5, 'cols'=>50));
-	//return '<textarea name='' . $name . '' id='' . $name . '' class='' . $class . ''>' . $value . '</textarea>';
+
+	return draw_tag('textarea', $args, $value);
 }
 
 function draw_google_analytics($id) {

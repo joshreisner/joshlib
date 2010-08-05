@@ -109,6 +109,7 @@ class form {
 		if ($type == 'hidden') {
 			$return .= draw_form_hidden($name, $value);
 		} else {
+			$args = array();
 			if ($label) {
 				if ($additional && (($type == 'checkboxes') || ($type == 'textarea'))) $label .= $additional;
 				$return .= draw_tag('label', array('for'=>$name), $label);
@@ -211,7 +212,13 @@ class form {
 					break;
 				case 'text':
 					if ($allow_changes) {
-						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+						$args = array('class'=>$class);
+						if (isset($default)) {
+							$return .= draw_javascript_src();
+							$args['onfocus'] = 'javascript:form_field_default(this, true, "' . $default . '");';
+							$args['onblur'] = 'javascript:form_field_default(this, false, "' . $default . '");';
+						}
+						$return .= draw_form_text($name, $value, $args, $maxlength, false, false) . $additional;
 					} else {
 						$return .= ($name == 'url') ? draw_link($value) : $value;
 					}
@@ -224,7 +231,12 @@ class form {
 						} elseif ($class == 'ckeditor') {
 							$return .= lib_get('ckeditor');
 						}
-						$return .= draw_form_textarea($name, $value, $class);
+						if (isset($default)) {
+							$return .= draw_javascript_src();
+							$args['onfocus'] = 'javascript:form_field_default(this, true, "' . $default . '");';
+							$args['onblur'] = 'javascript:form_field_default(this, false, "' . $default . '");';
+						}
+						$return .= draw_form_textarea($name, $value, $args);
 					} else {
 						$return .= $value;
 					}
@@ -244,6 +256,10 @@ class form {
 			$this->counter++;
 		}
 		return $return;
+	}
+	
+	function set_defaults() {
+		foreach ($this->fields as &$f) if (empty($f['default'])) $f['default'] = $f['label'];
 	}
 	
 	function set_field($array) {
