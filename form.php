@@ -71,14 +71,7 @@ class form {
 		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$_josh['request']['path_query'], 'name'=>$this->name, 'class'=>$this->name, 'onsubmit'=>'javascript:return form_validate(this);'), $return);
 		
 		//focus on first element
-		reset($this->fields);
-		if ($focus) {
-			if (!empty($this->focus)) {
-				draw_form_focus($this->focus);
-			} elseif ($this->fields[key($this->fields)]['name']) {
-				$return .= draw_form_focus($this->fields[key($this->fields)]['name']);
-			}
-		}
+		if ($focus && !empty($this->focus)) $return .= draw_form_focus($this->focus);
 
 		return $return;
 	}
@@ -212,6 +205,9 @@ class form {
 					break;
 				case 'text':
 					if ($allow_changes) {
+						//accepts insertion point
+						if (!$this->focus) set_focus($name);
+						
 						$args = array('class'=>$class);
 						if (isset($default)) {
 							$return .= draw_javascript_src();
@@ -226,6 +222,8 @@ class form {
 				case 'textarea':
 				case 'textarea-plain':
 					if ($allow_changes) {
+						//accepts insertion point
+						if (!$this->focus) $this->set_focus($name);
 						if ($class == 'tinymce') {
 							$return .= lib_get('tinymce');
 						} elseif ($class == 'ckeditor') {
@@ -252,7 +250,7 @@ class form {
 			}
 						
 			//wrap it up
-			$return = draw_div_class('field field_' . $this->counter . ' ' . $type . ' ' . $name . (($class) ? ' ' . $class : ''), $return);
+			$return = draw_div_class('field field_' . $this->counter . ' ' . $type . ' ' . $name . (($class) ? ' ' . $class : ''), $return) . NEWLINE;
 			$this->counter++;
 		}
 		return $return;

@@ -615,6 +615,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	}
 
 	$image = draw_tag('img', $arguments);
+	array_argument($alt, 'image');
 	if ($link) return draw_link($link, $image, $linknewwindow, $alt);
 	return $image;
 }
