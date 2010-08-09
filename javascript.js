@@ -2,7 +2,8 @@
 //this file is generated automatically, only edit through joshlib SVN
 
 function ajax_publish(which) {
-	//which.name eg chk_news_12
+	//requires jquery
+	//which.name eg chk_news-items_12
 	var action = which.name.split("_");
 	$.ajax({
 		url : url_action_add('ajax_publish', true),
@@ -16,7 +17,7 @@ function ajax_publish(which) {
 }
 
 function ajax_set(table, column, id, value, update) {
-	//requires jquery to be loaded
+	//requires jquery
 	$.ajax({
 		url : url_action_add('ajax_set', true),
 		type : "POST",
@@ -27,11 +28,6 @@ function ajax_set(table, column, id, value, update) {
 		}
 	});
 	return false;
-}
-
-function ajax_reorder() {
-	//don't know how i'm going to execute this because the function is defined in the script
-	//eg Sortable.create("photos_uws", { tag:"tr", handle:"draggy", ghosting:true, constraint:"vertical", onUpdate:reorder, tree:true });
 }
 
 function cookie_get(name) {
