@@ -341,11 +341,9 @@ function draw_form_file($name, $class=false, $onchange=false) {
 
 function draw_form_focus($name) {
 	global $_josh;
-	if (!isset($_josh['drawn']['focus'])) {
-		//only draw focus once -- don't want competition
-		$_josh['drawn']['focus'] = $name;
-		return draw_javascript('document.getElementById("' . $name . '").focus();');
-	}
+	if (!empty($_josh['drawn']['focus'])) return false; //only draw focus once
+	$_josh['drawn']['focus'] = $name;
+	return draw_javascript('document.getElementById("' . $name . '").focus();');
 }
 
 function draw_form_hidden($name, $value='') {
@@ -458,6 +456,7 @@ function draw_form_text($name, $value='', $args=false, $maxlength=255, $style=fa
 	array_argument($args, 'text');
 	array_argument($args, 'text', 'type');
 	array_argument($args, $name, 'id');
+	array_argument($args, $name, 'name');
 	array_argument($args, $value, 'value');
 	array_argument($args, $maxlength, 'maxlength'); //todo deprecate?
 	array_argument($args, $style, 'style'); //todo deprecate?

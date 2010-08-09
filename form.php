@@ -206,7 +206,7 @@ class form {
 				case 'text':
 					if ($allow_changes) {
 						//accepts insertion point
-						if (!$this->focus) set_focus($name);
+						if (!$this->focus) $this->set_focus($name);
 						
 						$args = array('class'=>$class);
 						if (isset($default)) {
@@ -224,10 +224,13 @@ class form {
 					if ($allow_changes) {
 						//accepts insertion point
 						if (!$this->focus) $this->set_focus($name);
-						if ($class == 'tinymce') {
-							$return .= lib_get('tinymce');
-						} elseif ($class == 'ckeditor') {
-							$return .= lib_get('ckeditor');
+						if ($class) {
+							$args['class'] = $class;
+							if ($class == 'tinymce') {
+								$return .= lib_get('tinymce');
+							} elseif ($class == 'ckeditor') {
+								$return .= lib_get('ckeditor');
+							}
 						}
 						if (isset($default)) {
 							$return .= draw_javascript_src();
@@ -376,7 +379,6 @@ class form {
 						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required'], 'maxlength'=>$c['length']));
 					}
 				} elseif ($c['type'] == 'text') {
-					//todo make tinymce reference dynamic here
 					$this->set_field(array('type'=>'textarea', 'name'=>$c['name'], 'class'=>'tinymce'));
 				} elseif (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
 					$this->set_field(array('type'=>'checkbox', 'name'=>$c['name']));

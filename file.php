@@ -98,7 +98,7 @@ function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
 }
 
 function file_ext($filename) {
-	$info = pathinfo($filename);
+	$info = pathinfo(strToLower($filename));
 	
 	switch ($info['extension']) {
 		//correct horrible filenames
