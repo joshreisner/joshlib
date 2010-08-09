@@ -4,29 +4,29 @@
 function ajax_publish(which) {
 	//which.name eg chk_news_12
 	var action = which.name.split("_");
-
-	//send request		
-	new Ajax.Request(url_action_add('ajax_publish', true), {
-		method: 'post',
-		parameters: { 'table':action[1].replace(/-/g, "_"), 'id':action[2], 'checked':which.checked },
-		onSuccess: function(transport) {
-			//feedback here
-			//alert(transport.responseText);
+	$.ajax({
+		url : url_action_add('ajax_publish', true),
+		type : "POST",
+		data : "table=" + action[1].replace(/-/g, "_") + "&id=" + action[2] + "&checked=" + which.checked,
+		success : function(data) {
+			//alert('hi' + data);
 		}
-	});	
+	});
+	return false;
 }
 
 function ajax_set(table, column, id, value, update) {
-	//success = false;
-	//used by intranet helptext toggle
-	new Ajax.Request(url_action_add('ajax_set', true), {
-		method: 'post',
-		parameters: { 'table':table, 'column':column, 'id':id, 'value':value },
-		onSuccess: function(transport) {
-			if (update && object_exists('object')) update.innerHTML = transport.responseText;
-			function_run('set_' + table + '_' + column, value);
+	//requires jquery to be loaded
+	$.ajax({
+		url : url_action_add('ajax_set', true),
+		type : "POST",
+		data : "table=" + table + "&column=" + column + "&id=" + id + "&value=" + value,
+		success : function(data) {
+			//if (update && object_exists('object')) update.innerHTML = data;
+			//function_run('set_' + table + '_' + column, value);		
 		}
 	});
+	return false;
 }
 
 function ajax_reorder() {
@@ -183,45 +183,26 @@ function form_tinymce_clear(field_id) {
 }
 
 function form_tinymce_init(cssLocation, showplugins) {
-	if (showplugins) {
-		tinyMCE.init({
-			mode : "textareas",
-			theme : "advanced",
-			theme_advanced_buttons1 : "styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,|,bullist,numlist,outdent,indent,|,link,unlink,insertimage,|,code",
-			theme_advanced_buttons2 : "",
-			theme_advanced_buttons3 : "",
-			theme_advanced_resizing : true,		
-			//theme_advanced_statusbar_location : "bottom",
-			theme_advanced_blockformats : "p,h1,h2,h3,h4,blockquote",
-			theme_advanced_toolbar_location : "top",
-			extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align]",
-			content_css : cssLocation + "?" + new Date().getTime(),
-			plugins : "imagemanager,filemanager,paste",
-			editor_selector : "tinymce",
-			editor_deselector : "mceNoEditor",
-			relative_urls : false,
-			remove_script_host : false
-		});
-		//tinyMCE.get('elm1').addShortcut("ctrl+1","nix","Dummy");
-	} else {
-		tinyMCE.init({
-			mode : "textareas",
-			theme : "advanced",
-			theme_advanced_buttons1 : "bold,italic,underline,strikethrough,separator,justifyleft,justifycenter,blockquote,separator,bullist,numlist,separator,link,unlink,|,code",
-			theme_advanced_buttons2 : "",
-			theme_advanced_buttons3 : "",
-			theme_advanced_resizing : true,		
-			//theme_advanced_statusbar_location : "bottom",
-			theme_advanced_toolbar_location : "top",
-			extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[align|style],p[align]",
-			content_css : cssLocation + "?" + new Date().getTime(),
-			editor_selector : "tinymce",
-			editor_deselector : "mceNoEditor",
-			relative_urls : false,
-			remove_script_host : false
-		});
-		
-	}
+	var buttons = (showplugins) ? 
+		"styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,|,bullist,numlist,outdent,indent,|,link,unlink,insertimage,|,code" :
+		"bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,|,link,unlink,|,code";		
+
+	tinyMCE.init({
+		mode : "specific_textareas",
+		theme : "advanced",
+		theme_advanced_buttons1 : buttons,
+		theme_advanced_buttons2 : "",
+		theme_advanced_buttons3 : "",
+		theme_advanced_resizing : true,		
+		theme_advanced_blockformats : "p,h1,h2,h3,h4,blockquote",
+		theme_advanced_toolbar_location : "top",
+		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align]",
+		content_css : cssLocation + "?" + new Date().getTime(),
+		plugins : "imagemanager,filemanager,paste",
+		editor_selector : "tinymce",
+		relative_urls : false,
+		remove_script_host : false
+	});
 }
 
 function form_field_email(obj) {
@@ -458,7 +439,7 @@ function url_query(key) {
 function url_query_set(key, value, returnval) {
 	//sets a query string value.  leaves other query elements alone
 	var query	= window.location.search.substring(1);
-	
+
 	var pairs	= query.split("&");
 	var found	= false;
 	var ret		= Array();
@@ -475,7 +456,11 @@ function url_query_set(key, value, returnval) {
     ret.sort();
     
     var target = location.href;
-   	if (location.hash) target = target.substring(0, target.length - location.hash.length);
+   	if (location.hash) {
+   		target = target.substring(0, target.length - location.hash.length);
+   	} else if (target.substring(target.length-1) == "#") {
+   		target = target.substring(0, target.length-1);
+   	}
    	if (ret.length) {
 	    target = (query) ? target.replace(query, ret.join("&")) : target + '?' + ret.join("&");
    	} else {

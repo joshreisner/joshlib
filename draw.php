@@ -1007,8 +1007,8 @@ function draw_table($array, $name='untitled_table', $css=false) {
 			width:650px;
 			color:transparent;
 			z-index:1000;
-			margin:0px;		      
-		}
+			margin:0px;
+		}		
 	') . $return;
 	
 	return $return;

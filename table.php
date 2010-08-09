@@ -57,7 +57,7 @@ class table {
 				}
 				
 				//row and arguments
-				$id = (isset($v['id'])) ? 'item_' . $v['id'] : false;
+				$id = (isset($v['id'])) ? $this->name . '-row-' . $v['id'] : false;
 				$class = $row;
 				if (!empty($v['class'])) $class .= ' ' . $v['class']; // . ' ' . $row . '_' . $v['class'];
 				if ($counter == 1) $class .= ' first_row';
@@ -96,11 +96,36 @@ class table {
 		}
 		
 		$class = $this->name . ' table'; //temp for intranet
-		$return = draw_container('table', $return, array('cellspacing'=>0, 'class'=>$class));
+		$return = draw_container('table', $return, array('cellspacing'=>0, 'class'=>$class, 'id'=>$this->name));
 		
 		//drag and drop table
 		if ($this->draggable && $count_rows) {
+			$return .= lib_get('tablednd') . draw_javascript('$(document).ready(function() { 
+				$("#' . $this->name . '").tableDnD({
+			        onDrop: function(table, row) {
+				        $.ajax({
+							type: "POST",
+							data: "table=' . $this->name . '&column=' . $this->dragcolumn . '&" + $("#' . $this->name . '").tableDnDSerialize(),
+							url: "' . url_action_add('ajax_reorder') . '",
+							success: function(data) { 
+								//alert(data); 
+							}
+						});
+			        },
+					onDragClass: "dragclass",
+			        dragHandle: "' . $this->draghandle . '"
+			    });
+			});');
 			for ($i = 0; $i <= $bodycounter; $i++) {
+				/*
+				$("#' . $this->name . '").tableDnD({
+			        onDrop: function(table, row) {
+			            alert($("#' . $this->name . '").tableDnDSerialize());
+			        },
+			        dragHandle: "' . $this->draghandle . '"
+			    });
+				*/				
+				/* 2010 08 09 jr - scriptaculous is deprecated
 				$return .= lib_get('scriptaculous') . draw_javascript('
 					function reorder' . $this->name . $i . '() {
 						var options = { method:"post", parameters:Sortable.serialize("' . $this->name . $i . '") + unescape("%26") + "table=' . $this->name . '" + unescape("%26") + "column=' . $this->dragcolumn . '", onSuccess:function(transport) {
@@ -109,7 +134,7 @@ class table {
 						new Ajax.Request("' . url_action_add('ajax_reorder') . '", options);
 					}
 					Sortable.create("' . $this->name . $i . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder' . $this->name . $i . ', tree:true });
-				');
+				');*/
 			}
 		}
 		return $return;

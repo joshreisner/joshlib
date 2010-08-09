@@ -9,24 +9,26 @@ LICENSE
 THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
-	~~TITLE~~~~~~~~~~~~~LANG~~~~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~LICENSE~~~~~~~~~~~~~~~~~~~~
-	> codepress			js		http://sourceforge.net/projects/codepress/			LGPL
-	> fpdf				php		http://www.fpdf.org/								
-	> lightbox2			js		http://www.lokeshdhakar.com/projects/lightbox2/		CC Attribution 2.5
-	> lorem_ipsum		js		http://tinyurl.com/yjrmlcy
-	> prototype			js		http://prototypejs.org/								MIT
-	> salesforce		php		http://developer.force.com/							
-	> scriptaculous		js		http://script.aculo.us/								MIT
-	> simple_html_dom	php		http://sourceforge.net/projects/simplehtmldom/		MIT
-	> swiftmailer		php		http://swiftmailer.org/								LGPL
-	> tinymce			js		http://tinymce.moxiecode.com/						LGPL
+	~~TITLE~~~~~~~~~~~~~LANG~~~~LICENSE~VERSION~UPDATED~~~~~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	> codepress			js		LGPL						http://sourceforge.net/projects/codepress/
+	> file_icons
+	> fpdf				php									http://www.fpdf.org/
+	> jquery			js		MIT		1.4.2	2010-08-09	http://jquery.com/
+	> lorem_ipsum		js									http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
+	> salesforce		php									http://developer.force.com/							
+	> simple_html_dom	php		MIT							http://sourceforge.net/projects/simplehtmldom/
+	> swiftmailer		php		LGPL	4.0.6	2010-08-09	http://swiftmailer.org/
+	> tinymce			js		LGPL	3.3.8	2010-08-09	http://tinymce.moxiecode.com/
+
+	JQUERY EXTENSIONS (in the jquery folder)
+	> table drag and drop		LGPL	0.5		2010-08-09	http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/		
 
 USING THE DEBUGGER
 	you can run the debug() function after joshlib has been included to see output of various processes
 	to debug the loading of the joshlib itself, set $_josh['debug'] = true before you include it
 
-RUNNING ON THE CLI
-	joshlib depends on certain $SERVER variables being present.  add these lines before including joshlib:
+RUNNING ON THE COMMAND LINE
+	joshlib depends on certain $_SERVER variables being present.  add these lines before including joshlib:
 	$_SERVER['HTTP_HOST']		= 'backend.livingcities.org';
 	$_SERVER['SCRIPT_NAME']		= '/salesforce/index.php';
 	$_SERVER['DOCUMENT_ROOT']	= '/home/livingcities/www/backend';
@@ -238,19 +240,26 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				exit;
 			case 'ajax_publish':
 				//todo implement
-				if ($array['checked']) {
+				if ($array['checked'] == 'true') {
 					db_query('UPDATE ' . $array['table'] . ' SET is_published = 1, publish_user = ' . user() . ', publish_date = ' . db_date() . ' WHERE id = ' . $array['id']);
-				} else {
+					echo 'published';
+				} elseif ($array['checked'] == 'false') {
 					db_query('UPDATE ' . $array['table'] . ' SET is_published = 0, publish_user = NULL, publish_date = NULL WHERE id = ' . $array['id']);
+					echo 'unpublished';
 				}
 				exit;
 			case 'ajax_reorder':
 				//db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = NULL');
-				foreach ($array as $key=>$value) {
-					$key = urldecode($key);
-					if (format_text_starts($array['table'], $key)) db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . (format_numeric($key, true) + 1) . ' WHERE id = ' . $value);
+				if (!empty($array['table']) && !empty($array['column'])) {
+					$counter = 1;
+					foreach ($_REQUEST[$array['table']] as $value) {
+						if ($value) {
+							db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . $counter . ' WHERE id = ' . $value);
+							$counter++;
+						}
+					}
+					echo 'reordered ' . $counter . ' rows';
 				}
-				echo 'reordered';
 				exit;
 			case 'ajax_draw_select':
 				//when would this happen?  kthxbai
@@ -268,6 +277,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				} else {
 					echo 'ERROR';
 				}
+				echo 'working';
 				exit;
 			case 'db_check':
 				$tables = db_tables();
@@ -464,24 +474,28 @@ function lib_get($string) {
 		case 'jquery' :
 		case 'jquery-latest' :
 		case 'lorem_ipsum' :
-		case 'prototype' :
-		case 'scriptaculous' :
+		case 'tablednd' :
 		case 'tinymce' :
 		if (isset($_josh['drawn'][$string])) return false;
 		
 		$_josh['drawn'][$string] = true;
 		$return = draw_javascript_src(lib_location($string));
-		
+
 		if ($string == 'tinymce') {
 			//special statements for tinymce
 			file_dir_writable('images');
 			file_dir_writable('files');
 			$return .= draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
-		} elseif ($string == 'scriptaculous') {
-			$return = lib_get('prototype') . $return;
+		} elseif ($string == 'tablednd') {
+			$return = lib_get('jquery') . $return;
 		}
 		
 		return $return;
+
+		//deprecated
+		case 'prototype' :
+		case 'scriptaculous' :
+		return error_handle('Prototype and Scriptaculous are deprecated', 'As of August 9th 2010, jQuery is the official Javascript framework of Joshlib');
 	}
 }
 
@@ -502,12 +516,6 @@ function lib_location($string) {
 		case 'lorem_ipsum' :
 		return $lib . 'lorem_ipsum.js';
 				
-		case 'prototype' :
-		return $lib . 'prototype-1.5.0.js';
-		
-		case 'scriptaculous' :
-		return $lib . 'scriptaculous-1.6.5/scriptaculous.js';
-
 		case 'salesforce' :
 		return DIRECTORY_ROOT . $lib . 'phptoolkit-13_1/soapclient/SforceEnterpriseClient.php';
 		
@@ -517,8 +525,11 @@ function lib_location($string) {
 		case 'swiftmailer' :
 		return DIRECTORY_ROOT . $lib . 'swift_required.php';
 		
+		case 'tablednd' :
+		return DIRECTORY_WRITE . '/lib/jquery/jquery.tablednd_0_5.js';
+		
 		case 'tinymce' :
-		return $lib . 'tinymce-3.3rc1/tiny_mce.js';
+		return $lib . 'tinymce_3_3_8/tiny_mce.js';
 	}
 }
 
