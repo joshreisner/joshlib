@@ -200,7 +200,8 @@ function draw_div($id, $innerhtml=false, $arguments=false, $dbinfo=false) {
 					cancel	: false,
 					submit	: false,
 					onblur	: "submit",
-					event	: "dblclick"
+					event	: "dblclick",
+					data: function(value, settings) { return value.replace(/<br[\s\/]?>/gi, "\n"); }
 				});
 			});	
 		');

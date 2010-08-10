@@ -275,7 +275,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				//if (($array['table'] == 'app_objects')) $array['value'] = str_replace("\n", '<br/>', $array['value']); //nl2br($array['value'])
 				
 				if (db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = \'' . $array['value'] . '\' WHERE id = ' . $array['id'])) {
-					echo (stristr($array['column'], 'date')) ? format_date($array['value']) : format_quotes($array['value'], true);
+					echo (stristr($array['column'], 'date')) ? format_date($array['value']) : str_ireplace("\n", '<br/>', format_quotes($array['value'], true));
 				} else {
 					echo 'ERROR';
 				}
