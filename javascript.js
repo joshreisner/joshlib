@@ -324,6 +324,14 @@ function map_marker(latitude, longitude, html, icon, autoclick) {
 	return marker;
 }
 
+function nl2br(str, reverse) {
+	if (reverse) {
+		return str.replace(/<br[\s\/]?>/gi, '\n');
+	} else {
+		return str.replace('\n', '<br/>');
+	}
+}
+
 function object_exists(obj) {
 	return (typeof(obj) == 'object');
 }

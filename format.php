@@ -755,8 +755,12 @@ function format_quantitize($quantity, $entity, $title_case=true) {
 	return $return;
 }
 
-function format_quotes($string) {
-	if (format_verify($string, 'string')) $string = trim(str_replace("'", "''", stripslashes($string)));
+function format_quotes($string, $reverse=false) {
+	if ($reverse) {
+		$string = trim(str_replace("''", "'", stripslashes($string)));
+	} else {
+		if (format_verify($string, 'string')) $string = trim(str_replace("'", "''", stripslashes($string)));
+	}
 	return $string;
 }
 

@@ -21,6 +21,7 @@ THIRD PARTY SOFTWARE
 	> tinymce			js		LGPL	3.3.8	2010-08-09	http://tinymce.moxiecode.com/
 
 	JQUERY EXTENSIONS (in the jquery folder)
+	> jeditable									2010-08-10	http://www.appelsiini.net/projects/jeditable
 	> table drag and drop		LGPL	0.5		2010-08-09	http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/		
 
 USING THE DEBUGGER
@@ -266,18 +267,19 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				echo draw_form_select($array['name'], 'SELECT id, value FROM ' . $array['table'] . ' WHERE is_active = 1', $array['value'], $array['required']);
 				exit;
 			case 'ajax_set':
+			
 				//todo, better column type sensing
 				if (stristr($array['column'], 'date')) $array['value'] = format_date($array['value'], 'NULL', 'SQL');
 				
 				//special exception for #panel in cms on object list and form pages
-				if (($array['table'] == 'app_objects')) $array['value'] = str_replace("\n", '<br/>', $array['value']); //nl2br($array['value'])
+				//if (($array['table'] == 'app_objects')) $array['value'] = str_replace("\n", '<br/>', $array['value']); //nl2br($array['value'])
 				
 				if (db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = \'' . $array['value'] . '\' WHERE id = ' . $array['id'])) {
-					echo (stristr($array['column'], 'date')) ? format_date($array['value']) : $array['value'];
+					echo (stristr($array['column'], 'date')) ? format_date($array['value']) : format_quotes($array['value'], true);
 				} else {
 					echo 'ERROR';
 				}
-				echo 'working';
+
 				exit;
 			case 'db_check':
 				$tables = db_tables();
@@ -471,6 +473,7 @@ function lib_get($string) {
 		return include_once(lib_location($string));
 		
 		//javascript libraries
+		case 'jeditable' :
 		case 'jquery' :
 		case 'jquery-latest' :
 		case 'lorem_ipsum' :
@@ -486,7 +489,7 @@ function lib_get($string) {
 			file_dir_writable('images');
 			file_dir_writable('files');
 			$return .= draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
-		} elseif ($string == 'tablednd') {
+		} elseif (($string == 'tablednd') || ($string == 'jeditable')) {
 			$return = lib_get('jquery') . $return;
 		}
 		
@@ -507,6 +510,9 @@ function lib_location($string) {
 		case 'fpdf' :
 		return DIRECTORY_ROOT . $lib . 'fpdf-1.6.php';
 		
+		case 'jeditable' :
+		return DIRECTORY_WRITE . '/lib/jquery/jquery.jeditable.mini.js';
+
 		case 'jquery' :
 		return $lib . 'jquery-1.4.2.min.js';
 		
