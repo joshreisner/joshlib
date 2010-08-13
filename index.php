@@ -455,7 +455,7 @@ function language_translate($string, $from, $to) {
 		
 		// now, process the JSON string
 		$json = json_decode($body, true);
-		if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string was ' . strlen($c) . '.  ' . draw_array($json));	
+		if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string length was ' . strlen($c) . BR . BR . $c . BR . BR . '.  json was ' . $json . draw_array($json));	
 		$string .= $json['responseData']['translatedText'];
 	}
 	return format_quotes($string);
