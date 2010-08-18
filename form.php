@@ -68,7 +68,7 @@ class form {
 		$return = draw_div_class('fieldset', draw_tag('fieldset', false, $return));
 		
 		//wrap in form
-		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$_josh['request']['path_query'], 'name'=>$this->name, 'class'=>$this->name, 'onsubmit'=>'javascript:return form_validate(this);'), $return);
+		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$_josh['request']['path_query'], 'name'=>$this->name, 'id'=>$this->name, 'class'=>$this->name, 'onsubmit'=>'javascript:return form_validate(this);'), $return);
 		
 		//focus on first element
 		if ($focus && !empty($this->focus)) $return .= draw_form_focus($this->focus);
