@@ -806,7 +806,7 @@ function format_ssn($str) {
 	return substr($str, 0, 3) . '-' . substr($str, 3, 2) . '-' . substr($str, 5, 4);
 }
 
-function format_string($string, $target=30, $append='&hellip;') {
+function format_string($string, $target=30, $append='&hellip; ') {
 	//shorten a $string to $target length, breaking on the ends of words
 	$str_new = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 	$encoded = ($str_new != $string);
@@ -828,12 +828,13 @@ function format_string($string, $target=30, $append='&hellip;') {
 				$length += $wordlength;
 			}
 		}
+		if ($encoded) $return = htmlentities($return, ENT_QUOTES, 'UTF-8');
 		$return .= $append;
 	} else {
 		$return = $str_new;
+		if ($encoded) $return = htmlentities($return, ENT_QUOTES, 'UTF-8');
 	}
 	//die('the length is ' . strlen($return));
-	if ($encoded) $return = htmlentities($return, ENT_QUOTES, 'UTF-8');
 	return $return;
 }
 
