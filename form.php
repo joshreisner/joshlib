@@ -13,6 +13,7 @@ class form {
 	var $readonly		= false;
 	var $focus			= false;
 	var $counter		= 1;
+	var $javascript		= array();
 	
 	function __construct($name, $id=false, $submit=true, $cancel=false, $readonly=false) {
 		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
@@ -72,6 +73,14 @@ class form {
 		
 		//focus on first element
 		if ($focus && !empty($this->focus)) $return .= draw_form_focus($this->focus);
+
+		//if javascript, prepend validation function
+		if (count($this->javascript)) $return = draw_javascript('
+			function validate_' . $this->name . '() { 
+				var errors = new Array();
+				' . implode(NEWLINE, $this->javascript) . ' 
+				return form_errors(errors);
+			}') . $return;
 
 		return $return;
 	}
@@ -215,6 +224,8 @@ class form {
 							$args['onblur'] = 'javascript:form_field_default(this, false, "' . $default . '");';
 						}
 						$return .= draw_form_text($name, $value, $args, $maxlength, false, false) . $additional;
+						
+						if ($required) $this->javascript[] = 'if (form_text_empty(document.' . $this->name . '.' . $name . ')) errors[errors.length] = "the ' . $label . ' field is empty";';
 					} else {
 						$return .= ($name == 'url') ? draw_link($value) : $value;
 					}
@@ -246,6 +257,7 @@ class form {
 					if ($allow_changes) {
 						if (!$value) $value = 'http://';
 						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+						if ($required) $this->javascript[] = 'if (form_url_empty(document.' . $this->name . '.' . $name . ')) errors[errors.length] = "the ' . $label . ' field is empty";';
 					} else {
 						$return .= draw_link($value);
 					}

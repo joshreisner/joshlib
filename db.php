@@ -577,6 +577,7 @@ function db_save($table, $id='get', $array=false) {
 				$value = "'" . $array[$c['name']] . "'";
 				//$value = ''' . format_html_entities($array[$c['name']]) . ''';
 				if (($value == "''") && (!$c['required'])) $value = 'NULL'; //special null
+				if (($value == "'http://'")) $value = 'NULL'; //url special null
 			} elseif (($c['type'] == 'text') || ($c['type'] == 'longtext')) { //textarea
 				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
 				$value = "'" . format_html($array[$c['name']] . "'");

@@ -252,6 +252,17 @@ function form_text_complex(text) {
 	return complex;
 }
 
+function form_text_empty(obj) {
+	var str = trim(obj.value);
+	return !str.length;
+}
+
+function form_url_empty(obj) {
+	var str = trim(obj.value);
+	str = str.replace('http://', '').replace('https://', '');
+	return !str.length;
+}
+
 function form_validate(form) {
 	if (eval("typeof validate_" + form.name + " == 'function'")) {
 		return eval("validate_" + form.name + "(form);");
@@ -405,6 +416,14 @@ function scroll_to(newPallet, dont_clear_interval) {
 	scrollvars.duration	= 25;
 	scrollvars.element	= scroll_element;
 	scrollvars.timer	= setInterval("scroll_horizontally();", 15);
+}
+
+function trim(str) {
+	var l = 0;
+	var r = str.length -1;
+	while (l < str.length && str[l] == ' ') l++;
+	while (r > l && str[r] == ' ') r -= 1;
+	return str.substring(l, r+1);
 }
 
 function url_action_add(value, returnval) {
