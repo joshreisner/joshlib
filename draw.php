@@ -235,14 +235,21 @@ function draw_dl($array, $class=false) {
 }
 
 function draw_doctype($version=false) {
+	//version could be 4, 5, strict or transitional
 	global $_josh;
 	if ($version) { //set version
-		$_josh['html'] = $version;
+		if ($version == 5) {
+			$_josh['html'] = 5;
+		} else {
+			$_josh['html'] = 4;
+		}
 	} else { //get version
 		$version = $_josh['html'];
 	}
 	if ($version == 4) {
 		return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
+	} elseif ($version == 'strict') {
+		return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html>';
 	} elseif ($version == 5) {
 		return '<!DOCTYPE html><html>';
 	}
