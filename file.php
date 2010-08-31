@@ -144,7 +144,6 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 			$thisfile = array(
 				'name'=>$name,
 				'ext'=>@$file['extension'],
-				'human'=>format_text_human(@$file['filename']), 
 				'path_name'=>str_replace(DIRECTORY_ROOT, '', $folder) . '/' . $name,
 				'type'=>@filetype($folder . '/' . $name),
 				'fmod'=>@filemtime($folder . '/' . $name),
