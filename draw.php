@@ -287,14 +287,14 @@ function draw_form_button($text, $location=false, $class=false, $disabled=false,
 	return $return;
 }
 
-function draw_form_checkbox($name, $checked=false, $arguments=false, $javascript=false, $title=false) {
+function draw_form_checkbox($name, $checked=false, $arguments=false, $javascript=false, $label=false) {
 	$arguments = array_arguments($arguments);
 	$arguments['class'] = (empty($arguments['class'])) ? 'checkbox' : $arguments['class'] . ' checkbox';
 	$arguments['type'] = 'checkbox';
 	$arguments['name'] = $arguments['id'] = $name;
 	if ($javascript) $arguments['onclick'] = 'javascript:' . $javascript;
 	if ($checked) $arguments['checked'] = 'checked';
-	return draw_tag('input', $arguments) . ($title ? draw_tag('label', array('for'=>$name, 'class'=>$arguments['class']), $title) : false);
+	return draw_tag('input', $arguments) . ($label ? draw_form_label($name, $label, $arguments['class']) : false);
 }
 
 function draw_form_checkboxes($name, $linking_table=false, $object_col=false, $option_col=false, $id=false) {
@@ -378,6 +378,10 @@ function draw_form_hidden($name, $value='') {
 function draw_form_img($url, $class='submit') {
 	if (empty($class)) $class = 'submit';
 	return draw_tag('input', array('type'=>'image', 'src'=>$url, 'class'=>$class));
+}
+
+function draw_form_label($for, $content, $class) {
+	return draw_tag('label', array('for'=>$for, 'class'=>$class), $content);
 }
 
 function draw_form_password($name, $value='', $class=false, $maxlength=255) {

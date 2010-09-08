@@ -43,7 +43,7 @@ function format_accents_remove($string) {
     return strtr(utf8_decode($string), utf8_decode($from), $to);
 }
 
-function format_array_text($array) {
+function format_array_text($array, $separator='and') {
 	if (!is_array($array)) {
 		//string
 		return $array;
@@ -54,7 +54,7 @@ function format_array_text($array) {
 		return $array[0];
 	} else {
 		$last = array_pop($array);
-		return implode(', ', $array) . ' and ' . $last;
+		return implode(', ', $array) . ' ' . $separator . ' ' . $last;
 	}
 }
 
