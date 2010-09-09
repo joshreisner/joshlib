@@ -498,9 +498,10 @@ function draw_form_textarea($name, $value='', $args=false) {
 	array_argument($args, $name, 'name');
 	array_argument($args, $name, 'id');
 	
-	//legacy, remove?
+	//validator requires these values
 	if (empty($args['rows'])) $args['rows'] = 5;
 	if (empty($args['cols'])) $args['cols'] = 50;
+	
 	if (!$value) $value = '';
 
 	return draw_tag('textarea', $args, $value);
