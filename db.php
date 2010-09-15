@@ -842,6 +842,7 @@ function db_words($text, $object_id, $join_table='objects_to_words', $words_tabl
 	global $_josh;
 
 	//todo make part of db_table_create
+	if (!db_table_exists($words_table)) db_query('CREATE TABLE `' . $words_table . '` ( `id` int(11) NOT NULL AUTO_INCREMENT, `word` varchar(255) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 	if (!db_table_exists($join_table)) db_query('CREATE TABLE `' . $join_table . '` ( `object_id` int(11) NOT NULL, `word_id` int(11) NOT NULL, `count` int(11) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 	
 	//todo need to fix usage of split here
