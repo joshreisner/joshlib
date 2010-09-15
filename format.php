@@ -40,6 +40,12 @@ function format_accents_remove($string) {
 	$string = html_entity_decode($string);
 	$from	= 'áàäâçéèëêíìïîóòöôøúùüûñ';
 	$to		= 'aaaaceeeeiiiiooooouuuun';
+	
+	$string = str_replace('&rsquo;', "'", $string);
+	$string = str_replace('&lsquo;', "'", $string);
+	$string = str_replace('&rdsquo;', '"', $string);
+	$string = str_replace('&ldsquo;', '"', $string);
+	
     return strtr(utf8_decode($string), utf8_decode($from), $to);
 }
 

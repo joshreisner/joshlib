@@ -153,6 +153,13 @@ function array_insert_assoc($array, $position, $key, $value) {
     return $array;
 }
 
+function array_instances($array, $needle) {
+	//returns a count of all the instances of needle in array
+	$count = 0;
+	foreach ($array as $value) if ($needle == $value) $count++;
+	return $count;
+}
+
 function array_key_filter($array, $key, $value) {
 	//only return array keys of a particular value
 	$return = array();

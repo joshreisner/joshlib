@@ -522,7 +522,7 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 
 }
 
-function db_save($table, $id='get', $array=false) {
+function db_save($table, $id='get', $array='post', $create_index=true) {
 	global $_josh;
 		
 	//default behavior is to use $_GET['id'] as the id number to deal with
@@ -535,13 +535,14 @@ function db_save($table, $id='get', $array=false) {
 	
 	$userID = user('NULL');
 	
-	if (!$array) $array = $_POST;
+	if ($array == 'post') $array = $_POST;
 	if ($id) $values = db_grab('SELECT * FROM ' . $table . ' WHERE id = ' . $id);
 	
 	$columns	= db_columns($table, true);
 	$query1		= array();
 	$query2		= array();
 	$required	= $_josh['system_columns'];
+	$full_text	= false;
 	//debug();
 	
 	foreach ($columns as $c) {
@@ -575,14 +576,13 @@ function db_save($table, $id='get', $array=false) {
 			} elseif ($c['type'] == 'varchar') { //text
 				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
 				$value = "'" . $array[$c['name']] . "'";
-				//$value = ''' . format_html_entities($array[$c['name']]) . ''';
+				if (($c['name'] != 'url') && ($c['name'] != 'password')) $full_text .= $value;
 				if (($value == "''") && (!$c['required'])) $value = 'NULL'; //special null
 				if (($value == "'http://'")) $value = 'NULL'; //url special null
 			} elseif (($c['type'] == 'text') || ($c['type'] == 'longtext')) { //textarea
 				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
 				$value = "'" . format_html($array[$c['name']] . "'");
-			//} elseif (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
-			//	$value = format_boolean($array[$c['name']], '1|0');
+				$full_text .= $value;
 			} elseif ($c['type'] == 'datetime') {
 				//this would never happen
 				$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
@@ -705,11 +705,16 @@ function db_save($table, $id='get', $array=false) {
 	}
 	
 	//handle checkboxes based on foreign key situation
+	//todo deprecate
 	if ($keys = db_keys_to($table)) {
 		foreach ($keys as $key) {
 			db_checkboxes($key['ref_table'], $key['table_name'], $key['column_name'], $key['name'], $id);
 		}
 	}
+	
+	//if possible, populate search indexes
+	if ($full_text) db_words($full_text, $id, $table . '_to_words');
+	
 	return $id;
 }
 
@@ -742,6 +747,7 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 	if ($fields) foreach ($fields as $field=>$type) $columns .= '`' . strToLower($field) . '` ' . db_column_type($type) . ' DEFAULT NULL, ';
 	
 	//run sql
+	//todo make system fields optional
 	if (db_query('CREATE TABLE `' . $tablename . '` (
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  ' . $columns . '
@@ -820,25 +826,60 @@ function db_translate($sql, $from, $to) {
 
 function db_undelete($table, $id=false) {
 	//undeleting an object does not update it
-	global $_SESSION;
-	if (!$id) {
-		if (isset($_GET['id'])) {
-			$id = $_GET['id'];
-		} else {
-			error_handle('expecting \$_GET[\'id\']', 'db_delete is expecting an id variable');
-		}
-	}
-	db_query('UPDATE ' . $table . ' SET 
-		deleted_date = NULL, 
-		deleted_user = NULL, 
-		is_active = 1
-		WHERE id = ' . $id);
+	if (!$id) $id = url_id();
+	if (!$id) error_handle('expecting \$_GET[\'id\']', __function__ . ' is expecting an id variable');
+	db_query('UPDATE ' . $table . ' SET deleted_date = NULL, deleted_user = NULL, is_active = 1 WHERE id = ' . $id);
 }
 
-function db_updated($table=false) {
-	//$table generally means a disambuiguator, eg SELECT t.id FROM table t, although it could also be the table name
-	$table = ($table) ? $table . '.' : '';
+function db_updated($table='') {
+	//$table generally means a disambuiguator, eg SELECT t.id or SELECT table_name.id
+	if (!empty($table)) $table .= '.';
 	return 'IFNULL(' . $table . 'updated_date, ' . $table . 'created_date) updated';
+}
+
+function db_words($text, $object_id, $join_table='objects_to_words', $words_table='words') {
+	//maintain an index of words for searching.  requires a words table and a linking table
+	global $_josh;
+
+	//todo make part of db_table_create
+	if (!db_table_exists($join_table)) db_query('CREATE TABLE `' . $join_table . '` ( `object_id` int(11) NOT NULL, `word_id` int(11) NOT NULL, `count` int(11) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
+	
+	//todo need to fix usage of split here
+	$words = array_diff(@split('[^[:alpha:]]+', strtolower(format_accents_remove(strip_tags($text)))), $_josh['ignored_words']);
+	
+	$words_unique = array_unique($words);
+	//die(draw_array($words) . '<hr><pre>' . $text . '</pre>');
+	
+	db_query('DELETE FROM ' . $join_table . ' WHERE object_id = ' . $object_id);
+	foreach ($words_unique as $word) {
+		if (!$word_id = db_grab('SELECT id FROM words WHERE word = "' . $word . '"')) $word_id = db_query('INSERT INTO words ( word ) VALUES ( "' . $word . '" )');
+		db_query('INSERT INTO ' . $join_table . ' ( word_id, object_id, count ) VALUES ( ' . $word_id . ', ' . $object_id . ', ' . array_instances($words, $word) . ' )');
+	}
+}
+
+function db_words_refresh($words_table='words') {
+	//refresh indexes for whole database
+	$tables = db_tables();
+	foreach ($tables as $t) {
+		if ($t == $words_table) continue;
+		$columns = db_columns($t);
+		$text_cols = array();
+		$id_present = false;
+		foreach ($columns as $c) {
+			if (($c['name'] == 'id') && ($c['type'] == 'int')) $id_present = true;
+			if ((($c['type'] == 'varchar') || ($c['type'] == 'text')) && ($c['name'] != 'url') && ($c['name'] != 'password')) $text_cols[] = $t . '.' . $c['name'];
+		}
+		if ($id_present && count($text_cols)) {
+			echo implode(', ', $text_cols) . BR;
+			if (count($text_cols) > 1) {
+				$values = db_table('SELECT id, CONCAT_WS(" ", ' . implode(', ', $text_cols) . ') text FROM ' . $t);
+			} else {
+				$values = db_table('SELECT id, ' . $text_cols[0] . ' text FROM ' . $t);
+			}
+			foreach ($values as $v) db_words($v['text'], $v['id'], $t . '_to_words', $words_table);
+		}
+	}
+	exit;
 }
 
 ?>
