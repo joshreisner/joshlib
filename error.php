@@ -114,7 +114,7 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	*/
 
 	//render
-	$subject = 'Error: ' . $type;
+	$subject = '[Joshlib Error] ' . $type;
 	$message = error_draw($type, $message);
 	
 	//notify

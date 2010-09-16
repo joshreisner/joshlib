@@ -858,11 +858,15 @@ function db_words($text, $object_id, $join_table='objects_to_words', $words_tabl
 	}
 }
 
-function db_words_refresh($words_table='words') {
+function db_words_refresh($specific_tables=false, $words_table='words') {
+	
+	if ($specific_tables) $specific_tables = array_separated($specific_tables);
+
 	//refresh indexes for whole database
 	$tables = db_tables();
 	foreach ($tables as $t) {
 		if ($t == $words_table) continue;
+		if ($specific_tables && !in_array($t, $specific_tables)) continue;
 		$columns = db_columns($t);
 		$text_cols = array();
 		$id_present = false;
