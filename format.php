@@ -302,15 +302,10 @@ function format_file_size($file) {
 	return format_size($size);
 } 
 
-function format_highlight($haystack, $needles, $style='background-color:#FFFFBB;padding:1px;font-weight:bold;') {
+function format_highlight($haystack, $needles) {
 	//sometimes you want to use a highlighter on html -- usually in search results
 	if (is_array($needles)) $needles = implode('|', $needles);
-	return preg_replace('/($needles)/i','<span style="' . $style . '"><b>\\0</b></span>', $haystack);
-}
-
-function format_hilite($haystack, $needles, $style='background-color:#FFFFBB;padding:1px;font-weight:bold;') {
-	//alias of format_highlight
-	return format_highlight($haystack, $needles, $style);
+	return preg_replace("/($needles)/i",'<span class="highlight"><b>\\0</b></span>', $haystack);
 }
 
 function format_html($text) {
@@ -353,7 +348,7 @@ function format_html($text) {
 				//no empty divs
 				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = '';
 			} elseif ($e->tag == 'em') {
-				//personal preference: replace <strong> with <b>
+				//personal preference: replace <em> with <i>
 				$e->outertext = '<i>' . $e->innertext . '</i>';
 			//} elseif ($e->tag == 'img') {
 				//no small, narrow or flat images
