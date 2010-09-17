@@ -391,14 +391,24 @@ function draw_form_password($name, $value='', $class=false, $maxlength=255) {
 	return $return;
 }
 
-function draw_form_radio($name, $value='', $checked=false, $class=false) {
-	global $_josh;
-	$class = ($class) ? $class . ' radio' : 'radio';
-	$return  = '<input type="radio" name="' . $name . '" value="' . $value . '"';
-	if ($class) $return .= ' class="' . $class . '"';
-	if ($checked) $return .= ' checked';
-	$return .= '>';
-	return $return;
+function draw_form_radio($name, $value='', $checked=false, $args=false, $label=false) {
+	$args = array_arguments($args);
+	array_argument($args, 'radio');
+	array_argument($args, 'radio', 'type');
+	if ($checked) array_argument($args, 'checked', 'checked');
+	array_argument($args, $name . '-' . $value, 'id');
+	array_argument($args, $name, 'name');
+	array_argument($args, $value, 'value');
+	return draw_tag('input', $args) . ($label ? draw_tag('label', array('for'=>$name . '-' . $value), $label) : '');
+}
+
+function draw_form_radio_set($name, $sql_options, $value=false) {
+	$options = array();
+	if (!is_array($sql_options)) $sql_options = array_key_promote(db_table($sql_options));
+	foreach ($sql_options as $key=>$val) {
+		$options[] = draw_form_radio($name, $key, ($key == $value), false, $val);
+	}
+	return draw_list($options);
 }
 
 function draw_form_select($name, $sql_options, $value=false, $not_nullable=true, $class=false, $onchange=false, $nullvalue='', $maxlength=60, $disabled=false) {
