@@ -538,127 +538,128 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	if ($array == 'post') $array = $_POST;
 	if ($id) $values = db_grab('SELECT * FROM ' . $table . ' WHERE id = ' . $id);
 	
-	$columns	= db_columns($table, true);
 	$query1		= array();
 	$query2		= array();
 	$required	= $_josh['system_columns'];
 	$full_text	= false;
 	//debug();
 	
-	foreach ($columns as $c) {
-		error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type'], __file__, __line__);
-		
-		//making bits always required, never null
-		if (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
-			$value = format_boolean(empty($array[$c['name']]), '0|1');
-			if ($id) {
-				$query1[] = $c['name'] . ' = ' . $value;
-			} else {
-				$query1[] = $c['name'];
-				$query2[] = $value;
-			}
-		} elseif (isset($array[$c['name']])) {
-			//we have a value to save for this column
-			if (($c['type'] == 'decimal') || ($c['type'] == 'float')) {
-				$value = format_null(format_numeric($array[$c['name']], false));
-			} elseif ($c['type'] == 'int') { //integer
-				$value = format_null(format_numeric($array[$c['name']], true));
-			} elseif (($c['type'] == 'mediumblob') && ($c['name'] == 'password')) {
+	if ($columns	= db_columns($table, true)) {
+		foreach ($columns as $c) {
+			error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type'], __file__, __line__);
+			
+			//making bits always required, never null
+			if (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
+				$value = format_boolean(empty($array[$c['name']]), '0|1');
 				if ($id) {
-					$query1[] = $c['name'] . ' = ' . db_pwdencrypt($value);
+					$query1[] = $c['name'] . ' = ' . $value;
 				} else {
 					$query1[] = $c['name'];
-					$query2[] = db_pwdencrypt($value);
+					$query2[] = $value;
 				}
-			} elseif (($c['type'] == 'mediumblob') || ($c['type'] == 'image')) { //document
-				$value = format_binary($array[$c['name']]);
-				//die('length is ' . strlen($array[$c['name']]));
-			} elseif ($c['type'] == 'varchar') { //text
-				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
-				$value = "'" . $array[$c['name']] . "'";
-				if (($c['name'] != 'url') && ($c['name'] != 'password')) $full_text .= $value;
-				if (($value == "''") && (!$c['required'])) $value = 'NULL'; //special null
-				if (($value == "'http://'")) $value = 'NULL'; //url special null
-			} elseif (($c['type'] == 'text') || ($c['type'] == 'longtext')) { //textarea
-				if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
-				$value = "'" . format_html($array[$c['name']] . "'");
-				$full_text .= $value;
-			} elseif ($c['type'] == 'datetime') {
-				//this would never happen
-				$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
-			} elseif ($c['type'] == 'date') {
-				//new date field
-				if (empty($array[$c['name']])) {
-					if (!$c['required']) {
-						$value = 'NULL';
+			} elseif (isset($array[$c['name']])) {
+				//we have a value to save for this column
+				if (($c['type'] == 'decimal') || ($c['type'] == 'float')) {
+					$value = format_null(format_numeric($array[$c['name']], false));
+				} elseif ($c['type'] == 'int') { //integer
+					$value = format_null(format_numeric($array[$c['name']], true));
+				} elseif (($c['type'] == 'mediumblob') && ($c['name'] == 'password')) {
+					if ($id) {
+						$query1[] = $c['name'] . ' = ' . db_pwdencrypt($value);
 					} else {
-						error_handle('required value', $c['name'] . ' is required');
+						$query1[] = $c['name'];
+						$query2[] = db_pwdencrypt($value);
+					}
+				} elseif (($c['type'] == 'mediumblob') || ($c['type'] == 'image')) { //document
+					$value = format_binary($array[$c['name']]);
+					//die('length is ' . strlen($array[$c['name']]));
+				} elseif ($c['type'] == 'varchar') { //text
+					if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
+					$value = "'" . $array[$c['name']] . "'";
+					if (($c['name'] != 'url') && ($c['name'] != 'password')) $full_text .= $value;
+					if (($value == "''") && (!$c['required'])) $value = 'NULL'; //special null
+					if (($value == "'http://'")) $value = 'NULL'; //url special null
+				} elseif (($c['type'] == 'text') || ($c['type'] == 'longtext')) { //textarea
+					if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
+					$value = "'" . format_html($array[$c['name']] . "'");
+					$full_text .= $value;
+				} elseif ($c['type'] == 'datetime') {
+					//this would never happen
+					$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
+				} elseif ($c['type'] == 'date') {
+					//new date field
+					if (empty($array[$c['name']])) {
+						if (!$c['required']) {
+							$value = 'NULL';
+						} else {
+							error_handle('required value', $c['name'] . ' is required');
+						}
+					} else {
+						$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
 					}
 				} else {
-					$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
+					error_handle('unhandled data type', 'db_save hasn\'t been programmed yet to handle ' . $c['type']);
 				}
-			} else {
-				error_handle('unhandled data type', 'db_save hasn\'t been programmed yet to handle ' . $c['type']);
-			}
-			
-			if ($id) {
-				$query1[] = $c['name'] . ' = ' . $value;
-			} else {
-				$query1[] = $c['name'];
-				$query2[] = $value;
-			}
-		} elseif (isset($array[$c['name'] . 'Month'])) {
-			//this could be a date or datetime -- field names don't match column because there are three parts
-			if ($c['type'] == 'datetime') {
-				$value = format_post_date($c['name'], $array);
-			} elseif ($c['type'] == 'date') {
-				$value = format_post_date($c['name'], $array);
-			}
-			if ($id) {
-				$query1[] = $c['name'] . ' = ' . $value;
-			} else {
-				$query1[] = $c['name'];
-				$query2[] = $value;
-			}
-		} elseif (($c['type'] == 'mediumblob') && ($file = file_get_uploaded($c['name']))) {
-			//file isn't getting passed in (after resizing eg), but was uploaded
-			$value = format_binary($file);		
-			if ($id) {
-				$query1[] = $c['name'] . ' = ' . $value;
-			} else {
-				$query1[] = $c['name'];
-				$query2[] = $value;
-			}
-		} elseif (($c['type'] == 'varchar') && ($c['name'] == 'secret_key')) {
-			if ($id && empty($values['secret_key'])) {
-				$query1[] = 'secret_key = ' . db_key();
-			} elseif (!$id) {
-				$query1[] = $c['name'];
-				$query2[] = db_key();
-			}
-		} elseif ($id) {
-			//this is an update, so don't do anything
-			//needs to go above the default one!  eg living cities web pages level field
-		} elseif (!empty($c['default'])) {
-			//we have a default value to set for this
-			if ($id) {
-				$query1[] = $c['name'] . ' = ' . $c['default'];
-			} else {
-				$query1[] = $c['name'];
-				$query2[] = $c['default'];
-			}
-		} elseif ($c['name'] == 'precedence') {
-			//setting the precedence for a new object -- insert into slot 1, increment everything else
-			$query1[] = 'precedence';
-			$query2[] = 1;
-			db_query('UPDATE ' . $table . ' SET precedence = precedence + 1');
-		} elseif ($c['required']) {
-			//fill values with admin defaults
-			if (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
-				$query1[] = $c['name'];
-				$query2[] = 0;
-			} else {
-				error_handle('required value missing', 'db_save is expecting a value for ' . $c['name']);
+				
+				if ($id) {
+					$query1[] = $c['name'] . ' = ' . $value;
+				} else {
+					$query1[] = $c['name'];
+					$query2[] = $value;
+				}
+			} elseif (isset($array[$c['name'] . 'Month'])) {
+				//this could be a date or datetime -- field names don't match column because there are three parts
+				if ($c['type'] == 'datetime') {
+					$value = format_post_date($c['name'], $array);
+				} elseif ($c['type'] == 'date') {
+					$value = format_post_date($c['name'], $array);
+				}
+				if ($id) {
+					$query1[] = $c['name'] . ' = ' . $value;
+				} else {
+					$query1[] = $c['name'];
+					$query2[] = $value;
+				}
+			} elseif (($c['type'] == 'mediumblob') && ($file = file_get_uploaded($c['name']))) {
+				//file isn't getting passed in (after resizing eg), but was uploaded
+				$value = format_binary($file);		
+				if ($id) {
+					$query1[] = $c['name'] . ' = ' . $value;
+				} else {
+					$query1[] = $c['name'];
+					$query2[] = $value;
+				}
+			} elseif (($c['type'] == 'varchar') && ($c['name'] == 'secret_key')) {
+				if ($id && empty($values['secret_key'])) {
+					$query1[] = 'secret_key = ' . db_key();
+				} elseif (!$id) {
+					$query1[] = $c['name'];
+					$query2[] = db_key();
+				}
+			} elseif ($id) {
+				//this is an update, so don't do anything
+				//needs to go above the default one!  eg living cities web pages level field
+			} elseif (!empty($c['default'])) {
+				//we have a default value to set for this
+				if ($id) {
+					$query1[] = $c['name'] . ' = ' . $c['default'];
+				} else {
+					$query1[] = $c['name'];
+					$query2[] = $c['default'];
+				}
+			} elseif ($c['name'] == 'precedence') {
+				//setting the precedence for a new object -- insert into slot 1, increment everything else
+				$query1[] = 'precedence';
+				$query2[] = 1;
+				db_query('UPDATE ' . $table . ' SET precedence = precedence + 1');
+			} elseif ($c['required']) {
+				//fill values with admin defaults
+				if (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
+					$query1[] = $c['name'];
+					$query2[] = 0;
+				} else {
+					error_handle('required value missing', 'db_save is expecting a value for ' . $c['name']);
+				}
 			}
 		}
 	}
