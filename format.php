@@ -197,8 +197,8 @@ function format_date_time($timestamp=false, $error='', $separator=' ', $suppress
 
 function format_date_time_range($start, $end) {
 	//return a string date range, like Jan 21-22 2010, or Jan 8 from 11-11:30am
-	$start	= strtotime($start);
-	$end	= strtotime($end);
+	if (!is_integer($start)) $start	= strtotime($start);
+	if (!is_integer($end)) $end	= strtotime($end);
 	
 	if (date('Y', $start) == date('Y', $end)) {
 		if (date('n', $start) == date('n', $end)) {
