@@ -16,16 +16,12 @@ function ajax_publish(which) {
 	return false;
 }
 
-function ajax_set(table, column, id, value, update) {
+function ajax_set(table, column, id, value) {
 	//requires jquery
 	$.ajax({
 		url : url_action_add('ajax_set', true),
 		type : "POST",
-		data : "table=" + table + "&column=" + column + "&id=" + id + "&value=" + value,
-		success : function(data) {
-			//if (update && object_exists('object')) update.innerHTML = data;
-			//function_run('set_' + table + '_' + column, value);		
-		}
+		data : "table=" + table + "&column=" + column + "&id=" + id + "&value=" + value
 	});
 	return false;
 }
