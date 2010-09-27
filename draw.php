@@ -605,6 +605,15 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 		');
 }
 
+function draw_google_search($class='search') {
+	global $_josh;
+	return draw_tag('form', array('method'=>'get', 'action'=>'http://www.google.com/search', 'class'=>$class),  
+		draw_form_text('q') . 
+		draw_form_hidden('sitesearch', $_josh['request']['host']) . 
+		draw_form_submit('')
+	);
+}
+
 function draw_google_tracker($id) {
 	//todo deprecate
 	return draw_google_analytics($id);
