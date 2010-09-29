@@ -610,7 +610,7 @@ function draw_google_search($class='search') {
 	return draw_tag('form', array('method'=>'get', 'action'=>'http://www.google.com/search', 'class'=>$class),  
 		draw_form_text('q') . 
 		draw_form_hidden('sitesearch', $_josh['request']['host']) . 
-		draw_form_submit('')
+		draw_form_submit('Search')
 	);
 }
 
