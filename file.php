@@ -220,11 +220,10 @@ function file_get_uploaded($fieldname, $types_table=false) {
 
 function file_icon($filename_or_ext, $link=false, $type='16x16') {
 	//show the icon for a given filename
-	global $_josh;
 	if ((stristr($filename_or_ext, '.')) && (!$filename_or_ext = strToLower(file_ext($filename_or_ext)))) return false;
 	if ($return = draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/' . $filename_or_ext . '.png', $link)) return $return;
 	error_handle('file type not added yet', 'the file type "' . $filename_or_ext . '" was not found in the file_icons library.  this has been noted.');
-	return false;
+	return draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/unknown.png', $link);
 }
 
 function file_import_fixedlength($content, $definitions) {
