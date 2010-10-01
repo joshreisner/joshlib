@@ -2,6 +2,8 @@
 error_debug('including email.php', __file__, __line__);
 
 function email($to, $message, $subject='Email from Your Website', $from=false) {
+	//from could be array('josh@joshreisner.com'=>'Josh Reisner')
+
 	//todo: rewrite this whole function to use swiftmailer
 	global $_josh;
 
