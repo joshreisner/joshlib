@@ -74,7 +74,7 @@ class table {
 			
 			//assemble rows into tbody tags
 			for ($i = 0; $i <= $bodycounter; $i++) {
-				if (isset($bodies[$i]['title'])) $return .= draw_tag('tr', false, draw_tag('td', array('colspan'=>$count_columns, 'class'=>'group'), '<a name="' . format_text_code($bodies[$i]['title']) . '"></a>' . $bodies[$i]['title']));
+				if (isset($bodies[$i]['title'])) $return .= draw_tag('tr', array('class'=>'group'), draw_tag('td', array('colspan'=>$count_columns), '<a name="' . format_text_code($bodies[$i]['title']) . '"></a>' . $bodies[$i]['title']));
 				$return .= draw_tag('tbody', array('id'=>$this->name . $i), implode(NEWLINE, $bodies[$i]['rows']));
 			}
 
@@ -106,9 +106,15 @@ class table {
 				        $.ajax({
 							type: "POST",
 							data: "table=' . $this->name . '&column=' . $this->dragcolumn . '&" + $("#' . $this->name . '").tableDnDSerialize(),
-							url: "' . url_action_add('ajax_reorder') . '",
-							success: function(data) { 
-								//alert(data); 
+							url: "' . url_action_add('ajax_reorder') . '"
+						});
+						var thisclass = "odd";
+						$("#' . $this->name . ' tr").each(function(){
+							if ($(this).hasClass("group")) {
+								thisclass = "odd";
+							} else {
+								$(this).removeClass("odd even").addClass(thisclass);
+								thisclass = (thisclass == "odd") ? "even" : "odd";
 							}
 						});
 			        },
@@ -116,26 +122,6 @@ class table {
 			        dragHandle: "' . $this->draghandle . '"
 			    });
 			});');
-			for ($i = 0; $i <= $bodycounter; $i++) {
-				/*
-				$("#' . $this->name . '").tableDnD({
-			        onDrop: function(table, row) {
-			            alert($("#' . $this->name . '").tableDnDSerialize());
-			        },
-			        dragHandle: "' . $this->draghandle . '"
-			    });
-				*/				
-				/* 2010 08 09 jr - scriptaculous is deprecated
-				$return .= lib_get('scriptaculous') . draw_javascript('
-					function reorder' . $this->name . $i . '() {
-						var options = { method:"post", parameters:Sortable.serialize("' . $this->name . $i . '") + unescape("%26") + "table=' . $this->name . '" + unescape("%26") + "column=' . $this->dragcolumn . '", onSuccess:function(transport) {
-							//alert(transport.responseText);
-						} };
-						new Ajax.Request("' . url_action_add('ajax_reorder') . '", options);
-					}
-					Sortable.create("' . $this->name . $i . '", { tag:"tr", ' . (($this->draghandle) ? 'handle:"' . $this->draghandle . '", ' : '') . 'ghosting:true, constraint:"vertical", onUpdate:reorder' . $this->name . $i . ', tree:true });
-				');*/
-			}
 		}
 		return $return;
 	}

@@ -476,6 +476,7 @@ function lib_get($string) {
 		return include_once(lib_location($string));
 		
 		//javascript libraries
+		case 'fancybox' :
 		case 'jeditable' :
 		case 'jquery' :
 		case 'jquery-latest' :
@@ -492,8 +493,11 @@ function lib_get($string) {
 			file_dir_writable('images');
 			file_dir_writable('files');
 			$return .= draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
-		} elseif (($string == 'tablednd') || ($string == 'jeditable')) {
+		} elseif (($string == 'tablednd') || ($string == 'jeditable') || ($string == 'fancybox')) {
 			$return = lib_get('jquery') . $return;
+			if ($string == 'fancybox') $return .= 
+				draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.mousewheel-3.0.2.pack.js') . 
+				draw_css_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox-1.3.1.css');
 		}
 		
 		return $return;
@@ -510,6 +514,9 @@ function lib_location($string) {
 	$lib = DIRECTORY_WRITE . '/lib/' . $string . '/';
 
 	switch ($string) {
+		case 'fancybox' : 
+		return DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox-1.3.1.js';
+		
 		case 'fpdf' :
 		return DIRECTORY_ROOT . $lib . 'fpdf-1.6.php';
 		
