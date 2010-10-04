@@ -763,9 +763,7 @@ function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false
 function draw_list($options, $arguments=false, $type='ul', $selected=false) {
 	//make a ul or an ol out of a one-dimensional array
 	if (!is_array($options) || (!$count = count($options))) return false;
-	//if (!is_array($arguments)) $arguments = array('class'=>$arguments); //if arguments is a string, it's legacy class
 	$arguments = array_arguments($arguments);
-		
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
 		$li_args = array('class'=>'option' . ($i + 1));
