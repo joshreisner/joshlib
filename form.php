@@ -61,6 +61,9 @@ class form {
 		//start output
 		if (!$this->title) $this->title = ''; //legend is showing up <legend/>
 		$return = draw_container('legend', draw_container('span', $this->title_prefix . $this->title));
+		
+		//send form name
+		$this->set_hidden('form_id', $this->name);
 
 		//add fields
 		foreach ($this->fields as $field) $return .= $this->draw_row($field);

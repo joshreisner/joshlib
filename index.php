@@ -555,6 +555,12 @@ function lib_refresh() {
 	exit;
 }
 
+function posting($form_id=false) {
+	//tell if POST variables are present, and if specified, whether it's a particular form
+	if ($form_id && isset($_POST['form_id'])) return ($_POST['form_id'] == $form_id);
+	return (!empty($_POST));
+}
+
 function user($return=false) {
 	//shortcut to say if a session exists and what the id is, or return $return eg NULL for sql
 	if (!isset($_SESSION)) session_start();
