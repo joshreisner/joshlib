@@ -989,6 +989,10 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	return $return;
 }
 
+function draw_p($inner, $arguments=false) {
+	return draw_tag('p', $arguments, $inner);
+}
+
 function draw_page($title, $html) {
 	//this is for joshserver and error handling, eventually for setup your site messages
 	return '<html><head>' . draw_meta_utf8() . '<title>' . strip_tags($title) . '</title></head>
