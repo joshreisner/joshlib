@@ -771,7 +771,11 @@ function draw_list($options, $arguments=false, $type='ul', $selected=false) {
 		if ($counter == $count)		array_argument($li_args, 'last');
 		if ($selected == ($i + 1))	array_argument($li_args, 'selected');
 		if (empty($options[$i]))	array_argument($li_args, 'empty');
-		if ($options[$i] == false)	$options[$i] = ''; //don't pass a false value, li must be a container
+		if ($options[$i] == false) {
+			$options[$i] = ''; //don't pass a false value, li must be a container
+		} elseif (is_array($options[$i])) {
+			$options[$i] = draw_list($options[$i]);
+		}
 		$options[$i] = draw_tag('li', $li_args, $options[$i]);
 		$counter++;
 	}
