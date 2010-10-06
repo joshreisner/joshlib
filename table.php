@@ -78,21 +78,21 @@ class table {
 				$return .= draw_tag('tbody', array('id'=>$this->name . $i), implode(NEWLINE, $bodies[$i]['rows']));
 			}
 
-		}
-		if ($total) {
-			$return .= '<tfoot><tr class="total">';
-			foreach ($this->columns as $c) {
-				$return .= '<td class="' . $c['name'];
-				if ($c['class']) $return .= ' ' . $c['class'];
-				$return .= '">';
-				if (isset($totals[$c['name']])) {
-					$return .= $totals[$c['name']];
-				} else {
-					$return .= '&nbsp;';
+			if ($total) {
+				$return .= '<tfoot><tr class="total">';
+				foreach ($this->columns as $c) {
+					$return .= '<td class="' . $c['name'];
+					if ($c['class']) $return .= ' ' . $c['class'];
+					$return .= '">';
+					if (isset($totals[$c['name']])) {
+						$return .= $totals[$c['name']];
+					} else {
+						$return .= '&nbsp;';
+					}
+					$return .= '</td>';
 				}
-				$return .= '</td>';
+				$return .= '</tr></tfoot>';
 			}
-			$return .= '</tr></tfoot>';
 		}
 		
 		$class = $this->name . ' table'; //temp for intranet
