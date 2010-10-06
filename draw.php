@@ -608,9 +608,9 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 function draw_google_search($class='search') {
 	global $_josh;
 	return draw_tag('form', array('method'=>'get', 'action'=>'http://www.google.com/search', 'class'=>$class),  
-		draw_form_text('q') . 
+		draw_container('span', draw_form_text('q'), 'text') . 
 		draw_form_hidden('sitesearch', $_josh['request']['host']) . 
-		draw_form_submit('Search')
+		draw_container('span', draw_form_submit('Search'), 'submit')
 	);
 }
 
