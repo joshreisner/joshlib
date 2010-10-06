@@ -100,11 +100,12 @@ function format_code($code) {
 	return '<p style="font-family:courier; font-size:13px;">' . nl2br(str_replace('\t', '&nbsp;', htmlentities($code))) . '</p>';
 }
 
-function format_date($timestamp=false, $error='', $format='%b %d, %Y', $relativetime=true, $todaytime=false) {
+function format_date($timestamp=false, $error='', $format=false, $relativetime=true, $todaytime=false) {
 	global $_josh;
 
 	if ($timestamp === false) $timestamp = time();
-
+	if (!$format) $format = $_josh['date']['format'];
+	
 	//reject or convert
 	if (empty($timestamp) || ($timestamp == 'Jan 1 1900 12:00AM')) return $error;
 	if (!is_int($timestamp)) $timestamp = strToTime($timestamp);
@@ -188,7 +189,7 @@ function format_date_sql($month, $day=false, $year=false, $hour=false, $minute=f
 function format_date_time($timestamp=false, $error='', $separator=' ', $suppressMidnight=true, $relativetime=true) {
 	//string_datetime?
 	if ($timestamp === false) $timestamp = time();
-	$return = format_date($timestamp, $error, '%b %d, %Y', $relativetime);
+	$return = format_date($timestamp, $error, false, $relativetime);
 	//if (($return == 'Today') || ($return == 'Yesterday') || ($return == 'Tomorrow')) 
 	$time = format_time($timestamp);
 	if ($suppressMidnight && ($time == '12:00am')) return $return;

@@ -54,8 +54,9 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['months']				= array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
 	$_josh['mos']					= array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
+	$_josh['date']['format']		= '%b %d, %Y'; //default date Oct 06, 2010 http://php.net/manual/en/function.strftime.php
 	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
-
+	
 //constants
 	define('BR', '<br/>');
 	define('TAB', "\t");
