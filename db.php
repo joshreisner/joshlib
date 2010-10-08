@@ -405,11 +405,16 @@ function db_keys_to($table) {
 	return $keys;
 }
 
-function db_num_fields($result) {
+function db_language($set_language=false) {
 	global $_josh;
-	if ($_josh['db']['language'] == 'mysql') {
+	if ($set_language) $_josh['db']['language'] = $set_language;
+	return $_josh['db']['language'];
+}
+
+function db_num_fields($result) {
+	if (db_language() == 'mysql') {
 		return mysql_num_fields($result);
-	} elseif ($_josh['db']['language'] == 'mssql') {
+	} else {
 		return mssql_num_fields($result);
 	}
 }
@@ -773,43 +778,25 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 }
 
 function db_table_drop($tablename) {
-	global $_josh;
-	if ($_josh['db']['language'] == 'mssql') {
-		//not implemented yet
-		error_handle(__function__, 'this function is not yet implemented for mssql');
-	} elseif ($_josh['db']['language'] == 'mysql') {
-		return db_query('DROP TABLE ' . $tablename);
-	}
+	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql');
+	if (!db_table_exists($tablename)) return false;
+	return db_query('DROP TABLE ' . $tablename);
 }
 
 function db_table_exists($name) {
-	global $_josh;
-	if ($_josh['db']['language'] == 'mssql') {
-		//not implemented yet
-		error_handle(__function__, 'this function is not yet implemented for mssql');
-	} elseif ($_josh['db']['language'] == 'mysql') {
-		return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding massive db repition with dbCheck
-	}
+	if (db_language() == 'mssql') error_handle(__function__, 'this function is not yet implemented for mssql');
+	return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding function recursion with dbCheck
 }
 
 function db_table_rename($before, $after) {
-	global $_josh;
-	if ($_josh['db']['language'] == 'mssql') {
-		//not implemented yet
-		error_handle(__function__, 'this function is not yet implemented for mssql');
-	} elseif ($_josh['db']['language'] == 'mysql') {
-		return db_query('RENAME TABLE ' . $before . ' TO ' . $after);
-	}
+	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql');
+	return db_query('RENAME TABLE ' . $before . ' TO ' . $after);
 }
 
 function db_tables() {
-	global $_josh;
-	if ($_josh['db']['language'] == 'mysql') {
-		$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
-		foreach ($tables as &$t) $t = $t['Tables_in_' . $_josh['db']['database']];
-	} elseif ($_josh['db']['language'] == 'mssql') {
-		error_handle(__function__, 'this function is not yet implemented for mssql');
-	}
+	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql');
+	$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
+	foreach ($tables as &$t) $t = $t['Tables_in_' . $_josh['db']['database']];
 	return $tables;
 }
 
