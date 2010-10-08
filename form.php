@@ -223,7 +223,7 @@ class form {
 						if (!$this->focus) $this->set_focus($name);
 						
 						$args = array('class'=>$class);
-						if (isset($default)) {
+						if (!empty($default)) {
 							$return .= draw_javascript_src();
 							$args['onfocus'] = 'javascript:form_field_default(this, true, "' . $default . '");';
 							$args['onblur'] = 'javascript:form_field_default(this, false, "' . $default . '");';
@@ -248,7 +248,7 @@ class form {
 								$return .= lib_get('ckeditor');
 							}
 						}
-						if (isset($default)) {
+						if (!empty($default)) {
 							$return .= draw_javascript_src();
 							$args['onfocus'] = 'javascript:form_field_default(this, true, "' . $default . '");';
 							$args['onblur'] = 'javascript:form_field_default(this, false, "' . $default . '");';
