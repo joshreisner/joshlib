@@ -13,14 +13,18 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 	if (!$array) $array = array();
 	$key = false;
 	
-	//multiple rows
 	if (db_num_fields($result) == 1) {
+		//multiple rows, single column
 		//single d array
 		while ($r = db_fetch($result)) {
 			if (!$key) $key = array_keys($r);
 			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
 			$array[] = $r[$key[0]];
 		}		
+	} elseif (db_found($result) == 1) {
+		//multiple columns, single result
+		//single d array
+		return db_fetch($result);
 	} else {
 		//multidimensional array
 		while ($r = db_fetch($result)) {
@@ -120,6 +124,10 @@ function db_close($keepalive=false) { //close connection and quit
 	if (!$keepalive) exit;
 }
 
+function db_column($table, $column) {
+	return db_column_exists($table, $column); //alias
+}
+
 function db_column_add($table, $column, $type) {
 	global $_josh;
 	
@@ -190,12 +198,9 @@ function db_column_drop($table, $column) {
 }
 
 function db_column_exists($table, $column) {
-	global $_josh;
-	if ($_josh['db']['language'] == 'mysql') {
-		$result = db_query('SHOW COLUMNS FROM ' . $table . ' WHERE Field = "' . $column . '"');
-		return db_found($result);
-	} else {
-		error_handle('db_column_exists not yet supported for mssql');
+	$columns = db_columns($table);
+	foreach ($columns as $c) {
+		if ($c['name'] == $column) return $c;
 	}
 }
 
@@ -225,10 +230,12 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 			
 			$name = $r['Field'];
 			@list($type, $length) = explode('(', str_replace(')', '', $r['Type']));
+			$decimals = false;
+			@list($length, $decimals) = explode(',', $length);
 			$required = ($r['Null'] == 'YES') ? false : true;
 			$default = $r['Default'];
 			$comments = $r['Comment'];
-			$return[] = ($includeMetaData) ? compact('name','type','required','default','comments','length') : $name;
+			$return[] = ($includeMetaData) ? compact('name','type','required','default','comments','length','decimals') : $name;
 		}
 	} else {
 		$result = db_table('SELECT 

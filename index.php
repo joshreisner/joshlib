@@ -268,18 +268,27 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				echo draw_form_select($array['name'], 'SELECT id, value FROM ' . $array['table'] . ' WHERE is_active = 1', $array['value'], $array['required']);
 				exit;
 			case 'ajax_set':
-			
-				//todo, better column type sensing
-				if (stristr($array['column'], 'date')) $array['value'] = format_date($array['value'], 'NULL', 'SQL');
+				if ($c = db_column($array['table'], $array['column'])) {
+					if (($c['type'] == 'date') || ($c['type'] == 'datetime')) {
+						$array['value'] = format_date($array['value'], 'NULL', 'SQL');
+					} elseif (empty($array['value']) && (!$c['required'])) {
+						$array['value'] = 'NULL';
+					} else {
+						$array['value'] = '"' . $array['value'] . '"';
+					}
+					
+					if (db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . $array['value'] . ' WHERE id = ' . $array['id'])) {
+						echo db_grab('SELECT ' . $array['column'] . ' FROM ' . $array['table'] . ' WHERE id = ' . $array['id']);
+					} else {
+						echo 'ERROR';
+					}
+				} else {
+					//column does not exist
+				}
 				
 				//special exception for #panel in cms on object list and form pages
 				//if (($array['table'] == 'app_objects')) $array['value'] = str_replace("\n", '<br/>', $array['value']); //nl2br($array['value'])
-				
-				if (db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = \'' . $array['value'] . '\' WHERE id = ' . $array['id'])) {
-					echo (stristr($array['column'], 'date')) ? format_date($array['value']) : str_ireplace("\n", '<br/>', format_quotes($array['value'], true));
-				} else {
-					echo 'ERROR';
-				}
+				//echo (stristr($array['column'], 'date')) ? format_date($array['value']) : str_ireplace("\n", '<br/>', format_quotes($array['value'], true));
 
 				exit;
 			case 'db_check':

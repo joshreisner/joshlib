@@ -415,46 +415,24 @@ function draw_form_select($name, $sql_options, $value=false, $not_nullable=true,
 	//2010 04 04: changed $required to $not_nullable because it could still be required and have a null value at the top
 	$return = ($not_nullable) ? '' : '<option value="">' . $nullvalue . '</option>';
 	$lastgroup = '';
-	if (is_array($sql_options)) {
-		while (@list($key, $val, $group) = each($sql_options)) {
-			if (is_array($val)) @list($key, $val, $group) = array_values($val); //possible db_table optgroup situation
-			$val = format_string($val, $maxlength);
-			//new optgroup code
-			if (!isset($grouped)) {
-				if ($group) {
-					$grouped = true;
-					//first group
-					$lastgroup = $group;
-					$return .= '<optgroup label="' . $lastgroup . '">';
-				}
-			} elseif ($grouped && ($lastgroup != $group)) {
-				//subsequent group
+	if (!is_array($sql_options)) $sql_options = db_table($sql_options);
+	while (@list($key, $val, $group) = each($sql_options)) {
+		if (is_array($val)) @list($key, $val, $group) = array_values($val); //possible db_table optgroup situation
+		$val = format_string($val, $maxlength);
+		//new optgroup code
+		if (!isset($grouped)) {
+			if ($group) {
+				$grouped = true;
+				//first group
 				$lastgroup = $group;
-				$return .= '</optgroup><optgroup label="' . $lastgroup . '">';
+				$return .= '<optgroup label="' . $lastgroup . '">';
 			}
-			$return .= draw_tag('option', array('value'=>$key, 'id'=>$name . $key, 'selected'=>($key == $value) ? 'selected' : false), $val);
+		} elseif ($grouped && ($lastgroup != $group)) {
+			//subsequent group
+			$lastgroup = $group;
+			$return .= '</optgroup><optgroup label="' . $lastgroup . '">';
 		}
-	} else {
-		$result = db_query($sql_options);
-		$key = false;
-		while ($r = db_fetch($result)) {
-			if (!$key) $key = array_keys($r);
-			
-			//new optgroup code
-			if (!isset($grouped)) {
-				$grouped = array_keys($r, 'optgroup');
-				if ($grouped) {
-					//first group
-					$lastgroup = $r['optgroup'];
-					$return .= '<optgroup label="' . $lastgroup . '">';
-				}
-			} elseif ($grouped && ($lastgroup != $r['optgroup'])) {
-				//subsequent group
-				$lastgroup = $r['optgroup'];
-				$return .= '</optgroup><optgroup label="' . $lastgroup . '">';
-			}
-			$return .= draw_tag('option', array('value'=>$r[$key[0]], 'id'=>$name . $r[$key[0]], 'selected'=>($r[$key[0]] == $value) ? 'selected' : false), format_string($r[$key[1]]));
-		}
+		$return .= draw_tag('option', array('value'=>$key, 'id'=>$name . $key, 'selected'=>($key == $value) ? 'selected' : false), $val);
 	}
 	if (isset($grouped) && $grouped) $return .= '</optgroup>';
 

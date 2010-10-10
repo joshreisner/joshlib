@@ -16,14 +16,14 @@ function ajax_publish(which) {
 	return false;
 }
 
-function ajax_set(table, column, id, value) {
+function ajax_set(table, column, id, value, update) {
 	//requires jquery
 	$.ajax({
 		url : url_action_add('ajax_set', true),
 		type : "POST",
-		data : "table=" + table + "&column=" + column + "&id=" + id + "&value=" + value
+		data : "table=" + table + "&column=" + column + "&id=" + id + "&value=" + value,
+		success : function(data) { if (update) update.html(data); }
 	});
-	return false;
 }
 
 function cookie_get(name) {
