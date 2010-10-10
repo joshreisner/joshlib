@@ -1079,4 +1079,8 @@ function draw_time($timestamp, $format=false, $is_pubdate=false) {
 	return '<time datetime="' . format_date_iso8601($timestamp) . '"' . (($is_pubdate) ? ' pubdate' : '') . '>' . format_date($timestamp, '', $format) . '</time>';
 }
 
+function draw_title($title) {
+	return draw_tag('title', false, strip_tags($title));
+}
+
 ?>
