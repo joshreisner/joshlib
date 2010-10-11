@@ -167,6 +167,7 @@ function draw_css_src($location='/styles/screen.css', $media=false) {
 	//special 'ie' mode for internet explorer
 	$ie = ($media == 'ie');
 	if ($ie) $media = 'screen';
+	if ($filemtime = @filemtime(DIRECTORY_ROOT . $location)) $location .= '?' . $filemtime; //refresh browser cache when the stylesheet is updated
 	$return = draw_tag('link', array('rel'=>'stylesheet', 'type'=>'text/css', 'media'=>$media, 'href'=>$location));
 	if ($ie) $return = '<!--[if IE]>' . $return . '<![endif]-->';
 	return $return;
@@ -593,7 +594,7 @@ function draw_google_search($class='search') {
 }
 
 function draw_google_tracker($id) {
-	//todo deprecate
+	error_deprecated(__FUNCTION__ . ' was deprecated on 10/11/2010 - you can use draw_google_analytics instead');
 	return draw_google_analytics($id);
 }
 
@@ -609,8 +610,8 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	if (!$image) return '';
 	
 	//debuggy!
-	error_debug('<b>draw_img</b> realpath is ' . $realpath);
-	error_debug('<b>draw_img</b> root is ' . DIRECTORY_ROOT);
+	error_debug('<b>draw_img</b> realpath is ' . $realpath, __file__, __line__);
+	error_debug('<b>draw_img</b> root is ' . DIRECTORY_ROOT, __file__, __line__);
 	
 	$src = url_base() . str_replace(DIRECTORY_ROOT, '', $realpath);
 	$src = $path; //because of aplus situation
@@ -892,7 +893,7 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	//2010 04 07 deprecated
 	error_deprecated(__function__ . ' was deprecated on 4/7/2010.  use draw_nav instead');
 	
-	//useid is for rollover navigation -- use everything after id= instead of slashless url
+	/*useid is for rollover navigation -- use everything after id= instead of slashless url
 	//2010 03 15 jr: useid is changed now to override -- can be 'id' or 'folder'
 	//type could be text, images or rollovers
 	global $_josh;
@@ -972,6 +973,7 @@ function draw_navigation($options, $match=false, $type='text', $class='navigatio
 	$return = draw_list($return, $class, 'ul', $selected);
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
 	return $return;
+	*/
 }
 
 function draw_p($inner, $arguments=false) {
