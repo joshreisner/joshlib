@@ -265,6 +265,12 @@ function draw_file_icon($filename, $link=true) {
 	return file_icon($filename, $link);
 }
 
+function draw_firebug() {
+	global $_josh;
+	if ($_josh['mode'] == 'dev') return draw_javascript_src('https://getfirebug.com/firebug-lite.js');
+	return false;
+}
+
 function draw_focus($form_element) {
 	global $_josh;
 	if (isset($_josh['drawn']['focus'])) return false;
