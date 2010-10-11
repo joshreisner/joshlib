@@ -608,8 +608,15 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	$image = @getimagesize($realpath);
 	if (!$image) return '';
 	
+	//debuggy!
+	error_debug('<b>draw_img</b> realpath is ' . $realpath);
+	error_debug('<b>draw_img</b> root is ' . DIRECTORY_ROOT);
+	
+	$src = url_base() . str_replace(DIRECTORY_ROOT, '', $realpath);
+	$src = $path; //because of aplus situation
+	
 	//assemble tag
-	$arguments = array('src'=>url_base() . str_replace(DIRECTORY_ROOT, '', $realpath), 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
+	$arguments = array('src'=>$src, 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
 	if (is_array($alt)) {
 		//values of alt can overwrite width, height, border, even src
 		if (isset($alt['maxwidth']) && !isset($alt['maxheight'])) {
