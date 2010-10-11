@@ -1098,4 +1098,8 @@ function draw_title($title) {
 	return draw_tag('title', false, strip_tags($title));
 }
 
+function draw_typekit($key='yxt2eld') {
+	return draw_javascript_src('http://use.typekit.com/' . $key . '.js') . draw_javascript('try{Typekit.load();}catch(e){}');
+}
+
 ?>
