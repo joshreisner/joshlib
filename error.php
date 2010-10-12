@@ -101,17 +101,14 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 		$from	= array($_SESSION['email']=>$_SESSION['full_name']);
 	}
 	if (isset($_SESSION['HTTP_USER_AGENT'])) $message .= '<p>Browser: ' . $_SESSION['HTTP_USER_AGENT'] . '</p>';
-	
-	$message .= '<p style="color:#fff;">filter_joshlib_error</p>';
-	
-	/*backtrace
+		
+	//backtrace
 	$message .= "<p>Backtrace:";
 	foreach ($backtrace as $b) {
 		if (isset($b['args'])) unset($b['args']);
 		if (isset($b['file'])) $b['file'] = str_replace(DIRECTORY_ROOT, "", $b['file']);
 		$message .= draw_array($b, true) . "<br>";
 	}
-	*/
 
 	//render
 	$subject = '[Joshlib Error] ' . $type;
