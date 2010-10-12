@@ -182,17 +182,15 @@ function form_tinymce_init(cssLocation, showplugins) {
 
 	tinyMCE.init({
 		mode : "specific_textareas",
+		editor_selector : "tinymce",
 		theme : "advanced",
 		theme_advanced_buttons1 : buttons,
 		theme_advanced_buttons2 : "",
-		theme_advanced_buttons3 : "",
 		theme_advanced_resizing : true,		
-		theme_advanced_blockformats : "p,h1,h2,h3,h4,blockquote",
 		theme_advanced_toolbar_location : "top",
-		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align]",
+		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align|class]",
 		content_css : cssLocation + "?" + new Date().getTime(),
 		plugins : "imagemanager,filemanager,paste",
-		editor_selector : "tinymce",
 		relative_urls : false,
 		remove_script_host : false
 	});
