@@ -3,17 +3,15 @@
 should this be called http instead of url?  i could include cookie, and url_header would make more sense.
 potentially just need to add http.php
 */
-
 error_debug('including url.php', __file__, __line__);
 
 function url_action($matches, $key='action') {
 	//don't know whether this is any good.  matches possible $_GET['action'] values
-	global $_GET;
 	if (isset($_GET[$key])) {
 		error_debug('<b>' . __function__ . '</b> checking $_GET[\'' . $key . '\'] for ' . $matches, __file__, __line__);
-		$matches = explode(',', $matches);
+		$matches = array_separated($matches);
 		foreach ($matches as $m) {
-			if ($_GET[$key] == trim($m)) {
+			if ($_GET[$key] == $m) {
 				error_debug('<b>' . __function__ . '</b> found a match!', __file__, __line__);
 				return true;
 			}
