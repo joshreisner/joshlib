@@ -175,7 +175,7 @@ class form {
 				case 'file':
 					$return .= draw_form_file($name, $class, $onchange) . $additional;
 					//todo -- this is wonky -- presupposes it's a jpg
-					if ($value) $return .= draw_img(file_dynamic($this->table, $name, $this->id, 'jpg'), false, array('maxwidth'=>545));
+					if ($value) $return .= draw_img(file_dynamic($this->table, $name, $this->id, 'jpg'), false, array('maxwidth'=>545, 'class'=>'preview'));
 					break;
 				case 'html':
 				case 'group':

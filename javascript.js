@@ -18,6 +18,7 @@ function ajax_publish(which) {
 
 function ajax_set(table, column, id, value, update) {
 	//requires jquery
+	if (!value) value = '';
 	$.ajax({
 		url : url_action_add('ajax_set', true),
 		type : "POST",
