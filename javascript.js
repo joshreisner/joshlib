@@ -177,7 +177,7 @@ function form_tinymce_clear(field_id) {
 
 function form_tinymce_init(cssLocation, showplugins) {
 	var buttons = (showplugins) ? 
-		"styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,|,bullist,numlist,outdent,indent,|,link,unlink,insertimage,|,code" :
+		"styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,|,bullist,numlist,outdent,indent,|,link,unlink,insertimage,image,|,code" :
 		"bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,|,link,unlink,|,code";		
 
 	tinyMCE.init({
@@ -188,7 +188,7 @@ function form_tinymce_init(cssLocation, showplugins) {
 		theme_advanced_buttons2 : "",
 		theme_advanced_resizing : true,		
 		theme_advanced_toolbar_location : "top",
-		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align|class]",
+		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align|class]",
 		content_css : cssLocation + "?" + new Date().getTime(),
 		plugins : "imagemanager,filemanager,paste",
 		relative_urls : false,

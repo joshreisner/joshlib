@@ -338,7 +338,7 @@ function format_html($text) {
 			if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : '';
 					
 			//never want these attributes
-			$bad_attributes = array('alt', 'onclick', 'onmouseout', 'onmouseover', 'style', 'title');
+			$bad_attributes = array('alt', 'onclick', 'onmouseout', 'onmouseover', 'title');
 			foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
 			
 			//certain tags we are wary of
