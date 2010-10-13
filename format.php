@@ -392,6 +392,8 @@ function format_html($text) {
 	preg_match_all("/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i", $text, $matches);
 	foreach ($matches[0] as $m) $text = str_replace($m, format_ascii($m), $text);
 	
+	$text = str_replace('&nbsp;', ' ', $text);
+	
 	return $text;
 }
 
