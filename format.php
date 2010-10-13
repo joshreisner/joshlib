@@ -376,8 +376,8 @@ function format_html($text) {
 				if (isset($e->width)) unset($e->width);
 			} elseif ($e->tag == 'td') {
 				//kill table cell alignment?  not sure if this is good
-				if (isset($e->align)) unset($e->align);
-				if (isset($e->width)) unset($e->width);
+				//if (isset($e->align)) unset($e->align);
+				//if (isset($e->width)) unset($e->width);
 			}
 			//this could be a time to trim text
 			//if (@$e->outertext && !strlen(trim($e->outertext))) $e->outertext = '';

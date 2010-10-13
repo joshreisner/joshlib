@@ -188,7 +188,7 @@ function form_tinymce_init(cssLocation, showplugins) {
 		theme_advanced_buttons2 : "",
 		theme_advanced_resizing : true,		
 		theme_advanced_toolbar_location : "top",
-		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align|class]",
+		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align|class],table[cellspacing,align,border,cellpadding,class],tr[class],td[width,align,class]",
 		content_css : cssLocation + "?" + new Date().getTime(),
 		plugins : "imagemanager,filemanager,paste",
 		relative_urls : false,
