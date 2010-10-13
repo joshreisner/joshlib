@@ -345,6 +345,9 @@ function format_html($text) {
 			if ($e->tag == 'a') {
 				//no in-page links or anchors
 				if (!$e->href) $e->outertext = '';
+			} elseif ($e->tag == 'b') {
+				//personal preference: replace <strong> with <b>
+				$e->outertext = '<strong>' . $e->innertext . '</strong>';
 			} elseif ($e->tag == 'div') {
 				//no empty divs
 				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = '';
@@ -367,9 +370,6 @@ function format_html($text) {
 					//ditch the empty span
 					$e->outertext = '';
 				}
-			} elseif ($e->tag == 'strong') {
-				//personal preference: replace <strong> with <b>
-				$e->outertext = '<b>' . $e->innertext . '</b>';
 			} elseif ($e->tag == 'table') {
 				//kill table cell alignment?  not sure if this is good
 				if (isset($e->align)) unset($e->align);
