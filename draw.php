@@ -604,6 +604,26 @@ function draw_google_tracker($id) {
 	return draw_google_analytics($id);
 }
 
+function draw_h1($content) {
+	return draw_tag('h1', false, $content);
+}
+
+function draw_h2($content) {
+	return draw_tag('h2', false, $content);
+}
+
+function draw_h3($content) {
+	return draw_tag('h3', false, $content);
+}
+
+function draw_h4($content) {
+	return draw_tag('h4', false, $content);
+}
+
+function draw_h5($content) {
+	return draw_tag('h5', false, $content);
+}
+
 function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=false) {
 	//alt could also be an array of arguments
 	global $_josh;
@@ -678,7 +698,6 @@ function draw_img_thumbnail($path, $link, $max) {
 	} else {
 		return 'tall';
 	}
-	
 }
 
 function draw_javascript($javascript=false) {
