@@ -758,6 +758,9 @@ function db_table($sql, $limit=false, $suppress_error=false) {
 function db_table_create($tablename, $fields=false, $rechecking=false) {
 	//create table based on array schema
 	
+	//exists
+	if (db_table_exists($tablename)) return false;
+	
 	//config columns
 	$columns = '';
 	if ($fields) foreach ($fields as $field=>$type) $columns .= '`' . strToLower($field) . '` ' . db_column_type($type) . ' DEFAULT NULL, ';
