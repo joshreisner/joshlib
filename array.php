@@ -220,7 +220,7 @@ function array_range($start, $end, $increment=1) {
 		//descending increment
 		while ($start >= $end) {
 			$return[] = $start;
-			$start -= $increment;
+			$start += $increment;
 		}
 	}
 	return $return;
