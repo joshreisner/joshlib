@@ -5,7 +5,7 @@
 error_debug('including db.php', __file__, __line__);
 
 function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $limit=false) {
-	//returns a single one-dimensional array from the database
+	//returns a single one-dimensional array from the database, or an associative array like array_key_promote(db_table())
 
 	//db_table	returns multiple associative results like array(0=>array('name'=>'josh', 'role'=>'coder', 'gender'=>'m'), ...);
 	//db_grab	returns a single associative result, like array('name'=>'josh', 'role'=>'coder', 'gender'=>'m')
@@ -27,7 +27,7 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 		//multiple columns, single result. one-dimensional array.
 		return db_fetch($result);
 	} else {
-		//multidimensional array.  works like array_key_promote(db_table())
+		//multidimensional array.  works like array_key_promote
 		while ($r = db_fetch($result)) {
 			if (!$key) $key = array_keys($r);
 			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
@@ -77,6 +77,7 @@ function db_backup($limit=false) {
 }
 
 function db_check($table, $column=false) {
+	error_deprecated(__function__ . ' was deprecated on 10/16/2010 for disuse and because it\'s of questionable utility');
 	global $_josh;
 	db_switch('information_schema');
 	if ($column) {
@@ -97,12 +98,13 @@ function db_checkboxes($name, $linking_table, $object_col, $option_col, $object_
 	foreach ($categories as $category_id) db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $object_id . ', ' . $category_id . ' )');
 }
 
+/*deprecated 10/16/2010 due to disuse
 function db_clear($tables=false) { //cant find where this is called from.  obsolete?
 	global $_josh;
 	$sql = ($_josh['db']['language'] == 'mssql') ? 'SELECT name FROM sysobjects WHERE type="u" AND status > 0' : 'SHOW TABLES FROM ' . $_josh['db']['database'];
 	$tables = ($tables) ? explode(',', $tables) : db_array($sql);
 	foreach ($tables as $t) db_query('DELETE FROM ' . $t);
-}
+}*/
 
 function db_close($keepalive=false) { //close connection and quit
 	global $_josh;
@@ -432,7 +434,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	
 	//skip if already connected
 	if (db_connected()) return;
-	
+
 	error_debug('<b>db_open</b> running', __file__, __line__);
 
 	//reset variables if you're specifying which ones to use
@@ -448,7 +450,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 		$_josh['db']['pointer'] = mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 	} elseif ($_josh['db']['language'] == 'mssql') {
 		$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
-		//msssql 2000 doesn't support utf8
+		//mssql 2000 doesn't support utf8
 	}
 
 	//handle error
@@ -462,6 +464,8 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	
 	//select db
 	db_switch();
+	
+	return db_connected();
 }
 
 function db_option($table, $value) {
@@ -522,7 +526,7 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 		
 		//report error
 		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
-		error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__, '#fed');
+		error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__, '#ffdddd');
 		if ($suppress_error) return false;
 		error_handle('Database Error', format_code($query) . $error);
 	} else {
@@ -739,11 +743,11 @@ function db_switch($target=false) {
 	global $_josh;
 	db_open();
 	if (!$target) $target = $_josh['db']['database'];
-	if (empty($_josh['db']['database'])) error_handle('database nots specified');
+	if (empty($_josh['db']['database'])) error_handle('database not specified');
 	if ($_josh['db']['language'] == 'mssql') {
 		mssql_select_db($target, $_josh['db']['pointer']);
 	} elseif ($_josh['db']['language'] == 'mysql') {
-		mysql_select_db($target, $_josh['db']['pointer']);
+		if (!mysql_select_db($target, $_josh['db']['pointer'])) $_josh['db']['pointer'] = false;
 	}
 	$_josh['db']['switched'] = ($target == $_josh['db']['database']) ? false : true;
 }

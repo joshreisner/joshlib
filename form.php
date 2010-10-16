@@ -1,4 +1,5 @@
 <?php
+//one big class for making forms
 error_debug('including form.php', __file__, __line__);
 
 class form { 
@@ -192,7 +193,10 @@ class form {
 					break;
 				case 'radio':
 					if (!$options) {
-						if (!$sql) $sql = 'SELECT id, ' . $option_title . ' FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title;
+						if (!$sql) {
+							if (!db_table_exists($options_table)) error_handle('Form Error', 'No options provided for radio field ' . $name . '.  Either pass $options, $sql or have content in ' . $options_table . '.' . $option_title);
+							$sql = 'SELECT id, ' . $option_title . ' FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title;
+						}
 						$options = db_array($sql);
 					}
 					$return .= '<div class="radio">';

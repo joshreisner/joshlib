@@ -4,7 +4,7 @@
 
 error_debug('including error.php', __file__, __line__);
 
-/* function deprecated 10/16/2010 for non-use, only in FSS
+/* function deprecated 10/16/2010 due to disuse, only found commented in FSS
 function error_break() {
 	//todo -- what's this for?
 	global $_josh;
