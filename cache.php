@@ -1,4 +1,7 @@
 <?php
+//cache features are under construction
+//code needs review
+
 error_debug('including cache.php', __file__, __line__);
 
 function cache_clear($match=false) {

@@ -1,4 +1,7 @@
 <?php
+//a collection of functions that facilitate interactions with the database
+//code needs review 
+
 error_debug('including db.php', __file__, __line__);
 
 function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $limit=false) {
@@ -14,16 +17,14 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 	$key = false;
 	
 	if (db_num_fields($result) == 1) {
-		//multiple rows, single column
-		//single d array
+		//multiple rows, single column.  single dimension array
 		while ($r = db_fetch($result)) {
 			if (!$key) $key = array_keys($r);
 			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
 			$array[] = $r[$key[0]];
 		}		
 	} elseif (db_found($result) == 1) {
-		//multiple columns, single result
-		//single d array
+		//multiple columns, single result.  single dimension array.  how is this not db_grab()?
 		return db_fetch($result);
 	} else {
 		//multidimensional array

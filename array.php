@@ -1,28 +1,29 @@
 <?php
+//a collection of functions that return arrays
+//code reviewed 10/16/2010
+
 error_debug('including array.php', __file__, __line__);
 
 function array_2d($array) {
-	//to take a scalar array and convert it to a two-dimensional array by doubling the keys / values
-	//used by draw_form_date() and other places
+	//takes a normal array and makes it associative by doubling, eg (1, 2, 'foo') becomes (1=>1, 2=>2, 'foo'=>'foo'), used by draw_form_date() and elsewhere
 	$return = array();
 	foreach ($array as $a) $return[$a] = $a;
 	return $return;
 }
 
-function array_ajax($required=false) {
+function array_ajax($required_values=false) {
 	//returns an array of ajax-posted content
-	//if (!$source) $source = file_get_contents('php://input');
 	$array = url_query_parse(file_get_contents('php://input'));
 	foreach ($array as $key=>$value) $array[$key] = format_quotes($value);
-	if ($required) {
-		$required = array_separated($required);
-		foreach ($required as $r) if (!isset($array[$r])) exit; //intended to just quietly bomb.  lots of spiders seem to want to post empty to ajax urls for some reason.
+	if ($required_values) {
+		$required_values = array_separated($required_values);
+		foreach ($required_values as $r) if (!isset($array[$r])) exit; //intended to just quietly bomb.  lots of spiders seem to want to post empty to ajax urls for some reason.
 	}
 	return $array;
 }
 
 function array_argument(&$array, $value, $key='class', $separator=' ') {
-	//for appending class values, eg class="foo bar".  you don't need to know if it exists when you array_argument it
+	//for appending class values, eg class="foo bar".  you don't need to know if it exists when you array_argument it.  used by several draw_ functions
 	if (empty($value)) return false;
 	if (empty($array[$key])) {
 		$array[$key] = $value;
@@ -32,25 +33,24 @@ function array_argument(&$array, $value, $key='class', $separator=' ') {
 }
 
 function array_arguments($arguments=false) {
+	//for constructing an array of tag arguments, used by draw_ functions.
 	if (!$arguments) return array();
 	if (is_string($arguments)) return array('class'=>$arguments);
 	return $arguments;
 }
 
 function array_chunk_html($string, $length) {
-	//split an html string into smaller chunks while not breaking inside an HTML tag
-	//used by language_translate
+	//split an html string into an array of strings while not breaking inside a tag, used by language_translate()
 
-	//maybe string doesn't need to be split bc is too short
 	if (strlen($string) < $length) return array($string);
 	
 	$words = array_explode_html($string, ' ');
 	$wordcount = count($words);
 	
 	//iterator variables
-	$lengthcounter = 0;
-	$wordcounter = 0;
-	$array_position = 0;
+	$lengthcounter	= 0;
+	$wordcounter	= 0;
+	$array_position	= 0;
 	$return = array($array_position=>'');
 
 	foreach ($words as $w) {
@@ -80,35 +80,26 @@ function array_chunk_html($string, $length) {
 }
 
 function array_csv($content, $delimiter=',') {
-	global $_josh;
-	error_debug('doing an array csv on delimiter ' . $delimiter, __file__, __line__);
-	//input function.  pass it a file_get() 'ed CSV and it will give you an associative array back
-	//assumes first line is header
-	//written by josh on 5/15/09 for work mgmt: harvest import
+	//makes an associative array out of a delimited file, assumes first line is header
 	
-	$rows = array_separated($content, NEWLINE);
-	
-	//parse header
-	$columns = array();
-	$header = array_shift($rows);
-	$cells = explode($delimiter, trim($header));
-	foreach ($cells as $c) $columns[] = format_text_code($c);
-	$count = count($columns);
-	
+	//set up header
+	$rows	= array_separated($content, NEWLINE, true);
+	$cols	= explode($delimiter, array_shift($rows));
+	foreach ($cols as &$c) $c = format_text_code($c);
+	$count	= count($cols);
+
 	//do rows
-	$return = array();
-	foreach ($rows as $r) {
-		$cells = array_separated($r, $delimiter);
+	foreach ($rows as &$r) {
+		$cells = array_separated($r, $delimiter, true);
 		$thisrow = array();
-		for ($i = 0; $i < $count; $i++) $thisrow[$columns[$i]] = trim(@$cells[$i]);
-		$return[] = $thisrow;
+		for ($i = 0; $i < $count; $i++) $thisrow[$cols[$i]] = @$cells[$i];
+		$r = $thisrow;
 	}
 	
-	return $return;
+	return $rows;
 }
 
 function array_explode_html($string, $separator) { 
-	//used by array_chunk_html
 	//splits an HTML string into an array like explode() but keeps HTML tags together
 	//adapted from stefan at NOSPAM dot elakpistol dot com http://theserverpages.com/php/manual/en/function.explode.php
 	$return = array();
@@ -138,15 +129,15 @@ function array_explode_html($string, $separator) {
 }
 
 function array_insert($array, $position, $value) {
-	//insert a $value into a flat $array at a particular $position
+	//inserts a $value into a flat $array at a particular $position
     $array_clip = array_splice($array, $position);
     $array[] = $value;
-    $array = array_merge($array, $array_clip);
-    return $array;
+    return array_merge($array, $array_clip);
 }
 
 function array_insert_assoc($array, $position, $key, $value) {
 	//insert a $value into an associative $array at a particular $position
+	//todo possibly combine with array_insert where value is an array(key=>value)
     $array_clip = array_splice($array, $position);
     $array[$key] = $value;
     $array = array_merge($array, $array_clip);
@@ -154,46 +145,38 @@ function array_insert_assoc($array, $position, $key, $value) {
 }
 
 function array_instances($array, $needle) {
-	//returns a count of all the instances of needle in array
+	//returns a count of all the instances of needle in array.  used by db_words()
 	$count = 0;
 	foreach ($array as $value) if ($needle == $value) $count++;
 	return $count;
 }
 
 function array_key_filter($array, $key, $value) {
-	//only return array keys of a particular value
+	//returns an $array's keys of a particular value.  used by PLC
+	//todo deprecate once PLC is backended
 	$return = array();
 	foreach ($array as $element) if ($element[$key] == $value) $return[] = $element;
 	return $return;
 }
 
 function array_key_promote($array) {
-	/*takes an array of format 
-		array(
-			0=>array('key'=>'value', 'key1'=>'value1'),
-			1=>array('key2'=>'value2', 'key3'=>'value3')
-		)
-	and converts it to 
-		array('value'=>'value1, 'value2'=>'value3')
-	for db navigation
-	*/
+	//makes a two-column resultset into an associative array. used by draw_nav()
 	$return = array();
 	foreach ($array as $a) {
 		$keys = array_keys($a);
 		$return[$a[$keys[0]]] = $a[$keys[1]];
 	}
-	//die(draw_array($return));
 	return $return;
 }
 
 function array_object($object) {
-	//convert object to associative array
+	//converts an object to an associative array recursively.  used by array_xml()
     if (is_object($object)) $object = get_object_vars($object);
     return is_array($object) ? array_map(__FUNCTION__, $object) : $object;
 }
 
 function array_post_checkboxes($field_name) {
-	//used by db_checkboxes and living cities internal newsletter
+	//finds checkbox values in POSTDATA.  used by db_checkboxes()
 	$return = array();
 	foreach ($_POST as $key=>$value) {
 		$array = explode('-', $key);
@@ -202,48 +185,44 @@ function array_post_checkboxes($field_name) {
 	return $return;
 }
 
-/* function array_post_fields($fieldnames, $delimiter=',') {
-	error_deprecated(__function__ . ' was deprecated on 3/11/2010.  use array_separated instead');
-	return array_separated($fieldnames, $delimiter);
-}*/
-
 function array_range($start, $end, $increment=1) {
-	//numeric, sequential arrays for draw_form_date
+	//returns an array of numeric values.  used by draw_form_date()
 	$return = array();
-	if (($increment > 0) && ($start < $end)) {
-		//ascending increment
+	$increment = abs($increment);
+	if ($start < $end) {
 		while ($start <= $end) {
 			$return[] = $start;
 			$start += $increment;
 		}
-	} elseif (($increment < 0) && ($start > $end)) {
-		//descending increment
+	} elseif ($start > $end) {
 		while ($start >= $end) {
 			$return[] = $start;
-			$start += $increment;
+			$start -= $increment;
 		}
+	}
+	return $return;
+}
+
+function array_query_string($string, $defaults=false, $separator='&') {
+	//coverts a key/value string eg key=value&foo=bar and returns an array
+	//separator is a variable because cookie strings are separated with semicolons
+	$return	= array();
+	$pairs	= array_separated($string, $separator);
+	foreach ($pairs as $p) {
+		list($key, $value) = array_separated(urldecode($p), '=');
+		$return[$key] = $value;
 	}
 	return $return;
 }
 
 function array_receive() {
+	//receive json data.  is a pair with array_send()
 	return json_decode(file_get_contents('php://input'), true);
 }
 
-function array_query_string($str, $defaults=false, $separator='&') {
-	//takes a key/pair string in the form you'd find in a query string and returns an array
-	//separator is an argument because cookie strings are separated with semicolons
-	$return = array();
-	$pairs = explode($separator, $str);
-	foreach ($pairs as $p) {
-		list($key, $value) = explode('=', trim($p));
-		$return[urldecode($key)] = urldecode($value);
-	}
-	return $return;
-}
-
 function array_remove($needle, $haystack) {
-	//remove an array element with a specific key.  arguments should probably be reversed?
+	//removes an array element with a specific key.  arguments should probably be reversed?
+	//is the opposite of array_filter?
 	$return = array();
 	foreach ($haystack as $value) if ($value != $needle) $return[] = $value;
 	return $return;
@@ -268,7 +247,7 @@ function array_send($array, $target) {
 	if ($target['host'] == $_josh['request']['host']) continue;
 		
 	if ($pointer = fsockopen($target['host'], 80, $errno, $errstr, 30)) {
-		error_debug('<b>array_send</b> has a stream to ' . $target['host'], __file__, __line__);
+		error_debug('<b>' . __function__ . '</b> has a stream to ' . $target['host'], __file__, __line__);
 		fputs($pointer, 'POST ' . $target['path_query'] . ' HTTP/1.0\r\n');
 		fputs($pointer, 'Host: ' . $target['host'] . '\r\n');
 		fputs($pointer, 'Content-type: application/json; charset=utf-8\r\n');
@@ -281,46 +260,37 @@ function array_send($array, $target) {
 		$response = '';
 		while (!feof($pointer)) $response .= fgets($pointer, 128);
 		fclose($pointer);		
-		error_debug('<b>array_send</b> was returned ' . $response, __file__, __line__);
+		error_debug('<b>' . __function__ . '</b> was returned ' . $response, __file__, __line__);
 		$response = substr($response, strpos($response, '\r\n\r\n') + 4);
 	}
 	echo $response;
 	return false;	
 }
 
-function array_separated($content, $separator=',') {
-	//like explode, but strips empty spaces and null content
-	
+function array_separated($content, $separator=',', $preserve_nulls=false) {
+	//returns an array from a string like explode does, but it trims values.  used widely.
 	if (is_array($content)) return $content; //might not need splitting
-
 	$return = array();
 	$fields = explode($separator, $content);
 	foreach ($fields as $f) {
 		$f = trim($f);
-		if (!empty($f)) $return[] = $f;
+		if (!empty($f) || (empty($f) && $preserve_nulls)) $return[] = $f;
 	}
 	return $return;
 }
 
 function array_slice_assoc($array, $start=false, $length=false) {
+	//returns a subsection of an array, like array_slice, but works with associative arrays.  used in NBI and PSA
 	$keys = array_slice(array_keys($array), $start, $length);
     return array_intersect_key($array, array_2d($keys));
 }
 
 function array_sort($array, $direction='asc', $key=false) {
-	//sort an array's values for a particular key
-	global $_josh;
+	//sorts an associative array by its values.  used by file_folder()
 	
-	//key defaults to the first key
-	$_josh['sort_key'] = ($key) ? $key : array_shift(array_keys($array[0]));
-	
-	error_debug('<b>arraySort</b> running for $key', __file__, __line__);
-	
-	//define our custom callback functions
 	if (!function_exists('array_sort_asc')) {
 		function array_sort_asc($a, $b) {
 			global $_josh;
-			error_debug('<b>arrayKeyCompare</b> comparing' . $a[$_josh['sort_key']], __file__, __line__);
 			return strcmp($a[$_josh['sort_key']], $b[$_josh['sort_key']]);
 		}
 	}
@@ -328,46 +298,40 @@ function array_sort($array, $direction='asc', $key=false) {
 	if (!function_exists('array_sort_desc')) {
 		function array_sort_desc($a, $b) {
 			global $_josh;
-			error_debug('<b>arrayKeyCompare</b> comparing' . $a[$_josh['sort_key']], __file__, __line__);
 			return strcmp($b[$_josh['sort_key']], $a[$_josh['sort_key']]);
 		}
 	}
 	
+	//$key defaults to be the first key
+	global $_josh;
+	$_josh['sort_key'] = ($key) ? $key : array_shift(array_keys($array[0]));
+	error_debug('<b>' . __function__ . '</b> running for ' . $key, __file__, __line__);
 	usort($array, 'array_sort_' . strToLower($direction));
-
-	//don't need this anymore
-	unset($_josh['sort_key']);
-	
+	unset($_josh['sort_key']);	
 	return $array;
 }
 
 function array_to_lower($array) {
-	//format a one-dimensional array in lowercase
-	//used in format_title()
+	//formats a one-dimensional array in lowercase.  used in format_title()
 	if (!is_array($array)) return false;
-	$return = array();
-	foreach ($array as $a) $return[] = strToLower($a);
-	return $return;
+	foreach ($array as &$a) $a = strToLower($a);
+	return $array;
 }
 
-/* function array_url($str, $defaults=false, $separator='&') {
-	error_deprecated(__function__ . ' was deprecated on 3/11/2010.  use array_query_string instead.  this one\'s going to go fast because url_parse is going to fill this spot.');
-	return array_query_string($str, $defaults, $separator);
-} */
-
 function array_random($array) {
-	//return a random value from a one-dimensional array
+	//returns a random value from a one-dimensional array
 	return $array[rand(0, count($array)-1)];
 }
 
 function array_rss($url) {
-	return array_xml(url_get($url));
+	//returns an associative array from a $url
+	if ($xml = url_get($url)) return array_xml($xml);
+	return false;
 }
 
-function array_xml($stringxml) {
-	//for harvest import -- take data in string xml format and return it as an associative array
-	//todo verify this works
-	$data = new SimpleXMLElement($stringxml);
+function array_xml($string) {
+	//reads xml data into an associative array
+	$data = new SimpleXMLElement($string);
 	if (is_object($data)) return array_object($data->children());
 }
 ?>
