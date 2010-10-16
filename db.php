@@ -5,11 +5,11 @@
 error_debug('including db.php', __file__, __line__);
 
 function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $limit=false) {
-	//exec a sql query and return an array of the results
+	//returns a single one-dimensional array from the database
 
-	//db_array vs db_table
-	//db_table returns resultsets like $array[0] = array('name'=>'josh', 'role'=>'coder', 'gender'=>'m');
-	//db_array can return either $array = array('foo', 'bar', 'baz') or $array = array('name'=>'josh', 'role'=>'coder', 'gender'=>'m');
+	//db_table	returns multiple associative results like array(0=>array('name'=>'josh', 'role'=>'coder', 'gender'=>'m'), ...);
+	//db_grab	returns a single associative result, like array('name'=>'josh', 'role'=>'coder', 'gender'=>'m')
+	//db_array	returns a single one-dimensional array('josh', 'coder', 'm') or array('josh', 'jane', 'jessica')
 	
 	global $_josh;
 	$result = db_query($sql, $limit);
@@ -17,17 +17,17 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 	$key = false;
 	
 	if (db_num_fields($result) == 1) {
-		//multiple rows, single column.  single dimension array
+		//multiple rows, single column.  one-dimensional array.
 		while ($r = db_fetch($result)) {
 			if (!$key) $key = array_keys($r);
 			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
 			$array[] = $r[$key[0]];
 		}		
 	} elseif (db_found($result) == 1) {
-		//multiple columns, single result.  single dimension array.  how is this not db_grab()?
+		//multiple columns, single result. one-dimensional array.
 		return db_fetch($result);
 	} else {
-		//multidimensional array
+		//multidimensional array.  works like array_key_promote(db_table())
 		while ($r = db_fetch($result)) {
 			if (!$key) $key = array_keys($r);
 			if ($prepend_id) $r[$key[0]] = $prepend_id . $r[$key[0]];
@@ -101,7 +101,7 @@ function db_clear($tables=false) { //cant find where this is called from.  obsol
 	global $_josh;
 	$sql = ($_josh['db']['language'] == 'mssql') ? 'SELECT name FROM sysobjects WHERE type="u" AND status > 0' : 'SHOW TABLES FROM ' . $_josh['db']['database'];
 	$tables = ($tables) ? explode(',', $tables) : db_array($sql);
-	foreach ($tables as $table) db_query('DELETE FROM ' . $table);
+	foreach ($tables as $t) db_query('DELETE FROM ' . $t);
 }
 
 function db_close($keepalive=false) { //close connection and quit
@@ -524,7 +524,7 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
 		error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__, '#fed');
 		if ($suppress_error) return false;
-		error_handle('sql error', format_code($query) . $error);
+		error_handle('Database Error', format_code($query) . $error);
 	} else {
 		//handle success
 		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
@@ -749,7 +749,6 @@ function db_switch($target=false) {
 }
 
 function db_table($sql, $limit=false, $suppress_error=false) {
-	//todo - rename db_arrays()?
 	$return = array();
 	$result = db_query($sql, $limit, $suppress_error);
 	while ($r = db_fetch($result)) $return[] = $r;

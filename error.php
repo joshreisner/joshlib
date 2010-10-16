@@ -1,13 +1,17 @@
 <?php
-error_debug("including error.php", __file__, __line__);
+//a collection of functions that help handle errors
+//reviewed 10/16/2010
 
+error_debug('including error.php', __file__, __line__);
+
+/* function deprecated 10/16/2010 for non-use, only in FSS
 function error_break() {
 	//todo -- what's this for?
 	global $_josh;
 	unset($_josh['ignored_words']); //too long. gets in the way!
 	echo draw_array($_josh);
 	exit;
-}
+} */
 
 function error_debug($message, $file, $line, $bgcolor='#fff') {
 	global $_josh;	
@@ -18,14 +22,11 @@ function error_debug($message, $file, $line, $bgcolor='#fff') {
 		error_debug('<b>error_debug</b> welcome to joshlib!', __file__, __line__);
 	}
 	
-	if (defined('DIRECTORY_ROOT') && stristr($file, DIRECTORY_ROOT)) $file = str_replace(DIRECTORY_ROOT, '', $file);
-	if (defined('DIRECTORY_JOSHLIB') && stristr($file, DIRECTORY_JOSHLIB)) $file = str_replace(DIRECTORY_JOSHLIB, '/joshlib/', $file);
-
 	//timer
 	$time = round(microtime(true) - $_josh['time_lastdebug'], 3);
 	$time = ($time < .001) ? '' : $time . 's';
 	echo '<div style="background-color:' . $bgcolor . ';text-align:left;float:left;clear:left;margin:10px;padding:10px;border:2px dashed #6699cc;font-family:verdana;color:#000;font-size:15px;min-height:70px;">
-			<div style="font-weight:normal;font-size:12px;margin-bottom:7px;color:#888;">', $file, ' line ', $line, '
+			<div style="font-weight:normal;font-size:12px;margin-bottom:7px;color:#888;">', error_path($file), ' line ', $line, '
 				<div style="float:right;color:#ccc;">', $time, '</div>
 			</div>', 
 			$message, 
@@ -45,7 +46,7 @@ function error_draw($title, $html) {
 	//suppress HTML output if it's a CRON job
 	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . NEWLINE . NEWLINE . $html);
 
-	//add fancy error element
+	//add attractive error element
 	$title = '<div style="background-color:#59c;color:#fff;height:36px;line-height:36px;padding:0px 20px 0px 20px;position:absolute;top:-36px;left:0px;">Error</div>' . $title;
 	
 	if (function_exists('draw_page')) return draw_page($title, $html);
@@ -59,10 +60,10 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	global $_josh;
 	error_debug('ERROR! type is:' . $type . ' and message is: ' . $message, __file__, __line__);
 	
-	//small possiblity these vars aren't set yet
-	if (!isset($_josh['mode']))  $_josh['mode'] = 'dev';
-	if (!isset($_josh['debug'])) $_josh['debug'] = false;
-	if (!isset($_josh['email_admin'])) $_josh['email_admin'] = 'josh@joshreisner.com';
+	//possiblity these vars aren't set yet
+	if (!isset($_josh['mode']))			$_josh['mode'] = 'dev';
+	if (!isset($_josh['debug']))		$_josh['debug'] = false;
+	if (!isset($_josh['email_admin']))	$_josh['email_admin'] = 'josh@joshreisner.com';
 	
 	//don't let this happen recursively
 	if (isset($_josh['handling_error']) && $_josh['handling_error']) return false;
@@ -70,49 +71,31 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	
 	if (($_josh['mode'] == 'dev') && $_josh['debug']) exit;
 	
-	//where possible, specify your own file and line
+	//when throwing an error, specify file and line
 	if ($file && $line) {
-		$message .= '<p>At line ' . $line . ' of ' . $file;
+		$message .= 'At line ' . $line . ' of ' . $file;
 		if ($function) $message .= ', inside function ' . $function;
-		$message .= ".</p>";
+		$message .= draw_p($message);
 	} else {
-		//backtrace is problematic because every error seems to stem from a different place
 		$backtrace = debug_backtrace();
-		$level = 1;
-		if (isset($backtrace[$level]['line']) && isset($backtrace[$level]['file'])) {
-			$message .= '<p>At line ' . $backtrace[$level]['line'] . ' of ' . $backtrace[$level]['file'];
-			if (isset($backtrace[$level+1]['function'])) $message .= ', inside function ' . $backtrace[$level+1]['function'];
-			$message .= ".</p>";
-		}
+		array_shift($backtrace);
+		foreach ($backtrace as &$b) $b = $b['file'] . ' ' . $b['line'] . ' ' . draw_tag('span', array('style'=>'color:#aaa;float:right;'), $b['function']);
+		$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
 	}
 
-	//take out full path -- security hazard and decreases readability
-	if (defined('DIRECTORY_ROOT'))		$message = str_replace(DIRECTORY_ROOT, '', $message);
-	if (defined('DIRECTORY_JOSHLIB'))	$message = str_replace(DIRECTORY_JOSHLIB, '/joshlib/', $message);
-	
 	//add more stuff to admin message, set from and subject
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
 	if ($_josh['mode'] != 'dev') {
-		$message .= draw_container('p', 'Page: ' . draw_link($_josh['request']['url']));
-		$message .= draw_container('p', 'File: ' . $_SERVER['SCRIPT_FILENAME']);
+		$message .= draw_p('Request: ' . draw_link($_josh['request']['url'], false, false, array('style'=>'color:#336699;')));
+		if (isset($_SESSION['email']) && isset($_SESSION['full_name'])) {
+			$message .= draw_p('User: ' . draw_link('mailto:' . $_SESSION['email'], $_SESSION['full_name'], false, array('style'=>'color:#336699;')));
+			$from	= array($_SESSION['email']=>$_SESSION['full_name']);
+		}
+		if (isset($_SERVER['HTTP_USER_AGENT'])) $message .= draw_p('Browser: ' . $_SERVER['HTTP_USER_AGENT']);
 	}
-	if (isset($_SESSION['email']) && isset($_SESSION['full_name'])) {
-		$message .= "<p>User: <a href='mailto:" . $_SESSION['email'] . "'>" . $_SESSION['full_name'] . "</a></p>";
-		$from	= array($_SESSION['email']=>$_SESSION['full_name']);
-	}
-	if (isset($_SESSION['HTTP_USER_AGENT'])) $message .= '<p>Browser: ' . $_SESSION['HTTP_USER_AGENT'] . '</p>';
-		
-	//backtrace
-	$message .= "<p>Backtrace:";
-	foreach ($backtrace as $b) {
-		if (isset($b['args'])) unset($b['args']);
-		if (isset($b['file'])) $b['file'] = str_replace(DIRECTORY_ROOT, "", $b['file']);
-		$message .= draw_array($b, true) . "<br>";
-	}
-
-	//render
+			
 	$subject = '[Joshlib Error] ' . $type;
-	$message = error_draw($type, $message);
+	$message = error_draw($type, error_path($message));
 	
 	//notify
 	if ($_josh['mode'] == 'dev') {
@@ -158,4 +141,12 @@ function error_handle_php($number, $message, $file, $line) {
 	//format_code($message)
 	error_handle($title, $message);
 }
+
+function error_path($str) {
+	//remove excess pathinfo when reporting errors
+	if (defined('DIRECTORY_ROOT')) $str = str_replace(DIRECTORY_ROOT, '', $str);
+	if (defined('DIRECTORY_JOSHLIB')) $str = str_replace(DIRECTORY_JOSHLIB, '/joshlib/', $str);
+	return $str;
+}
+
 ?>

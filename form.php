@@ -15,11 +15,13 @@ class form {
 	var $counter		= 1;
 	var $javascript		= array();
 	
-	function __construct($name, $id=false, $submit=true, $cancel=false, $readonly=false) {
+	function __construct($name=false, $id=false, $submit=true, $cancel=false, $readonly=false) {
 		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
 		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		//$submit is a boolean, and indicates whether you should auto-add a submit button at the bottom
 		//if you pass $submit as a string, it will title use the text you passed, and title the form that
+		
+		if (!$name) error_handle('form error', 'your form must have a $name.  eg ' . format_code('$f = new form(\'foo\');'));
 		
 		$this->name		= $name;
 		$this->submit	= $submit;
