@@ -413,6 +413,30 @@ function scroll_to(newPallet, dont_clear_interval) {
 	scrollvars.timer	= setInterval("scroll_horizontally();", 15);
 }
 
+function table_dnd(name, column, handle) {
+	//jquery and tablednd are required
+	$("#" + name).tableDnD({
+        onDrop: function(table, row) {
+	        $.ajax({
+				type: "POST",
+				data: "table=" + name + "&column=" + column + "&" + $("#" + name).tableDnDSerialize(),
+				url: url_action_add('ajax_reorder', true)
+			});
+			var thisclass = "odd";
+			$("#" + name + " tr").each(function(){
+				if ($(this).hasClass("group")) {
+					thisclass = "odd";
+				} else {
+					$(this).removeClass("odd even").addClass(thisclass);
+					thisclass = (thisclass == "odd") ? "even" : "odd";
+				}
+			});
+        },
+		onDragClass: "dragclass",
+        dragHandle: handle
+    });
+}
+
 function trim(str) {
 	var l = 0;
 	var r = str.length -1;

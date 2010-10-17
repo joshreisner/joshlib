@@ -101,26 +101,7 @@ class table {
 		//drag and drop table
 		if ($this->draggable && $count_rows) {
 			$return .= lib_get('tablednd') . draw_javascript('$(document).ready(function() { 
-				$("#' . $this->name . '").tableDnD({
-			        onDrop: function(table, row) {
-				        $.ajax({
-							type: "POST",
-							data: "table=' . $this->name . '&column=' . $this->dragcolumn . '&" + $("#' . $this->name . '").tableDnDSerialize(),
-							url: "' . url_action_add('ajax_reorder') . '"
-						});
-						var thisclass = "odd";
-						$("#' . $this->name . ' tr").each(function(){
-							if ($(this).hasClass("group")) {
-								thisclass = "odd";
-							} else {
-								$(this).removeClass("odd even").addClass(thisclass);
-								thisclass = (thisclass == "odd") ? "even" : "odd";
-							}
-						});
-			        },
-					onDragClass: "dragclass",
-			        dragHandle: "' . $this->draghandle . '"
-			    });
+				table_dnd("' . $this->name . '", "' . $this->dragcolumn . '", "' . $this->draghandle . '");
 			});');
 		}
 		return $return;
@@ -128,10 +109,10 @@ class table {
 
 	function draw_column($c) {
 		$class = $c['name'];
-		if ($c['class']) $class .= ' ' . $c['class'];
-		$style = ($c['width']) ? 'width:' . $c['width'] . 'px;': false;
+		if (!empty($c['class'])) $class .= ' ' . $c['class'];
+		$style = ($c['width']) ? 'width:' . $c['width'] . 'px;' : false;
 		$content = ($c['title']) ? $c['title'] : format_text_human($c['name']);
-		return draw_container('th', $content, array('style'=>$style, 'class'=>$c['class']));
+		return draw_tag('th', array('style'=>$style, 'class'=>$c['class']), $content);
 	}
 
 	function draw_columns() {
