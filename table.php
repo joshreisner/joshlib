@@ -112,7 +112,7 @@ class table {
 		if (!empty($c['class'])) $class .= ' ' . $c['class'];
 		$style = ($c['width']) ? 'width:' . $c['width'] . 'px;' : false;
 		$content = ($c['title']) ? $c['title'] : format_text_human($c['name']);
-		return draw_tag('th', array('style'=>$style, 'class'=>$c['class']), $content);
+		return draw_tag('th', array('style'=>$style, 'class'=>$class), $content);
 	}
 
 	function draw_columns() {

@@ -79,7 +79,11 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	} else {
 		$backtrace = debug_backtrace();
 		array_shift($backtrace);
-		foreach ($backtrace as &$b) $b = $b['file'] . ' ' . $b['line'] . ' ' . draw_tag('span', array('style'=>'color:#aaa;float:right;'), $b['function']);
+		foreach ($backtrace as &$b) {
+			if (!isset($b['file'])) $b['file'] = 'Unknown file';
+			if (!isset($b['line'])) $b['line'] = '~';
+			$b = $b['file'] . ' ' . $b['line'] . ' ' . draw_tag('span', array('style'=>'color:#aaa;float:right;'), $b['function']);
+		}
 		$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
 	}
 
