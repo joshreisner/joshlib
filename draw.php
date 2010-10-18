@@ -229,6 +229,10 @@ function draw_div_open($id=false) {
 	return draw_tag('div', array('id'=>$id), false, true); 
 }
 
+function draw_div_class_open($class=false) {
+	return draw_tag('div', array('class'=>$class), false, true); 
+}
+
 function draw_dl($array, $class=false) {
 	$return = '';
 	foreach ($array as $key=>$value) $return .= draw_container('dt', $key) . draw_container('dd', $value);
