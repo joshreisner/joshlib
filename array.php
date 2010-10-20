@@ -39,6 +39,17 @@ function array_arguments($arguments=false) {
 	return $arguments;
 }
 
+function array_checkboxes($name, $array='post') {
+	//finds checkbox values in an array, default POSTDATA.  used by db_checkboxes()
+	if (!is_array($array)) $array = $_POST;
+	$return = array();
+	foreach ($array as $key=>$value) {
+		$parts = explode('-', $key);
+		if ((count($parts) == 3) && ($parts[0] == 'chk') && ($parts[1] == $name)) $return[] = $parts[2];
+	}
+	return $return;
+}
+
 function array_chunk_html($string, $length) {
 	//split an html string into an array of strings while not breaking inside a tag, used by language_translate()
 
@@ -176,13 +187,8 @@ function array_object($object) {
 }
 
 function array_post_checkboxes($field_name) {
-	//finds checkbox values in POSTDATA.  used by db_checkboxes()
-	$return = array();
-	foreach ($_POST as $key=>$value) {
-		$array = explode('-', $key);
-		if ((count($array) == 3) && ($array[0] == 'chk') && ($array[1] == $field_name)) $return[] = $array[2];
-	}
-	return $return;
+	//todo deprecate
+	return array_checkboxes($field_name);
 }
 
 function array_range($start, $end, $increment=1) {

@@ -775,13 +775,14 @@ function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false
 	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $arguments);
 }
 
-function draw_list($options, $arguments=false, $type='ul', $selected=false) {
+function draw_list($options, $arguments=false, $type='ul', $selected=false, $classes=false) {
 	//make a ul or an ol out of a one-dimensional array
 	if (!is_array($options) || (!$count = count($options))) return false;
 	$arguments = array_arguments($arguments);
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
 		$li_args = array('class'=>'option' . ($i + 1));
+		if (isset($classes[$i]))	array_argument($li_args, $classes[$i]);
 		if ($counter == 1)			array_argument($li_args, 'first');
 		if ($counter == $count)		array_argument($li_args, 'last');
 		if ($selected == ($i + 1))	array_argument($li_args, 'selected');
@@ -854,7 +855,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	if ($add_home) $options = array_merge(array('/'=>'Home'), $options);
 	
 	if (!count($options)) return false; //skip if empty
-	$return = array();
+	$return = $classes = array();
 		
 	//this is so you can have several sets of rollovers in the same page eg the smarter toddler site
 	if (!isset($_josh['drawn']['navigation'])) $_josh['drawn']['navigation'] = 0;
@@ -874,6 +875,12 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	$counter = 1;
 	$javascript = NEWLINE;
 	foreach ($options as $url=>$title) {
+		$liclass = str_replace('/', '', $url);
+		$liclass = str_replace('?', '_', $liclass);
+		$liclass = str_replace('=', '_', $liclass);
+		if (empty($liclass)) $liclass = 'home';
+		$classes[] = $liclass;
+		
 		$name = 'option_' . $_josh['drawn']['navigation'] . '_' . $counter;
 		$args = array('name'=>$name, 'class'=>$name);
 		
@@ -911,7 +918,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	if ($sets) {
 		$return = draw_list_sets($return, $sets, $class, 'ul', $selected);
 	} else {
-		$return = draw_list($return, $class, 'ul', $selected);
+		$return = draw_list($return, $class, 'ul', $selected, $classes);
 	}
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
 	if (html() == 5) $return = draw_tag('nav', array('id'=>$class), $return);
