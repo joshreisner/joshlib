@@ -41,7 +41,8 @@ function array_arguments($arguments=false) {
 
 function array_checkboxes($name, $array='post') {
 	//finds checkbox values in an array, default POSTDATA.  used by db_checkboxes()
-	if (!is_array($array)) $array = $_POST;
+	if ($array == 'post') $array = $_POST;
+	if (empty($array)) return false;
 	$return = array();
 	foreach ($array as $key=>$value) {
 		$parts = explode('-', $key);
