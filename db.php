@@ -191,13 +191,8 @@ function db_column_add($table, $column, $type) {
 }
 
 function db_column_drop($table, $column) {
-	global $_josh;
-	if ($_josh['db']['language'] == 'mysql') {
-		$result = db_query('ALTER TABLE ' . $table . ' DROP COLUMN ' . $column);
-	} else {
-		error_handle(__function__ . ' not yet supported for mssql');
-	}
-	return db_found($result);
+	if (db_language() == 'mssql') error_handle(__function__ . ' not yet supported for mssql');
+	$result = db_found(db_query('ALTER TABLE ' . $table . ' DROP COLUMN ' . $column));
 }
 
 function db_column_exists($table, $column) {
@@ -205,6 +200,12 @@ function db_column_exists($table, $column) {
 	foreach ($columns as $c) {
 		if ($c['name'] == $column) return $c;
 	}
+}
+
+function db_column_rename($table, $before, $after) {
+	if (db_language() == 'mssql') error_handle(__function__ . ' not yet supported for mssql');
+	$col = db_column_exists($table, $before);
+	$result = db_found(db_query('ALTER TABLE ' . $table . ' CHANGE ' . $before . ' ' . $after . ' ' . $col['type']));
 }
 
 function db_column_type($datatype, $length=false) {
