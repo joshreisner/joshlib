@@ -188,7 +188,7 @@ function array_object($object) {
 }
 
 function array_post_checkboxes($field_name) {
-	//todo deprecate
+	error_deprecated(__function__ . ' was deprecated on 10/20/2010 because it has been generalized into array_checkboxes');
 	return array_checkboxes($field_name);
 }
 
@@ -281,7 +281,7 @@ function array_separated($content, $separator=',', $preserve_nulls=false) {
 	$fields = explode($separator, $content);
 	foreach ($fields as $f) {
 		$f = trim($f);
-		if (!empty($f) || (empty($f) && $preserve_nulls)) $return[] = $f;
+		if (!empty($f) || $preserve_nulls) $return[] = $f;
 	}
 	return $return;
 }

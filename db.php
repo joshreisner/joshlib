@@ -91,10 +91,10 @@ function db_check($table, $column=false) {
 	return $return;
 }
 
-//db_checkboxes('doc', 'documents_to_categories', 'documentID', 'categoryID', $_GET['id']);
 function db_checkboxes($name, $linking_table, $object_col, $option_col, $object_id) {
+	//for example db_checkboxes('doc', 'documents_to_categories', 'document_id', 'category_id', $id);
 	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $object_id);
-	$categories = array_post_checkboxes($name);
+	$categories = array_checkboxes($name);
 	foreach ($categories as $category_id) db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $object_id . ', ' . $category_id . ' )');
 }
 
