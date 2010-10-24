@@ -2,6 +2,7 @@
 //a collection of functions that help handle errors
 //reviewed 10/16/2010
 
+error_debug('Starting Joshlib', __file__, __line__);
 error_debug('including error.php', __file__, __line__);
 
 /* function deprecated 10/16/2010 due to disuse, only found commented in FSS
@@ -15,17 +16,17 @@ function error_break() {
 
 function error_debug($message, $file, $line, $bgcolor='#fff') {
 	global $_josh;	
-	if (!$_josh['debug']) return;
+	if ($_josh['mode'] != 'debug') return;
 	
 	if (!isset($_josh['time_lastdebug'])) {
 		$_josh['time_lastdebug'] = TIME_START;
-		error_debug('<b>error_debug</b> welcome to joshlib!', __file__, __line__);
+		if (isset($_josh['finished_loading'])) error_debug('(Joshlib has already finished loading)', __file__, __line__);
 	}
 	
 	//timer
 	$time = round(microtime(true) - $_josh['time_lastdebug'], 3);
 	$time = ($time < .001) ? '' : $time . 's';
-	echo '<div style="background-color:' . $bgcolor . ';text-align:left;float:left;clear:left;margin:10px;padding:10px;border:2px dashed #6699cc;font-family:verdana;color:#000;font-size:15px;min-height:70px;">
+	echo '<div style="background-color:' . $bgcolor . ';text-align:left;float:left;clear:left;margin:10px;padding:10px;border:2px dashed #6699cc;font-family:verdana;color:#000;font-size:15px;min-height:70px;z-index:400;position:relative;">
 			<div style="font-weight:normal;font-size:12px;margin-bottom:7px;color:#888;">', error_path($file), ' line ', $line, '
 				<div style="float:right;color:#ccc;">', $time, '</div>
 			</div>', 
@@ -36,7 +37,7 @@ function error_debug($message, $file, $line, $bgcolor='#fff') {
 }
 
 function error_deprecated($message) {
-	$message = error_handle('use of deprecated function', $message);
+	$message = error_handle('Deprecated Function', $message);
 }
 
 function error_draw($title, $html) {	
@@ -61,15 +62,14 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	error_debug('ERROR! type is:' . $type . ' and message is: ' . $message, __file__, __line__);
 	
 	//possiblity these vars aren't set yet
-	if (!isset($_josh['mode']))			$_josh['mode'] = 'dev';
-	if (!isset($_josh['debug']))		$_josh['debug'] = false;
+	if (!isset($_josh['mode']))			$_josh['mode'] = 'live';
 	if (!isset($_josh['email_admin']))	$_josh['email_admin'] = 'josh@joshreisner.com';
 	
 	//don't let this happen recursively
 	if (isset($_josh['handling_error']) && $_josh['handling_error']) return false;
 	$_josh['handling_error'] = true;
 	
-	if (($_josh['mode'] == 'dev') && $_josh['debug']) exit;
+	if ($_josh['mode'] == 'debug') exit;
 	
 	//when throwing an error, specify file and line
 	if ($file && $line) {
@@ -91,9 +91,10 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
 	if ($_josh['mode'] != 'dev') {
 		$message .= draw_p('Request: ' . draw_link($_josh['request']['url'], false, false, array('style'=>'color:#336699;')));
+		if ($_josh['referrer']) $message .= draw_p('Request: ' . draw_link($_josh['referrer']['url'], false, false, array('style'=>'color:#336699;')));
 		if (isset($_SESSION['email']) && isset($_SESSION['full_name'])) {
 			$message .= draw_p('User: ' . draw_link('mailto:' . $_SESSION['email'], $_SESSION['full_name'], false, array('style'=>'color:#336699;')));
-			$from	= array($_SESSION['email']=>$_SESSION['full_name']);
+			$from = array($_SESSION['email']=>$_SESSION['full_name']);
 		}
 		if (isset($_SERVER['HTTP_USER_AGENT'])) $message .= draw_p('Browser: ' . $_SERVER['HTTP_USER_AGENT']);
 	}

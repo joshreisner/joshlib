@@ -48,12 +48,10 @@ function url_change($target='') {
 	}
 	if ($_josh['slow']) {
 		error_debug('<b>url_change</b> (slow) to ' . $target, __file__, __line__);
-		if ($_josh['debug']) db_close(); //exit early so you can see log
-		echo draw_javascript('location.href="' . $target . '"');
+		if ($_josh['mode'] != 'debug') draw_javascript('location.href="' . $target . '"');
 	} else {
 		error_debug('<b>url_change</b> (fast) to ' . $target, __file__, __line__);
-		if ($_josh['debug']) db_close(); //exit early so you can see log
-		header('Location: ' . $target);
+		if ($_josh['mode'] != 'debug') header('Location: ' . $target);
 	}
 	db_close();
 }
@@ -207,7 +205,7 @@ function url_parse($url) {
 	$return['url'] = $return['protocol'] . '://' . $return['host'] . $return['path_query'];
 	
 	//output for debugging ~ testing for debug since it takes some processing
-	if ($_josh['debug']) {
+	if ($_josh['mode'] == 'debug') {
 		ksort($return);
 		error_debug('<b>url_parse</b> is returning ' . draw_array($return), __file__, __line__);
 	}

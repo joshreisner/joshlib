@@ -26,7 +26,7 @@ THIRD PARTY SOFTWARE
 
 USING THE DEBUGGER
 	you can run the debug() function after joshlib has been included to see output of various processes
-	to debug the loading of the joshlib itself, set $_josh['debug'] = true before you include it
+	to debug the loading of the joshlib itself, set $_josh['mode'] = 'debug' before you include it
 
 RUNNING ON THE COMMAND LINE
 	joshlib depends on certain $_SERVER variables being present.  add these lines before including joshlib:
@@ -41,7 +41,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	error_reporting(E_ALL);
 	ini_set('display_errors', true);
 	ini_set('display_startup_errors', true);
-	if (!isset($_josh['debug'])) $_josh['debug'] = false;
+	if (!isset($_josh['mode'])) $_josh['mode'] = 'live'; //assume live until we can parse the url
 	define('DIRECTORY_JOSHLIB', dirname(__file__) . DIRECTORY_SEPARATOR);
 	require(DIRECTORY_JOSHLIB . 'error.php');
 	set_error_handler('error_handle_php');
@@ -193,7 +193,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (!is_dir(DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib')) file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE);
 
 //set error reporting level by determining whether this is a dev or live situation
-	if (format_text_starts('dev-', $_josh['request']['host']) || format_text_starts('beta.', $_josh['request']['host']) || format_text_ends('.site', $_josh['request']['host'])) {
+	if (format_text_starts('dev-', $_josh['request']['host']) || format_text_ends('.site', $_josh['request']['host'])) {
 		$_josh['mode'] = 'dev';
 		//error reporting already set above
 	} else {
@@ -350,6 +350,10 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		}
 	}
 
+$_josh['finished_loading'] = true;
+error_debug('joshlib finished loading in ' . format_time_exec(), __file__, __line__, '#def');
+
+
 //special functions that don't yet fit into a category
 
 function admin() {
@@ -371,7 +375,7 @@ function cookie($name=false, $value=false, $session=false) {
 	//in order for the cookie to take, there needs to be page output.  don't allow fast redirecting.
 	$_josh['slow'] = true;
 
-	if ($_josh['debug']) {
+	if ($_josh['mode'] == 'debug') {
 		error_debug('not actually setting cookie (' . $name . ', ' . $value . ') because buffer is already broken by debugger.', __file__, __line__);
 	} elseif ($name) {
 		$time = ($value) ? mktime(0, 0, 0, 1, 1, 2030) : time()-3600;
@@ -405,7 +409,7 @@ function daysInMonth($month, $year=false) {
 
 function debug() {
 	global $_josh;
-	$_josh['debug'] = true;
+	$_josh['mode'] = 'debug';
 }
 
 function geocode($address, $zip) {
@@ -577,6 +581,4 @@ function user($return=false) {
 	if (empty($_SESSION['user_id'])) return $return;
 	return $_SESSION['user_id'];
 }
-
-if ($_josh['debug']) error_debug('joshlib finished loading and self-debugging in ' . format_time_exec(), __file__, __line__, '#def');
 ?>
