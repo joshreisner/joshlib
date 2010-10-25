@@ -206,13 +206,15 @@ function format_date_time_range($start, $end) {
 			if (date('j', $start) == date('j', $end)) {
 				if (date('a', $start) == date('a', $end)) {
 					//same am/pm
-					return format_date($start) . ' ' . date('g', $start) . '-' . date('g', $end) . date('a', $end);
+					$starttime = (date('i', $start) == '00') ? date('g', $start) :  date('g:i', $start);
+					$endtime = (date('i', $end) == '00') ? date('g', $end) :  date('g:i', $end);
+					return format_date($start) . ' ' . $starttime . '-' . $endtime . date('a', $end);
 				}
 				//same day
 				return format_date($start) . ' from ' . format_time($start) . ' to ' . format_time($end);
 			}
 			//same month
-			return date('M', $start) . ' ' . date('j', $start) . '-' . date('j', $end) . ', ' . date('Y', $end);
+			return date('M', $start) . ' ' . date('j', $start) . '&ndash;' . date('j', $end) . ', ' . date('Y', $end);
 		}
 		//same year
 		return format_date_time($start, false, ' at ') . ' to ' . format_date_time($end, false, ' at ');
