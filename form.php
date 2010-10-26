@@ -209,7 +209,7 @@ class form {
 				case 'select':
 					if (!$options) {
 						if (!$sql) $sql = 'SELECT id, ' . $option_title . ' FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title;
-						$options = (stristr($sql, 'optgroup')) ? db_table($sql) : db_array($sql);
+						$options = db_table($sql);
 					}
 					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
 					if ($null_value) $required = false;
