@@ -875,11 +875,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	$counter = 1;
 	$javascript = NEWLINE;
 	foreach ($options as $url=>$title) {
-		$liclass = str_replace('/', '', $url);
-		$liclass = str_replace('?', '_', $liclass);
-		$liclass = str_replace('=', '_', $liclass);
-		if (empty($liclass)) $liclass = 'home';
-		$classes[] = $liclass;
+		$classes[] = format_class($url);
 		
 		$name = 'option_' . $_josh['drawn']['navigation'] . '_' . $counter;
 		$args = array('name'=>$name, 'class'=>$name);

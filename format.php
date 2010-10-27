@@ -95,6 +95,15 @@ function format_check($variable, $type='int') {
 	return format_verify($variable, $type);
 }
 
+function format_class($string) {
+	//used by draw_nav and admiral center to derive an HTML-safe class name from a URL
+	$string = str_replace('/', '', $string);
+	$string = str_replace('?', '_', $string);
+	$string = str_replace('=', '_', $string);
+	if (empty($string)) $string = 'home';
+	return $string;
+}
+
 function format_code($code) {
 	//afaik this is just for formatting error messages.  
 	return '<p style="font-family:courier; font-size:13px;">' . nl2br(str_replace('\t', '&nbsp;', htmlentities($code))) . '</p>';
