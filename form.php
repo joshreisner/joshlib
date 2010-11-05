@@ -25,14 +25,13 @@ class form {
 		if (!$name) error_handle('form error', 'your form must have a $name.  eg ' . format_code('$f = new form(\'foo\');'));
 		
 		$this->name		= $name;
-		$this->submit	= $submit;
 		$this->cancel	= $cancel;
 		$this->id		= $id;
 		$this->readonly	= $readonly;
 		
 		if ($name) $this->set_table($name);
 		if ($submit === true) {
-			$this->title = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($name));
+			$this->title = $this->submit = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($name));
 		} else {
 			$this->title = $submit;
 		}
