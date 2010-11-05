@@ -33,7 +33,7 @@ class form {
 		if ($submit === true) {
 			$this->title = $this->submit = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($name));
 		} else {
-			$this->title = $submit;
+			$this->title = $this->submit = $submit;
 		}
 		if ($this->table && $id) $this->set_values(db_grab('SELECT * FROM ' . $this->table . ' WHERE id = ' . $id));
 	}
