@@ -58,7 +58,7 @@ class form {
 			}
 			
 			//add submit
-			$this->set_field(array('type'=>'submit', 'value'=>strip_tags($this->title), 'additional'=>$additional));
+			$this->set_field(array('type'=>'submit', 'value'=>$this->submit, 'additional'=>$additional));
 		}
 				
 		//start output
