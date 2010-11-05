@@ -28,25 +28,30 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 
 	//use swiftmailer class
 	lib_get('swiftmailer');
-
-	//establish transport
-	if (empty($_josh['smtp']['location']) || empty($_josh['smtp']['username'])) {
-		//have to use PHP's mail function, bad!!
-		$transport = Swift_MailTransport::newInstance();
+	
+	if (class_exists('Swift_MailTransport')) {	
+		//establish transport
+		if (empty($_josh['smtp']['location']) || empty($_josh['smtp']['username'])) {
+			//have to use PHP's mail function
+			$transport = Swift_MailTransport::newInstance();
+		} else {
+			$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], 25)->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
+		}
+			
+		$mailer		= Swift_Mailer::newInstance($transport);
+		$message	= Swift_Message::newInstance()
+			->setSubject($subject)
+			->setFrom($from)
+			->setTo($good)
+			->setBody(strip_tags(nl2br($message)))
+			->addPart($message, 'text/html')
+			//->attach(Swift_Attachment::fromPath('my-document.pdf'))
+		;
+		if (!$count = $mailer->batchSend($message, $failures)) error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures));
 	} else {
-		$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], 25)->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
+		//use php mail transport
+		mail($to, $subject, $message, 'From:' . $from);
 	}
-		
-	$mailer		= Swift_Mailer::newInstance($transport);
-	$message	= Swift_Message::newInstance()
-		->setSubject($subject)
-		->setFrom($from)
-		->setTo($good)
-		->setBody(strip_tags(nl2br($message)))
-		->addPart($message, 'text/html')
-		//->attach(Swift_Attachment::fromPath('my-document.pdf'))
-	;
-	if (!$count = $mailer->batchSend($message, $failures)) error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures));
 	
 	if (count($bad)) error_handle('email addresses rejected', 'the email with subject ' . $subject . ' was rejected for the following recipients ' . draw_list($bad) . ' and was successfully sent to ' . count($good) . ' recipients');
 	return $count;
