@@ -175,7 +175,7 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 	return false;
 }
 
-function file_get($filename) {
+function file_get($filename, $eval=false) {
 	global $_josh;
 	$filename = urldecode($filename);
 	if (!$file = @fopen($filename, 'r')) {
@@ -186,6 +186,7 @@ function file_get($filename) {
 	if (!$size = @filesize($filename)) return false;
 	$data = fread($file, $size);
 	fclose($file);
+	if ($eval) $data = eval($data);
 	return ($data);
 }
 
