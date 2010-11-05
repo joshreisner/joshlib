@@ -48,7 +48,7 @@ function url_change($target='') {
 	}
 	if ($_josh['slow']) {
 		error_debug('<b>url_change</b> (slow) to ' . $target, __file__, __line__);
-		if ($_josh['mode'] != 'debug') draw_javascript('location.href="' . $target . '"');
+		if ($_josh['mode'] != 'debug') echo draw_javascript('location.href="' . $target . '"');
 	} else {
 		error_debug('<b>url_change</b> (fast) to ' . $target, __file__, __line__);
 		if ($_josh['mode'] != 'debug') header('Location: ' . $target);

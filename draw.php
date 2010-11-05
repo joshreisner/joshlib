@@ -396,9 +396,8 @@ function draw_form_label($for, $content, $class) {
 }
 
 function draw_form_password($name, $value='', $class=false, $maxlength=255) {
-	global $_josh;
 	$class = ($class) ? $class . ' password' : 'password';
-	$return = '<input type="password" name="' . $name . '" id="' . $name . '" value="' . $value . '" class="' . $class . '" maxlength="' . $maxlength . '" class="' . $class . '">';
+	$return = '<input type="password" name="' . $name . '" id="' . $name . '" value="' . $value . '" maxlength="' . $maxlength . '" class="' . $class . '"/>';
 	return $return;
 }
 
