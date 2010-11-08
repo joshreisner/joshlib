@@ -349,6 +349,10 @@ class form {
 		foreach ($names as $name) $this->set_field_property($name, 'type', $value);
 	}
 	
+	function set_field_value($name, $value='') {
+		$this->set_field_property($name, 'value', $value);
+	}
+	
 	function set_field_labels($pairs) {
 		foreach ($pairs as $name=>$value) $this->set_field_label($name, $value);
 	}
