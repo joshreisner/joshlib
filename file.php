@@ -28,8 +28,8 @@ function file_check($filename) {
 }
 
 function file_delete($filename) {
-	global $_josh;
-	if (file_exists(DIRECTORY_ROOT . $filename)) unlink(DIRECTORY_ROOT . $filename);
+	if (!file_exists(DIRECTORY_ROOT . $filename)) return false;
+	unlink(DIRECTORY_ROOT . $filename);
 	return true;
 }
 

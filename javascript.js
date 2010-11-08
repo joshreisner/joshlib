@@ -23,7 +23,10 @@ function ajax_set(table, column, id, value, update) {
 		url : url_action_add('ajax_set', true),
 		type : "POST",
 		data : "table=" + table + "&column=" + column + "&id=" + id + "&value=" + value,
-		success : function(data) { if (update) update.html(data); }
+		success : function(data) { 
+			//alert(data);
+			if (update) update.html(data); 
+		}
 	});
 }
 
