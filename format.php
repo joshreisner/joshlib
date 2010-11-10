@@ -609,6 +609,11 @@ function format_money($value, $dollarsign=true, $comma=true, $error='') {
 	return $value;
 }
 
+function format_more($string, $link, $separator='<p>[more]</p>') {
+	if ($jump = strpos($string, $separator)) return substr($string, 0, $jump) . draw_p(draw_link($link, 'Read more&hellip;'), 'more');
+	return $string;
+}
+
 /* function format_nobr($string='') {
 	//should have been draw_nobr anyway
 	error_deprecated(__FUNCTION__ . ' was deprecated on 10/28/2009 because it\'s invalid html -- use table width instead, or white-space: nowrap');
