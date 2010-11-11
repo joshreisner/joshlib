@@ -870,7 +870,7 @@ function format_text_code($string) {
 	$string = preg_replace("/[^A-Za-z0-9_]/", '', $string); 
 	$string = preg_replace('/\s\s+/', ' ', $string);
 	
-	return urlencode($string)`;
+	return urlencode($string);
 }
 
 function format_text_ends($needle, $haystack) {
