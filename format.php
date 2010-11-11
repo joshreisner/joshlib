@@ -862,19 +862,15 @@ function format_text_code($string) {
 	$string = format_accents_remove(strToLower(trim(strip_tags($string))));
 	
 	//remove special characters
-	/*$string = str_replace("'",	'',		$string);
-	$string = str_replace(',',	'',		$string);
-	$string = str_replace('.',	'',		$string);
-	$string = str_replace(':',	'',		$string);
-	$string = str_replace('?',	'',	$string);*/
 	$string = str_replace('/',	'_',	$string);
 	$string = str_replace(' ',	'_',	$string);
 	$string = str_replace('&',	'and',	$string);
 	$string = str_replace('+',	'and',	$string);
 	
 	$string = preg_replace("/[^A-Za-z0-9_]/", '', $string); 
+	$string = preg_replace('/\s\s+/', ' ', $string);
 	
-	return $string;
+	return urlencode($string);
 }
 
 function format_text_ends($needle, $haystack) {
