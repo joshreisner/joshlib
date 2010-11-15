@@ -562,6 +562,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	$full_text	= false;
 	//debug();
 	
+	
 	if ($columns = db_columns($table, true)) {
 		foreach ($columns as $c) {
 			error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type'], __file__, __line__);
@@ -665,14 +666,6 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 					$query1[] = $c['name'];
 					$query2[] = $c['default'];
 				}
-			} elseif ($c['name'] == 'precedence') {
-				$query1[] = 'precedence';
-				/*setting the precedence for a new object -- insert into slot 1, increment everything else
-				don't like this behavior anymore, particularly for cms and inserting new web pages
-				$query2[] = 1;
-				db_query('UPDATE ' . $table . ' SET precedence = precedence + 1');
-				*/
-				$query2[] = db_grab('SELECT MAX(precedence) FROM ' . $table) + 1;				
 			} elseif ($c['required']) {
 				//fill values with admin defaults
 				if (($c['type'] == 'bit') || ($c['type'] == 'tinyint')) {
@@ -722,6 +715,8 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 		$query2[] = ((isset($array['created_user'])) ? $array['created_user'] : $userID);
 		$query1[] = 'is_active';
 		$query2[] = 1;
+		$query1[] = 'precedence';
+		$query2[] = db_grab('SELECT MAX(precedence) FROM ' . $table) + 1;
 		$query = 'INSERT INTO ' . $table . ' ( ' . implode(', ', $query1) . ' ) VALUES ( ' . implode(', ', $query2) . ' )';
 		$id = db_query($query);
 	}
