@@ -225,8 +225,10 @@ function draw_div_id($id, $innerhtml='', $arguments=false) {
 	return draw_tag('div', $arguments, $innerhtml);
 }
 
-function draw_div_open($id=false) {
-	return draw_tag('div', array('id'=>$id), false, true); 
+function draw_div_open($id=false, $arguments=false) {
+	$arguments = array_arguments($arguments);
+	$arguments['id'] = $id;
+	return draw_tag('div', $arguments, false, true); 
 }
 
 function draw_div_class_open($class=false) {
