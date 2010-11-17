@@ -299,11 +299,7 @@ function db_delete($table, $id=false) {
 			error_handle('expecting \$_GET[\'id\']', 'db_delete is expecting an id variable');
 		}
 	}
-	db_query('UPDATE ' . $table . ' SET 
-		deleted_date = ' . db_date() . ', 
-		deleted_user = ' . user('NULL') . ', 
-		is_active = 0 
-		WHERE id = ' . $id);
+	db_query('UPDATE ' . $table . ' SET deleted_date = ' . db_date() . ', deleted_user = ' . user('NULL') . ', updated_user = ' . user('NULL') . ', updated_date = NOW(), is_active = 0 WHERE id = ' . $id);
 }
 
 function db_fetch($result) {
@@ -829,7 +825,7 @@ function db_undelete($table, $id=false) {
 	//undeleting an object does not update it
 	if (!$id) $id = url_id();
 	if (!$id) error_handle('expecting \$_GET[\'id\']', __function__ . ' is expecting an id variable');
-	db_query('UPDATE ' . $table . ' SET deleted_date = NULL, deleted_user = NULL, is_active = 1 WHERE id = ' . $id);
+	db_query('UPDATE ' . $table . ' SET deleted_date = NULL, deleted_user = NULL, updated_user = ' . user('NULL') . ', updated_date = NOW(), is_active = 1 WHERE id = ' . $id);
 }
 
 function db_updated($table='') {

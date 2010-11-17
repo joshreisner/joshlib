@@ -675,9 +675,17 @@ function format_pluralize($entity, $count=2) {
 	if ($count == 1) return $entity;
 	
 	$length = strlen($entity);
-	if (substr($entity, -1) == 'y') {
+	if (substr($entity, -1) == 's') {
+		//already ends in an s
+		return $entity;
+	} elseif (substr(strtolower($entity), -6) == ' media') {
+		//needs no change
+		return $entity;
+	} elseif (substr($entity, -1) == 'y') {
+		//ends in an ies
 		return substr($entity, 0, ($length - 1)) . 'ies';
 	} else {
+		//needs just an s
 		return $entity . 's';
 	}
 }
@@ -765,7 +773,7 @@ function format_quantitize($quantity, $entity, $title_case=true) {
 	if ($quantity == 0) {
 		$return = 'no ' . format_pluralize($entity);
 	} elseif ($quantity == 1) {
-		$return = 'one ' . $entity;
+		$return = 'one ' . format_singular($entity);
 	} elseif (format_verify($quantity) && ($quantity < 10)) {
 		$return = $_josh['numbers'][$quantity] . ' ' . format_pluralize($entity);
 	} else {
