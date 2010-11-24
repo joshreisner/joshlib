@@ -413,6 +413,14 @@ function file_sister($filename, $ext) {
 	return false;
 }
 
+function file_type($filename) {
+	if ($parts = explode('.', strToLower($filename))) {
+		return $parts[count($parts)];
+	} else {
+		return false;
+	}
+}
+
 function file_unzip($source, $target) {
 	global $_josh;
 	
