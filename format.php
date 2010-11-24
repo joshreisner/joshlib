@@ -902,6 +902,33 @@ function format_text_starts($needle, $haystack) {
 	return false;
 }
 
+function format_thumbnail_pdf($source) {
+	//returns a JPG thumbnail for supplied PDF in $source
+	
+	$source_name = DIRECTORY_WRITE . '/source.pdf';
+	$target_name = DIRECTORY_WRITE . '/target.jpg';
+	
+	file_put($source_name, $source);
+	
+	exec('/usr/local/bin/convert ' . DIRECTORY_ROOT . $source_name . '[0] ' . DIRECTORY_ROOT . $target_name);
+		
+	if (file_check($target_name)) {
+		//operation worked
+		$binary = file_get($target_name);
+		header('Content-type: image/jpeg');
+		echo format_image_resize($binary, 120);
+		return $binary;
+	} else {
+		//did not work
+		error_handle('ImageMagick Not Installed', __function__ . ' requires the ' . draw_link('http://www.imagemagick.org/', 'ImageMagick PHP library') . ' to work on the command line.  Please install it and try again.  ', __file__, __line__, __function__);
+		return false;
+	}
+	
+	//clean up
+	file_delete($source_name);
+	file_delete($target_name);
+}
+
 function format_time($timestamp=false, $error='') {
 	if ($timestamp === false) {
 		$timestamp = time();

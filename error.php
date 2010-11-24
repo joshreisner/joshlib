@@ -73,9 +73,9 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	
 	//when throwing an error, specify file and line
 	if ($file && $line) {
-		$message .= 'At line ' . $line . ' of ' . $file;
-		if ($function) $message .= ', inside function ' . $function;
-		$message .= draw_p($message);
+		$message .= '  Error is at line ' . $line . ' of ' . $file;
+		if ($function) $message .= ', inside function ' . $function . '.';
+		$message = draw_p($message);
 	} else {
 		$backtrace = debug_backtrace();
 		array_shift($backtrace);
