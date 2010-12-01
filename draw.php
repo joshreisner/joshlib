@@ -785,6 +785,7 @@ function draw_list($options, $arguments=false, $type='ul', $selected=false, $cla
 		$li_args = array('class'=>'option' . ($i + 1));
 		if (isset($classes[$i]))	array_argument($li_args, $classes[$i]);
 		if ($counter == 1)			array_argument($li_args, 'first');
+		if ($counter % 2)			{ array_argument($li_args, 'odd'); } else { array_argument($li_args, 'even'); }
 		if ($counter == $count)		array_argument($li_args, 'last');
 		if ($selected == ($i + 1))	array_argument($li_args, 'selected');
 		if (empty($options[$i]))	array_argument($li_args, 'empty');

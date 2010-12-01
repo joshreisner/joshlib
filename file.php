@@ -414,8 +414,10 @@ function file_sister($filename, $ext) {
 }
 
 function file_type($filename) {
-	if ($parts = explode('.', strToLower($filename))) {
-		return $parts[count($parts)];
+	$parts = explode('.', strToLower($filename));
+	$count = count($parts);
+	if ($count) {
+		return $parts[$count-1];
 	} else {
 		return false;
 	}
