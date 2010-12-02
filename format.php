@@ -303,7 +303,7 @@ function format_file_name($str, $ext) {
 	$str = str_replace('  ',	' ',	$str);
 
 	//$str = str_replace(' ',		'_',	$str);
-	$str = substr($str, 0, 60);
+	$str = format_string($str, 60, ''); //substr($str, 0, 60);
 
 	return $str . '.' . $ext;
 	return strtolower($str . '.' . $ext);
