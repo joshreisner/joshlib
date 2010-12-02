@@ -701,7 +701,7 @@ function draw_img_thumbnail($path, $link, $max) {
 	if ($width >= $height) {
 		return draw_img($path, $link, array('width'=>$max, 'height'=>$height*($max/$width)));
 	} else {
-		return 'tall';
+		return draw_img($path, $link, array('width'=>$width*($max/$height), 'height'=>$max));
 	}
 }
 
