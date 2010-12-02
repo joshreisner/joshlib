@@ -237,9 +237,10 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 			$decimals = false;
 			@list($length, $decimals) = explode(',', $length);
 			$required = ($r['Null'] == 'YES') ? false : true;
+			$auto = ($r['Extra'] == 'auto_increment') ? true : false;
 			$default = $r['Default'];
 			$comments = $r['Comment'];
-			$return[] = ($includeMetaData) ? compact('name','type','required','default','comments','length','decimals') : $name;
+			$return[] = ($includeMetaData) ? compact('name','type','required','auto','default','comments','length','decimals') : $name;
 		}
 	} else {
 		$result = db_table('SELECT 
@@ -800,9 +801,11 @@ function db_table_rename($before, $after) {
 }
 
 function db_tables() {
+	global $_josh;
 	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql');
 	$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
-	foreach ($tables as &$t) $t = $t['Tables_in_' . $_josh['db']['database']];
+	foreach ($tables as &$t) $t = strToLower($t['Tables_in_' . $_josh['db']['database']]);
+	sort($tables);
 	return $tables;
 }
 
