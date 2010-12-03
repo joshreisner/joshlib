@@ -875,7 +875,7 @@ function format_text_code($string) {
 	$string = str_replace('&',	'and',	$string);
 	$string = str_replace('+',	'and',	$string);
 	
-	$string = preg_replace("/[^A-Za-z0-9_]/", '', $string); 
+	$string = preg_replace("/[^A-Za-z0-9_-]/", '', $string); 
 	$string = preg_replace('/\s\s+/', ' ', $string);
 	
 	return urlencode($string);
