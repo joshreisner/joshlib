@@ -177,7 +177,7 @@ class form {
 				case 'file':
 					$return .= draw_form_file($name, $class, $onchange) . $additional;
 					//todo -- this is wonky -- presupposes it's a jpg
-					if ($value) $return .= draw_img(file_dynamic($this->table, $name, $this->id, 'jpg'), false, array('maxwidth'=>545, 'class'=>'preview'));
+					if ($value && $preview) $return .= draw_img(file_dynamic($this->table, $name, $this->id, 'jpg'), false, array('maxwidth'=>545, 'class'=>'preview'));
 					break;
 				case 'html':
 				case 'group':
@@ -289,7 +289,7 @@ class form {
 		//defaults
 		$type = $value = $class = $default = $name = $label = $required = $append = $position = false;
 		$sql = $action = $onchange = $additional = $maxlength = $options_table = $option_id = false;
-		$option_title = $object_id = $options = $linking_table = $null_value = false;
+		$option_title = $object_id = $options = $linking_table = $null_value = $preview = false;
 		$allow_changes = true;
 		
 		//load inputs
@@ -325,7 +325,7 @@ class form {
 
 		//package and save
 		if ($position === false) {
-			$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength', 'null_value');
+			$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength', 'null_value', 'preview');
 		} else {
 			if (isset($this->fields[$name])) unset($this->fields[$name]);
 			$this->fields = array_insert_assoc($this->fields, $position, $name, compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength', 'null_value'));
