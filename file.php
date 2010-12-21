@@ -62,7 +62,8 @@ function file_dir_writable($subdirectory=false) {
 function file_download($content, $filename, $extension) {
 	//header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	//header('Cache-Control: public');
-
+	//todo add more types from http://www.iana.org/assignments/media-types/
+	$mime = ($extension == 'pdf') ? 'application/pdf' : 'application/octet-stream';
 	$filename = format_file_name($filename, $extension);
 	
 	//for IE over SSL
@@ -70,7 +71,7 @@ function file_download($content, $filename, $extension) {
 	header('Pragma: public');
 	
 	header('Content-Description: File Transfer');
-	header('Content-Type: application/octet-stream');
+	header('Content-Type: ' . $mime);
 	header('Content-Length: ' . strlen($content));
 	header('Content-Disposition: attachment; filename=' . $filename);
 	echo $content;
