@@ -1,6 +1,13 @@
 //joshlib javascript functions
 //this file is generated automatically, only edit through joshlib SVN
 
+$(function(){
+	//auto start new slideshows
+	$("ul.slideshow").each(function(){
+		new slideshow($(this));
+	});
+});
+
 function ajax_publish(which) {
 	//requires jquery
 	//which.name eg chk_news-items_12
@@ -415,6 +422,142 @@ function scroll_to(newPallet, dont_clear_interval) {
 	scrollvars.timer	= setInterval("scroll_horizontally();", 15);
 }
 
+function slideshow(element) {
+	/*
+	slideshow function by josh, diego and michael
+	call by <ul class="slideshow arrows bullets move continuous">
+	*/
+	$(element).wrap('<div class="slideshow_container" />').wrap('<div class="slideshow" />');
+
+    var vars = {
+        deselectedPosition:	0,
+        hasArrows:			$(element).hasClass('arrows'),
+        hasBullets:			$(element).hasClass('bullets'),
+        interval:			3000,
+        isContinuous:		$(element).hasClass('continuous'),
+        mode:				($(element).hasClass('fade')) ? 'fade' : 'move',
+        selectedPosition:	0,
+        slides:				$(element).find('li'),
+        slideWidth:			$(element).find('li').width(),
+        totalSlides:		$(element).find('li').size(),
+		manageArrows:		function() {	
+								if (!vars.hasArrows) return false;
+								if (vars.selectedPosition == 0) {
+									vars.parent.find('span.arrows.previous').css('visibility', 'hidden')
+								} else {
+									vars.parent.find('span.arrows.previous').css('visibility', 'visible')
+								}
+								
+								if (vars.selectedPosition == vars.totalSlides - 1) {
+									vars.parent.find('span.arrows.next').css('visibility', 'hidden')
+								} else {
+									vars.parent.find('span.arrows.next').css('visibility', 'visible')
+								}
+							},
+        parent:				$(element).closest('div.slideshow_container'),
+		manageBullets:		function() {
+								if (!vars.hasBullets) return false;
+								var thisBullet = vars.parent.find('ul.bullet_controls li').removeClass('selected').get(vars.selectedPosition);
+								$(thisBullet).addClass('selected');
+							}, 
+		goToSlide:			function() {
+								if (vars.mode == 'fade') {
+									vars.slides.each(function(){$(this).css('z-index', 'auto');});
+									$(vars.slides.get(vars.selectedPosition)).css('z-index', 40).show();
+									$(vars.slides.get(vars.deselectedPosition)).css('z-index', 50).fadeOut(600);
+								} else {
+									if (vars.isContinuous && (vars.selectedPosition == 0)) {
+										//move to special last slide
+										$(element).animate({ 'marginLeft': vars.slideWidth * (-vars.totalSlides)}, 400, function(){
+											$(element).css('marginLeft', '0px');
+										});
+									} else {
+										$(element).animate({ 'marginLeft': vars.slideWidth * (-vars.selectedPosition)}, 400);
+									}
+								}
+								$(vars.slides.removeClass('selected').get(vars.selectedPosition)).addClass('selected');
+							},
+		hasAuto:			$(element).hasClass('auto'),
+		timer:				false,
+		autoSlide: 			function() {
+								//goToNext basically
+								vars.deselectedPosition	= vars.selectedPosition;
+								vars.selectedPosition++;
+								if (vars.selectedPosition >= vars.totalSlides) {
+									vars.selectedPosition = 0;
+								} else if (vars.selectedPosition < 0) {
+									vars.selectedPosition = vars.totalSlides - 1;
+								}
+								vars.manageBullets();
+								vars.manageArrows();
+								vars.goToSlide();
+							},
+		autoClear:			function() {
+								clearTimeout(vars.timer);
+							}
+    };
+			
+	//initialize -- need selected class for api (eg slideshow mask)
+	vars.slides.first().addClass("selected");
+	if (vars.mode == 'fade') {
+		vars.slides.hide().first().show();
+	} else if (vars.mode == 'move') {
+		$(element).css('width', (vars.slideWidth * vars.totalSlides));		
+	}
+
+	//add arrows & bullets
+	if (vars.totalSlides > 1) {
+		if (vars.hasArrows) {
+			$(element).parent('div.slideshow').prepend('<span class="arrows previous">Prev</span><span class="arrows next">Next</span>');
+		}
+
+		if (vars.hasBullets) {
+			var bulletContainerHTML = '<ul class="bullet_controls">';
+			for (i = 0; i < vars.totalSlides; i++) bulletContainerHTML += '<li></li>';
+			bulletContainerHTML += '</ul>';
+			vars.parent.prepend(bulletContainerHTML);
+		}
+		
+		if ((vars.mode == 'move') && vars.isContinuous) {
+			//we duplicate the first slide at the end so we can always scroll to the right
+			$(element).css('width', (vars.slideWidth * (vars.totalSlides + 1)));
+			$(element).append($(element).find('li').first().html());
+		}
+	}
+
+	//go to the first slide
+	vars.manageBullets();
+	vars.manageArrows();
+
+	//if auto set timer
+	if (vars.hasAuto) vars.timer = setInterval(vars.autoSlide, vars.interval);
+
+	//arrows behavior
+	vars.parent.find('span.arrows').click(function() {
+		vars.deselectedPosition	= vars.selectedPosition;
+		vars.selectedPosition	= ($(this).hasClass('next')) ? vars.selectedPosition + 1 : vars.selectedPosition - 1;
+		if (vars.selectedPosition >= vars.totalSlides) {
+			vars.selectedPosition = 0;
+		} else if (vars.selectedPosition < 0) {
+			vars.selectedPosition = vars.totalSlides - 1;
+		}
+		vars.manageBullets();
+		vars.manageArrows();
+		vars.autoClear();
+		vars.goToSlide();
+	});
+	
+	//bullets behavior
+	vars.parent.find('ul.bullet_controls li').click(function() {
+		vars.deselectedPosition = vars.selectedPosition;
+		vars.selectedPosition = $(this).index();
+		vars.manageBullets();
+		vars.manageArrows();
+		vars.autoClear();
+		vars.goToSlide();
+	});
+}
+	
 function table_dnd(name, column, handle) {
 	//jquery and tablednd are required
 	$("#" + name).tableDnD({
