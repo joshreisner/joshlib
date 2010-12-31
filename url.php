@@ -239,7 +239,7 @@ function url_query_drop($deletes=false, $go=true) {
 	$get = $_GET;
 	$target = url_base() . $_josh['request']['path'];
 	if ($deletes) {
-		if (!is_array($deletes)) $deletes = explode(',', $deletes);
+		if (!is_array($deletes)) $deletes = array_separated($deletes);
 		foreach ($deletes as $key) {
 			$key = trim($key);
 			if (array_key_exists($key, $get)) unset($get[$key]);

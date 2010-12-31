@@ -390,9 +390,9 @@ class form {
 		$this->table = false;
 		if ($cols = db_columns($table, true)) {
 		
-			//preload foreign keys
-			$foreign_keys = array();
-			if ($keys = db_keys_from($table)) foreach ($keys as $key) $foreign_keys[$key['name']] = $key;
+			//preload foreign keys deprecated (godaddy SELECT command denied to user)
+			//$foreign_keys = array();
+			//if ($keys = db_keys_from($table)) foreach ($keys as $key) $foreign_keys[$key['name']] = $key;
 
 			$this->table = $table;
 			foreach ($cols as $c) {
@@ -415,16 +415,15 @@ class form {
 				} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob')) {
 					$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
 				} elseif ($c['type'] == 'int') {
-					if (isset($foreign_keys[$c['name']])) {
-						$this->set_field(array('type'=>'select', 'name'=>$key['name'], 'label'=>$key['label'], 'sql'=>'SELECT * FROM ' . $key['ref_table'], 'additional'=>$c['comments'], 'required'=>$c['required']));
-					} elseif ($c['name'] != 'precedence') {
+					//if (isset($foreign_keys[$c['name']])) {
+					//	$this->set_field(array('type'=>'select', 'name'=>$key['name'], 'label'=>$key['label'], 'sql'=>'SELECT * FROM ' . $key['ref_table'], 'additional'=>$c['comments'], 'required'=>$c['required']));
+					//} elseif ($c['name'] != 'precedence') {
 						$this->set_field(array('type'=>'hidden', 'name'=>$c['name']));
-					}
+					//}
 				}
 			}
 			
-			//load checkboxes tables 
-			//todo deprecate
+			/*load checkboxes tables, deprecated
 			if ($keys = db_keys_to($table)) {
 				foreach ($keys as $key) {
 					if (isset($key['ref_table'])) {
@@ -444,7 +443,7 @@ class form {
 						);
 					}
 				}
-			}
+			}*/
 		}
 		
 	}
