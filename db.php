@@ -718,13 +718,12 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 		$id = db_query($query);
 	}
 	
-	//handle checkboxes based on foreign key situation
-	//todo deprecate
+	/* handle checkboxes based on foreign key situation, deprecated.  godaddy: SELECT command denied to user 
 	if ($keys = db_keys_to($table)) {
 		foreach ($keys as $key) {
 			db_checkboxes($key['ref_table'], $key['table_name'], $key['column_name'], $key['name'], $id);
 		}
-	}
+	} */
 	
 	//if possible, populate search indexes
 	if ($full_text) db_words($full_text, $id, $table . '_to_words');
