@@ -202,8 +202,9 @@ function url_parse($url) {
 	}
 	
 	//get full browser address
-	$return['url'] = $return['protocol'] . '://' . $return['host'] . $return['path_query'];
-	
+	$return['base'] = $return['protocol'] . '://' . $return['host'];
+	$return['url'] = $return['base'] . $return['path_query'];
+		
 	//output for debugging ~ testing for debug since it takes some processing
 	if ($_josh['mode'] == 'debug') {
 		ksort($return);

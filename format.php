@@ -418,6 +418,49 @@ function format_html_entities($string) {
 	return $string;
 }
 
+function format_html_paragraphs($text, $limit=false) {
+	lib_get('simple_html_dom');
+	$blocks = str_get_html(format_html($text))->find('p');
+	$text = '';
+	$total_length = 0;
+	foreach ($blocks as $b) {
+		if (!$b->class) {
+			$length = strlen(strip_tags($b));
+			if ($limit && $length + $total_length > $limit) break;
+			$text .= $b;
+			$total_length += $length;
+		}
+	}
+	return $text;
+}
+
+function format_html_title($text) {
+	lib_get('simple_html_dom');
+	$blocks = str_get_html($text)->find('h1');
+	$text = '';
+	foreach ($blocks as $b) $text .= $b->innertext;
+	return $text;
+}
+
+function format_html_img($text, $url, $width, $height) {
+	global $_josh;
+	lib_get('simple_html_dom');
+	$blocks = str_get_html(format_html($text))->find('img');
+	$images = array();
+	foreach ($blocks as $b) {
+		$area = $b->width * $b->height;
+		format_html_set_max($area);
+		$images[$area] = $b;
+	}
+	$src = $images[$_josh['max_text_len']]->src;
+	if (substr($src, 0, 1) == '/') {
+		$url = url_parse($url);
+		$src = $url['base'] . $src;
+	}
+	//todo support non-jpg
+	return format_image_resize(file_get($src), $width, $height);
+}
+
 function format_html_trim($text) {
 	global $_josh;
 	$text = format_html($text);
@@ -460,7 +503,7 @@ function format_html_trim($text) {
 	$text = trim($html->save());
 	$html->clear();
 	
-	die($text);
+	//die($text);
 	
 	return $text;
 }
