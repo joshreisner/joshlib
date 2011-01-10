@@ -177,7 +177,6 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 }
 
 function file_get($filename, $eval=false) {
-	global $_josh;
 	$filename = urldecode($filename);
 	if (!$file = @fopen($filename, 'r')) {
 		$filename = DIRECTORY_ROOT . $filename;

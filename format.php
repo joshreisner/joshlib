@@ -418,31 +418,7 @@ function format_html_entities($string) {
 	return $string;
 }
 
-function format_html_paragraphs($text, $limit=false) {
-	lib_get('simple_html_dom');
-	$blocks = str_get_html(format_html($text))->find('p');
-	$text = '';
-	$total_length = 0;
-	foreach ($blocks as $b) {
-		if (!$b->class) {
-			$length = strlen(strip_tags($b));
-			if ($limit && $length + $total_length > $limit) break;
-			$text .= $b;
-			$total_length += $length;
-		}
-	}
-	return $text;
-}
-
-function format_html_title($text) {
-	lib_get('simple_html_dom');
-	$blocks = str_get_html($text)->find('h1');
-	$text = '';
-	foreach ($blocks as $b) $text .= $b->innertext;
-	return $text;
-}
-
-function format_html_img($text, $url, $width, $height) {
+function format_html_img($text, $url) {
 	global $_josh;
 	lib_get('simple_html_dom');
 	$blocks = str_get_html(format_html($text))->find('img');
@@ -457,8 +433,47 @@ function format_html_img($text, $url, $width, $height) {
 		$url = url_parse($url);
 		$src = $url['base'] . $src;
 	}
-	//todo support non-jpg
-	return format_image_resize(file_get($src), $width, $height);
+	return $src;
+}
+
+function format_html_paragraphs($text, $limit=false) {
+	lib_get('simple_html_dom');
+	$blocks = str_get_html(format_html($text))->find('p');
+	$text = '';
+	$total_length = 0;
+	foreach ($blocks as $b) {
+		if (!$b->class) {
+			$b = draw_p(strip_tags($b));
+			$length = strlen($b);
+			if ($limit && $length + $total_length > $limit) break;
+			$text .= $b;
+			$total_length += $length;
+		}
+	}
+	return $text;
+}
+
+function format_html_set_max($len) {
+	//helper function for above, due to weird scope reason i don't fully comprehend
+	global $_josh;
+	if (!isset($_josh['max_text_len'])) $_josh['max_text_len'] = 0;
+	if ($len > $_josh['max_text_len']) $_josh['max_text_len'] = $len;
+}
+
+function format_html_text($str) {
+	$return = strip_tags($str);
+	$return = str_replace('&nbsp;', ' ', $return);
+	$return = trim($return);
+	if (empty($return)) return false;
+	return $return;
+}
+
+function format_html_title($text) {
+	lib_get('simple_html_dom');
+	$blocks = str_get_html($text)->find('h1');
+	$text = '';
+	foreach ($blocks as $b) $text .= $b->innertext;
+	return $text;
 }
 
 function format_html_trim($text) {
@@ -503,24 +518,7 @@ function format_html_trim($text) {
 	$text = trim($html->save());
 	$html->clear();
 	
-	//die($text);
-	
 	return $text;
-}
-
-function format_html_set_max($len) {
-	//helper function for above, due to weird scope reason i don't fully comprehend
-	global $_josh;
-	if (!isset($_josh['max_text_len'])) $_josh['max_text_len'] = 0;
-	if ($len > $_josh['max_text_len']) $_josh['max_text_len'] = $len;
-}
-
-function format_html_text($str) {
-	$return = strip_tags($str);
-	$return = str_replace('&nbsp;', ' ', $return);
-	$return = trim($return);
-	if (empty($return)) return false;
-	return $return;
 }
 
 function format_image_resize($source, $max_width=false, $max_height=false) {

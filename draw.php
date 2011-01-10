@@ -750,18 +750,21 @@ function draw_javascript_src($filename=false) {
 	return draw_tag('script', array('language'=>'javascript', 'src'=>$filename, 'type'=>'text/javascript'), '');
 }
 
-function draw_link($href=false, $str=false, $newwindow=false, $arguments=false) {
+function draw_link($href=false, $str=false, $newwindow=false, $arguments=false, $maxlen=60) {
 	$arguments = array_arguments($arguments);
 	if (format_text_starts('mailto:', $href)) {
 		//obfuscate email
-		if (!$str) $str = format_ascii(format_string(str_replace('mailto:', '', $href), 60));
+		if (!$str) $str = format_ascii(substr(str_replace('mailto:', '', $href), 0, $maxlen));
 		$arguments['href'] = format_ascii($href);
 	} elseif (format_text_starts('javascript:', $href)) {
 		//correct link for javascript
 		$arguments['href'] = '#';
 		$arguments['onclick'] = $href;
 	} elseif ($href) {
-		if (!$str) $str = format_string($href, 60);
+		if (!$str) {
+			$str = $href;
+			if (strlen($str) > $maxlen) $str = substr($str, 0, $maxlen) . '&hellip;';
+		}
 		$arguments['href'] = htmlentities($href);
 	} else {
 		$arguments['class'] = (isset($arguments['class'])) ? $arguments['class'] . ' empty' : 'empty';
