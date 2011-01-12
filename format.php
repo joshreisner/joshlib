@@ -473,7 +473,7 @@ function format_html_title($text) {
 	$blocks = str_get_html($text)->find('h1');
 	$text = '';
 	foreach ($blocks as $b) $text .= $b->innertext;
-	return $text;
+	return strip_tags($text);
 }
 
 function format_html_trim($text) {
