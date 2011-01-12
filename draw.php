@@ -1036,7 +1036,7 @@ function draw_rss_link($address) {
 	return draw_tag('link', array('rel'=>'alternate', 'type'=>'application/rss+xml', 'title'=>'RSS', 'href'=>$address));
 }
 
-function draw_span($class, $inner) {
+function draw_span($class, $inner='') {
 	//eg draw_span('title', $r) == draw_container('span', $r['title'], array('class'=>'title')) == '<span class="title">' . $r['title'] . '</span>'
 	if (is_array($inner)) {
 		if (isset($inner[$class])) {
