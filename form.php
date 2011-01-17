@@ -222,12 +222,13 @@ class form {
 						$return .= draw_form_submit($value, $class) . $additional;
 					}
 					break;
+				case 'int':
 				case 'text':
 					if ($allow_changes) {
 						//accepts insertion point
 						if (!$this->focus) $this->set_focus($name);
 						
-						$args = array('class'=>$class);
+						$args = array('class'=>$type);
 						if (!empty($default)) {
 							$return .= draw_javascript_src();
 							$args['onfocus'] = 'javascript:form_field_default(this, true, "' . $default . '");';
@@ -320,7 +321,7 @@ class form {
 			$additional = $label;
 			$label = '&nbsp;';
 		}
-		
+
 		error_debug('<b>' . __function__ . '</b> adding ' . $name . ' of type ' . $type, __file__, __line__);
 
 		//package and save
@@ -388,12 +389,7 @@ class form {
 	
 	function set_table($table) {
 		$this->table = false;
-		if ($cols = db_columns($table, true)) {
-		
-			//preload foreign keys deprecated (godaddy SELECT command denied to user)
-			//$foreign_keys = array();
-			//if ($keys = db_keys_from($table)) foreach ($keys as $key) $foreign_keys[$key['name']] = $key;
-
+		if ($cols = db_columns($table, true)) {		
 			$this->table = $table;
 			foreach ($cols as $c) {
 				if ($c['type'] == 'varchar') {
@@ -415,37 +411,14 @@ class form {
 				} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob')) {
 					$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
 				} elseif ($c['type'] == 'int') {
-					//if (isset($foreign_keys[$c['name']])) {
-					//	$this->set_field(array('type'=>'select', 'name'=>$key['name'], 'label'=>$key['label'], 'sql'=>'SELECT * FROM ' . $key['ref_table'], 'additional'=>$c['comments'], 'required'=>$c['required']));
-					//} elseif ($c['name'] != 'precedence') {
+					if ($c['name'] == 'precedence') {
 						$this->set_field(array('type'=>'hidden', 'name'=>$c['name']));
-					//}
-				}
-			}
-			
-			/*load checkboxes tables, deprecated
-			if ($keys = db_keys_to($table)) {
-				foreach ($keys as $key) {
-					if (isset($key['ref_table'])) {
-						$this->set_field(array(
-							'type'=>'checkboxes', 
-							'value'=>$this->id, //this doesn't feel like the right place to set this
-							'name'=>$key['ref_table'], //todo make this unnecessary: make it the linking table instead of the options table
-							'label'=>$key['constraint_name'],
-							//'option_title'=>'name',
-							//"additional"=>$additional, 
-							//"allow_changes"=>$allow_changes, 
-							'options_table'=>$key['ref_table'], 
-							'linking_table'=>$key['table_name'], 
-							'option_id'=>$key['name'], 
-							'object_id'=>$key['column_name']
-							)
-						);
+					} else {
+						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'class'=>'int', 'required'=>$c['required'], 'additional'=>$c['comments']));
 					}
 				}
-			}*/
+			}
 		}
-		
 	}
 	
 	function set_title($title=false) {
