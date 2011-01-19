@@ -287,7 +287,7 @@ function file_put($filename, $content) {
 	//arguments should be reversed?
 	$file = @fopen(DIRECTORY_ROOT . $filename, 'w');
 	if ($file === false) {
-		error_handle('could not open file', 'the file ' . DIRECTORY_ROOT . $filename . ' could not be opened for writing.  perhaps it is a permissions problem.');
+		error_handle('could not write file', '<b>' . __function__ . '</b> could not open ' . DIRECTORY_ROOT . $filename . ' for writing.  perhaps it is a permissions problem.');
 	} else {
 		if (is_array($content)) $content = implode($content);
 		$bytes = fwrite($file, $content);
