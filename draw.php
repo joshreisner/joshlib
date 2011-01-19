@@ -355,12 +355,13 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 	draw_form_select($namePrefix . 'Day', array_2d(array_range(1, 31)), $day, $required, $class) .
 	draw_form_select($namePrefix . 'Year', array_2d(array_range(1920, 2015)), $year, $required, $class);
 	if ($withTime) {
-		$return .= '&nbsp;' . 
-		draw_form_select($namePrefix . 'Hour', array_2d(array(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)), $hour, $required, $class) .
-		draw_form_select($namePrefix . 'Minute', array_2d(array('00', 15, 30, 45)), $minute, $required, $class) .
-		draw_form_select($namePrefix . 'AMPM', array_2d(array('AM', 'PM')), $ampm, $required, $class);
+		$return .= draw_div_class('time',  
+			draw_form_select($namePrefix . 'Hour', array_2d(array(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)), $hour, $required, $class) .
+			draw_form_select($namePrefix . 'Minute', array_2d(array('00', 15, 30, 45)), $minute, $required, $class) .
+			draw_form_select($namePrefix . 'AMPM', array_2d(array('AM', 'PM')), $ampm, $required, $class)
+		);
 	}
-	return draw_container('nobr', $return);
+	return draw_div_class('date', $return);
 }
 
 function draw_form_date_cal($name, $value=false) {

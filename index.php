@@ -497,6 +497,7 @@ function lib_get($string) {
 		case 'jeditable' :
 		case 'jquery' :
 		case 'jquery-latest' :
+		case 'jscrollpane' :
 		case 'lorem_ipsum' :
 		case 'tablednd' :
 		case 'tinymce' :
@@ -510,11 +511,16 @@ function lib_get($string) {
 			file_dir_writable('images');
 			file_dir_writable('files');
 			$return .= draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
-		} elseif (($string == 'tablednd') || ($string == 'jeditable') || ($string == 'fancybox')) {
+		} elseif (($string == 'tablednd') || ($string == 'jeditable') || ($string == 'fancybox') || ($string == 'jscrollpane')) {
 			$return = lib_get('jquery') . $return;
-			if ($string == 'fancybox') $return .= 
-				draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.mousewheel-3.0.2.pack.js') . 
-				draw_css_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox-1.3.1.css');
+			if ($string == 'fancybox') {
+				$return .= draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.mousewheel-3.0.2.pack.js') . 
+					draw_css_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox-1.3.1.css');
+			} elseif ($string == 'jscrollpane') {
+				$return = draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.css') . 
+					$return . 
+					draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.mousewheel.js');
+			}
 		}
 		
 		return $return;
@@ -546,6 +552,9 @@ function lib_location($string) {
 		case 'jquery-hosted' :
 		return 'http://code.jquery.com/jquery-1.4.2.min.js';
 		
+		case 'jscrollpane' :
+		return DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.min.js';
+
 		case 'lorem_ipsum' :
 		return $lib . 'lorem_ipsum.js';
 				
@@ -570,6 +579,13 @@ function lib_refresh() {
 	//this doesn't work yet, unfortunately
 	file_delete(DIRECTORY_WRITE . '/lib');
 	exit;
+}
+
+function max_num($number=false) {
+	//method for getting max in a loop
+	if (!isset($_josh['max'])) $_josh['max'] = 0;
+	if ($number === false) return $_josh['max'];
+	if ($number > $_josh['max']) $_josh['max'] = $number;
 }
 
 function posting($form_id=false) {

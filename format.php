@@ -419,21 +419,24 @@ function format_html_entities($string) {
 }
 
 function format_html_img($text, $url) {
-	global $_josh;
 	lib_get('simple_html_dom');
 	$blocks = str_get_html(format_html($text))->find('img');
 	$images = array();
 	foreach ($blocks as $b) {
 		$area = $b->width * $b->height;
-		format_html_set_max($area);
+		max_num($area);
 		$images[$area] = $b;
 	}
-	$src = $images[$_josh['max_text_len']]->src;
-	if (substr($src, 0, 1) == '/') {
-		$url = url_parse($url);
-		$src = $url['base'] . $src;
+	if ($max = max_num()) {
+		$src = $images[$max]->src;
+		if (substr($src, 0, 1) == '/') {
+			$url = url_parse($url);
+			$src = $url['base'] . $src;
+		}
+		return $src;
+	} else {
+		return false;
 	}
-	return $src;
 }
 
 function format_html_paragraphs($text, $limit=false) {
@@ -453,13 +456,6 @@ function format_html_paragraphs($text, $limit=false) {
 	return $text;
 }
 
-function format_html_set_max($len) {
-	//helper function for above, due to weird scope reason i don't fully comprehend
-	global $_josh;
-	if (!isset($_josh['max_text_len'])) $_josh['max_text_len'] = 0;
-	if ($len > $_josh['max_text_len']) $_josh['max_text_len'] = $len;
-}
-
 function format_html_text($str) {
 	$return = strip_tags($str);
 	$return = str_replace('&nbsp;', ' ', $return);
@@ -470,10 +466,15 @@ function format_html_text($str) {
 
 function format_html_title($text) {
 	lib_get('simple_html_dom');
-	$blocks = str_get_html($text)->find('h1');
-	$text = '';
-	foreach ($blocks as $b) $text .= $b->innertext;
-	return strip_tags($text);
+	$text = str_get_html($text);
+	$blocks = $text->find('h1');
+	$return = '';
+	foreach ($blocks as $b) $return .= strip_tags($b->innertext);
+	if (empty($return)) {
+		$blocks = $text->find('title');
+		foreach ($blocks as $b) $return .= strip_tags($b->innertext);
+	}
+	return $return;
 }
 
 function format_html_trim($text) {
@@ -485,7 +486,7 @@ function format_html_trim($text) {
 	//find td, div or body with longest text block
 	$html = str_get_html($text);
 	$blocks = $html->find('text');
-	foreach ($blocks as $b) format_html_set_max(strlen(trim($b)));
+	foreach ($blocks as $b) max_num(strlen(trim($b)));
 	
 	if (!function_exists('get_parent')) {
 		function get_parent($e) {
@@ -497,7 +498,7 @@ function format_html_trim($text) {
 
 	foreach ($blocks as $b) {
 		$len = strlen(trim($b));
-		if ($len == $_josh['max_text_len']) {
+		if ($len == max_num()) {
 			$e = get_parent($b->parent);
 			$text = $e->innertext;
 			echo $text;
