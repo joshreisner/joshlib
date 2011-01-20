@@ -191,6 +191,7 @@ function url_parse($url) {
 	}
 	
 	//protocol is a better word than scheme
+	//die(draw_array($return));
 	$return['protocol'] = $return['scheme'];
 	
 	//get socket

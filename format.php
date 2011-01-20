@@ -425,6 +425,12 @@ function format_html_img($url, $text=false) {
 	if (!$text) $text = url_get($url);
 	
 	if ($text) {
+	
+		//quick search for <link rel="image_src">
+		$blocks = str_get_html($text)->find('link');
+		foreach ($blocks as $b) if (($b->rel == 'image_src') && $b->href) return $b->href;
+
+		//loop through images		
 		$blocks = str_get_html(format_html($text))->find('img');
 		error_debug('<b>' . __function__ . '</b> found ' . count($blocks) . ' images within ' . strlen($text) . ' char text', __file__, __line__);
 		$images = array();
@@ -441,7 +447,7 @@ function format_html_img($url, $text=false) {
 		if ($max = max_num()) {
 			error_debug('<b>' . __function__ . '</b> found max, which was ' . $max, __file__, __line__);
 			if (substr($images[$max], 0, 1) == '/') {
-				$images[$max] = url_parse($images[$max]);
+				$url = url_parse($url);
 				$images[$max] = $url['base'] . $images[$max];
 			}
 			error_debug('<b>' . __function__ . '</b> returning ' . $images[$max], __file__, __line__);
@@ -459,13 +465,28 @@ function format_html_img($url, $text=false) {
 function format_html_paragraphs($text, $limit=false) {
 	lib_get('simple_html_dom');
 	$blocks = str_get_html(format_html($text))->find('p');
+	error_debug('<b>' . __function__ . '</b> found ' . count($blocks) . ' ps within ' . strlen($text) . ' char text', __file__, __line__);
 	$text = '';
 	$total_length = 0;
 	foreach ($blocks as $b) {
 		if (!$b->class) {
 			$b = draw_p(strip_tags($b));
 			$length = strlen($b);
-			if ($limit && $length + $total_length > $limit) break;
+			if ($limit && $length + $total_length > $limit) {
+				if (!$total_length) {
+					$sentences = array_separated(strip_tags($b), '.');
+					error_debug('<b>' . __function__ . '</b> reached limit in first paragraph, breaking into ' . count($sentences) . ' sentences', __file__, __line__);					
+					foreach ($sentences as $s) {
+						$length = strlen($s) + 2;
+						if ($length + $total_length <= $limit) {
+							$text .= $s . '. ';
+							$total_length += $length;
+						}
+					}
+					$text = draw_p($text);
+				}
+				break;
+			}
 			$text .= $b;
 			$total_length += $length;
 		}
