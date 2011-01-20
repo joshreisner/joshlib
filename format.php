@@ -418,23 +418,40 @@ function format_html_entities($string) {
 	return $string;
 }
 
-function format_html_img($text, $url) {
+function format_html_img($url, $text=false) {
+	//returns the largest (jpg) image from the specified $url or within the provided $text
 	lib_get('simple_html_dom');
-	$blocks = str_get_html(format_html($text))->find('img');
-	$images = array();
-	foreach ($blocks as $b) {
-		$area = $b->width * $b->height;
-		max_num($area);
-		$images[$area] = $b;
-	}
-	if ($max = max_num()) {
-		$src = $images[$max]->src;
-		if (substr($src, 0, 1) == '/') {
-			$url = url_parse($url);
-			$src = $url['base'] . $src;
+	
+	if (!$text) $text = url_get($url);
+	
+	if ($text) {
+		$blocks = str_get_html(format_html($text))->find('img');
+		error_debug('<b>' . __function__ . '</b> found ' . count($blocks) . ' images within ' . strlen($text) . ' char text', __file__, __line__);
+		$images = array();
+		foreach ($blocks as $b) {
+			if ($b->width && $b->height && (file_type($b->src) == 'jpg')) {
+				$area = $b->width * $b->height;
+				max_num($area);
+				error_debug('<b>' . __function__ . '</b> using ' . htmlentities($b) . ' with area ' . $area, __file__, __line__);
+				$images[$area] = $b->src;
+			} else {
+				error_debug('<b>' . __function__ . '</b> skipping ' . htmlentities($b) . ' because either width, height or src is missing or src is not jpg', __file__, __line__);
+			}
 		}
-		return $src;
+		if ($max = max_num()) {
+			error_debug('<b>' . __function__ . '</b> found max, which was ' . $max, __file__, __line__);
+			if (substr($images[$max], 0, 1) == '/') {
+				$images[$max] = url_parse($images[$max]);
+				$images[$max] = $url['base'] . $images[$max];
+			}
+			error_debug('<b>' . __function__ . '</b> returning ' . $images[$max], __file__, __line__);
+			return $images[$max];
+		} else {
+			error_debug('<b>' . __function__ . '</b> not returning anything', __file__, __line__);
+			return false;
+		}
 	} else {
+		error_debug('<b>' . __function__ . '</b> quitting because no text', __file__, __line__);
 		return false;
 	}
 }
@@ -528,7 +545,6 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 
 	if (!function_exists('resize')) {
 		function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
-			global $_josh;
 			//resize an image and save to the $target_name
 			$tmp = imagecreatetruecolor($new_width, $new_height);
 			if (!$image = imagecreatefromjpeg(DIRECTORY_ROOT . $source_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name);
@@ -539,12 +555,16 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		}
 
 		function crop($new_width, $new_height, $target_name) {
-			global $_josh;
 			//crop an image and save to the $target_name
 			list($width, $height) = getimagesize(DIRECTORY_ROOT . $target_name);
+			$offsetx = ($width - $new_width) / 2;
+			$offsety = ($height - $new_height) / 2;
+			if ($offsetx < 0) $offsetx = 0;
+			if ($offsety < 0) $offsety = 0;
+			
 			$tmp = imagecreatetruecolor($new_width, $new_height);
 			if (!$image = @imagecreatefromjpeg(DIRECTORY_ROOT . $target_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name);
-			imagecopyresized($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $new_width, $new_height);
+			imagecopyresized($tmp, $image, 0, 0, $offsetx, $offsety, $new_width, $new_height, $new_width, $new_height);
 			imagejpeg($tmp, DIRECTORY_ROOT . $target_name, 100);
 			imagedestroy($tmp);
 			imagedestroy($image);

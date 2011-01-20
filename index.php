@@ -582,10 +582,16 @@ function lib_refresh() {
 }
 
 function max_num($number=false) {
+	global $_josh;
 	//method for getting max in a loop
 	if (!isset($_josh['max'])) $_josh['max'] = 0;
-	if ($number === false) return $_josh['max'];
-	if ($number > $_josh['max']) $_josh['max'] = $number;
+	if (!$number) {
+		error_debug('<b>' . __function__ . '</b> getting max, which is ' . $_josh['max'], __file__, __line__);
+		return $_josh['max'];
+	} elseif (is_numeric($number) && ($number > $_josh['max'])) {
+		error_debug('<b>' . __function__ . '</b> setting max for ' . $number, __file__, __line__);
+		$_josh['max'] = $number;
+	}
 }
 
 function posting($form_id=false) {
