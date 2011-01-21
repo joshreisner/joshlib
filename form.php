@@ -375,6 +375,10 @@ class form {
 		$this->set_field(array('name'=>$name, 'value'=>$value, 'type'=>'hidden'));
 	}
 	
+	function set_javascript($js) {
+		$this->javascript[] = $js;
+	}
+	
 	function set_order($strorder='') {
 		$fields = array_separated($strorder);
 		$return = array();

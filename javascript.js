@@ -162,6 +162,11 @@ function form_checkboxes_empty(form, name) {
 	return !oneFound;
 }
 
+function form_date_range_valid(form, start_prefix, end_prefix) {
+	//eg if (!form_date_range_valid(document.members_staff_events, "start_date", "end_date")) errors[errors.length] = "the Start Date is after the End Date";
+	return true;
+}
+
 function form_errors(errors) {
 	var error;
 	if (errors.length == 0) return true;
