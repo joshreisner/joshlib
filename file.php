@@ -142,15 +142,20 @@ function file_folder($folder=false, $endfilter=false, $simple=false) {
 		while (($name = readdir($handle)) !== false) {
 			if (substr($name, 0, 1) == '.') continue;
 			$file = pathinfo($folder . $name);
+			list($filename, $extension, $path) = file_name($name);
+			$path = str_replace(DIRECTORY_ROOT, '', $folder);
 			$thisfile = array(
 				'name'=>$name,
-				'ext'=>@$file['extension'],
-				'path_name'=>str_replace(DIRECTORY_ROOT, '', $folder) . '/' . $name,
+				'ext'=>$extension,
+				'path_name'=>$path . '/' . $name,
 				'type'=>@filetype($folder . '/' . $name),
 				'fmod'=>@filemtime($folder . '/' . $name),
-				'size'=>@filesize($folder . '/' . $name)
+				'size'=>@filesize($folder . '/' . $name),
+				'base'=>$filename,
+				'path'=>$path,
+				'realpath'=>$folder
 			);
-
+			ksort($thisfile);
 			error_debug('<b>file folder</b> found ' . $thisfile['name'] . ' of type ' . $thisfile['type'], __file__, __line__);
 			if ($thisfile['type'] == 'dir') $thisfile['path_name'] .= '/';
 			if ($endfilter) {

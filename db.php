@@ -205,7 +205,8 @@ function db_column_exists($table, $column) {
 function db_column_rename($table, $before, $after) {
 	if (db_language() == 'mssql') error_handle(__function__ . ' not yet supported for mssql');
 	$col = db_column_exists($table, $before);
-	$result = db_found(db_query('ALTER TABLE ' . $table . ' CHANGE ' . $before . ' ' . $after . ' ' . $col['type']));
+	if (($col['type'] == 'varchar') && $col['length']) $col['type'] = $col['type'] . '(' . $col['length'] . ')';
+	$result = db_found(db_query('ALTER TABLE `' . $table . '` CHANGE `' . $before . '` `' . $after . '` ' . strToUpper($col['type'])));
 }
 
 function db_column_type($datatype, $length=false) {

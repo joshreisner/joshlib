@@ -751,6 +751,10 @@ function draw_javascript_src($filename=false) {
 	return draw_tag('script', array('language'=>'javascript', 'src'=>$filename, 'type'=>'text/javascript'), '');
 }
 
+function draw_li($content='', $arguments=false) {
+	return draw_tag('li', $arguments, $content);
+}
+
 function draw_link($href=false, $str=false, $newwindow=false, $arguments=false, $maxlen=60) {
 	$arguments = array_arguments($arguments);
 	if (format_text_starts('mailto:', $href)) {

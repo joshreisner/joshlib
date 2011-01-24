@@ -131,7 +131,7 @@ class table {
 	}
 	
 	function draw_title() {
-		return ($this->title) ? draw_container('tr', draw_container('th', $this->title, array('class'=>'title', 'colspan'=>count($this->columns)))) : '';
+		return ($this->title) ? draw_container('tr', draw_container('th', $this->title, array('class'=>'table_title', 'colspan'=>count($this->columns)))) : '';
 	}
 	
 	function col($name, $class=false, $title=false, $width=false) {
