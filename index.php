@@ -110,6 +110,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	require(DIRECTORY_JOSHLIB . 'file.php');
 	require(DIRECTORY_JOSHLIB . 'form.php');
 	require(DIRECTORY_JOSHLIB . 'format.php');
+	require(DIRECTORY_JOSHLIB . 'html.php');
 	require(DIRECTORY_JOSHLIB . 'table.php');
 	require(DIRECTORY_JOSHLIB . 'url.php');
 
@@ -596,8 +597,9 @@ function max_num($number=false) {
 
 function posting($form_id=false) {
 	//tell if POST variables are present, and if specified, whether it's a particular form
-	if ($form_id && isset($_POST['form_id'])) return ($_POST['form_id'] == $form_id);
-	return (!empty($_POST));
+	if (!$form_id) return (!empty($_POST));
+	if (!isset($_POST['form_id'])) return false;
+	return ($_POST['form_id'] == $form_id);
 }
 
 function user($return=false) {

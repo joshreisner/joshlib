@@ -711,7 +711,7 @@ function draw_javascript($javascript=false) {
 	return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);
 }
 
-function draw_javascript_lib() {
+/* function draw_javascript_lib() {
 	error_deprecated(__FUNCTION__ . ' was deprecated on 4/5/2010 - use lib_get');
 	return draw_javascript_src() . lib_get('scriptaculous');
 }
@@ -728,12 +728,18 @@ function draw_javascript_link($target, $text, $id=false, $class=false) {
 		$target = '';
 	}
 	return '<a style="cursor:pointer;"' . $target . $id . $class . '>' . $text . '</a>';
+} */
+
+function draw_javascript_folder_src() {
+	//conditionally include a javascript file based on the current folder
+	$filename = '/scripts/' . url_folder() . '.js';
+	if (file_check($filename)) return draw_javascript_src($filename);
 }
 
-function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='/_site/tiny_mce/tiny_mce.js') {
+/* function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='/_site/tiny_mce/tiny_mce.js') {
 	error_deprecated(__FUNCTION__ . ' is deprecated as of 3/11/2010 use lib_get');
 	return draw_javascript_src() . draw_javascript_src($path_script) . draw_javascript('form_tinymce_init("' . $path_css . '");');
-}
+}*/
 
 function draw_javascript_src($filename=false) {
 	global $_josh;

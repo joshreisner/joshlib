@@ -670,7 +670,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 					$query1[] = $c['name'];
 					$query2[] = 0;
 				} else {
-					error_handle('required value missing', 'db_save is expecting a value for ' . $c['name']);
+					error_handle('required value missing', 'db_save is expecting a value for ' . $table . '.' . $c['name']);
 				}
 			}
 		}
