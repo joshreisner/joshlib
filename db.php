@@ -191,7 +191,7 @@ function db_column_add($table, $column, $type) {
 }
 
 function db_column_drop($table, $column) {
-	if (db_language() == 'mssql') error_handle('MSSQL Not Fully Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
 	$result = db_found(db_query('ALTER TABLE ' . $table . ' DROP COLUMN ' . $column));
 }
 
@@ -202,8 +202,13 @@ function db_column_exists($table, $column) {
 	}
 }
 
+function db_column_key($table, $column) {
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
+	return db_query('ALTER TABLE `' . $table . '` MODIFY `' . $column . '` INT(11) NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (' . $column . ');');
+}
+
 function db_column_rename($table, $before, $after) {
-	if (db_language() == 'mssql') error_handle('MSSQL Not Fully Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
 	$col = db_column_exists($table, $before);
 	if (($col['type'] == 'varchar') && $col['length']) $col['type'] = $col['type'] . '(' . $col['length'] . ')';
 	$result = db_found(db_query('ALTER TABLE `' . $table . '` CHANGE `' . $before . '` `' . $after . '` ' . strToUpper($col['type'])));
@@ -220,6 +225,11 @@ function db_column_type($datatype, $length=false) {
 	//otherwise max
 	$maxes = array('INT'=>11, 'TINYINT'=>4, 'VARCHAR'=>255);
 	return $datatype . '(' . ($length ? $length : $maxes[$datatype]) . ')';
+}
+
+function db_column_type_set($table, $column, $newtype) {
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
+	return db_query('ALTER TABLE `' . $table . '` MODIFY `' . $column . '` ' . db_column_type($newtype));
 }
 
 function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) {
