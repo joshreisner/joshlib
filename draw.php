@@ -311,7 +311,7 @@ function draw_form_checkbox($name, $checked=false, $arguments=false, $javascript
 }
 
 function draw_form_checkboxes($name, $linking_table=false, $object_col=false, $option_col=false, $id=false) {
-	if (stristr($name, '_')) error_handle('draw_form_checkboxes()', 'an error occurred with the calling of this function; you can\'t have an underscore in the field name', __file__. __line__);
+	if (stristr($name, '_')) error_handle('draw_form_checkboxes()', 'an error occurred with the calling of this function; you can\'t have an underscore in the field name', __file__, __line__);
 	if ($linking_table) {
 		$result = db_query('SELECT o.id, o.value, (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_col . ' = o.id AND ' . $object_col . ' = ' . $id . ') checked  FROM option_' . $name . ' o ORDER BY value');
 	} else {
@@ -511,7 +511,7 @@ function draw_form_textarea($name, $value='', $args=false) {
 function draw_google_analytics($id) {
 	global $_josh;
 	error_debug('drawing google tracker', __file__, __line__);
-	if ($_josh['mode'] == 'dev') return false;
+	if ($_josh['mode'] != 'live') return false;
 	return draw_javascript_src((($_josh['request']['protocol'] == 'https') ? 'https://ssl' : 'http://www') . '.google-analytics.com/ga.js') . draw_javascript('try {
 			var pageTracker = _gat._getTracker("' . $id. '");
 			pageTracker._setDomainName(".' . $_josh['request']['domain'] . '");
@@ -551,7 +551,7 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 	//markers must be an array with latitude, longitude, title, description, color
 	global $_josh;
 	
-	if (!isset($_josh['google']['mapkey'])) error_handle(__function__ . ' requires a google maps api key', 'you can ' . draw_link('http://code.google.com/apis/maps/signup.html', 'go here') . ' to get one');
+	if (!isset($_josh['google']['mapkey'])) error_handle(__function__ . ' requires a google maps api key', 'you can ' . draw_link('http://code.google.com/apis/maps/signup.html', 'go here') . ' to get one', __file__, __line__);
 	
 	//markers
 	$markerstr = '';
@@ -751,7 +751,7 @@ function draw_javascript_src($filename=false) {
 		$joshlibf = DIRECTORY_JOSHLIB . 'javascript.js';
 		if (!file_check($filename) || (filemtime($joshlibf) > filemtime(DIRECTORY_ROOT . $filename))) {
 			//either doesn't exist or is out-of-date
-			if (!file_put($filename, file_get($joshlibf))) return error_handle(__FUNCTION__ . ' can\'t write the js file.', __file__, __line__);
+			if (!file_put($filename, file_get($joshlibf))) return error_handle('JS Write Error', __FUNCTION__ . ' can\'t write the js file.', __file__, __line__);
 		}
 	}
 	return draw_tag('script', array('language'=>'javascript', 'src'=>$filename, 'type'=>'text/javascript'), '');

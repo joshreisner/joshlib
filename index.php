@@ -115,7 +115,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	require(DIRECTORY_JOSHLIB . 'url.php');
 
 //parse environment variables
-	if (!isset($_SERVER['DOCUMENT_ROOT']) || !isset($_SERVER['HTTP_HOST']) || !isset($_SERVER['SCRIPT_NAME'])) error_handle('environment variables not set', 'joshlib requires $_SERVER[\'DOCUMENT_ROOT\'], $_SERVER[\'HTTP_HOST\'] and $_SERVER[\'SCRIPT_NAME\'] to function properly.  please define these before proceeding.');
+	if (!isset($_SERVER['DOCUMENT_ROOT']) || !isset($_SERVER['HTTP_HOST']) || !isset($_SERVER['SCRIPT_NAME'])) error_handle('environment variables not set', 'joshlib requires $_SERVER[\'DOCUMENT_ROOT\'], $_SERVER[\'HTTP_HOST\'] and $_SERVER[\'SCRIPT_NAME\'] to function properly.  please define these before proceeding.', __file__, __line__);
 
 	//build request as string, then set it to array with url_parse
 	$_josh['request'] = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) ? 'https' : 'http';
@@ -463,7 +463,7 @@ function language_translate($string, $from, $to) {
 	foreach ($chunks as $c) {
 		error_debug('<b>lanuage_translate</b> running query for a string that is ' . strlen($c) . ' characters long', __file__, __line__);
 	
-		if (!isset($_josh['google_search_api_key'])) error_handle('api key not set', __function__ . ' needs a ' . draw_link('http://code.google.com/apis/ajaxsearch/signup.html', 'Google AJAX search API key'));
+		if (!isset($_josh['google_search_api_key'])) error_handle('api key not set', __function__ . ' needs a ' . draw_link('http://code.google.com/apis/ajaxsearch/signup.html', 'Google AJAX search API key'), __file__, __line__);
 		
 		$ch = curl_init();
 		$url = 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&langpair=' . $from . '%7C' . $to;
@@ -476,7 +476,7 @@ function language_translate($string, $from, $to) {
 		
 		// now, process the JSON string
 		$json = json_decode($body, true);
-		if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string length was ' . strlen($c) . BR . BR . $c . BR . BR . '.  json was ' . $json . draw_array($json));	
+		if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string length was ' . strlen($c) . BR . BR . $c . BR . BR . '.  json was ' . $json . draw_array($json), __file__, __line__);
 		$string .= $json['responseData']['translatedText'];
 	}
 	return format_quotes($string);
@@ -529,7 +529,7 @@ function lib_get($string) {
 		//deprecated
 		case 'prototype' :
 		case 'scriptaculous' :
-		return error_handle('Prototype and Scriptaculous are deprecated', 'As of August 9th 2010, jQuery is the official Javascript framework of Joshlib');
+		return error_handle('Prototype and Scriptaculous are deprecated', 'As of August 9th 2010, jQuery is the official Javascript framework of Joshlib', __file__, __line__);
 	}
 }
 

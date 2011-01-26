@@ -568,7 +568,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
 			//resize an image and save to the $target_name
 			$tmp = imagecreatetruecolor($new_width, $new_height);
-			if (!$image = imagecreatefromjpeg(DIRECTORY_ROOT . $source_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name);
+			if (!$image = imagecreatefromjpeg(DIRECTORY_ROOT . $source_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name, __file__, __line__);
 			imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
 			imagejpeg($tmp, DIRECTORY_ROOT . $target_name, 100);
 			imagedestroy($tmp);
@@ -584,7 +584,7 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 			if ($offsety < 0) $offsety = 0;
 			
 			$tmp = imagecreatetruecolor($new_width, $new_height);
-			if (!$image = @imagecreatefromjpeg(DIRECTORY_ROOT . $target_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name);
+			if (!$image = @imagecreatefromjpeg(DIRECTORY_ROOT . $target_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name, __file__, __line__);
 			imagecopyresized($tmp, $image, 0, 0, $offsetx, $offsety, $new_width, $new_height, $new_width, $new_height);
 			imagejpeg($tmp, DIRECTORY_ROOT . $target_name, 100);
 			imagedestroy($tmp);
@@ -1000,7 +1000,7 @@ function format_thumbnail_pdf($source, $width=false, $height=false) {
 		if ($width || $height) $source = format_image_resize($source, $width, $height);
 	} else {
 		//did not work
-		error_handle('ImageMagick Not Installed', __function__ . ' requires the ' . draw_link('http://www.imagemagick.org/', 'ImageMagick PHP library') . ' to work on the command line.  Please install it and try again.  ', __file__, __line__, __function__);
+		error_handle('ImageMagick Not Installed', __function__ . ' requires the ' . draw_link('http://www.imagemagick.org/', 'ImageMagick PHP library') . ' to work on the command line.  Please install it and try again.  ', __file__, __line__);
 	}
 	
 	//clean up

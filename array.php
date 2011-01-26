@@ -72,7 +72,7 @@ function array_chunk_html($string, $length) {
 		
 		if ($wordlength > $length) {
 			//todo - just break the word up anyway?
-			error_handle('word too long', 'array_chunk_html has a word ' . $w . ' that longer than ' . $length . ' characters, which is set as its max');
+			error_handle('word too long', 'array_chunk_html has a word ' . $w . ' that longer than ' . $length . ' characters, which is set as its max', __file__, __line__);
 			return '';
 		}
 		
@@ -242,7 +242,7 @@ function array_send($array, $target) {
 	//prepare POSTdata
 	if (is_array($array)) {
 		//must have JSON
-		if (!function_exists('json_encode')) return error_handle('JSON Not Installed', 'You need the JSON library for array_send to work.');
+		if (!function_exists('json_encode')) return error_handle('JSON Not Installed', 'You need the JSON library for array_send to work.', __file__, __line__);
 		$postdata = utf8_encode(json_encode($array));
 	} else {
 		$postdata = $array;

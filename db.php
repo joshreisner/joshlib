@@ -58,7 +58,7 @@ function db_backup($limit=false) {
 	
 	//only works with mysql right now
 	extract($_josh['db']);
-	if ($language != 'mysql') error_handle('only mysql supported', 'db_backup is a mysql-only function right now');
+	if ($language != 'mysql') error_handle('only mysql supported', 'db_backup is a mysql-only function right now', __file__, __line__);
 
 	//build command, socket hack, execute
 	$command = 'mysqldump --opt --host="' . $location . '" --user="' . $username . '" --password="' . $password . '" "' . $database . '" | gzip > ' . DIRECTORY_ROOT . $target;
@@ -135,7 +135,7 @@ function db_column_add($table, $column, $type) {
 	global $_josh;
 	
 	//type, in this case, means a key from $_josh['field_types'], not mysql datatypes
-	if (!in_array($type, array_keys($_josh['field_types']))) error_handle('unknown data type', __function__ . ' received a request for ' . $type . ' which is not handled.');
+	if (!in_array($type, array_keys($_josh['field_types']))) error_handle('unknown data type', __function__ . ' received a request for ' . $type . ' which is not handled.', __file__, __line__);
 	
 	//handle single-field translations.  multi-field and linked tables are todo
 	$datatype = $length = false;
@@ -191,7 +191,7 @@ function db_column_add($table, $column, $type) {
 }
 
 function db_column_drop($table, $column) {
-	if (db_language() == 'mssql') error_handle(__function__ . ' not yet supported for mssql');
+	if (db_language() == 'mssql') error_handle('MSSQL Not Fully Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
 	$result = db_found(db_query('ALTER TABLE ' . $table . ' DROP COLUMN ' . $column));
 }
 
@@ -203,7 +203,7 @@ function db_column_exists($table, $column) {
 }
 
 function db_column_rename($table, $before, $after) {
-	if (db_language() == 'mssql') error_handle(__function__ . ' not yet supported for mssql');
+	if (db_language() == 'mssql') error_handle('MSSQL Not Fully Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
 	$col = db_column_exists($table, $before);
 	if (($col['type'] == 'varchar') && $col['length']) $col['type'] = $col['type'] . '(' . $col['length'] . ')';
 	$result = db_found(db_query('ALTER TABLE `' . $table . '` CHANGE `' . $before . '` `' . $after . '` ' . strToUpper($col['type'])));
@@ -298,7 +298,7 @@ function db_delete($table, $id=false) {
 		if (isset($_GET['id'])) {
 			$id = $_GET['id'];
 		} else {
-			error_handle('expecting \$_GET[\'id\']', 'db_delete is expecting an id variable');
+			error_handle('expecting \$_GET[\'id\']', 'db_delete is expecting an id variable', __file__, __line__);
 		}
 	}
 	db_query('UPDATE ' . $table . ' SET deleted_date = ' . db_date() . ', deleted_user = ' . user('NULL') . ', updated_user = ' . user('NULL') . ', updated_date = NOW(), is_active = 0 WHERE id = ' . $id);
@@ -446,7 +446,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	//connect to db
 	error_debug('<b>db_open</b> trying to connect ' . $_josh['db']['language'] . ' on ' . $_josh['db']['location'], __file__, __line__);
 	if ($_josh['db']['language'] == 'mysql') {
-		$_josh['db']['pointer'] = mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
+		$_josh['db']['pointer'] = @mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 	} elseif ($_josh['db']['language'] == 'mssql') {
 		$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 		//mssql 2000 doesn't support utf8
@@ -454,7 +454,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 
 	//handle error
 	if (!db_connected()) {
-		error_handle('Database Connection', 'Most likely, you haven\'t yet configured the variables in ' . $_josh['config'] . '.  It\'s also possible that the database is suddenly down.');
+		error_handle('Database Connection', 'Most likely, you have not yet configured the variables in ' . $_josh['config'] . '.  Or the database could be down.', __file__, __line__);
 		exit; //to prevent massive repetition
 	}
 
@@ -477,7 +477,7 @@ function db_option($table, $value) {
 	if ($id = db_query('INSERT INTO ' . $table . ' ( title, created_date, is_active ) VALUES ( \'' . $value . '\', NOW(), 1 )')) return $id;
 	
 	//there was an error
-	error_handle(__function__ . ' error', 'could not add db_option' . $value . ' to table ' . $table);
+	error_handle(__function__ . ' error', 'could not add db_option' . $value . ' to table ' . $table, __file__, __line__);
 }
 
 function db_pwdcompare($string, $field) {
@@ -527,7 +527,7 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
 		error_debug('<b>db_query</b> failed <i>' . $query . '</i>', __file__, __line__, '#ffdddd');
 		if ($suppress_error) return false;
-		error_handle('Database Error', format_code($query) . $error);
+		error_handle('Database Error', format_code($query) . $error, __file__, __line__);
 	} else {
 		//handle success
 		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
@@ -545,7 +545,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	if ($id == 'get') $id = url_id();
 	if ($id == 'id') {
 		//this happened once, and was problematic because it evaluates to all records
-		error_handle('db_save can\'t process', 'a value of "id" was set for the ID');
+		error_handle('db_save can\'t process', 'a value of "id" was set for the ID', __file__, __line__);
 		exit;
 	}
 	
@@ -609,13 +609,13 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 						if (!$c['required']) {
 							$value = 'NULL';
 						} else {
-							error_handle('required value', $c['name'] . ' is required');
+							error_handle('required value', $c['name'] . ' is required', __file__, __line__);
 						}
 					} else {
 						$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
 					}
 				} else {
-					error_handle('unhandled data type', 'db_save hasn\'t been programmed yet to handle ' . $c['type']);
+					error_handle('unhandled data type', 'db_save hasn\'t been programmed yet to handle ' . $c['type'], __file__, __line__);
 				}
 				
 				if ($id) {
@@ -670,7 +670,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 					$query1[] = $c['name'];
 					$query2[] = 0;
 				} else {
-					error_handle('required value missing', 'db_save is expecting a value for ' . $table . '.' . $c['name']);
+					error_handle('required value missing', 'db_save is expecting a value for ' . $table . '.' . $c['name'], __file__, __line__);
 				}
 			}
 		}
@@ -736,7 +736,6 @@ function db_switch($target=false) {
 	global $_josh;
 	db_open();
 	if (!$target) $target = $_josh['db']['database'];
-	if (empty($_josh['db']['database'])) error_handle('database not specified');
 	if ($_josh['db']['language'] == 'mssql') {
 		mssql_select_db($target, $_josh['db']['pointer']);
 	} elseif ($_josh['db']['language'] == 'mysql') {
@@ -781,28 +780,28 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 		  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;', false, false, $rechecking)) return $tablename;
 	
 	//or not
-	error_handle('could not create table' . $tablename);
+	error_handle('could not create table' . $tablename, __file__, __line__);
 }
 
 function db_table_drop($tablename) {
-	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql');
+	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql', __file__, __line__);
 	if (!db_table_exists($tablename)) return false;
 	return db_query('DROP TABLE ' . $tablename);
 }
 
 function db_table_exists($name) {
-	if (db_language() == 'mssql') error_handle(__function__, 'this function is not yet implemented for mssql');
+	if (db_language() == 'mssql') error_handle(__function__, 'this function is not yet implemented for mssql', __file__, __line__);
 	return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding function recursion with dbCheck
 }
 
 function db_table_rename($before, $after) {
-	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql');
+	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql', __file__, __line__);
 	return db_query('RENAME TABLE ' . $before . ' TO ' . $after);
 }
 
 function db_tables() {
 	global $_josh;
-	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql');
+	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql', __file__, __line__);
 	$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
 	foreach ($tables as &$t) $t = strToLower($t['Tables_in_' . $_josh['db']['database']]);
 	sort($tables);
@@ -827,7 +826,7 @@ function db_translate($sql, $from, $to) {
 function db_undelete($table, $id=false) {
 	//undeleting an object does not update it
 	if (!$id) $id = url_id();
-	if (!$id) error_handle('expecting \$_GET[\'id\']', __function__ . ' is expecting an id variable');
+	if (!$id) error_handle('expecting \$_GET[\'id\']', __function__ . ' is expecting an id variable', __file__, __line__);
 	db_query('UPDATE ' . $table . ' SET deleted_date = NULL, deleted_user = NULL, updated_user = ' . user('NULL') . ', updated_date = NOW(), is_active = 1 WHERE id = ' . $id);
 }
 

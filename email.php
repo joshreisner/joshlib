@@ -47,13 +47,13 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 			->addPart($message, 'text/html')
 			//->attach(Swift_Attachment::fromPath('my-document.pdf'))
 		;
-		if (!$count = $mailer->batchSend($message, $failures)) error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures));
+		if (!$count = $mailer->batchSend($message, $failures)) error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
 	} else {
 		//use php mail transport
 		mail($to, $subject, $message, 'From:' . $from);
 	}
 	
-	if (count($bad)) error_handle('email addresses rejected', 'the email with subject ' . $subject . ' was rejected for the following recipients ' . draw_list($bad) . ' and was successfully sent to ' . count($good) . ' recipients');
+	if (count($bad)) error_handle('email addresses rejected', 'the email with subject ' . $subject . ' was rejected for the following recipients ' . draw_list($bad) . ' and was successfully sent to ' . count($good) . ' recipients', __file__, __line__);
 	return $count;
 }
 

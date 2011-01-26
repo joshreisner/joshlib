@@ -22,7 +22,7 @@ class form {
 		//$submit is a boolean, and indicates whether you should auto-add a submit button at the bottom
 		//if you pass $submit as a string, it will title use the text you passed, and title the form that
 		
-		if (!$name) error_handle('form error', 'your form must have a $name.  eg ' . format_code('$f = new form(\'foo\');'));
+		if (!$name) error_handle('form error', 'your form must have a $name.  eg ' . format_code('$f = new form(\'foo\');'), __file__, __line__);
 		
 		$this->name		= $name;
 		$this->cancel	= $cancel;
@@ -131,18 +131,18 @@ class form {
 					break;
 				case 'checkboxes':
 					if (!$option_title) {
-						if (empty($options_table)) error_handle('options table not set', 'please specify your options table', __file__, __line__, __function__);
+						if (empty($options_table)) error_handle('options table not set', 'please specify your options table', __file__, __line__);
 						//$option_title = 'title';
 						if ($options_columns = db_columns($options_table)) {
 							$option_title = $options_columns[1]['name'];
 						} else {
-							error_handle('options_table does not exist', 'form checkboxes ' . $name . ' is looking for ' . $options_table . ' which does not exist');
+							error_handle('options_table does not exist', 'form checkboxes ' . $name . ' is looking for ' . $options_table . ' which does not exist', __file__, __line__);
 						}
 					}
 					if (!$options) {
 						if (!$sql) {
 							if ($this->id) {
-								if (empty($linking_table)) error_handle('linking_table not set', 'please specify your linking table for a form checkboxes field', __file__, __line__, __function__);
+								if (empty($linking_table)) error_handle('linking_table not set', 'please specify your linking table for a form checkboxes field', __file__, __line__);
 								$sql = 'SELECT o.id, o.' . $option_title . ', (SELECT COUNT(*) FROM ' . $linking_table . ' l WHERE l.' . $option_id . ' = o.id AND l.' . $object_id . ' = ' . $this->id . ') checked FROM ' . $options_table . ' o WHERE o.is_active = 1 ORDER BY o.' . $option_title;
 							} else {
 								$value = (strToLower($value) == 'all') ? 1 : 0;
@@ -193,7 +193,7 @@ class form {
 				case 'radio':
 					if (!$options) {
 						if (!$sql) {
-							if (!db_table_exists($options_table)) error_handle('Form Error', 'No options provided for radio field ' . $name . '.  Either pass $options, $sql or have content in ' . $options_table . '.' . $option_title);
+							if (!db_table_exists($options_table)) error_handle('Form Error', 'No options provided for radio field ' . $name . '.  Either pass $options, $sql or have content in ' . $options_table . '.' . $option_title, __file__, __line__);
 							$sql = 'SELECT id, ' . $option_title . ' FROM ' . $options_table . ' WHERE is_active = 1 ORDER BY ' . $option_title;
 						}
 						$options = db_array($sql);
@@ -294,11 +294,11 @@ class form {
 		$allow_changes = true;
 		
 		//load inputs
-		if (!is_array($array)) return error_handle('array not set');
+		if (!is_array($array)) return error_handle('Array Error', 'Array not set', __file__, __line__);
 		extract($array);
 
 		//type is required
-		if (!$type) return error_handle('type not set');
+		if (!$type) return error_handle('Type Error', 'type not set', __file__, __line__);
 		if ((($type == 'text') || ($type == 'password')) && !isset($array['additional']) && $required) $additional = '(required)';
 
 		if (!$name)	$name	= format_text_code($label);

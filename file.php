@@ -51,10 +51,10 @@ function file_dir_writable($subdirectory=false) {
 	if ($subdirectory) $directory .= DIRECTORY_SEPARATOR . $subdirectory;
 	
 	//make folder
-	if (!is_dir($directory) && !@mkdir($directory)) error_handle('couldn\'t create folder', 'file_dir_writable tried to create a folder at ' . format_ascii($directory) . ' but could not.  please create a folder there and make it writable.');
+	if (!is_dir($directory) && !@mkdir($directory)) error_handle('couldn\'t create folder', 'file_dir_writable tried to create a folder at ' . format_ascii($directory) . ' but could not.  please create a folder there and make it writable.', __file__, __line__);
 
 	//set permissions
-	if (!is_writable($directory) && !@chmod($directory, 0777)) error_handle('couldn\'t set permissions', 'file_dir_writable needs the ' . $directory . ' to be writable by the webserver.');
+	if (!is_writable($directory) && !@chmod($directory, 0777)) error_handle('couldn\'t set permissions', 'file_dir_writable needs the ' . $directory . ' to be writable by the webserver.', __file__, __line__);
 	
 	return true;
 }
@@ -216,7 +216,7 @@ function file_get_uploaded($fieldname, $types_table=false) {
 	//todo deprecate types_table / type system
 	if (!isset($_FILES[$fieldname])) return false;
 	if ($_FILES[$fieldname]['error'] && ($_FILES[$fieldname]['error'] == 4)) return false;
-	if ($_FILES[$fieldname]['error']) error_handle('file_get_uploaded upload error', 'file max is ' . file_get_max() . draw_array($_FILES));
+	if ($_FILES[$fieldname]['error']) error_handle('file_get_uploaded upload error', 'file max is ' . file_get_max() . draw_array($_FILES), __file__, __line__);
 	$content = file_get($_FILES[$fieldname]['tmp_name']);
 	error_debug('<b>file_get_uploaded</b> running ~ user is uploading a file of ' . $_FILES[$fieldname]['size'], __file__, __line__);
 	@unlink($_FILES[$fieldname]['tmp_name']);
@@ -228,7 +228,7 @@ function file_icon($filename_or_ext, $link=false, $type='16x16') {
 	//show the icon for a given filename
 	if ((stristr($filename_or_ext, '.')) && (!$filename_or_ext = strToLower(file_ext($filename_or_ext)))) return false;
 	if ($return = draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/' . $filename_or_ext . '.png', $link)) return $return;
-	error_handle('file type not added yet', 'the file type "' . $filename_or_ext . '" was not found in the file_icons library.  this has been noted.');
+	error_handle('file type not added yet', 'the file type "' . $filename_or_ext . '" was not found in the file_icons library.  this has been noted.', __file__, __line__);
 	return draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/unknown.png', $link);
 }
 
@@ -292,7 +292,7 @@ function file_put($filename, $content) {
 	//arguments should be reversed?
 	$file = @fopen(DIRECTORY_ROOT . $filename, 'w');
 	if ($file === false) {
-		error_handle('could not write file', '<b>' . __function__ . '</b> could not open ' . DIRECTORY_ROOT . $filename . ' for writing.  perhaps it is a permissions problem.');
+		error_handle('could not write file', '<b>' . __function__ . '</b> could not open ' . DIRECTORY_ROOT . $filename . ' for writing.  perhaps it is a permissions problem.', __file__, __line__);
 	} else {
 		if (is_array($content)) $content = implode($content);
 		$bytes = fwrite($file, $content);
@@ -432,7 +432,7 @@ function file_unzip($source, $target) {
 	global $_josh;
 	
 	//check to see if the ZIP library is installed
-	if (!function_exists('zip_open')) return error_handle('ZIP library missing', 'trying to unzip a file but the library is not installed.  if you don\'t want to install it, you must manually unzip lib.zip and put the resulting folder inside ' . DIRECTORY_WRITE . ' for joshlib to run.');
+	if (!function_exists('zip_open')) return error_handle('ZIP library missing', 'trying to unzip a file but the library is not installed.  if you don\'t want to install it, you must manually unzip lib.zip and put the resulting folder inside ' . DIRECTORY_WRITE . ' for joshlib to run.', __file__, __line__);
 	
     $zip = zip_open($source);
 
@@ -443,7 +443,7 @@ function file_unzip($source, $target) {
 		'Can\'t open file', 'Failure to create temporary file.', 'Zlib error', 'Memory allocation failure', 'Entry has been changed', 'Compression method not supported.', 
 		'Premature EOF', 'Invalid argument', 'Not a zip archive', 'Internal error', 'Zip archive inconsistent', 'Can\'t remove file', 'Entry has been deleted'
 		);
-		error_handle('ZIP won\'t open', 'zip_open failed with ' . $errors[$zip] . ' for ' . $source);
+		error_handle('ZIP won\'t open', 'zip_open failed with ' . $errors[$zip] . ' for ' . $source, __file__, __line__);
     }
 
 	while ($zip_entry = zip_read($zip)) {

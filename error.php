@@ -37,7 +37,7 @@ function error_debug($message, $file, $line, $bgcolor='#fff') {
 }
 
 function error_deprecated($message) {
-	$message = error_handle('Deprecated Function', $message);
+	$message = error_handle('Deprecated Function', $message, __file__, __line__);
 }
 
 function error_draw($title, $html) {	
@@ -57,7 +57,7 @@ function error_draw($title, $html) {
 	exit;
 }
 
-function error_handle($type, $message='', $file=false, $line=false, $function=false) {
+function error_handle($type, $message='', $file=false, $line=false) {
 	global $_josh;
 	error_debug('ERROR! type is:' . $type . ' and message is: ' . $message, __file__, __line__);
 	
@@ -71,21 +71,22 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	
 	if ($_josh['mode'] == 'debug') exit;
 	
-	//when throwing an error, specify file and line
-	if ($file && $line) {
-		$message .= '  Error is at line ' . $line . ' of ' . $file;
-		if ($function) $message .= ', inside function ' . $function . '.';
-		$message = draw_p($message);
-	} else {
-		$backtrace = debug_backtrace();
-		array_shift($backtrace);
-		foreach ($backtrace as &$b) {
-			if (!isset($b['file'])) $b['file'] = 'Unknown file';
-			if (!isset($b['line'])) $b['line'] = '~';
-			$b = $b['file'] . ' ' . $b['line'] . ' ' . draw_tag('span', array('style'=>'color:#aaa;float:right;'), $b['function']);
-		}
-		$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
+	//show backtrace stack
+	$backtrace = array_reverse(debug_backtrace());
+		
+	$last_function = ''; //i think it's more readable if the function applies to the previous line (you are here)
+	foreach ($backtrace as &$b) {
+		if (($b['function'] == 'error_handle') || ($b['function'] == 'error_handle_php')) $b = false; //don't care what happened after the error occurred
+		if (!isset($b['file'])) $b['file'] = $file;
+		if (!isset($b['line'])) $b['line'] = $line;
+		$function = (function_exists('draw_tag')) ? draw_tag('span', array('style'=>'color:#aaa;float:right;'), $last_function) : '[' . $last_function . ']';
+		$last_function = $b['function'] . '()';
+		$b['file'] = error_path($b['file']);
+		$thisfile = $b['file'] . ' ' . $b['line'];
+		if (function_exists('format_text_starts') && ($filename = format_text_starts('/joshlib/', $b['file']))) $thisfile = '<a href="http://code.google.com/p/joshlib/source/browse/trunk/' . $filename . '#' . $b['line'] . '" style="color:#59c;" target="_blank">' . $thisfile . '</a>';
+		$b = $thisfile . ' ' . $function;
 	}
+	$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
 
 	//add more stuff to admin message, set from and subject
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
@@ -100,7 +101,7 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 	}
 			
 	$subject = '[Joshlib Error] ' . $type;
-	$message = error_draw($type, error_path($message));
+	$message = error_draw($type, $message);
 	
 	//notify
 	if ($_josh['mode'] == 'dev') {
@@ -115,7 +116,7 @@ function error_handle($type, $message='', $file=false, $line=false, $function=fa
 }
 
 function error_handle_exception($exception) {
-	return error_handle('Exception Error', $exception);
+	return error_handle('Exception Error', $exception, __file__, __line__);
 }
 
 function error_handle_php($number, $message, $file, $line) {
@@ -142,9 +143,7 @@ function error_handle_php($number, $message, $file, $line) {
 		default:					$title .= 'Unknown error ($number)';	break;
 	}
 	
-	//debug();
-	//format_code($message)
-	error_handle($title, $message);
+	error_handle($title, $message, __file__, __line__);
 }
 
 function error_path($str) {
