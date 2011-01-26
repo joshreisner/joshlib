@@ -58,7 +58,7 @@ function db_backup($limit=false) {
 	
 	//only works with mysql right now
 	extract($_josh['db']);
-	if ($language != 'mysql') error_handle('only mysql supported', 'db_backup is a mysql-only function right now', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 
 	//build command, socket hack, execute
 	$command = 'mysqldump --opt --host="' . $location . '" --user="' . $username . '" --password="' . $password . '" "' . $database . '" | gzip > ' . DIRECTORY_ROOT . $target;
@@ -76,7 +76,7 @@ function db_backup($limit=false) {
 	}
 }
 
-function db_check($table, $column=false) {
+/* function db_check($table, $column=false) {
 	error_deprecated(__function__ . ' was deprecated on 10/16/2010 for disuse and because it\'s of questionable utility');
 	global $_josh;
 	db_switch('information_schema');
@@ -89,7 +89,7 @@ function db_check($table, $column=false) {
 	$return = db_grab('SELECT * FROM ' . $target . ' WHERE table_schema = "' . $_josh['db']['database'] . '" AND table_name = "' . $table . '"' . $column);
 	db_switch();
 	return $return;
-}
+} */
 
 function db_checkboxes($name, $linking_table, $object_col, $option_col, $object_id) {
 	//for example db_checkboxes('doc', 'documents_to_categories', 'document_id', 'category_id', $id);
@@ -191,7 +191,7 @@ function db_column_add($table, $column, $type) {
 }
 
 function db_column_drop($table, $column) {
-	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	$result = db_found(db_query('ALTER TABLE ' . $table . ' DROP COLUMN ' . $column));
 }
 
@@ -203,12 +203,12 @@ function db_column_exists($table, $column) {
 }
 
 function db_column_key($table, $column) {
-	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	return db_query('ALTER TABLE `' . $table . '` MODIFY `' . $column . '` INT(11) NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (' . $column . ');');
 }
 
 function db_column_rename($table, $before, $after) {
-	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	$col = db_column_exists($table, $before);
 	if (($col['type'] == 'varchar') && $col['length']) $col['type'] = $col['type'] . '(' . $col['length'] . ')';
 	$result = db_found(db_query('ALTER TABLE `' . $table . '` CHANGE `' . $before . '` `' . $after . '` ' . strToUpper($col['type'])));
@@ -228,7 +228,7 @@ function db_column_type($datatype, $length=false) {
 }
 
 function db_column_type_set($table, $column, $newtype) {
-	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is not yet supported for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	return db_query('ALTER TABLE `' . $table . '` MODIFY `' . $column . '` ' . db_column_type($newtype));
 }
 
@@ -793,25 +793,27 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 	error_handle('could not create table' . $tablename, __file__, __line__);
 }
 
-function db_table_drop($tablename) {
-	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql', __file__, __line__);
-	if (!db_table_exists($tablename)) return false;
-	return db_query('DROP TABLE ' . $tablename);
+function db_table_drop($tables) {
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
+	$tables = array_separated($tables);
+	$counter = 0;
+	foreach ($tables as $t) if (db_table_exists($t) && db_query('DROP TABLE ' . $t)) $counter++;
+	return $counter;
 }
 
 function db_table_exists($name) {
-	if (db_language() == 'mssql') error_handle(__function__, 'this function is not yet implemented for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding function recursion with dbCheck
 }
 
 function db_table_rename($before, $after) {
-	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	return db_query('RENAME TABLE ' . $before . ' TO ' . $after);
 }
 
 function db_tables() {
 	global $_josh;
-	if (db_language() == 'mssql') return error_handle(__function__, 'this function is not yet implemented for mssql', __file__, __line__);
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
 	foreach ($tables as &$t) $t = strToLower($t['Tables_in_' . $_josh['db']['database']]);
 	sort($tables);

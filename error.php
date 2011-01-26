@@ -80,7 +80,7 @@ function error_handle($type, $message='', $file=false, $line=false) {
 		if (!isset($b['file'])) $b['file'] = $file;
 		if (!isset($b['line'])) $b['line'] = $line;
 		$function = (function_exists('draw_tag')) ? draw_tag('span', array('style'=>'color:#aaa;float:right;'), $last_function) : '[' . $last_function . ']';
-		$last_function = $b['function'] . '()';
+		if (!empty($b['function'])) $last_function = $b['function'] . '()';
 		$b['file'] = error_path($b['file']);
 		$thisfile = $b['file'] . ' ' . $b['line'];
 		if (function_exists('format_text_starts') && ($filename = format_text_starts('/joshlib/', $b['file']))) $thisfile = '<a href="http://code.google.com/p/joshlib/source/browse/trunk/' . $filename . '#' . $b['line'] . '" style="color:#59c;" target="_blank">' . $thisfile . '</a>';

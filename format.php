@@ -1020,6 +1020,20 @@ function format_time($timestamp=false, $error='') {
 }
 
 function format_time_business($start, $end=false) {
+	if (!function_exists('isBusinessHours')) {
+		function isBusinessHours($udate) {
+			$hourOfDay = date('G', $udate);
+			return (($hourOfDay > 9) && ($hourOfDay < 17));
+		}
+	}
+	
+	if (!function_exists('isWeekDay')) {
+		function isWeekDay($udate) {
+			$dayOfWeek = date('w', $udate);
+			return (($dayOfWeek > 0) && ($dayOfWeek < 6));
+		}	
+	}
+
 	$start = strToTime($start);
 	if (empty($end) || !$end) {
 		$end = date('U');
@@ -1069,20 +1083,6 @@ function format_time_business($start, $end=false) {
 		return '<i>just opened</i>';
 	} else {
 		return implode(', ', $return);
-	}
-	
-	if (!function_exists('isBusinessHours')) {
-		function isBusinessHours($udate) {
-			$hourOfDay = date('G', $udate);
-			return (($hourOfDay > 9) && ($hourOfDay < 17));
-		}
-	}
-	
-	if (!function_exists('isWeekDay')) {
-		function isWeekDay($udate) {
-			$dayOfWeek = date('w', $udate);
-			return (($dayOfWeek > 0) && ($dayOfWeek < 6));
-		}	
 	}
 }
 
