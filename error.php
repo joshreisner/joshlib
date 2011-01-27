@@ -76,7 +76,6 @@ function error_handle($type, $message='', $file=false, $line=false) {
 		
 	$last_function = ''; //i think it's more readable if the function applies to the previous line (you are here)
 	foreach ($backtrace as &$b) {
-		if (($b['function'] == 'error_handle') || ($b['function'] == 'error_handle_php')) $b = false; //don't care what happened after the error occurred
 		if (!isset($b['file'])) $b['file'] = $file;
 		if (!isset($b['line'])) $b['line'] = $line;
 		$function = (function_exists('draw_tag')) ? draw_tag('span', array('style'=>'color:#aaa;float:right;'), $last_function) : '[' . $last_function . ']';

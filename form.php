@@ -39,7 +39,7 @@ class form {
 	}
 
 	function draw($values=false, $focus=true) {
-		global $_josh, $_GET;
+		global $_josh;
 		
 		if ($values) $this->set_values($values);
 		
@@ -59,7 +59,7 @@ class form {
 			//add submit
 			$this->set_field(array('type'=>'submit', 'value'=>$this->submit, 'additional'=>$additional));
 		}
-				
+
 		//start output
 		if (!$this->title) $this->title = ''; //legend is showing up <legend/>
 		$return = draw_container('legend', draw_container('span', $this->title_prefix . $this->title));
@@ -329,7 +329,7 @@ class form {
 			$this->fields[$name] = compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength', 'null_value', 'preview');
 		} else {
 			if (isset($this->fields[$name])) unset($this->fields[$name]);
-			$this->fields = array_insert_assoc($this->fields, $position, $name, compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength', 'null_value'));
+			$this->fields = array_insert_assoc($this->fields, $position, $name, compact('name', 'type', 'label', 'value', 'default', 'append', 'required', 'allow_changes', 'sql', 'class', 'action', 'onchange', 'additional', 'options_table', 'option_id', 'option_title', 'object_id', 'options', 'linking_table', 'maxlength', 'null_value', 'preview'));
 		}
 	}
 	
