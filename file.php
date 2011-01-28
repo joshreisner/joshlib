@@ -248,6 +248,7 @@ function file_import_fixedlength($content, $definitions) {
 }
 
 function file_include($filename) {
+	global $return; //this is to allow the included file to return something
 	if (file_exists(DIRECTORY_ROOT . $filename)) {
 		include(DIRECTORY_ROOT . $filename);
 		return true;
