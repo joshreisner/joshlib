@@ -188,6 +188,9 @@ class form {
 					$return .= '<div class="note">' . $additional . '</div>';
 					break;
 				case 'password':
+					//accepts insertion point
+					if (!$this->focus) $this->set_focus($name);
+					
 					$return .= draw_form_password($name, $value, $class, 255, false) . $additional;
 					break;
 				case 'radio':

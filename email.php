@@ -47,7 +47,12 @@ function email($to, $message, $subject='Email from Your Website', $from=false) {
 			->addPart($message, 'text/html')
 			//->attach(Swift_Attachment::fromPath('my-document.pdf'))
 		;
-		if (!$count = $mailer->batchSend($message, $failures)) error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
+		error_debug(__function__ . ' attempting to send to ' . implode(', ', $good) . ' addresses', __file__, __line__);
+		if (!$count = $mailer->batchSend($message, $failures)) {
+			error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
+		} else {
+			error_debug(__function__ . ' sent ' . $count . ' messages successfully', __file__, __line__);
+		}
 	} else {
 		//use php mail transport
 		mail($to, $subject, $message, 'From:' . $from);

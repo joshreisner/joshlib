@@ -279,4 +279,9 @@ function url_subfolder($empty=false) {
 	return (empty($_josh['request']['subfolder'])) ? $empty : $_josh['request']['subfolder'];
 }
 
+function url_tld($empty=false) {
+	global $_josh;
+	return (empty($_josh['request']['tld'])) ? $empty : $_josh['request']['tld'];
+}
+
 ?>
