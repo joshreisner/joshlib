@@ -590,7 +590,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 					$value = format_null(format_numeric($array[$c['name']], false));
 				} elseif ($c['type'] == 'int') { //integer
 					$value = format_null(format_numeric($array[$c['name']], true));
-				} elseif (($c['type'] == 'mediumblob') && ($c['name'] == 'password')) {
+				} elseif (($c['type'] == 'mediumblob') && ($c['type'] == 'longblob') && ($c['name'] == 'password')) {
 					if ($id) {
 						$query1[] = $c['name'] . ' = ' . db_pwdencrypt($value);
 					} else {

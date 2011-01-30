@@ -202,7 +202,7 @@ function format_date_time($timestamp=false, $error='', $separator=' ', $suppress
 	//if (($return == 'Today') || ($return == 'Yesterday') || ($return == 'Tomorrow')) 
 	$time = format_time($timestamp);
 	if ($suppressMidnight && ($time == '12:00am')) return $return;
-	return $return . $separator . $time;;
+	return $return . $separator . $time;
 }
 
 function format_date_time_range($start, $end) {
@@ -283,8 +283,6 @@ function format_email($address) {
 
 	return $address;
 }
-
-
 
 function format_file_name($str, $ext) {
 	//formatting for downloaded files
@@ -1016,7 +1014,7 @@ function format_time($timestamp=false, $error='') {
 		if (empty($timestamp) || ($timestamp == 'Jan 1 1900 12:00AM')) return $error;
 		if (!is_int($timestamp)) $timestamp = strToTime($timestamp);
 	}
-	return date('g:ia', $timestamp);
+	return strftime('%l:%M%p', $timestamp);
 }
 
 function format_time_business($start, $end=false) {
