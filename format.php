@@ -418,18 +418,24 @@ function format_html_entities($string) {
 
 function format_html_img($url, $text=false) {
 	//returns the largest (jpg) image from the specified $url or within the provided $text
+	//you have to provide the URL because it might need to correct the images
 	lib_get('simple_html_dom');
 	
 	if (!$text) $text = url_get($url);
 	
 	if ($text) {
+		$text = str_get_html($text);
+		
+		//first, look for facebook share title http://developers.facebook.com/docs/share/
+		$blocks = $text->find('meta');
+		foreach ($blocks as $b) if ($b->property == 'og:image') return trim($b->content);
 	
 		//quick search for <link rel="image_src">
-		$blocks = str_get_html($text)->find('link');
+		$blocks = $text->find('link');
 		foreach ($blocks as $b) if (($b->rel == 'image_src') && $b->href) return $b->href;
 
 		//loop through images		
-		$blocks = str_get_html(format_html($text))->find('img');
+		$blocks = $text->find('img');
 		error_debug('<b>' . __function__ . '</b> found ' . count($blocks) . ' images within ' . strlen($text) . ' char text', __file__, __line__);
 		$images = array();
 		foreach ($blocks as $b) {
@@ -462,9 +468,16 @@ function format_html_img($url, $text=false) {
 
 function format_html_paragraphs($text, $limit=false) {
 	lib_get('simple_html_dom');
-	$blocks = str_get_html(format_html($text))->find('p');
+	$text = str_get_html($text);
+	
+	//first, look for facebook share or meta description http://developers.facebook.com/docs/share/
+	$blocks = $text->find('meta');
+	foreach ($blocks as $b) if (($b->property == 'og:description') || ($b->name == 'description')) return trim($b->content);
+		
+	//otherwise loop through paragraphs and sentences
+	$blocks = $text->find('p');
 	error_debug('<b>' . __function__ . '</b> found ' . count($blocks) . ' ps within ' . strlen($text) . ' char text', __file__, __line__);
-	$text = '';
+	$return = '';
 	$total_length = 0;
 	foreach ($blocks as $b) {
 		if (!$b->class) {
@@ -477,19 +490,19 @@ function format_html_paragraphs($text, $limit=false) {
 					foreach ($sentences as $s) {
 						$length = strlen($s) + 2;
 						if ($length + $total_length <= $limit) {
-							$text .= $s . '. ';
+							$return .= $s . '. ';
 							$total_length += $length;
 						}
 					}
-					$text = draw_p($text);
+					$return = draw_p($return);
 				}
 				break;
 			}
-			$text .= $b;
+			$return .= $b;
 			$total_length += $length;
 		}
 	}
-	return $text;
+	return $return;
 }
 
 function format_html_text($str) {
@@ -503,14 +516,24 @@ function format_html_text($str) {
 function format_html_title($text) {
 	lib_get('simple_html_dom');
 	$text = str_get_html($text);
-	$blocks = $text->find('h1');
+	
 	$return = '';
-	foreach ($blocks as $b) $return .= strip_tags($b->innertext);
+
+	//first, look for facebook share title http://developers.facebook.com/docs/share/
+	$blocks = $text->find('meta');
+	foreach ($blocks as $b) if ($b->property == 'og:title') return trim($b->content);
+	
+	//otherwise gather all the h1s, since those aren't usually gamed for SEO
+	$blocks = $text->find('h1');
+	foreach ($blocks as $b) $return .= strip_tags($b->innertext) . ' ';
+	
+	//otherwise go with the page title
 	if (empty($return)) {
 		$blocks = $text->find('title');
 		foreach ($blocks as $b) $return .= strip_tags($b->innertext);
 	}
-	return $return;
+	
+	return trim($return);
 }
 
 function format_html_trim($text) {
