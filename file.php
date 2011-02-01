@@ -63,7 +63,7 @@ function file_download($content, $filename, $extension) {
 	//header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	//header('Cache-Control: public');
 	//todo add more types from http://www.iana.org/assignments/media-types/
-	$mime = ($extension == 'pdf') ? 'application/pdf' : 'application/octet-stream';
+
 	$filename = format_file_name($filename, $extension);
 	
 	//for IE over SSL
@@ -71,9 +71,9 @@ function file_download($content, $filename, $extension) {
 	header('Pragma: public');
 	
 	header('Content-Description: File Transfer');
-	header('Content-Type: ' . $mime);
+	header('Content-Type: ' . file_mime($extension));
 	header('Content-Length: ' . strlen($content));
-	header('Content-Disposition: attachment; filename=' . $filename);
+	header('Content-Disposition: attachment; filename="' . $filename . '"');
 	echo $content;
 	db_close();
 }
@@ -262,6 +262,23 @@ function file_include($filename) {
 	global $_josh;
 	return file_exists(DIRECTORY_ROOT . $filename);
 }*/
+
+function file_mime($ext) {
+	$types = array(
+		'pdf'=>'application/pdf',
+		'xls'=>'application/vnd.ms-excel',
+		'doc'=>'application/msword',
+		'zip'=>'application/zip',
+		'gif'=>'image/gif',
+		'png'=>'image/png',
+		'jpg'=>'image/jpeg',
+		'txt'=>'text/plain',
+		'pub'=>'application/x-mspublisher',
+		'eps'=>'application/postscript'
+	);
+	if (array_key_exists($ext, $types)) return $types[$ext];
+	return 'application/octet-stream';
+}
 
 function file_name($filepath) {
 	global $_josh;
