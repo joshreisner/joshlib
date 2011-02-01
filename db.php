@@ -214,17 +214,27 @@ function db_column_rename($table, $before, $after) {
 	$result = db_found(db_query('ALTER TABLE `' . $table . '` CHANGE `' . $before . '` `' . $after . '` ' . strToUpper($col['type'])));
 }
 
-function db_column_type($datatype, $length=false) {
+function db_column_type($datatype, $length=false, $decimals=false) {
 	//edit $datatype declaration in sql statement
 	//$datatype in this case is a mysql datatype
 	$datatype = strToUpper($datatype);
 	
-	//these have no max
-	if (in_array($datatype, array('DATETIME', 'MEDIUMBLOB', 'TEXT'))) return $datatype;
+	//these have no explicit length
+	if (in_array($datatype, array('DATE', 'DATETIME', 'MEDIUMBLOB', 'TEXT'))) return $datatype;
 	
-	//otherwise max
-	$maxes = array('INT'=>11, 'TINYINT'=>4, 'VARCHAR'=>255);
-	return $datatype . '(' . ($length ? $length : $maxes[$datatype]) . ')';
+	//these do
+	if (!$length) {
+		$maxes = array('INT'=>11, 'DECIMAL'=>11, 'TINYINT'=>4, 'VARCHAR'=>255);
+		$length = $maxes[$datatype];
+	}
+	
+	//this also has precision
+	if ($datatype == 'DECIMAL') {
+		if (!$decimals) $decimals = 2;
+		$length .= ',' . $decimals;
+	}
+	
+	return $datatype . '(' . $length . ')';
 }
 
 function db_column_type_set($table, $column, $newtype) {
@@ -769,7 +779,10 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 	
 	//config columns
 	$columns = '';
-	if ($fields) foreach ($fields as $field=>$type) $columns .= '`' . strToLower($field) . '` ' . db_column_type($type) . ' DEFAULT NULL, ';
+	if ($fields) foreach ($fields as $field=>$type) {
+		if (is_array($type)) extract($type); //type could be array('type'=>'int', 'length'=>12, 'decimals'=>4) per db_table_from_array
+		$columns .= '`' . strToLower($field) . '` ' . db_column_type($type, @$length, @$decimals) . ' DEFAULT NULL, ';
+	}
 	
 	//run sql
 	//todo make system fields optional
@@ -777,7 +790,7 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 		  `id` int(11) NOT NULL AUTO_INCREMENT,
 		  ' . $columns . '
 		  `created_date` datetime NOT NULL,
-		  `created_user` int(11) NOT NULL,
+		  `created_user` int(11) DEFAULT NULL,
 		  `publish_date` datetime DEFAULT NULL,
 		  `publish_user` int(11) DEFAULT NULL,
 		  `is_published` tinyint(4) NOT NULL,
@@ -804,6 +817,46 @@ function db_table_drop($tables) {
 function db_table_exists($name) {
 	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding function recursion with dbCheck
+}
+
+function db_table_from_array($array, $table_name=false) {
+	//creates a database table to house the array you pass it
+	//$array should be multi-dimensional
+		
+	$columns = array();
+	$sql = array();
+	
+	foreach ($array as $a) {
+		$row = array();
+		foreach ($a as $column=>$value) {
+			if ($value == '""') $value = '';
+			$value = trim($value);
+			$row[] = format_null(format_quotes($value));
+			if (!array_key_exists($column, $columns)) $columns[$column] = array('type'=>'int', 'length'=>false, 'decimals'=>false);
+			$type	= format_get($value);
+			$length	= strlen($value);
+			if ($length > $columns[$column]['length']) $columns[$column]['length'] = $length;
+			if ($type == 'decimal') {
+				$decimals = $length - strpos($value, '.') - 1;
+				if ($decimals > $columns[$column]['decimals']) $columns[$column]['decimals'] = $decimals;
+				if ($columns[$column]['type'] == 'int') $columns[$column]['type'] = 'decimal';
+			} elseif ($type == 'varchar') {
+				if ($columns[$column]['type'] != 'text') $columns[$column]['type'] = 'varchar';
+			} elseif ($type == 'text') {
+				$columns[$column]['type'] = 'text';
+			}
+		}
+		if ($table_name) $sql[] = 'INSERT INTO ' . $table_name . ' ( `' . implode('`, `', array_keys($columns)) . '`, created_date, created_user, is_active ) VALUES ( ' . implode(', ', $row) . ', ' . db_date() . ', ' . user('NULL') . ', 1 )';
+	}
+	
+	if ($table_name) {
+		db_table_drop($table_name);
+		db_table_create($table_name, $columns);
+		foreach ($sql as $s) db_query($s);
+	} else {
+		//echo draw_array($columns, '', true);
+		return $columns;
+	}
 }
 
 function db_table_rename($before, $after) {

@@ -312,10 +312,23 @@ function format_file_size($file) {
 	return format_size($size);
 } 
 
+function format_get($value) {
+	//returns int, decimal, text, textarea
+	//used by db_table_from_array
+	if (empty($value)) return false;
+	if (is_numeric($value)) {
+		if (strstr($value, '.')) return 'decimal';
+		return 'int';
+	} elseif (strlen($value) > 255) {
+		return 'text';
+	}
+	return 'varchar';
+}
+
 function format_highlight($haystack, $needles) {
 	//sometimes you want to use a highlighter on html -- usually in search results
 	if (is_array($needles)) $needles = implode('|', $needles);
-	return preg_replace("/($needles)/i",'<span class="highlight"><b>\\0</b></span>', $haystack);
+	return preg_replace("/($needles)/i", draw_span('highlight', '\\0'), $haystack);
 }
 
 function format_html($text) {
@@ -727,7 +740,7 @@ function format_more($string, $link, $separator='<p>[more]</p>') {
 function format_null($value='') {
 	//could also be a db function?
 	if (empty($value)) return 'NULL';
-	if (!is_numeric($value)) return '"' . $value . '"';
+	if (!is_numeric($value)) return '\'' . $value . '\'';
 	return $value;
 }
 
