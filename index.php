@@ -185,7 +185,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		file_dir_writable();
 		file_put_config();
 	}
-	if (!include(DIRECTORY_ROOT . $_josh['config'])) die('Could not create config file, please check the root folder\'s permissions.');
+	if (!include(DIRECTORY_ROOT . $_josh['config'])) die('Could not create config file, please check the permissions on ' . DIRECTORY_ROOT . '.');
 	
 //check to make sure we're on the correct domain, might have read host variable from config file
 	if (isset($_josh['host']) && ($_josh['host'] != $_josh['request']['host'])) url_change($_josh['request']['protocol'] . '://' . $_josh['host'] . $_josh['request']['path_query']);
