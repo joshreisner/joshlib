@@ -835,7 +835,6 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguments=false, $type='ul
 function draw_list_sets($options, $length=2, $arguments=false, $type='ul', $selected=false) {
 	//return a list broken into sublists by the number of options, eg draw_list_sets with 2 is 
 	$sets = array();
-	debug();
 	$columns = ceil(count($options) / $length);
 	for ($i = 0; $i < $columns; $i++) {
 		$suboptions = array_slice($options, $i * $length, $length);
