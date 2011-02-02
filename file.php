@@ -288,7 +288,7 @@ function file_name($filepath) {
 	$path		= implode(DIRECTORY_SEPARATOR, $pathparts);
 	$fileparts	= explode('.', $file);
 	$extension	= array_pop($fileparts);
-	$filename	= implode('.', $fileparts);
+	$filename	= urldecode(implode('.', $fileparts));
 	error_debug('file_name returning file = ' . $file . ', ext = ' . $extension . ', path = ' . $path, __file__, __line__);
 	return array($filename, $extension, $path);
 }

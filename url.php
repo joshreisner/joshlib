@@ -78,7 +78,7 @@ function url_folder($empty='home') {
 	return (empty($_josh['request']['folder'])) ? $empty : $_josh['request']['folder'];
 }
 
-function url_get($url) {
+function url_get($url, $username=false, $password=false) {
 	//retrieve remote pagedata
 	
 	//curl_init is the preferred method.  if it's not available, try file()
@@ -86,10 +86,15 @@ function url_get($url) {
 
 	//run curl
 	$ch = curl_init($url);
+	if (format_text_starts('https://', $url)) curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	if ($username && $password) curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . base64_encode($username . ':' . $password)));
 	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)');
 	curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
 	$return = curl_exec($ch);
+	
+	if (curl_errno($ch)) error_handle('CURL error', curl_error($ch), __file__, __line__);
+
 	curl_close($ch);
 	return $return;
 }
