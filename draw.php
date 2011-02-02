@@ -834,10 +834,15 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguments=false, $type='ul
 
 function draw_list_sets($options, $length=2, $arguments=false, $type='ul', $selected=false) {
 	//return a list broken into sublists by the number of options, eg draw_list_sets with 2 is 
-	$return = array();
+	$sets = array();
+	debug();
 	$columns = ceil(count($options) / $length);
-	for ($i = 0; $i < $columns; $i++) $return[] = draw_list(array_slice($options, $i * $length, $length));
-	return draw_list($return, $arguments, $type, $selected);
+	for ($i = 0; $i < $columns; $i++) {
+		$suboptions = array_slice($options, $i * $length, $length);
+		error_debug('drew list on ' . $i * $length . ' ' . $length . ' ' . count($suboptions), __file__, __line__);
+		$sets[] = draw_list($suboptions);
+	}
+	return draw_list($sets, $arguments, $type, $selected);
 }
 
 function draw_meta_description($string) {

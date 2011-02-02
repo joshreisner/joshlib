@@ -227,7 +227,8 @@ function file_get_uploaded($fieldname, $types_table=false) {
 function file_icon($filename_or_ext, $link=false, $type='16x16') {
 	//show the icon for a given filename
 	if (empty($filename_or_ext)) return false;
-	if ((stristr($filename_or_ext, '.')) && (!$filename_or_ext = strToLower(file_ext($filename_or_ext)))) return false;
+	$filename_or_ext = strtolower($filename_or_ext);
+	if ((stristr($filename_or_ext, '.')) && (!$filename_or_ext = file_ext($filename_or_ext))) return false;
 	if ($return = draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/' . $filename_or_ext . '.png', $link)) return $return;
 	error_handle('file type not added yet', 'the file type "' . $filename_or_ext . '" was not found in the file_icons library.  this has been noted.', __file__, __line__);
 	return draw_img(DIRECTORY_WRITE . '/lib/file_icons/' . $type . '/unknown.png', $link);

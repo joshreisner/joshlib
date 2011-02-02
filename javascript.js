@@ -430,10 +430,16 @@ function scroll_to(newPallet, dont_clear_interval) {
 function slideshow(element) {
 	/*
 	slideshow function by josh, diego and michael
-	call by <ul class="slideshow arrows bullets move continuous">
+	call by <ul class="slideshow arrows bullets move continuous interval_8000">
 	*/
 	$(element).wrap('<div class="slideshow_container" />').wrap('<div class="slideshow" />');
 
+	//loop through the element's classes, find one that begins with interval_ and is followed by an integer
+	//set interval var to that class, otherwise set it to 3000
+	/*$(element).attr('class').each(function() {
+		alert($(this));
+	});*/
+	
     var vars = {
         deselectedPosition:	0,
         hasArrows:			$(element).hasClass('arrows'),
