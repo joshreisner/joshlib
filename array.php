@@ -152,8 +152,7 @@ function array_insert_assoc($array, $position, $key, $value) {
 	//todo possibly combine with array_insert where value is an array(key=>value)
     $array_clip = array_splice($array, $position);
     $array[$key] = $value;
-    $array = array_merge($array, $array_clip);
-    return $array;
+    return array_merge($array, $array_clip);
 }
 
 function array_instances($array, $needle) {
