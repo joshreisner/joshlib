@@ -811,7 +811,7 @@ function draw_list($options, $arguments=false, $type='ul', $selected=false, $cla
 		$options[$i] = draw_tag('li', $li_args, $options[$i]);
 		$counter++;
 	}
-	return draw_tag($type, $arguments, implode($options, ''));
+	return draw_tag($type, $arguments, implode($options, NEWLINE));
 }
 
 function draw_list_columns($options, $columns=2, $arguments=false, $type='ul', $selected=false) {
