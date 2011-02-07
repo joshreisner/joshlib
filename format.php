@@ -325,10 +325,16 @@ function format_get($value) {
 	return 'varchar';
 }
 
-function format_highlight($haystack, $needles) {
+function format_highlight($haystack, $needles=false) {
 	//sometimes you want to use a highlighter on html -- usually in search results
+	if (!$needles) return $haystack; //$needles is optional
 	if (is_array($needles)) $needles = implode('|', $needles);
-	return preg_replace("/($needles)/i", draw_span('highlight', '\\0'), $haystack);
+	
+	//pattern is not yet bulletproof, but supports html now
+	//thanks to ddrudik at http://www.experts-exchange.com/Web_Development/Web_Languages-Standards/PHP/Q_22713827.html
+	$pattern = '/(?<=^|[> ])(' . $needles . ')(?=$|[^a-z])/is';
+	
+	return preg_replace($pattern, draw_span('highlight', '\\0'), $haystack);
 }
 
 function format_html($text) {

@@ -6,6 +6,18 @@ $(function(){
 	$("ul.slideshow").each(function(){
 		new slideshow($(this));
 	});
+	
+	var defaults = {};
+	$('input.default').each(function(){ defaults[$(this).attr('name')] = $(this).val(); });
+	
+	$('input.default').click(function(){
+		if ($(this).val() == defaults[$(this).attr('name')]) $(this).val('');
+	});
+
+	$('input.default').blur(function(){
+		if ($(this).val() == '') $(this).val(defaults[$(this).attr('name')]);
+	});
+
 });
 
 function ajax_publish(which) {
