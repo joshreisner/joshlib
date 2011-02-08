@@ -447,11 +447,11 @@ function format_html_img($url, $text=false) {
 		
 		//first, look for facebook share title http://developers.facebook.com/docs/share/
 		$blocks = $text->find('meta');
-		foreach ($blocks as $b) if ($b->property == 'og:image') return trim($b->content);
+		foreach ($blocks as $b) if (($b->property == 'og:image') && (file_type($b->content) == 'jpg')) return trim($b->content);
 	
 		//quick search for <link rel="image_src">
 		$blocks = $text->find('link');
-		foreach ($blocks as $b) if (($b->rel == 'image_src') && $b->href) return $b->href;
+		foreach ($blocks as $b) if (($b->rel == 'image_src') && $b->href && (file_type($b->href) == 'jpg')) return $b->href;
 
 		//loop through images		
 		$blocks = $text->find('img');
