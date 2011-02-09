@@ -68,6 +68,12 @@ function url_change_post($target='') {
 	url_change($target);
 }
 
+function url_domain($url) {
+	//return just the domain from a URL
+	if ($url = url_parse($url)) return $url['domain'];
+	return false;
+}
+
 function url_drop($deletes=false, $go=true) {
 	//alias for url_query_drop
 	return url_query_drop($deletes, $go);

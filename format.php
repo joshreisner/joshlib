@@ -337,79 +337,90 @@ function format_highlight($haystack, $needles=false) {
 	return preg_replace($pattern, draw_span('highlight', '\\0'), $haystack);
 }
 
-function format_html($text) {
+function format_html($text, $profile='user') {
+	//profile can be public, user or admin, with decreasing restrictions
+	//todo tie this programmically to user() and admin()
+	
 	lib_get('simple_html_dom');
 	$html = str_get_html($text);
-	$html->set_callback('cleanup');
 	
-	if (!function_exists('tag_unset')) {
-		function tag_unset($e) {
-			if (@$e->innertext) $e->innertext = '';
-			if (@$e->outertext) $e->outertext = '';
-			if (@$e->children) foreach($e->children as $f) tag_unset($f);
+	if (($profile == 'public') || ($profile == 'user')) $html->set_callback('cleanupUser');
+	if ($profile == 'public') $html->set_callback('cleanupPublic');
+	//$html->set_callback('cleanupAdmin');
+	
+	if (!function_exists('cleanupAdmin')) {
+		function cleanupAdmin() {
+			//todo
 		}
-	
-		function cleanup($e) {
+		
+		function cleanupPublic($e) {
+			//person off the street, aka hacker
+			
+			if (in_array($e->tag, array('blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'))) {
+				//replace these with <p> tags so as to keep the formatting but losing the styling
+				$e->outertext = ($e->innertext) ? '<p>' . $e->innertext . '</p>' : '';
+			} elseif (!in_array($e->tag, array('a', 'b', 'br', 'dir', 'div', 'hgroup', 'i', 'p', 'strike', 'strong', 'text'))) {
+				//narrower list of acceptable tags
+				$e->outertext = ($e->innertext) ? ' ' . $e->innertext . ' ' : '';
+			}
+		}
+
+		function cleanupUser($e) {
 			//this callback is used to clear out bad tags and attributes
+						
+			//kill bad tags
 			//never want these tags, or anything inside them
-			$bad_tags = array('comment', 'form', 'iframe', 'label', 'link', 'noscript', 'script', 'unknown');
-			if (in_array($e->tag, $bad_tags)) tag_unset($e);
+			$bad_tags = array('comment', 'form', 'label', 'input', 'link', 'noscript', 'script', 'select', 'unknown'); //new iframe whitelist			
+			if (in_array($e->tag, $bad_tags)) tagUnset($e);		
 			
-			//these are the tags we want	
-			$good_tags	= array(
-				'a', 'b', 'blockquote', 'br', 'dir', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'i', 'img',
-				'p', 'span', 'strike', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
+			//these are the tags we want.  if you're not one of these, remove but keep your contents eg <NYT_HEADLINE>
+			if (!in_array($e->tag, array(
+				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'dir', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'i', 'img',
+				'p', 'section', 'span', 'strike', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
 				'object', 'embed', 'param'
-			);
-			
-			
-			if (!in_array($e->tag, $good_tags)) $e->outertext = ($e->innertext) ? $e->innertext : '';
+			))) $e->outertext = ($e->innertext) ? $e->innertext : '';
 					
 			//never want these attributes
-			$bad_attributes = array('alt', 'onclick', 'onmouseout', 'onmouseover', 'title');
+			$bad_attributes = array('onclick', 'onmouseout', 'onmouseover', 'onload');
 			foreach ($bad_attributes as $b) if (isset($e->$b)) unset($e->$b);
-			
+						
 			//certain tags we are wary of
 			if ($e->tag == 'a') {
-				//no in-page links or anchors
-				if (!$e->href) $e->outertext = '';
+				if (!$e->href) {
+					//no empty 
+					$e->outertext = '';
+				} elseif ($local_url = format_text_starts(url_base(), $e->href)) {
+					//local hyperlinks if possible
+					$e->href = $local_url;
+				}
 			} elseif ($e->tag == 'b') {
-				//personal preference: replace <strong> with <b>
+				//deprecated tag: replace <b> with <strong>
 				$e->outertext = '<strong>' . $e->innertext . '</strong>';
 			} elseif ($e->tag == 'div') {
 				//no empty divs
 				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = '';
-			} elseif ($e->tag == 'em') {
-				//personal preference: replace <em> with <i>
-				$e->outertext = '<i>' . $e->innertext . '</i>';
-			//} elseif ($e->tag == 'img') {
-				//no small, narrow or flat images
-			//	if (($e->width && ($e->width < 20)) || ($e->height && ($e->height < 20))) $e->outertext = '';
+			} elseif ($e->tag == 'i') {
+				//deprecated tag: replace <i> with <em>
+				$e->outertext = '<em>' . $e->innertext . '</em>';
+			} elseif ($e->tag == 'iframe') {
+				//be cautious with iframes, they can be malicious
+				if (!in_array(url_domain($e->src, array('google.com', 'vimeo.com', 'youtube.com')))) $e->outertext = '';
 			} elseif (($e->tag == 'p') && (!$e->innertext || ($e->innertext == '&nbsp;'))) {
-				//kill empty p tags -- don't know where these are coming from!
+				//kill empty p tags
 				$e->outertext = '';
 			} elseif ($e->tag == 'span') {
-				if ($e->src) {
-					//nytimes has this -- i'm not sure yet if it's good or not
-				} elseif (!$e->children && !$e->plaintext) {
-					/*ditch the span, keep the contents
-					$e->outertext = $e->innertext;
-				} else {*/
-					//ditch the empty span
+				//remove empty spans
+				if (!$e->children && !$e->plaintext) {
 					$e->outertext = '';
 				}
-			} elseif ($e->tag == 'table') {
-				//kill table cell alignment?  not sure if this is good
-				if (isset($e->align)) unset($e->align);
-				if (isset($e->width)) unset($e->width);
-			} elseif ($e->tag == 'td') {
-				//kill table cell alignment?  not sure if this is good
-				//if (isset($e->align)) unset($e->align);
-				//if (isset($e->width)) unset($e->width);
 			}
-			//this could be a time to trim text
-			//if (@$e->outertext && !strlen(trim($e->outertext))) $e->outertext = '';
 		}
+		
+		function tagUnset($e) {
+			if (@$e->children) foreach($e->children as $f) tagUnset($f);
+			if (@$e->innertext) $e->innertext = '';
+			if (@$e->outertext) $e->outertext = '';
+		}		
 	}
 		
 	//reset html to get rid of artifacts and compress
