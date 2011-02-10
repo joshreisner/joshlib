@@ -42,6 +42,10 @@ function draw_autorefresh($minutes=5) {
 	return draw_tag('meta', array('http-equiv'=>'refresh', 'content'=>$minutes * 60));
 }
 
+function draw_b($inner, $arguments=false) {
+	return draw_strong($inner, $arguments);
+}
+
 function draw_body_open() {
 	//draw the opening body tag, in, say, drawTop()
 	global $_josh;
@@ -146,7 +150,7 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 				if ($type == 'table') {
 					$return .= draw_container('td', '', 'blank ' . $days_short[$day-1]);
 				} else {
-					$return .= draw_div_class('blank ' . $days_short[$day-1]);
+					$return .= draw_div_class('day blank ' . $days_short[$day-1]);
 				}
 			}
 		}
@@ -1061,6 +1065,10 @@ function draw_span($class, $inner='') {
 		}
 	}
 	return draw_container('span', $inner, array('class'=>$class));
+}
+
+function draw_strong($inner, $arguments=false) {
+	return draw_tag('strong', $arguments, $inner);
 }
 
 function draw_swf($path, $width, $height, $alternate='') {

@@ -23,11 +23,11 @@ $(function(){
 function ajax_publish(which) {
 	//requires jquery
 	//which.name eg chk_news-items_12
-	var action = which.name.split("_");
+	var action = which.name.split('_');
 	$.ajax({
 		url : url_action_add('ajax_publish', true),
-		type : "POST",
-		data : "table=" + action[1].replace(/-/g, "_") + "&id=" + action[2] + "&checked=" + which.checked,
+		type : 'POST',
+		data : 'table=' + action[1].replace(/-/g, '_') + '&id=' + action[2] + '&checked=' + which.checked,
 		success : function(data) {
 			//alert('hi' + data);
 		}
