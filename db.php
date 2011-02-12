@@ -752,6 +752,25 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	return $id;
 }
 
+function db_schema_check($schema) {
+	//check to verify that db structure is current
+	//returns true if passed check, false if changes were made
+	//used by bureaublank tasks and cms
+
+	//create any missing tables
+	$passed = true;
+	foreach ($schema as $table=>$fields) {
+		if (!db_table_exists($table)) {
+			$passed = false;
+			db_table_create($table, $fields, true);
+		}
+	}
+
+	//todo check columns are accurate
+	
+	return $passed;
+}
+
 function db_switch($target=false) {
 	global $_josh;
 	db_open();
