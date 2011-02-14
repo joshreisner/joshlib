@@ -17,7 +17,6 @@ $(function(){
 	$('input.default').blur(function(){
 		if ($(this).val() == '') $(this).val(defaults[$(this).attr('name')]);
 	});
-
 });
 
 function ajax_publish(which) {
@@ -200,27 +199,6 @@ function form_errors(errors) {
 
 function form_tinymce_clear(field_id) {
 	tinyMCE.getInstanceById(field_id).getBody().innerHTML='';
-}
-
-function form_tinymce_init(cssLocation, showplugins) {
-	var buttons = (showplugins) ? 
-		"styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,|,bullist,numlist,outdent,indent,|,link,unlink,insertimage,image,|,code" :
-		"bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,|,link,unlink,|,code";		
-
-	tinyMCE.init({
-		mode : "specific_textareas",
-		editor_selector : "tinymce",
-		theme : "advanced",
-		theme_advanced_buttons1 : buttons,
-		theme_advanced_buttons2 : "",
-		theme_advanced_resizing : true,		
-		theme_advanced_toolbar_location : "top",
-		extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align|class],table[cellspacing,align,border,cellpadding,class],tr[class],td[width,align,class]",
-		content_css : cssLocation + "?" + new Date().getTime(),
-		plugins : "imagemanager,filemanager,paste",
-		relative_urls : false,
-		remove_script_host : false /*we need this again for lc backend */
-	});
 }
 
 function form_field_email(obj) {
@@ -448,7 +426,6 @@ function slideshow(element) {
 	
     var vars = {
         deselectedPosition:	0,
-        hasArrows:			$(element).hasClass('arrows'),
         hasBullets:			$(element).hasClass('bullets'),
         interval:			($(element).hasClass('slow')) ? 6000 : 3000,
         isContinuous:		$(element).hasClass('continuous'),
@@ -456,9 +433,10 @@ function slideshow(element) {
         selectedPosition:	0,
         slides:				$(element).find('li'),
         slideWidth:			$(element).find('li').width(),
+        slideHeight:		$(element).find('li').height(),
         totalSlides:		$(element).find('li').size(),
-		manageArrows:		function() {	
-								if (!vars.hasArrows) return false;
+		manageArrows:		function() {
+								//this should probably just be css, in case you didn't want them fully hidden
 								if (vars.selectedPosition == 0) {
 									vars.parent.find('span.arrows.previous').css('visibility', 'hidden')
 								} else {
@@ -472,10 +450,9 @@ function slideshow(element) {
 								}
 							},
         parent:				$(element).closest('div.slideshow_container'),
-		manageBullets:		function() {
-								if (!vars.hasBullets) return false;
-								var thisBullet = vars.parent.find('ul.bullet_controls li').removeClass('selected').get(vars.selectedPosition);
-								$(thisBullet).addClass('selected');
+		manageController:	function() {
+								//var el = vars.parent.find('ul.controller li').removeClass('selected').get(vars.selectedPosition + 1);
+								//el.addClass('selected');
 							}, 
 		goToSlide:			function() {
 								if (vars.mode == 'fade') {
@@ -505,7 +482,7 @@ function slideshow(element) {
 								} else if (vars.selectedPosition < 0) {
 									vars.selectedPosition = vars.totalSlides - 1;
 								}
-								vars.manageBullets();
+								vars.manageController();
 								vars.manageArrows();
 								vars.goToSlide();
 							},
@@ -519,21 +496,25 @@ function slideshow(element) {
 	if (vars.mode == 'fade') {
 		vars.slides.hide().first().show();
 	} else if (vars.mode == 'move') {
+		$(element).parent('div.slideshow').css({ 'width':vars.slideWidth, 'height':vars.slideHeight, 'overflow':'hidden' });
 		$(element).css('width', (vars.slideWidth * vars.totalSlides));		
 	}
 
 	//add arrows & bullets
 	if (vars.totalSlides > 1) {
-		if (vars.hasArrows) {
-			$(element).parent('div.slideshow').prepend('<span class="arrows previous">Prev</span><span class="arrows next">Next</span>');
-		}
 
-		if (vars.hasBullets) {
-			var bulletContainerHTML = '<ul class="bullet_controls">';
-			for (i = 0; i < vars.totalSlides; i++) bulletContainerHTML += '<li></li>';
-			bulletContainerHTML += '</ul>';
-			vars.parent.prepend(bulletContainerHTML);
+		//create controller
+		var controllerHTML = '<ul class="controller"><li class="previous">Prev</li>';
+		for (i = 0; i < vars.totalSlides; i++) {
+			if (vars.hasBullets) {
+				controllerHTML += '<li>&bull;</li>';
+			} else {
+				controllerHTML += '<li>' + i + '</li>';
+			}
 		}
+		controllerHTML += '<li class="next"></li></ul>';
+		vars.parent.prepend(controllerHTML);
+
 		
 		if ((vars.mode == 'move') && vars.isContinuous) {
 			//we duplicate the first slide at the end so we can always scroll to the right
@@ -543,7 +524,7 @@ function slideshow(element) {
 	}
 
 	//go to the first slide
-	vars.manageBullets();
+	vars.manageController();
 	vars.manageArrows();
 
 	//if auto set timer
@@ -558,17 +539,24 @@ function slideshow(element) {
 		} else if (vars.selectedPosition < 0) {
 			vars.selectedPosition = vars.totalSlides - 1;
 		}
-		vars.manageBullets();
+		vars.manageController();
 		vars.manageArrows();
 		vars.autoClear();
 		vars.goToSlide();
 	});
 	
 	//bullets behavior
-	vars.parent.find('ul.bullet_controls li').click(function() {
+	vars.parent.find('ul.controller li').click(function() {
+		if ($(this).index()) == 0) {
+			//prev
+		} else if ($(this).index()) == vars.totalSlides) {
+			//next
+		} else { 
+			//go to specific slides
+		}
 		vars.deselectedPosition = vars.selectedPosition;
 		vars.selectedPosition = $(this).index();
-		vars.manageBullets();
+		vars.manageController();
 		vars.manageArrows();
 		vars.autoClear();
 		vars.goToSlide();

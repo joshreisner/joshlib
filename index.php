@@ -509,9 +509,47 @@ function lib_get($string) {
 
 		if ($string == 'tinymce') {
 			//special statements for tinymce
+			$return = lib_get('jquery') . draw_javascript('
+				$(function(){
+					$("textarea.tinymce").tinymce({
+						// Location of TinyMCE script
+						script_url : "' . str_replace('jquery.tinymce.js', 'tiny_mce.js', lib_location('tinymce')) . '",
+				
+						//legacy code
+						theme : "advanced",
+						
+						theme_advanced_buttons1 : "' . (user() ? 
+							'styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,outdent,indent,|,link,unlink,image,|,code' : 
+							'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,|,link,unlink') . '",
+						theme_advanced_buttons2 : "",
+						theme_advanced_resizing : true,		
+						theme_advanced_toolbar_location : "top",
+						
+						extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align|class],table[cellspacing,align,border,cellpadding,class],tr[class],td[width,align,class]",
+						content_css : "/styles/tinymce.css?" + new Date().getTime(),
+						plugins : "' . (user() ? 'imagemanager,filemanager,' : '') . 'paste",
+						
+						relative_urls : false,
+						remove_script_host : false /*we need this again for lc backend */
+				
+						/* new stuff in this version
+						// Drop lists for link/image/media/template dialogs
+						template_external_list_url : "lists/template_list.js",
+						external_link_list_url : "lists/link_list.js",
+						external_image_list_url : "lists/image_list.js",
+						media_external_list_url : "lists/media_list.js",
+				
+						// Replace values for the template plugin
+						template_replace_values : {
+							username : "Some User",
+							staffid : "991234"
+						}*/
+					});
+				});
+			') . $return;
 			file_dir_writable('images');
 			file_dir_writable('files');
-			$return .= draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
+			//$return .= draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
 		} elseif (($string == 'tablednd') || ($string == 'jeditable') || ($string == 'fancybox') || ($string == 'jscrollpane')) {
 			$return = lib_get('jquery') . $return;
 			if ($string == 'fancybox') {
@@ -551,7 +589,7 @@ function lib_location($string) {
 		return $lib . 'jquery-1.4.2.min.js';
 		
 		case 'jquery-hosted' :
-		return 'http://code.jquery.com/jquery-1.4.2.min.js';
+		return 'http://code.jquery.com/jquery-1.5.min.js';
 		
 		case 'jscrollpane' :
 		return DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.min.js';
@@ -572,7 +610,7 @@ function lib_location($string) {
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.tablednd_0_5.js';
 		
 		case 'tinymce' :
-		return $lib . 'tinymce_3_3_8/tiny_mce.js';
+		return $lib . 'tinymce_3_3_9/jquery.tinymce.js';
 	}
 }
 

@@ -740,11 +740,6 @@ function draw_javascript_folder_src() {
 	if (file_check($filename)) return draw_javascript_src($filename);
 }
 
-/* function draw_javascript_tinymce($path_css='/styles/tinymce.css', $path_script='/_site/tiny_mce/tiny_mce.js') {
-	error_deprecated(__FUNCTION__ . ' is deprecated as of 3/11/2010 use lib_get');
-	return draw_javascript_src() . draw_javascript_src($path_script) . draw_javascript('form_tinymce_init("' . $path_css . '");');
-}*/
-
 function draw_javascript_src($filename=false) {
 	global $_josh;
 	if (!$filename) {
