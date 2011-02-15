@@ -425,35 +425,23 @@ function slideshow(element) {
 	$(element).wrap('<div class="slideshow_container" />').wrap('<div class="slideshow" />');
 	
     var vars = {
-        deselectedPosition:	0,
-        hasBullets:			$(element).hasClass('bullets'),
-        interval:			($(element).hasClass('slow')) ? 6000 : 3000,
-        isContinuous:		$(element).hasClass('continuous'),
-        mode:				($(element).hasClass('fade')) ? 'fade' : 'move',
-        selectedPosition:	0,
-        slides:				$(element).find('li'),
-        slideWidth:			$(element).find('li').width(),
-        slideHeight:		$(element).find('li').height(),
-        totalSlides:		$(element).find('li').size(),
-		manageArrows:		function() {
-								//this should probably just be css, in case you didn't want them fully hidden
-								if (vars.selectedPosition == 0) {
-									vars.parent.find('span.arrows.previous').css('visibility', 'hidden')
-								} else {
-									vars.parent.find('span.arrows.previous').css('visibility', 'visible')
-								}
-								
-								if (vars.selectedPosition == vars.totalSlides - 1) {
-									vars.parent.find('span.arrows.next').css('visibility', 'hidden')
-								} else {
-									vars.parent.find('span.arrows.next').css('visibility', 'visible')
-								}
+		autoClear:			function() {
+								clearTimeout(vars.timer);
 							},
-        parent:				$(element).closest('div.slideshow_container'),
-		manageController:	function() {
-								//var el = vars.parent.find('ul.controller li').removeClass('selected').get(vars.selectedPosition + 1);
-								//el.addClass('selected');
-							}, 
+		autoSlide: 			function() {
+								//goToNext basically
+								vars.deselectedPosition	= vars.selectedPosition;
+								vars.selectedPosition++;
+								if (vars.selectedPosition >= vars.totalSlides) {
+									vars.selectedPosition = 0;
+								} else if (vars.selectedPosition < 0) {
+									vars.selectedPosition = vars.totalSlides - 1;
+								}
+								vars.manageController();
+								vars.manageArrows();
+								vars.goToSlide();
+							},
+        deselectedPosition:	0,
 		goToSlide:			function() {
 								if (vars.mode == 'fade') {
 									vars.slides.each(function(){$(this).css('z-index', 'auto');});
@@ -472,23 +460,32 @@ function slideshow(element) {
 								$(vars.slides.removeClass('selected').get(vars.selectedPosition)).addClass('selected');
 							},
 		hasAuto:			$(element).hasClass('auto'),
-		timer:				false,
-		autoSlide: 			function() {
-								//goToNext basically
-								vars.deselectedPosition	= vars.selectedPosition;
-								vars.selectedPosition++;
-								if (vars.selectedPosition >= vars.totalSlides) {
-									vars.selectedPosition = 0;
-								} else if (vars.selectedPosition < 0) {
-									vars.selectedPosition = vars.totalSlides - 1;
+        hasBullets:			$(element).hasClass('bullets'),
+        interval:			($(element).hasClass('slow')) ? 6000 : 3000,
+        isContinuous:		$(element).hasClass('continuous'),
+		manageController:	function() {
+								$(vars.controller.find('li.number').removeClass('selected').get(vars.selectedPosition)).addClass('selected');
+								
+								if (vars.selectedPosition == 0) {
+									vars.controller.find('li.prev').addClass('inactive');
+								} else {
+									vars.controller.find('li.prev').removeClass('inactive');
 								}
-								vars.manageController();
-								vars.manageArrows();
-								vars.goToSlide();
-							},
-		autoClear:			function() {
-								clearTimeout(vars.timer);
-							}
+								
+								if (vars.selectedPosition == vars.totalSlides-1) {
+									vars.controller.find('li.next').addClass('inactive');
+								} else {
+									vars.controller.find('li.next').removeClass('inactive');
+								}
+							}, 
+        mode:				($(element).hasClass('fade')) ? 'fade' : 'move',
+        parent:				$(element).closest('div.slideshow_container'),
+        selectedPosition:	0,
+        slides:				$(element).find('li'),
+        slideWidth:			$(element).find('li').width(),
+        slideHeight:		$(element).find('li').height(),
+		timer:				false,
+        totalSlides:		$(element).find('li').size()
     };
 			
 	//initialize -- need selected class for api (eg slideshow mask)
@@ -503,18 +500,12 @@ function slideshow(element) {
 	//add arrows & bullets
 	if (vars.totalSlides > 1) {
 
-		//create controller
-		var controllerHTML = '<ul class="controller"><li class="previous">Prev</li>';
-		for (i = 0; i < vars.totalSlides; i++) {
-			if (vars.hasBullets) {
-				controllerHTML += '<li>&bull;</li>';
-			} else {
-				controllerHTML += '<li>' + i + '</li>';
-			}
-		}
-		controllerHTML += '<li class="next"></li></ul>';
+		//build controller
+		var controllerHTML = '<ul class="controller"><li class="arrows prev">Prev</li>';
+		for (i = 0; i < vars.totalSlides; i++) controllerHTML += '<li class="number">' + (vars.hasBullets ? '&bull;' : i) + '</li>';
+		controllerHTML += '<li class="arrows next">Next</li></ul>';
 		vars.parent.prepend(controllerHTML);
-
+		vars.controller = vars.parent.find('ul.controller');
 		
 		if ((vars.mode == 'move') && vars.isContinuous) {
 			//we duplicate the first slide at the end so we can always scroll to the right
@@ -525,39 +516,29 @@ function slideshow(element) {
 
 	//go to the first slide
 	vars.manageController();
-	vars.manageArrows();
 
 	//if auto set timer
 	if (vars.hasAuto) vars.timer = setInterval(vars.autoSlide, vars.interval);
 
-	//arrows behavior
-	vars.parent.find('span.arrows').click(function() {
-		vars.deselectedPosition	= vars.selectedPosition;
-		vars.selectedPosition	= ($(this).hasClass('next')) ? vars.selectedPosition + 1 : vars.selectedPosition - 1;
+	//controller clicks
+	vars.parent.find('ul.controller li').click(function() {
+		vars.deselectedPosition = vars.selectedPosition;
+		if ($(this).hasClass('prev')) {
+			//prev
+			vars.selectedPosition--;
+		} else if ($(this).hasClass('next')) {
+			//next
+			vars.selectedPosition++;
+		} else { 
+			//go to specific slides
+			vars.selectedPosition = $(this).index() - 1;
+		}
 		if (vars.selectedPosition >= vars.totalSlides) {
 			vars.selectedPosition = 0;
 		} else if (vars.selectedPosition < 0) {
 			vars.selectedPosition = vars.totalSlides - 1;
 		}
 		vars.manageController();
-		vars.manageArrows();
-		vars.autoClear();
-		vars.goToSlide();
-	});
-	
-	//bullets behavior
-	vars.parent.find('ul.controller li').click(function() {
-		if ($(this).index()) == 0) {
-			//prev
-		} else if ($(this).index()) == vars.totalSlides) {
-			//next
-		} else { 
-			//go to specific slides
-		}
-		vars.deselectedPosition = vars.selectedPosition;
-		vars.selectedPosition = $(this).index();
-		vars.manageController();
-		vars.manageArrows();
 		vars.autoClear();
 		vars.goToSlide();
 	});
