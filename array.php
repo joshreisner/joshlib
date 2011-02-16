@@ -180,6 +180,13 @@ function array_key_promote($array) {
 	return $return;
 }
 
+function array_key_values($array, $key) {
+	//take an associative array's values for particular key and return a 1-d array of it
+	$return = array();
+	foreach ($array as $a) $return[] = $a[$key];
+	return $return;
+}
+
 function array_object($object) {
 	//converts an object to an associative array recursively.  used by array_xml()
     if (is_object($object)) $object = get_object_vars($object);

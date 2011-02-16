@@ -833,6 +833,17 @@ function db_table_drop($tables) {
 	return $counter;
 }
 
+function db_table_duplicate($old, $new) {
+	if (!db_table_exists($old)) error_handle(__function__ . ' trying to copy from ' . $old . ' which does not exist.', __file__, __line__);
+	if (db_table_exists($new)) error_handle(__function__ . ' trying to overwrite ' . $new . ' which already exists.', __file__, __line__);
+	
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
+
+	db_query('CREATE TABLE ' . $new . ' LIKE ' . $old);
+	db_query('INSERT ' . $new . ' SELECT * FROM ' . $old);
+	db_query('UPDATE ' . $new . ' SET created_date = ' . db_date() . ', created_user = ' . user('NULL') . ', updated_date = NULL, updated_user = NULL');
+}
+
 function db_table_exists($name) {
 	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 	return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding function recursion with dbCheck

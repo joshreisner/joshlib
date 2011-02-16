@@ -375,7 +375,7 @@ function format_html($text, $profile='user') {
 			
 			//these are the tags we want.  if you're not one of these, remove but keep your contents eg <NYT_HEADLINE>
 			if (!in_array($e->tag, array(
-				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'dir', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'i', 'img',
+				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'dir', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'i', 'img',
 				'p', 'section', 'span', 'strike', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
 				'object', 'embed', 'param'
 			))) $e->outertext = ($e->innertext) ? $e->innertext : '';

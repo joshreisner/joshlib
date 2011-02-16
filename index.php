@@ -525,6 +525,28 @@ function lib_get($string) {
 						theme_advanced_resizing : true,		
 						theme_advanced_toolbar_location : "top",
 						
+						valid_elements : "@[id|class|style|title|dir<ltr?rtl|lang|xml::lang|onclick|ondblclick|"
+							+ "onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|"
+							+ "onkeydown|onkeyup],a[rel|rev|charset|hreflang|tabindex|accesskey|type|"
+							+ "name|href|target|title|class|onfocus|onblur],strong/b,em/i,strike,u,"
+							+ "#p,-ol[type|compact],-ul[type|compact],-li,br,img[longdesc|usemap|"
+							+ "src|border|alt=|title|hspace|vspace|width|height|align],-sub,-sup,"
+							+ "-blockquote,-table[border=0|cellspacing|cellpadding|width|frame|rules|"
+							+ "height|align|summary|bgcolor|background|bordercolor],-tr[rowspan|width|"
+							+ "height|align|valign|bgcolor|background|bordercolor],tbody,thead,tfoot,"
+							+ "#td[colspan|rowspan|width|height|align|valign|bgcolor|background|bordercolor"
+							+ "|scope],#th[colspan|rowspan|width|height|align|valign|scope],caption,-div,"
+							+ "-span,-code,-pre,address,-h1,-h2,-h3,-h4,-h5,-h6,hr[size|noshade],-font[face"
+							+ "|size|color],dd,dl,dt,cite,abbr,acronym,del[datetime|cite],ins[datetime|cite],"
+							+ "object[classid|width|height|codebase|*],param[name|value|_value],embed[type|width"
+							+ "|height|src|*],script[src|type],map[name],area[shape|coords|href|alt|target],bdo,"
+							+ "button,col[align|char|charoff|span|valign|width],colgroup[align|char|charoff|span|"
+							+ "valign|width],dfn,fieldset,form[action|accept|accept-charset|enctype|method],"
+							+ "input[accept|alt|checked|disabled|maxlength|name|readonly|size|src|type|value],"
+							+ "kbd,label[for],legend,noscript,optgroup[label|disabled],option[disabled|label|selected|value],"
+							+ "q[cite],samp,select[disabled|multiple|name|size],small,"
+							+ "textarea[cols|rows|disabled|name|readonly],tt,var,big",
+
 						extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class],p[align|class],table[cellspacing,align,border,cellpadding,class],tr[class],td[width,align,class]",
 						content_css : "/styles/tinymce.css?" + new Date().getTime(),
 						plugins : "' . (user() ? 'imagemanager,filemanager,' : '') . 'paste",

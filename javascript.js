@@ -438,7 +438,6 @@ function slideshow(element) {
 									vars.selectedPosition = vars.totalSlides - 1;
 								}
 								vars.manageController();
-								vars.manageArrows();
 								vars.goToSlide();
 							},
         deselectedPosition:	0,
@@ -489,7 +488,7 @@ function slideshow(element) {
     };
 			
 	//initialize -- need selected class for api (eg slideshow mask)
-	vars.slides.first().addClass("selected");
+	vars.slides.first().addClass('selected');
 	if (vars.mode == 'fade') {
 		vars.slides.hide().first().show();
 	} else if (vars.mode == 'move') {
@@ -502,7 +501,7 @@ function slideshow(element) {
 
 		//build controller
 		var controllerHTML = '<ul class="controller"><li class="arrows prev">Prev</li>';
-		for (i = 0; i < vars.totalSlides; i++) controllerHTML += '<li class="number">' + (vars.hasBullets ? '&bull;' : i) + '</li>';
+		for (i = 0; i < vars.totalSlides; i++) controllerHTML += '<li class="number">' + (vars.hasBullets ? '&bull;' : i + 1) + '</li>';
 		controllerHTML += '<li class="arrows next">Next</li></ul>';
 		vars.parent.prepend(controllerHTML);
 		vars.controller = vars.parent.find('ul.controller');
