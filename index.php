@@ -405,8 +405,9 @@ function cookie_get($key) {
 	return format_quotes($_COOKIE[$key]);
 }
 
-function daysInMonth($month, $year=false) {
+function daysInMonth($month=false, $year=false) {
 	global $_josh;
+	if (!$month) $month = $_josh['month'];
 	if (!$year) $year = $_josh['year'];
 	return date('d', mktime(0,0,0, $month + 1, 0, $year));
 }

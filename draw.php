@@ -67,9 +67,13 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 			link		optional	if the event should be linked
 			color		optional	if there should be a background color to its div
 			toggling	optional	mouseover event
+			
+		todo deprecate table-based
 	*/
 	global $_josh;
 	$id = 0;
+	
+	if (is_string($events)) $events = db_table($events);
 	
 	if (!function_exists('draw_event')) {
 		function draw_event($e, $id, $toggling) {
@@ -95,6 +99,10 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 		$month_start	= mktime(0, 0, 0, $month, 1, $year);
 		$month_end		= mktime(23, 59, 59, $month+1, 0, $year);
 		foreach ($events as $e)	{
+			//allow for _date
+			if (empty($e['start']) && !empty($e['start_date'])) $e['start'] = $e['start_date'];
+			if (empty($e['end']) && !empty($e['end_date'])) $e['end'] = $e['end_date'];
+			
 			if (!empty($e['start'])) {
 				//parse start
 				$start			= strToTime($e['start']);
@@ -102,13 +110,16 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 				
 				if (empty($e['end'])) {
 					//if the end is empty then the event doesn't span. we have to assume that it's just this day
-					$cal_events[$start_day] .= draw_event($e, $id, $toggling);
+					if (date('n', $start) == $month) $cal_events[$start_day] .= draw_event($e, $id, $toggling);
 				} else {
-					//otherwise could be before or after
+					//otherwise could be before or after, draw a series of events on each day in the span
 					$end			= strToTime($e['end']);
-					$startAt		= ($month_start > $start) ? 1 : $start_day;
-					$endAt			= ($month_end < $end) ? 31 : date('j', $end);
-					for ($i = $startAt; $i <= $endAt; $i++) $cal_events[$i] .= draw_event($e, $id, $toggling);
+					if (($month_start > $end) || ($month_end < $start)) continue;
+					if ($month_start > $start) $start = $month_start;
+					if ($month_end < $end) $end = $month_end;
+					$start_day		= date('j', $start);
+					$end_day		= date('j', $start);
+					for ($i = $start_day; $i <= $end_day; $i++) $cal_events[$i] .= draw_event($e, $id, $toggling);
 				}
 			}
 		}
