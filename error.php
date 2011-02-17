@@ -82,7 +82,16 @@ function error_handle($type, $message='', $file=false, $line=false) {
 		if (!empty($b['function'])) $last_function = $b['function'] . '()';
 		$b['file'] = error_path($b['file']);
 		$thisfile = $b['file'] . ' ' . $b['line'];
-		if (function_exists('format_text_starts') && ($filename = format_text_starts('/joshlib/', $b['file']))) $thisfile = '<a href="http://code.google.com/p/joshlib/source/browse/trunk/' . $filename . '#' . $b['line'] . '" style="color:#59c;" target="_blank">' . $thisfile . '</a>';
+		
+		//replace with links ~ todo refactor
+		if (function_exists('format_text_starts')) {
+			if ($filename = format_text_starts('/joshlib/', $b['file'])) {
+				$thisfile = draw_link('http://code.google.com/p/joshlib/source/browse/trunk/' . $filename . '#' . $b['line'], $b['file'], true, array('style'=>'color:#59c;')) . ' ' . $b['line'];
+			} elseif ($filename = format_text_starts('/Users/joshreisner/Sites/login/', $b['file'])) { //todo genericize this
+				$thisfile = draw_link('http://code.google.com/p/bb-login/source/browse/trunk/' . $filename . '#' . $b['line'], '/login/' . $filename, true, array('style'=>'color:#c59;')) . ' ' . $b['line'];
+			}
+		}
+		
 		$b = $thisfile . ' ' . $function;
 	}
 	$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
