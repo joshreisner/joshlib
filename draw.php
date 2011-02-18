@@ -228,7 +228,7 @@ function draw_div($id, $innerhtml=false, $arguments=false, $dbinfo=false) {
 function draw_div_class($class, $innerhtml='', $arguments=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	$arguments = array_arguments($arguments);
-	$arguments['class'] = $class;
+	array_argument($arguments, $class);
 	if (empty($innerhtml)) $arguments['class'] .= ' empty';
 	return draw_tag('div', $arguments, $innerhtml);
 }

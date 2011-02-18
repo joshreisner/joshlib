@@ -221,7 +221,12 @@ function form_file_suggest(str, target) {
 	var extension	= fileParts.pop();
 	var filename	= fileParts.join(' ');
 	
-	if (form_text_empty(target)) target.value = format_title(filename);
+	if (typeof(target) == 'string') {
+		if (form_text_empty(target)) target.value = format_title(filename);
+	} else {
+		//jquery object
+		if (!target.val().length) target.val(filename);
+	}
 }
 
 function form_radio_empty(radio) {
