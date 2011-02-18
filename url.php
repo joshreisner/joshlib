@@ -99,7 +99,9 @@ function url_get($url, $username=false, $password=false) {
 	curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
 	$return = curl_exec($ch);
 	
-	if (curl_errno($ch)) error_handle('CURL error', curl_error($ch), __file__, __line__);
+	if ($error = curl_errno($ch)) {
+		if ($error != CURLE_COULDNT_CONNECT) error_handle('CURL Error', curl_error($ch), __file__, __line__);
+	}
 
 	curl_close($ch);
 	return $return;
