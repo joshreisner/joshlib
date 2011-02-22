@@ -675,3 +675,20 @@ function window_scroll_top() {
 		}
 	}
 }
+
+function lib_location(library) {
+	if (library == 'tinymce') {
+		return '/lib/tinymce/tinymce_3_3_9/tiny_mce.js';
+	}
+	return false;
+}
+
+function url_sans_www() {
+	if (location.hostname.substr(0, 4) == 'www.') return location.hostname.substr(4);
+	return location.hostname;
+}
+
+function write_folder() {
+	//return the location of the write_folder
+	return '/_' + url_sans_www();
+}
