@@ -96,6 +96,19 @@ function url_get($url, $username=false, $password=false) {
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	if ($username && $password) curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . base64_encode($username . ':' . $password)));
 	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)');
+	
+	//attempt
+	$header = array(
+		'Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5', 
+		'Cache-Control: max-age=0',
+		'Connection: keep-alive',
+		'Keep-Alive: 300',
+		'Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+		'Accept-Language: en-us,en;q=0.5',
+		'Pragma: ' // browsers keep this blank. 
+	);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $header); 
+	
 	curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
 	$return = curl_exec($ch);
 	
