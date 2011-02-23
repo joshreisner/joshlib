@@ -85,7 +85,7 @@ function url_folder($empty='home') {
 }
 
 function url_get($url, $username=false, $password=false) {
-	//retrieve remote pagedata
+	//retrieve remote page data
 	
 	//curl_init is the preferred method.  if it's not available, try file()
 	if (!function_exists('curl_init')) return @implode('', @file($url));
@@ -96,9 +96,7 @@ function url_get($url, $username=false, $password=false) {
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	if ($username && $password) curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . base64_encode($username . ':' . $password)));
 	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)');
-	
-	//attempt
-	$header = array(
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 		'Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5', 
 		'Cache-Control: max-age=0',
 		'Connection: keep-alive',
@@ -106,15 +104,12 @@ function url_get($url, $username=false, $password=false) {
 		'Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7',
 		'Accept-Language: en-us,en;q=0.5',
 		'Pragma: ' // browsers keep this blank. 
-	);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, $header); 
-	
+	)); 
 	curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
 	$return = curl_exec($ch);
 	
-	if ($error = curl_errno($ch)) {
-		if ($error != CURLE_COULDNT_CONNECT) error_handle('CURL Error', curl_error($ch), __file__, __line__);
-	}
+	//don't report couldn't connect errors, generates too much email
+	if ($error = curl_errno($ch) && ($error != CURLE_COULDNT_CONNECT)) error_handle('CURL Error', curl_error($ch), __file__, __line__);
 
 	curl_close($ch);
 	return $return;
