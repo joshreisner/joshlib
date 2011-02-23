@@ -902,16 +902,25 @@ function format_q($quantity, $entity, $capitalize=true) {
 	return format_quantitize($quantity, $entity, $capitalize);
 }
 
-function format_quantitize($quantity, $entity, $title_case=true) {
+function format_quantity($quantity, $title_case=true) {
 	global $_josh;
 	if ($quantity == 0) {
-		$return = 'no ' . format_pluralize($entity);
-	} elseif ($quantity == 1) {
-		$return = 'one ' . format_singular($entity);
-	} elseif (format_verify($quantity) && ($quantity < 10)) {
-		$return = $_josh['numbers'][$quantity] . ' ' . format_pluralize($entity);
+		$return = 'no';
+	} elseif ($quantity < 10) {
+		$return = $_josh['numbers'][$quantity];
 	} else {
-		$return = $quantity . ' ' . format_pluralize($entity);
+		$return = $quantity;
+	}
+	if ($title_case) $return = format_title($return);
+	return $return;
+}
+
+function format_quantitize($quantity, $entity, $title_case=true) {
+	$quantity = format_quantity($quantity) . ' ';
+	if ($quantity == 1) {
+		$return = $quantity . format_singular($entity);
+	} else {
+		$return = $quantity . format_pluralize($entity);
 	}
 	if ($title_case) $return = format_title($return);
 	return $return;
