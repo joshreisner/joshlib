@@ -2,10 +2,8 @@
 //this file is generated automatically, only edit through joshlib SVN
 
 $(function(){
-	//auto start new slideshows
-	$("ul.slideshow").each(function(){
-		new slideshow($(this));
-	});
+	//automatically load new slideshows
+	$('ul.slideshow').each(function(){ new slideshow($(this)); });
 	
 	var defaults = {};
 	$('input.default').each(function(){ defaults[$(this).attr('name')] = $(this).val(); });
@@ -327,6 +325,13 @@ function google_search(form) {
 
 function img_roll(what, how) { 
 	eval("document." + what + ".src = " + what + "_" + how + ".src;"); 
+}
+
+function lib_location(library) {
+	if (library == 'tinymce') {
+		return '/lib/tinymce/tinymce_3_3_9/tiny_mce.js';
+	}
+	return false;
 }
 
 function map_marker(latitude, longitude, html, icon, autoclick) {
@@ -653,6 +658,11 @@ function url_query_set(key, value, returnval) {
 	location.href = target;
 }
 	
+function url_sans_www() {
+	if (location.hostname.substr(0, 4) == 'www.') return location.hostname.substr(4);
+	return location.hostname;
+}
+
 function window_scroll_top() {
 	if (navigator.platform != "Win32") {
 		scrollTo(0,0);
@@ -674,18 +684,6 @@ function window_scroll_top() {
 			setTimeout("window_scroll_top()", 20);
 		}
 	}
-}
-
-function lib_location(library) {
-	if (library == 'tinymce') {
-		return '/lib/tinymce/tinymce_3_3_9/tiny_mce.js';
-	}
-	return false;
-}
-
-function url_sans_www() {
-	if (location.hostname.substr(0, 4) == 'www.') return location.hostname.substr(4);
-	return location.hostname;
 }
 
 function write_folder() {
