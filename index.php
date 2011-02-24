@@ -217,9 +217,11 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	
 	$_josh['uploading'] = false;
 	if (!empty($_FILES)) {
-		foreach($_FILES as &$file) {
-			if (!empty($file['name'])) {
-				$file['name'] = format_quotes($file['name']);
+		//refactoring for php4
+		$count = count($_FILES);
+		for ($i = 0; $i < $count; $i++) {
+			if (!empty($_FILES[$i]['name'])) {
+				$_FILES[$i]['name'] = format_quotes($_FILES[$i]['name']);
 				$_josh['uploading'] = true;
 			}
 		}
@@ -296,17 +298,20 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 
 				exit;
 			case 'db_check':
-				$tables = db_tables();
-				foreach ($tables as &$t) {
+				$result = db_tables();
+				//refactoring for php4
+				$tables = array();
+				foreach ($result as $r) {
 					//debug();
-					error_debug('looking at ' . $t, __file__, __line__);
+					error_debug('looking at ' . $r, __file__, __line__);
 					$lookingfor = $_josh['system_columns'];
-					$columns = db_columns($t);
+					$columns = db_columns($r);
 					foreach ($columns as $c) $lookingfor = array_remove($c['name'], $lookingfor);
 					$t = array('name'=>$t);
 					$t['missing']	= ($count = count($lookingfor)) ? $count : 0;
 					$t['details']	= ($count) ? implode(' &amp; ', $lookingfor) : 'All Good';
 					$t['fix']		= ($count) ? draw_link(url_query_add(array('action'=>'db_fix', 'table'=>$t['name']), false), ' FIX ') : '';
+					$tables[] = $t;
 				}
 				echo draw_table($tables, 'name', true);
 				echo draw_link(url_action_add(false), 'Exit');
@@ -670,8 +675,10 @@ function user($return=false) {
 	return $_SESSION['user_id'];
 }
 
-function var_name(&$var, &$defined_vars) {
-	//&$defined_vars should be get_defined_vars()
+/* deprecating for php4 support
+function var_name(-$var, -$defined_vars) {
+	//replacing apersands with hyphens
+	//-$defined_vars should be get_defined_vars()
 	//adapted from http://mach13.com/how-to-get-a-variable-name-as-a-string-in-php (thank you)
     foreach ($defined_vars as $key=>$value) $defined_vars_0[$key] = $value;
     $save		= $var;
@@ -680,5 +687,5 @@ function var_name(&$var, &$defined_vars) {
     $var		= $save;
     return $diff_keys[0];
 }
-
+*/
 ?>

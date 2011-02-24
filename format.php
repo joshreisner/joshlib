@@ -1164,6 +1164,7 @@ function format_times($num) {
 }
 
 function format_title($str, $force_upper=false) {
+	//force upper is a comma-separated string of additional uppercased words
 	error_debug('<b>format_title</b> starting with ' . $str, __file__, __line__);
 	$return = array();
 	$lower = array('a', 'an', 'and', 'but', 'for', 'from', 'if', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'via', 'with');
@@ -1173,8 +1174,9 @@ function format_title($str, $force_upper=false) {
 		'V', 'VI', 'VII', 'VIII', 'WTF', 'X', 'XML');
 		
 	if ($force_upper) {
-		$upper2 = explode(',', strToUpper($force_upper));
-		foreach ($upper2 as &$u) $u = trim($u);
+		$force_upper = array_separated($force_upper);
+		$upper2 = array();
+		foreach ($force_upper as $word) $upper2[] = trim(strToUpper($word));
 		$upper = array_merge($upper, $upper2);
 	}
 	
