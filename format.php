@@ -316,7 +316,7 @@ function format_get($value) {
 	//returns int, decimal, text, textarea
 	//used by db_table_from_array
 	if (empty($value)) return false;
-	if (is_numeric($value)) {
+	if (is_numeric($value) || is_numeric(str_replace(',', '', $value))) {
 		if (strstr($value, '.')) return 'decimal';
 		return 'int';
 	} elseif (strlen($value) > 255) {

@@ -27,6 +27,29 @@ function file_check($filename) {
 	return @filesize(DIRECTORY_ROOT . $filename);
 }
 
+function file_csv($filename) {
+	//potential replacement to array_csv.  running into problems with delimiters being inside quotes, want to use fgetcsv() for this purpose
+	$count = false;
+	$return = $cols = array();
+	if (($handle = fopen(DIRECTORY_ROOT . $filename, 'r'))) {
+	    while ($data = fgetcsv($handle, 1000, ',')) {
+	    	if (!$count) {
+	    		//set header cols
+	    		$cols = $data;
+	    		$count = count($cols);
+	    		//echo 'count was ' . $count . ' and headers were ' . draw_array($data);
+	    	} else {
+	    		//add row
+	    		$row = array();
+				for ($i = 0; $i < $count; $i++) $row[$cols[$i]] = $data[$i];
+				$return[] = $row;
+	    	}
+	    }
+	    fclose($handle);
+	}
+	return $return;
+}
+
 function file_delete($filename) {
 	if (!file_exists(DIRECTORY_ROOT . $filename)) return false;
 	unlink(DIRECTORY_ROOT . $filename);

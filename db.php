@@ -859,8 +859,14 @@ function db_table_from_array($array, $table_name=false) {
 	foreach ($array as $a) {
 		$row = array();
 		foreach ($a as $column=>$value) {
+			$column = str_replace('#', '', $column); //illegal character
 			if ($value == '""') $value = '';
 			$value = trim($value);
+			//if (substr($value, 0, 1) == '"') $value = substr($value, 1);
+			//if (substr($value, -1) == '"') $value = substr($value, 0, -1);
+			if (substr($value, 0, 1) == '$') {
+				$value = substr(str_replace(',', '', $value), 1);
+			}
 			$row[] = format_null(format_quotes($value));
 			if (!array_key_exists($column, $columns)) $columns[$column] = array('type'=>'int', 'length'=>false, 'decimals'=>false);
 			$type	= format_get($value);
