@@ -218,10 +218,10 @@ function form_file_suggest(str, target) {
 	var fileParts   = pathParts[pathParts.length-1].split('.');
 	var extension	= fileParts.pop();
 	var filename	= fileParts.join(' ');
-	
 	if (typeof(target) == 'string') {
 		if (form_text_empty(target)) target.value = format_title(filename);
 	} else {
+		target = $(target);
 		//jquery object
 		if (!target.val().length) target.val(filename);
 	}

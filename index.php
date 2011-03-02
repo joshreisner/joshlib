@@ -217,16 +217,14 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	
 	$_josh['uploading'] = false;
 	if (!empty($_FILES)) {
-		//refactoring for php4
-		$count = count($_FILES);
-		for ($i = 0; $i < $count; $i++) {
-			if (!empty($_FILES[$i]['name'])) {
-				$_FILES[$i]['name'] = format_quotes($_FILES[$i]['name']);
-				$_josh['uploading'] = true;
-			}
+		$_josh['uploading'] = true;
+		error_debug('uploading ' . count($_FILES) . ' files', __file__, __line__);
+		while (list($key, $vars) = each($_FILES)) {
+			error_debug('vars for this file were ' . draw_array($vars), __file__, __line__);
+			//escape quotes in filename for db entry
+			if (!empty($_FILES[$key]['name'])) $_FILES[$key]['name'] = format_quotes($_FILES[$key]['name']);
 		}
 	}
-	
 	$_josh['posting']	= !empty($_POST);
 	if ($_josh['posting']) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes(str_replace('& ', '&amp; ', $value));
 	
