@@ -105,14 +105,15 @@ function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
 	//function file_dynamic($filename, $lastmod, $query);
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
 	file_dir_writable('dynamic');
+	//debug();
 	$filename = DIRECTORY_WRITE . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
-	error_debug('<b>' . __function__ . '</b> running with filename = ' . $filename, __file__, __line__);
+	error_debug(draw_strong(__function__) . ' running for filename = ' . $filename . ' with lastmod ' . $lastmod, __file__, __line__);
 	if (!$lastmod || !file_exists(DIRECTORY_ROOT . $filename) || (strToTime($lastmod) > filemtime(DIRECTORY_ROOT . $filename))) {
-		//die('file_dynamic executive on ' . $filename . ' lastmod was ' . $lastmod);
+		if (!file_exists(DIRECTORY_ROOT . $filename)) error_debug(draw_strong(__function__) . ' ' . DIRECTORY_ROOT . $filename . ' does not exist ', __file__, __line__);		
 		if ($content = db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id)) {
 			file_put($filename, $content);
 		} else {
-			error_debug('<b>' . __function__ . '</b> returning false because no select', __file__, __line__);
+			error_debug('<b>' . __function__ . '</b> returning false because ' . $table . '.' . $column . ' was empty for id ' . $id, __file__, __line__);
 			return false;
 		}
 	} else {
