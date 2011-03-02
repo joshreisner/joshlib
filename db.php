@@ -621,8 +621,12 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 					$value = "'" . format_html($array[$c['name']] . "'");
 					$full_text .= $value;
 				} elseif ($c['type'] == 'datetime') {
-					//this would never happen
-					$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
+					//this happens in bb task mgmt
+					if (($array[$c['name']] == db_date()) || ($array[$c['name']] == 'NULL')) {
+						$value = $array[$c['name']];
+					} else {
+						$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
+					}
 				} elseif ($c['type'] == 'date') {
 					//new date field
 					if (empty($array[$c['name']])) {
@@ -725,6 +729,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 		if (isset($array['created_user'])) $query1[] = 'created_user = ' .  $array['created_user']; //could be changing created_user (eg intranet)
 		$query1[] = 'updated_date = ' .  db_date();
 		$query1[] = 'updated_user = ' . ((isset($array['updated_user'])) ? $array['updated_user'] : $userID);
+		//die('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id);
 		if (!db_query('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id)) return false;
 	} else {
 		$query1[] = 'created_date';
