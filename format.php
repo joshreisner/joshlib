@@ -917,7 +917,7 @@ function format_quantity($quantity, $title_case=true) {
 
 function format_quantitize($quantity, $entity, $title_case=true) {
 	$quantity = format_quantity($quantity) . ' ';
-	if ($quantity == 1) {
+	if ($quantity == 'One ') {
 		$return = $quantity . format_singular($entity);
 	} else {
 		$return = $quantity . format_pluralize($entity);
