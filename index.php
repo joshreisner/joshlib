@@ -194,7 +194,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (!is_dir(DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib')) file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE);
 
 //set error reporting level by determining whether this is a dev or live situation
-	if (format_text_starts('dev-', $_josh['request']['host']) || format_text_ends('.site', $_josh['request']['host'])) {
+	if (format_text_starts('dev-', $_josh['request']['host']) || format_text_ends('.site', $_josh['request']['host']) || format_text_ends('.dev', $_josh['request']['host'])) {
 		$_josh['mode'] = 'dev';
 		//error reporting already set above
 	} else {
