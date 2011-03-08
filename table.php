@@ -6,6 +6,7 @@ class table {
 	var $draggable	= false;
 	var $dragcolumn	= false;
 	var $name		= false;
+	var $nested		= false;
 	var $title		= false;
 
 	public function __construct($name='table', $title=false) {
@@ -62,7 +63,7 @@ class table {
 				if (!empty($v['class'])) $class .= ' ' . $v['class']; // . ' ' . $row . '_' . $v['class'];
 				if ($counter == 1) $class .= ' first_row';
 				if ($counter == $count_rows) $class .= ' last_row';
-				$onclick = (isset($v['link'])) ? 'location.href=\'' . $v['link'] . '\';' : false;
+				$onclick = (isset($v['link'])) ? 'location.href=\'' . $v['link'] . '\';' : false; //todo deprecate?
 				$inner = '';
 				foreach ($this->columns as $c) $inner .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class'], 'style'=>(($c['width']) ? 'width:' . $c['width'] . 'px;': false)), $v[$c['name']]);
 				
@@ -152,6 +153,10 @@ class table {
 	
 	function unset_draggable() {
 		$this->draggable = $this->draghandle = $this->dragcolumn = false;
+	}
+	
+	function set_nested($nested=true) {
+		$this->nested = $nested;
 	}
 	
 	function set_title($html) {
