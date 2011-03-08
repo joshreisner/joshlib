@@ -739,7 +739,13 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 		$query1[] = 'is_active';
 		$query2[] = 1;
 		$query1[] = 'precedence';
-		$query2[] = db_grab('SELECT MAX(precedence) FROM ' . $table) + 1;
+		if (isset($array['precedence'])) {
+			$query2[] = $array['precedence'];
+			db_query('UPDATE ' . $table . ' SET precedence = precedence + 1 WHERE precedence >= ' . $array['precedence']);
+		} else {
+			//otherwise append to list
+			$query2[] = db_grab('SELECT MAX(precedence) FROM ' . $table) + 1;
+		}
 		$query = 'INSERT INTO ' . $table . ' ( ' . implode(', ', $query1) . ' ) VALUES ( ' . implode(', ', $query2) . ' )';
 		$id = db_query($query);
 	}
