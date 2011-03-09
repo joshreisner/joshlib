@@ -18,7 +18,7 @@ function draw_array($array, $nice=false) {
 	if (!is_array($array)) return false;
 	$return = '<table cellspacing="1" style="background-color:#ccc;color:#333;border:0px;">';
 	//if (!$nice) ksort($array);
-	while(list($key, $value) = each($array)) {
+	foreach ($array as $key=>$value) {
 		$key = urldecode($key);
 		if ($nice && (strToLower($key) == 'j')) continue;
 		$value = format_quotes($value);
