@@ -551,7 +551,7 @@ function lib_get($string) {
 							+ "q[cite],samp,select[disabled|multiple|name|size],small,"
 							+ "textarea[cols|rows|disabled|name|readonly],tt,var,big",
 
-						extended_valid_elements : "a[href|target|rel],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class|style],p[align|class|style],table[cellspacing,align,border,cellpadding,class],tr[class],td[width,align,class]",
+						extended_valid_elements : "a[href|target|rel|name],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class|style],p[align|class|style],table[cellspacing,align,border,cellpadding,class],tr[class],td[width,align,class]",
 						content_css : "/styles/tinymce.css?" + new Date().getTime(),
 						plugins : "' . (user() ? 'imagemanager,filemanager,' : '') . 'paste",
 						
