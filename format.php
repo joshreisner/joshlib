@@ -386,10 +386,10 @@ function format_html($text, $profile='user') {
 						
 			//certain tags we are wary of
 			if ($e->tag == 'a') {
-				if (!$e->href) {
+				/*if (!$e->href) {
 					//no empty 
 					$e->outertext = '';
-				} elseif ($local_url = format_text_starts(url_base(), $e->href)) {
+				} else*/ if ($local_url = format_text_starts(url_base(), $e->href)) {
 					//local hyperlinks if possible
 					$e->href = $local_url;
 				}
