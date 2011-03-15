@@ -753,10 +753,12 @@ function draw_javascript_folder_src() {
 
 function draw_javascript_src($filename=false) {
 	global $_josh;
+	$return = '';
 	if (!$filename) {
 		//default is to draw joshlib's own javascript library
 		if (isset($_josh['drawn']['javascript'])) return false; //only draw this file once per page
 		$_josh['drawn']['javascript'] = true;
+		$return = lib_get('jquery'); //javascript.js requires jquery now
 		$filename = DIRECTORY_WRITE . '/javascript.js';
 		$joshlibf = DIRECTORY_JOSHLIB . 'javascript.js';
 		if (!file_check($filename) || (filemtime($joshlibf) > filemtime(DIRECTORY_ROOT . $filename))) {
@@ -764,7 +766,7 @@ function draw_javascript_src($filename=false) {
 			if (!file_put($filename, file_get($joshlibf))) return error_handle('JS Write Error', __FUNCTION__ . ' can\'t write the js file.', __file__, __line__);
 		}
 	}
-	return draw_tag('script', array('language'=>'javascript', 'src'=>$filename, 'type'=>'text/javascript'), '');
+	return $return . draw_tag('script', array('language'=>'javascript', 'src'=>$filename, 'type'=>'text/javascript'), '');
 }
 
 function draw_li($content='', $arguments=false) {
