@@ -32,12 +32,12 @@ function file_csv($filename) {
 	$count = false;
 	$return = $cols = array();
 	if (($handle = fopen(DIRECTORY_ROOT . $filename, 'r'))) {
-	    while ($data = fgetcsv($handle, 1000, ',')) {
+	    while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
 	    	if (!$count) {
 	    		//set header cols
 	    		$cols = $data;
 	    		$count = count($cols);
-	    		//echo 'count was ' . $count . ' and headers were ' . draw_array($data);
+	    		echo 'count was ' . $count . ' and headers were ' . draw_array($data);
 	    	} else {
 	    		//add row
 	    		$row = array();
