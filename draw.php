@@ -188,6 +188,14 @@ function draw_css_src($location='/styles/screen.css', $media=false) {
 	return $return;
 }
 
+function draw_csv($array, $separator=',') {
+	//make a csv out of an associative $array
+	$columns = array_keys($array[0]);
+	$return = implode($separator, $columns) . NEWLINE;
+	foreach ($array as $a) $return .= implode($separator, array_values($a)) . NEWLINE;
+	return $return;
+}
+
 function draw_container($tag, $innerhtml, $arguments=false) {
 	//convenience function for draw_tag if you're just writing a simple container tag
 	return draw_tag($tag, $arguments, $innerhtml);

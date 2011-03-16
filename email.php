@@ -1,64 +1,56 @@
 <?php
 error_debug('including email.php', __file__, __line__);
 
-function email($to, $message, $subject='Email from Your Website', $from=false) {
-	//from could be array('josh@joshreisner.com'=>'Josh Reisner')
+function email($to, $message, $subject='Email from Your Website', $from=false, $cc=false, $bcc=false, $attachments=false) {
+	//$to can be an array('person1@example.org', 'person2@example.org') or comma-separated string
+	//$from can be array('josh@joshreisner.com'=>'Josh Reisner') or email address
 
-	//todo: rewrite this whole function to use swiftmailer
 	global $_josh;
 
 	//set the sender	
 	if (empty($from)) $from = (!empty($_josh['email_default'])) ? $_josh['email_default'] : 'josh@joshreisner.com';
 	
-	//fix up the recipient list
-	if (!is_array($to)) $to = array($to);
-	$to = array_unique($to);
-	//$tocount = count($to);
-	//for ($i = 0; $i < $tocount; $i++) if (empty($to[$i])) unset($to[$i]); //make sure they're non-null
+	//check recipient list
+	if (!$to = email_addresses($to)) return false; //quit if now if there are no good recipients for email
+	$cc = email_addresses($cc);
+	$bcc = email_addresses($bcc);
 	
-	$good = $bad = array();
-	foreach ($to as $e) {
-		if (!$good[] = format_email($e)) {
-			array_pop($good);
-			$bad[] = $e;
-		}
-	}
-
-	if (!count($good)) return false; //quit if now is empty array
-
 	//use swiftmailer class
 	lib_get('swiftmailer');
 	
-	if (class_exists('Swift_MailTransport')) {	
-		//establish transport
-		if (empty($_josh['smtp']['location']) || empty($_josh['smtp']['username'])) {
-			//have to use PHP's mail function
-			$transport = Swift_MailTransport::newInstance();
-		} else {
-			$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], 25)->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
-		}
-			
-		$mailer		= Swift_Mailer::newInstance($transport);
-		$message	= Swift_Message::newInstance()
-			->setSubject($subject)
-			->setFrom($from)
-			->setTo($good)
-			->setBody(strip_tags(nl2br($message)))
-			->addPart($message, 'text/html')
-			//->attach(Swift_Attachment::fromPath('my-document.pdf'))
-		;
-		error_debug(__function__ . ' attempting to send to ' . implode(', ', $good) . ' addresses', __file__, __line__);
-		if (!$count = $mailer->batchSend($message, $failures)) {
-			error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
-		} else {
-			error_debug(__function__ . ' sent ' . $count . ' messages successfully', __file__, __line__);
-		}
+	//establish transport
+	if (empty($_josh['smtp']['location']) || empty($_josh['smtp']['username'])) {
+		//have to use PHP's mail function
+		$transport = Swift_MailTransport::newInstance();
 	} else {
-		//use php mail transport
-		mail($to, $subject, $message, 'From:' . $from);
+		$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], 25)->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
+	}
+	$mailer		= Swift_Mailer::newInstance($transport);
+
+	//define required message properties	
+	$message	= Swift_Message::newInstance()
+		->setSubject($subject)
+		->setFrom($from)
+		->setTo($to)
+		->setBody(strip_tags(nl2br($message)))
+		->addPart($message, 'text/html');
+	
+	//optional message properties
+	if ($cc) $message->setCc($cc);
+	if ($bcc) $message->setBcc($bcc);
+	if ($attachments) {
+		if (!is_array($attachments)) $attachments = array($attachments);
+		foreach ($attachments as $a) $message->attach(Swift_Attachment::fromPath($a));
+	}
+
+	error_debug(__function__ . ' attempting to send to ' . implode(', ', $to), __file__, __line__);
+	
+	if (!$count = $mailer->batchSend($message, $failures)) {
+		error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
+	} else {
+		error_debug(__function__ . ' sent ' . $count . ' messages successfully', __file__, __line__);
 	}
 	
-	if (count($bad)) error_handle('email addresses rejected', 'the email with subject ' . $subject . ' was rejected for the following recipients ' . draw_list($bad) . ' and was successfully sent to ' . count($good) . ' recipients', __file__, __line__);
 	return $count;
 }
 
@@ -78,6 +70,21 @@ function email_address_parse($address) {
 	}
 	
 	return array(trim($email), format_title(trim($from)));
+}
+
+function email_addresses($input) {
+	//return an array of properly formatted addresses from either an array or comma-separated list
+	$input = (is_array($input)) ? array_unique($input) : array_separated($input);
+	$good = $bad = array();
+	foreach ($input as $e) {
+		if (!$good[] = format_email($e)) {
+			array_pop($good);
+			$bad[] = $e;
+		}
+	}
+	error_debug(__function__ . ' filtered out the following recipients ' . draw_list($bad), __file__, __line__);
+	if (!count($good)) return false;
+	return $good;
 }
 
 function email_post($to=false, $subject=false, $from=false) {
