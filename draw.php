@@ -640,6 +640,10 @@ function draw_h5($content, $arguments=false) {
 	return draw_tag('h5', $arguments, $content);
 }
 
+function draw_header($content, $arguments=false) {
+	return draw_tag('header', $arguments, $content);
+}
+
 function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=false) {
 	//alt could also be an array of arguments
 	global $_josh;
