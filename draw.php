@@ -264,25 +264,12 @@ function draw_dl($array, $class=false) {
 	return draw_container('dl', $return, array('class'=>$class));
 }
 
-function draw_doctype($version=false) {
-	//version could be 4, 5, strict or transitional
-	global $_josh;
-	if ($version) { //set version
-		if ($version == 5) {
-			$_josh['html'] = 5;
-		} else {
-			$_josh['html'] = 4;
-		}
-	} else { //get version
-		$version = $_josh['html'];
-	}
-	if ($version == 4) {
-		return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
-	} elseif ($version == 'strict') {
-		return '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html>';
-	} elseif ($version == 5) {
-		return '<!DOCTYPE html><html>';
-	}
+function draw_doctype() {
+	return '<!DOCTYPE html>
+		<!--[if lt IE 7 ]><html class="no-js ie6" lang="en"><![endif]-->
+		<!--[if IE 7 ]><html class="no-js ie7" lang="en"><![endif]-->
+		<!--[if IE 8 ]><html class="no-js ie8" lang="en"><![endif]-->
+		<!--[if (gte IE 9)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->';
 }
 
 function draw_favicon($location='/images/favicon.png') {
@@ -963,6 +950,35 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	}
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
 	if (html() == 5) $return = draw_tag('nav', array('id'=>$class), $return);
+	return $return;
+}
+
+function draw_nav_nested($pages, $class, $current_depth=1) {
+	global $request;
+	$return = '<ul' . (($current_depth == 1) ? ' class="' . $class . ' clearfix"' : '') . '>';
+	$count = count($pages);
+	if (!$count) return false;
+	$counter = 1;
+	foreach ($pages as $p) {
+		$return .= '<li';
+		if ($count == 1) { //there is only one li in the list
+			$return .= ' class="first last"';
+		} elseif ($counter == 1) { //first li
+			$return .= ' class="first"';
+		} elseif ($counter == $count) { //last li
+			$return .= ' class="last"';
+		}
+		if ($current_depth == 1) $p['title'] = draw_span('menu-text', $p['title']) . draw_span('arrow-container', draw_span('arrow'));
+		$return .= '>' . draw_link($p['url'], $p['title'], false, (($request['path'] == $p['url']) ? 'selected' : false));
+		if ($current_depth == 1) {
+		} elseif ($current_depth == 3) {
+			$return .= draw_span('arrow');
+		}
+		if (count($p['children'])) $return .= draw_nav_nested($p['children'], $class, $current_depth + 1);
+		$return .= '</li>';
+		$counter++;
+	}
+	$return .= '</ul>';
 	return $return;
 }
 

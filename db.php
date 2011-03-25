@@ -796,7 +796,7 @@ function db_switch($target=false) {
 
 function db_table($sql, $limit=false, $suppress_error=false) {
 	$return = array();
-	$result = db_query($sql, $limit, $suppress_error);
+	if (!$result = db_query($sql, $limit, $suppress_error)) return false;
 	while ($r = db_fetch($result)) $return[] = $r;
 	return $return;
 }

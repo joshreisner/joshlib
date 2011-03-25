@@ -499,11 +499,13 @@ function lib_get($string) {
 		
 		//javascript libraries
 		case 'fancybox' :
+		case 'innershiv' :
 		case 'jeditable' :
 		case 'jquery' :
 		case 'jquery-latest' :
 		case 'jscrollpane' :
 		case 'lorem_ipsum' :
+		case 'modernizr' :
 		case 'tablednd' :
 		case 'tinymce' :
 		if (isset($_josh['drawn'][$string])) return false;
@@ -608,11 +610,14 @@ function lib_location($string) {
 		case 'fpdf' :
 		return DIRECTORY_ROOT . $lib . 'fpdf-1.6.php';
 		
+		case 'innershiv' :
+		return $lib . 'innershiv.min.js';
+		
 		case 'jeditable' :
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.jeditable.mini.js';
 
 		case 'jquery' :
-		return $lib . 'jquery-1.4.2.min.js';
+		return $lib . 'jquery-1.5.min.js';
 		
 		case 'jquery-hosted' :
 		return 'http://code.jquery.com/jquery-1.5.min.js';
@@ -622,6 +627,9 @@ function lib_location($string) {
 
 		case 'lorem_ipsum' :
 		return $lib . 'lorem_ipsum.js';
+				
+		case 'modernizr' :
+		return $lib . 'modernizr-1.7.min.js';
 				
 		case 'salesforce' :
 		return DIRECTORY_ROOT . $lib . 'phptoolkit-13_1/soapclient/SforceEnterpriseClient.php';

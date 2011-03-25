@@ -47,8 +47,9 @@ function error_draw($title, $html) {
 	//suppress HTML output if it's a CRON job
 	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . NEWLINE . NEWLINE . $html);
 
-	//add attractive error element
-	$title = '<div style="background-color:#59c;color:#fff;height:36px;line-height:36px;padding:0px 20px 0px 20px;position:absolute;top:-36px;left:0px;">Error</div>' . $title;
+	//add quazi-attractive error element
+	$html = '<div style="background-color:#59c;color:#fff;height:36px;line-height:36px;font-size:24px;padding:0px 20px 0px 20px;position:absolute;top:-36px;left:0px;">Error</div>' . 
+		str_replace('<a href=', '<a style="color:#59c;" href=', $html);
 	
 	if (function_exists('draw_page')) return draw_page($title, $html);
 
