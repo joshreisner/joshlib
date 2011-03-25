@@ -953,7 +953,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	return $return;
 }
 
-function draw_nav_nested($pages, $class, $current_depth=1) {
+function draw_nav_nested($pages, $class='nav', $current_depth=1) {
 	global $request;
 	$return = '<ul' . (($current_depth == 1) ? ' class="' . $class . ' clearfix"' : '') . '>';
 	$count = count($pages);
