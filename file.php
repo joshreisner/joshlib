@@ -209,6 +209,7 @@ function file_get($filename, $eval=false) {
 	$filename = urldecode($filename);
 	if (!$file = @fopen($filename, 'r')) {
 		$filename = DIRECTORY_ROOT . $filename;
+		echo $filename . BR;
 		if (!$file = @fopen($filename, 'r')) return false;
 	}
 	error_debug('<b>file_get</b> filename is ' . $filename, __file__, __line__);

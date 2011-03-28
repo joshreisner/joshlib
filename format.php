@@ -157,7 +157,7 @@ function format_date($timestamp=false, $error='', $format=false, $relativetime=t
 	
 	if ($return === 1) return $error;
 	
-	return $return;
+	return draw_tag('time', false, $return);
 }
 
 function format_date_iso8601($timestamp=false) {

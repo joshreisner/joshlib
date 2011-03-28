@@ -46,10 +46,10 @@ function draw_b($inner, $arguments=false) {
 	return draw_strong($inner, $arguments);
 }
 
-function draw_body_open() {
+function draw_body_open($class=false) {
 	//draw the opening body tag, in, say, drawTop()
 	global $_josh;
-	$args = array();
+	$args = array('class'=>$class);
 	array_argument($args, url_folder());
 	array_argument($args, url_subfolder());
 	if ($_josh['editing']) array_argument($args, 'query');
@@ -292,6 +292,10 @@ function draw_focus($form_element) {
 	if (isset($_josh['drawn']['focus'])) return false;
 	$_josh['drawn']['focus'] = $form_element;
 	return draw_javascript('document.getElementById("' . $form_element . '").focus();');
+}
+
+function draw_footer($content=false, $arguments=false) {
+	return draw_tag('footer', $arguments, $content);
 }
 
 function draw_form_button($text, $location=false, $class=false, $disabled=false, $javascript=false) {
@@ -640,7 +644,7 @@ function draw_h5($content, $arguments=false) {
 	return draw_tag('h5', $arguments, $content);
 }
 
-function draw_header($content, $arguments=false) {
+function draw_header($content=false, $arguments=false) {
 	return draw_tag('header', $arguments, $content);
 }
 
@@ -1094,6 +1098,10 @@ function draw_page($title, $html) {
 
 function draw_rss_link($address) {
 	return draw_tag('link', array('rel'=>'alternate', 'type'=>'application/rss+xml', 'title'=>'RSS', 'href'=>$address));
+}
+
+function draw_section($inner=false, $arguments=false) {
+	return draw_tag('section', $arguments, $inner);
 }
 
 function draw_span($class, $inner='') {
