@@ -963,31 +963,37 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 
 function draw_nav_nested($pages, $class='nav', $current_depth=1) {
 	global $request;
-	$return = '<ul' . (($current_depth == 1) ? ' class="' . $class . ' clearfix"' : '') . '>';
-	$count = count($pages);
-	if (!$count) return false;
-	$counter = 1;
+	$selected = false;
+	$li_items = $classes = array();
 	foreach ($pages as $p) {
-		$return .= '<li';
-		if ($count == 1) { //there is only one li in the list
-			$return .= ' class="first last"';
-		} elseif ($counter == 1) { //first li
-			$return .= ' class="first"';
-		} elseif ($counter == $count) { //last li
-			$return .= ' class="last"';
+		//draw li for each page
+		$li_class = '';
+		
+		//get selected
+		if ($request['path'] == $p['url']) {
+			$li_class = 'selected';
+			$selected = true;
 		}
-		if ($current_depth == 1) $p['title'] = draw_span('menu-text', $p['title']) . draw_span('arrow-container', draw_span('arrow'));
-		$return .= '>' . draw_link($p['url'], $p['title'], false, (($request['path'] == $p['url']) ? 'selected' : false));
-		if ($current_depth == 1) {
-		} elseif ($current_depth == 3) {
-			$return .= draw_span('arrow');
+		
+		$return = draw_link($p['url'], $p['title']);
+		
+		if (count($p['children'])) {
+			list($str, $descendant_selected) = draw_nav_nested($p['children'], false, $current_depth + 1);
+			$return .= $str;
+			if ($descendant_selected) {
+				$li_class = 'descendant-selected';
+				$selected = true;
+			}
 		}
-		if (count($p['children'])) $return .= draw_nav_nested($p['children'], $class, $current_depth + 1);
-		$return .= '</li>';
-		$counter++;
+		
+		$classes[] = $li_class;
+		$li_items[] = $return;
 	}
-	$return .= '</ul>';
-	return $return;
+		
+	//function draw_list($options, $arguments=false, $type='ul', $selected=false, $classes=false) {
+	$return = draw_list($li_items, $class, 'ul', false, $classes);
+	if ($current_depth == 1) return $return;
+	return array($return, $selected); //have to pass the fact that there was a selected item up the chain
 }
 
 function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $override=false) {
