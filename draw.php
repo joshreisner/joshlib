@@ -174,6 +174,10 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 	}
 }
 
+function draw_comment($str) {
+	return NEWLINE . NEWLINE . '<!-- ' . $str . ' -->' . NEWLINE . NEWLINE;
+}
+
 function draw_css($content) {
 	return draw_tag('style', array('type'=>'text/css'), $content);
 }

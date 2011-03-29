@@ -171,6 +171,21 @@ function array_key_filter($array, $key, $value) {
 	return $return;
 }
 
+function array_key_group($array, $key=false) {
+	//take and array and 
+	//used on living cities new home page for member list
+	$return = array();
+	foreach ($array as $a) {
+		if (!$key) $key = array_shift(array_keys($a));
+		if (isset($return[$a[$key]])) {
+			$return[$a[$key]][] = $a;
+		} else {
+			$return[$a[$key]] = array($a);
+		}
+	}
+	return $return;
+}
+
 function array_key_promote($array) {
 	//makes a two-column resultset into an associative array. used by draw_nav()
 	$return = array();
