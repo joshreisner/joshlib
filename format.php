@@ -743,7 +743,8 @@ function format_money($value, $dollarsign=true, $comma=true, $error='') {
 	return $value;
 }
 
-function format_more($string, $link, $separator='<p>[more]</p>') {
+function format_more($string, $link=false, $separator='<p>[more]</p>') {
+	if (!$link) return str_replace($separator, '', $string);
 	if ($jump = strpos($string, $separator)) return substr($string, 0, $jump) . draw_p(draw_link($link, 'Read more&hellip;'), 'more');
 	return $string;
 }
