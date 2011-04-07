@@ -453,9 +453,11 @@ function slideshow(element) {
         deselectedPosition:	0,
 		goToSlide:			function() {
 								if (vars.mode == 'fade') {
-									vars.slides.each(function(){$(this).css('z-index', 'auto');});
-									$(vars.slides.get(vars.selectedPosition)).css('z-index', 40).show();
-									$(vars.slides.get(vars.deselectedPosition)).css('z-index', 50).fadeOut(600);
+									$(element).append($(element).find('li').first().clone().removeClass('selected'));
+									$(element).find('li').first().fadeOut('slow', 'swing', function(){ 
+										$(this).detach(); 
+										$(element).find('li').first().addClass('selected');
+									});
 								} else {
 									if (vars.isContinuous && (vars.selectedPosition == 0)) {
 										//move to special last slide
@@ -465,8 +467,8 @@ function slideshow(element) {
 									} else {
 										$(element).animate({ 'marginLeft': vars.slideWidth * (-vars.selectedPosition)}, 400);
 									}
+									$(vars.slides.removeClass('selected').get(vars.selectedPosition)).addClass('selected');
 								}
-								$(vars.slides.removeClass('selected').get(vars.selectedPosition)).addClass('selected');
 							},
 		hasAuto:			$(element).hasClass('auto'),
         hasBullets:			$(element).hasClass('bullets'),
@@ -498,10 +500,10 @@ function slideshow(element) {
     };
 			
 	//initialize -- need selected class for api (eg slideshow mask)
-	vars.slides.first().addClass('selected');
+	vars.slides.removeClass('selected').first().addClass('selected');
 	if (vars.mode == 'fade') {
-		vars.slides.hide().first().show();
 	} else if (vars.mode == 'move') {
+		//config css
 		$(element).parent('div.slideshow').css({ 'width':vars.slideWidth, 'height':vars.slideHeight, 'overflow':'hidden' });
 		$(element).css('width', (vars.slideWidth * vars.totalSlides));		
 	}
