@@ -491,6 +491,7 @@ function lib_get($string) {
 	
 	switch ($string) {
 		//php libraries
+		case 'dBug' :
 		case 'fpdf' :
 		case 'salesforce' :
 		case 'simple_html_dom' :
@@ -619,6 +620,9 @@ function lib_location($string) {
 	$lib = DIRECTORY_WRITE . '/lib/' . $string . '/';
 
 	switch ($string) {
+		case 'dBug' : 
+		return DIRECTORY_ROOT . $lib . 'dBug.php';
+		
 		case 'fancybox' : 
 		return DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox-1.3.1.js';
 		
