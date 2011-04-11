@@ -34,6 +34,10 @@ RUNNING ON THE COMMAND LINE
 	$_SERVER['SCRIPT_NAME']		= '/salesforce/index.php';
 	$_SERVER['DOCUMENT_ROOT']	= '/home/livingcities/www/backend';
 	
+GETTING STARTED
+	note that error messages will not be thrown unless you specify this as a dev server.
+	use a .dev or .site TLD when developing, like www.yoursite.dev
+	
 */
 define('TIME_START', microtime(true));	//start the processing time stopwatch -- use format_time_exec() to access this
 
@@ -172,7 +176,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (!isset($_josh['db']['password']))	$_josh['db']['password']	= '';
 	if (!isset($_josh['basedblanguage']))	$_josh['basedblanguage']	= $_josh['db']['language'];
 	if (!isset($_josh['is_secure']))		$_josh['is_secure']			= false;
-	if (!isset($_josh['email_admin']))		$_josh['email_admin']		= 'josh@joshreisner.com';
+	if (!isset($_josh['email_admin']))		$_josh['email_admin']		= false;
 	if (!isset($_josh['email_default']))	$_josh['email_default']		= ((empty($_josh['request']['subdomain'])) ? 'www' : $_josh['request']['subdomain']) . '@' . $_josh['request']['domain'];
 	if (!isset($_josh['error_log_api']))	$_josh['error_log_api']		= false;
 		

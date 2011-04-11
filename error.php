@@ -62,9 +62,8 @@ function error_handle($type, $message='', $file=false, $line=false) {
 	global $_josh;
 	error_debug('ERROR! type is:' . $type . ' and message is: ' . $message, __file__, __line__);
 	
-	//possiblity these vars aren't set yet
+	//possiblity this var isn't set yet
 	if (!isset($_josh['mode']))			$_josh['mode'] = 'live';
-	if (!isset($_josh['email_admin']))	$_josh['email_admin'] = 'josh@joshreisner.com';
 	
 	//don't let this happen recursively
 	if (isset($_josh['handling_error']) && $_josh['handling_error']) return false;
