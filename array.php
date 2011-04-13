@@ -171,7 +171,7 @@ function array_key_filter($array, $key, $value) {
 	return $return;
 }
 
-function array_key_group($array, $key=false) {
+function array_key_group($array, $key='group') {
 	//take and array and 
 	//used on living cities new home page for member list
 	$return = array();
