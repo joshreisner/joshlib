@@ -465,7 +465,9 @@ function slideshow(element) {
 											$(element).css('marginLeft', '0px');
 										});
 									} else {
-										$(element).animate({ 'marginLeft': vars.slideWidth * (-vars.selectedPosition)}, 400);
+										$(element).animate({ 'marginLeft': vars.slideWidth * (-vars.selectedPosition)}, 400, function(){
+											if (typeof slideshowTransitionCompleted == 'function') slideshowTransitionCompleted($(element));
+										});
 									}
 									$(vars.slides.removeClass('selected').get(vars.selectedPosition)).addClass('selected');
 								}
