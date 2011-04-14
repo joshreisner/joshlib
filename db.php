@@ -782,6 +782,14 @@ function db_schema_check($schema) {
 	return $passed;
 }
 
+function db_search_words($words=false) {
+	//pass this an array or string of words
+	if (is_string($words)) $words = array_separated(' ', $words);
+	foreach ($words as &$w) $w = 'w.word = "' . format_accents($w) . '"';
+	if (empty($words)) return false;
+	return 'AND (' . implode(' OR ', $words) . ')';
+}
+
 function db_switch($target=false) {
 	global $_josh;
 	db_open();
