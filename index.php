@@ -640,10 +640,10 @@ function lib_location($string) {
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.jeditable.mini.js';
 
 		case 'jquery' :
-		return $lib . 'jquery-1.5.min.js';
+		return $lib . 'jquery-1.5.2.min.js';
 		
 		case 'jquery-hosted' :
-		return 'http://code.jquery.com/jquery-1.5.min.js';
+		return 'http://code.jquery.com/jquery-1.5.2.min.js';
 		
 		case 'jscrollpane' :
 		return DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.min.js';
