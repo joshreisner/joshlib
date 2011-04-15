@@ -476,6 +476,7 @@ function slideshow(element) {
         hasBullets:			$(element).hasClass('bullets'),
         interval:			($(element).hasClass('slow')) ? 6000 : 3000,
         isContinuous:		$(element).hasClass('continuous'),
+        isLinear:			$(element).hasClass('linear'),
 		manageController:	function() {
 								$(vars.controller.find('li.number').removeClass('selected').get(vars.selectedPosition)).addClass('selected');
 								
@@ -536,6 +537,8 @@ function slideshow(element) {
 	//controller clicks
 	vars.parent.find('ul.controller li').click(function() {
 		vars.deselectedPosition = vars.selectedPosition;
+		
+		if (vars.isLinear && $(this).hasClass('inactive')) return false;
 		if ($(this).hasClass('prev')) {
 			//prev
 			vars.selectedPosition--;
