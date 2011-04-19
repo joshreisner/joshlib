@@ -578,11 +578,14 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	$query2		= array();
 	$required	= $_josh['system_columns'];
 	$full_text	= false;
+	$col_names	= array();
 	//debug();
 	
 	
 	if ($columns = db_columns($table, true)) {
 		foreach ($columns as $c) {
+			$col_names[] = $c['name'];
+			
 			error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type'], __file__, __line__);
 			
 			//making bits always required, never null
@@ -700,28 +703,30 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 		}
 	}
 
-	//new is_published date / user
-	if (!empty($array['is_published'])) {
-		if ($id) {
-			$query1[] = 'is_published = 1';
-			$query1[] = 'publish_date = ' .  db_date();
-			$query1[] = 'publish_user = ' . ((isset($array['publish_user'])) ? $array['publish_user'] : $userID);
+	//if table has is_published stuff, add it
+	if (in_array(array('is_published', 'publish_date', 'publish_user'), $col_names)) {
+		if (empty($array['is_published'])) {
+			if ($id) {
+				$query1[] = 'is_published = 0';
+				$query1[] = 'publish_date = NULL';
+				$query1[] = 'publish_user = NULL';
+			} else {
+				$query1[] = 'is_published';
+				$query2[] = 0;
+			}
 		} else {
-			$query1[] = 'publish_date';
-			$query2[] = db_date();
-			$query1[] = 'publish_user';
-			$query2[] = ((isset($array['publish_user'])) ? $array['publish_user'] : $userID);
-			$query1[] = 'is_published';
-			$query2[] = 1;
-		}
-	} else {
-		if ($id) {
-			$query1[] = 'is_published = 0';
-			$query1[] = 'publish_date = NULL';
-			$query1[] = 'publish_user = NULL';
-		} else {
-			$query1[] = 'is_published';
-			$query2[] = 0;
+			if ($id) {
+				$query1[] = 'is_published = 1';
+				$query1[] = 'publish_date = ' .  db_date();
+				$query1[] = 'publish_user = ' . ((isset($array['publish_user'])) ? $array['publish_user'] : $userID);
+			} else {
+				$query1[] = 'publish_date';
+				$query2[] = db_date();
+				$query1[] = 'publish_user';
+				$query2[] = ((isset($array['publish_user'])) ? $array['publish_user'] : $userID);
+				$query1[] = 'is_published';
+				$query2[] = 1;
+			}
 		}
 	}
 	
