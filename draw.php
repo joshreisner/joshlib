@@ -753,8 +753,12 @@ function draw_img_thumbnail($path, $link, $max) {
 }
 
 function draw_javascript($javascript=false) {
-	if (!$javascript) return draw_javascript_src();
+	if (!$javascript) return false; //draw_javascript_src();
 	return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);
+}
+
+function draw_javascript_ready($javascript=false) {
+	return draw_javascript('$(function(){' . $javascript . '});');
 }
 
 /* function draw_javascript_lib() {
@@ -815,10 +819,10 @@ function draw_link($href=false, $str=false, $newwindow=false, $arguments=false, 
 		$arguments['href'] = '#';
 		$arguments['onclick'] = $href;
 	} elseif ($href) {
-		if (!$str) {
+		/* if (!$str) {
 			$str = $href;
 			if (strlen($str) > $maxlen) $str = substr($str, 0, $maxlen) . '&hellip;';
-		}
+		} */
 		$arguments['href'] = htmlentities($href);
 	} else {
 		$arguments['class'] = (isset($arguments['class'])) ? $arguments['class'] . ' empty' : 'empty';
