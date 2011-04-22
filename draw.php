@@ -896,14 +896,16 @@ function draw_list_sets($options, $length=2, $arguments=false, $type='ul', $sele
 	return draw_list($sets, $arguments, $type, $selected);
 }
 
-function draw_meta_description($string) {
+function draw_meta_description($string='') {
+	if (!$string) return false;
 	//this strips tags and sets length at 150, which is the max
 	$string = html_entity_decode(format_string($string, 150, ''), ENT_QUOTES, 'UTF-8');
 	if (!strlen($string)) return false;
 	return draw_tag('meta', array('name'=>'description', 'content'=>$string));
 }
 
-function draw_meta_keywords($string) {
+function draw_meta_keywords($string='') {
+	if (!$string) return false;
 	return draw_tag('meta', array('name'=>'keywords', 'content'=>$string));
 }
 

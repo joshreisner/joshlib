@@ -184,6 +184,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		
 //get configuration variables
 	if (!defined('DIRECTORY_WRITE')) define('DIRECTORY_WRITE', '/_' . $_josh['request']['sanswww']);
+	if (!defined('DIRECTORY_LIB')) define('DIRECTORY_LIB', DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib');
 	if (!isset($_josh['config'])) $_josh['config'] = DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
 	if (!file_check($_josh['config'])) {
 		//if config file doesn't exist, create one
@@ -196,8 +197,9 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 //check to make sure we're on the correct domain, might have read host variable from config file
 	if (isset($_josh['host']) && ($_josh['host'] != $_josh['request']['host'])) url_change($_josh['request']['protocol'] . '://' . $_josh['host'] . $_josh['request']['path_query']);
 
-//ensure lib exists--todo autogen lib folder when lib.zip has been updated
-	if (!is_dir(DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib')) file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE);
+//ensure lib exists--todo autodelete these old lib folders
+	if (filemtime(DIRECTORY_JOSHLIB . 'lib.zip') > filemtime(DIRECTORY_LIB)) rename(DIRECTORY_LIB, DIRECTORY_LIB . '-old-' . time());
+	if (!is_dir(DIRECTORY_LIB)) file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE);
 
 //set error reporting level by determining whether this is a dev or live situation
 	if (format_text_starts('dev-', $_josh['request']['host']) || format_text_ends('.site', $_josh['request']['host']) || format_text_ends('.dev', $_josh['request']['host'])) {
