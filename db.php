@@ -582,9 +582,11 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	//debug();
 	
 	
-	if ($columns = db_columns($table, true)) {
+	if ($columns = db_columns($table)) {
 		foreach ($columns as $c) {
+			
 			$col_names[] = $c['name'];
+			if (in_array($c['name'], $_josh['system_columns'])) continue;
 			
 			error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type'], __file__, __line__);
 			
@@ -704,7 +706,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	}
 
 	//if table has is_published stuff, add it
-	if (in_array(array('is_published', 'publish_date', 'publish_user'), $col_names)) {
+	if (in_array('is_published', $col_names)) {
 		if (empty($array['is_published'])) {
 			if ($id) {
 				$query1[] = 'is_published = 0';
