@@ -99,8 +99,8 @@ function error_handle($type, $message='', $file=false, $line=false) {
 	//add more stuff to admin message, set from and subject
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
 	if ($_josh['mode'] != 'dev') {
-		$message .= draw_p('Request: ' . draw_link($_josh['request']['url'], false, false, array('style'=>'color:#336699;')));
-		if ($_josh['referrer']) $message .= draw_p('Referrer: ' . draw_link($_josh['referrer']['url'], false, false, array('style'=>'color:#336699;')));
+		$message .= draw_p('Request: ' . draw_link($_josh['request']['url'], $_josh['request']['url'], false, array('style'=>'color:#336699;')));
+		if ($_josh['referrer']) $message .= draw_p('Referrer: ' . draw_link($_josh['referrer']['url'], $_josh['referrer']['url'], false, array('style'=>'color:#336699;')));
 		if (isset($_SESSION['email']) && isset($_SESSION['full_name'])) {
 			$message .= draw_p('User: ' . draw_link('mailto:' . $_SESSION['email'], $_SESSION['full_name'], false, array('style'=>'color:#336699;')));
 			$from = array($_SESSION['email']=>$_SESSION['full_name']);

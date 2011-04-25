@@ -46,7 +46,7 @@ function email($to, $message, $subject='Email from Your Website', $from=false, $
 	error_debug(__function__ . ' attempting to send to ' . implode(', ', $to), __file__, __line__);
 	
 	if (!$count = $mailer->batchSend($message, $failures)) {
-		error_handle('email not sent', 'swiftmailer succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
+		error_handle('email not sent', __function__ . ' succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
 	} else {
 		error_debug(__function__ . ' sent ' . $count . ' messages successfully', __file__, __line__);
 	}

@@ -341,13 +341,22 @@ function format_html($text, $profile='user') {
 	//profile can be public, user or admin, with decreasing restrictions
 	//todo tie this programmically to user() and admin()
 	
+	//replace links not already in <a> tags
+	$bits = preg_split('/(<a(?:\s+[^>]*)?>.*?<\/a>|<[a-z][^>]*>)/is', $text, null, PREG_SPLIT_DELIM_CAPTURE);
+	$reconstructed = '';
+	foreach ($bits as $bit) {
+		if (strpos($bit, '<') !== 0) $bit = format_html_links($bit);
+		$reconstructed .= $bit;
+	}	
+	$text = $reconstructed;
+	
 	lib_get('simple_html_dom');
 	$html = str_get_html($text);
 	
 	if (($profile == 'public') || ($profile == 'user')) $html->set_callback('cleanupUser');
 	if ($profile == 'public') $html->set_callback('cleanupPublic');
 	//$html->set_callback('cleanupAdmin');
-	
+		
 	if (!function_exists('cleanupAdmin')) {
 		function cleanupAdmin() {
 			//todo
@@ -386,13 +395,12 @@ function format_html($text, $profile='user') {
 						
 			//certain tags we are wary of
 			if ($e->tag == 'a') {
-				/*if (!$e->href) {
-					//no empty 
-					$e->outertext = '';
-				} else*/ if ($local_url = format_text_starts(url_base(), $e->href)) {
+				if ($e->parent->tag == 'a') $e->parent->innertext = $e->innertext;
+				if ($local_url = format_text_starts(url_base(), $e->href)) {
 					//local hyperlinks if possible
 					$e->href = $local_url;
 				}
+				if ($e->href) $e->href = strip_tags($e->href);
 			} elseif ($e->tag == 'b') {
 				//deprecated tag: replace <b> with <strong>
 				$e->outertext = '<strong>' . $e->innertext . '</strong>';
@@ -431,6 +439,8 @@ function format_html($text, $profile='user') {
 	preg_match_all("/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i", $text, $matches);
 	foreach ($matches[0] as $m) $text = str_replace($m, format_ascii($m), $text);
 	
+	
+
 	$text = str_replace('&nbsp;', ' ', $text);
 	
 	return $text;
@@ -494,6 +504,27 @@ function format_html_img($url, $text=false) {
 		error_debug('<b>' . __function__ . '</b> quitting because no text', __file__, __line__);
 		return false;
 	}
+}
+
+function format_html_links($str) {
+	//from here: http://snipplr.com/view/2371/regex-regular-expression-to-match-a-url/
+	//$regex = '@(https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?)@';
+	
+	//daring fireball regex, can't get it to encapsulate correctly (from here: http://daringfireball.net/2010/07/improved_regex_for_matching_urls)
+	$regex = '@((?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’])))@';
+	$matches = array();
+	if ($num = preg_match_all($regex, $str, $matches)) {
+		$matches = array_unique($matches[0]);
+		//echo 'matches were ' . draw_array($matches);
+		foreach($matches as $m) {
+			if (format_text_starts('http://', $m) || format_text_starts('https://', $m)) {
+				$str = str_replace($m, draw_link($m, $m), $str);
+			} else {
+				$str = str_replace($m, draw_link('http://' . $m, $m), $str);
+			}
+		}
+	}
+	return $str;
 }
 
 function format_html_paragraphs($text, $limit=false) {
