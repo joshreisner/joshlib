@@ -433,7 +433,7 @@ function slideshow(element) {
 	call by <ul class="slideshow arrows bullets move continuous slow">
 	*/
 	$(element).wrap('<div class="slideshow_container" />').wrap('<div class="slideshow" />');
-	
+	$(element).css({listStyleType:'none'});
     var vars = {
 		autoClear:			function() {
 								clearTimeout(vars.timer);
@@ -453,10 +453,10 @@ function slideshow(element) {
         deselectedPosition:	0,
 		goToSlide:			function() {
 								if (vars.mode == 'fade') {
-									$(element).append($(element).find('li').first().clone().removeClass('selected'));
-									$(element).find('li').first().fadeOut('slow', 'swing', function(){ 
-										$(this).detach(); 
-										$(element).find('li').first().addClass('selected');
+									vars.slides.removeClass('selected');
+									$(vars.slides.get(vars.selectedPosition)).addClass('selected').hide().css({zIndex:20}).fadeIn('slow', 'swing', function(){
+										$(element).find('li:not(.selected)').css({zIndex:0});
+										$(element).find('li.selected').css({zIndex:10});
 									});
 								} else {
 									if (vars.isContinuous && (vars.selectedPosition == 0)) {
@@ -505,6 +505,10 @@ function slideshow(element) {
 	//initialize -- need selected class for api (eg slideshow mask)
 	vars.slides.removeClass('selected').first().addClass('selected');
 	if (vars.mode == 'fade') {
+		$(element).css({position:'relative',zIndex:0});
+		vars.slides.css({position:'absolute'});
+		$(element).find('li:not(.selected)').css({zIndex:0});
+		$(element).find('li.selected').css({zIndex:10});
 	} else if (vars.mode == 'move') {
 		//config css
 		$(element).parent('div.slideshow').css({ 'width':vars.slideWidth, 'height':vars.slideHeight, 'overflow':'hidden' });
