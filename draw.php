@@ -845,8 +845,12 @@ function draw_list($options, $arguments=false, $type='ul', $selected=false, $cla
 	for ($i = 0; $i < $count; $i++) {
 		$li_args = array('class'=>'option' . ($i + 1));
 		if (isset($classes[$i])) {
-			array_argument($li_args, $classes[$i]);
-			array_argument($li_args, $classes[$i], 'id'); //also setting id now for sortable list in cms
+			if (is_array($classes[$i])) {
+				foreach ($classes[$i] as $key=>$value) array_argument($li_args, $value, $key);
+			} else {
+				array_argument($li_args, $classes[$i]);
+			}
+			//array_argument($li_args, $classes[$i], 'id'); //also setting id now for sortable list in cms
 		}
 		if ($counter == 1)			array_argument($li_args, 'first');
 		if ($counter % 2)			{ array_argument($li_args, 'odd'); } else { array_argument($li_args, 'even'); }
