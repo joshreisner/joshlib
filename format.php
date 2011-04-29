@@ -943,13 +943,13 @@ function format_quantity($quantity, $title_case=true) {
 	} else {
 		$return = $quantity;
 	}
-	if ($title_case) $return = format_title($return);
+	if (!$title_case) $return = format_title($return);
 	return $return;
 }
 
 function format_quantitize($quantity, $entity, $title_case=true) {
 	$quantity = format_quantity($quantity) . ' ';
-	if ($quantity == 'One ') {
+	if ($quantity == 'one ') {
 		$return = $quantity . format_singular($entity);
 	} else {
 		$return = $quantity . format_pluralize($entity);

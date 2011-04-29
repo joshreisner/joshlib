@@ -846,7 +846,7 @@ function draw_list($options, $arguments=false, $type='ul', $selected=false, $cla
 	$arguments = array_arguments($arguments);
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
-		$li_args = array('class'=>'option' . ($i + 1));
+		$li_args = array('class'=>'option' . $counter);
 		if (isset($classes[$i])) {
 			if (is_array($classes[$i])) {
 				foreach ($classes[$i] as $key=>$value) array_argument($li_args, $value, $key);
