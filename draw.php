@@ -695,7 +695,8 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	$src = $path; //because of aplus situation
 	
 	//assemble tag
-	$arguments = array('src'=>$src, 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
+	$arguments = array('src'=>$src, 'width'=>$image[0], 'height'=>$image[1]);
+	//$arguments = array('src'=>$src, 'width'=>$image[0], 'height'=>$image[1], 'border'=>0);
 	if (is_array($alt)) {
 		//values of alt can overwrite width, height, border, even src
 		if (isset($alt['maxwidth']) && !isset($alt['maxheight'])) {
@@ -754,7 +755,8 @@ function draw_img_thumbnail($path, $link, $max) {
 
 function draw_javascript($javascript=false) {
 	if (!$javascript) return false; //draw_javascript_src();
-	return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);
+	return draw_tag('script', array('type'=>'text/javascript'), $javascript);
+	//return draw_tag('script', array('language'=>'javascript', 'type'=>'text/javascript'), $javascript);
 }
 
 function draw_javascript_ready($javascript=false) {
@@ -801,7 +803,8 @@ function draw_javascript_src($filename=false) {
 			if (!file_put($filename, file_get($joshlibf))) return error_handle('JS Write Error', __FUNCTION__ . ' can\'t write the js file.', __file__, __line__);
 		}
 	}
-	return $return . draw_tag('script', array('language'=>'javascript', 'src'=>$filename, 'type'=>'text/javascript'), '');
+	return $return . draw_tag('script', array('src'=>$filename, 'type'=>'text/javascript'), '');
+	//return $return . draw_tag('script', array('language'=>'javascript', 'src'=>$filename, 'type'=>'text/javascript'), '');
 }
 
 function draw_li($content='', $arguments=false) {
