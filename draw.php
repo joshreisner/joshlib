@@ -277,28 +277,24 @@ function draw_doctype() {
         <!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->';
 }
 
-function draw_dump($var, $forceType="", $bCollapsed=false)
-{
-	// use $forceType='xml' for xml otherwise it will be recognized as a string
-	// use $bCollapsed=true for collapsed view
+function draw_dump($var, $forceType='', $bCollapsed=false) {
+	//use $forceType='xml' for xml otherwise it will be recognized as a string
+	//use $bCollapsed=true for collapsed view
 	//get dBug class
 	lib_get('dBug');
 	
 	new dBug($var, $forceType, $bCollapsed);
 }
 
-function draw_exit($var, $forceType="", $bCollapsed=false)
-{
-	// use $forceType='xml' for xml otherwise it will be recognized as a string
-	// use $bCollapsed=true for collapsed view
+function draw_exit($var, $forceType='', $bCollapsed=false) {
+	//use $forceType='xml' for xml otherwise it will be recognized as a string
+	//use $bCollapsed=true for collapsed view
 	//get dBug class
 	lib_get('dBug');
 	
 	new dBug($var, $forceType, $bCollapsed);
 	exit();
 }
-
-
 
 function draw_favicon($location='/images/favicon.png') {
 	//only accepts PNGs right now
