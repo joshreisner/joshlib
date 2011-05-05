@@ -537,7 +537,7 @@ function lib_get($string) {
 							script_url : "' . str_replace('jquery.tinymce.js', 'tiny_mce.js', lib_location('tinymce')) . '",
 							theme : "advanced",
 							theme_advanced_buttons1 : "' . (user() ? 
-								'styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,outdent,indent,|,link,unlink,image,|,code' : 
+								'styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,outdent,indent,|,link,unlink,image,hr,|,code' : 
 								'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,|,link,unlink'
 							) . '",
 							theme_advanced_buttons2 : "",
