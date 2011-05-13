@@ -8,13 +8,28 @@ $(function(){
 	var defaults = {};
 	$('input.default').each(function(){ defaults[$(this).attr('name')] = $(this).val(); });
 	
+	//todo deprecate in favor of html5?
 	$('input.default').click(function(){
 		if ($(this).val() == defaults[$(this).attr('name')]) $(this).val('');
 	});
 
+	//todo deprecate in favor of html5?
 	$('input.default').blur(function(){
 		if ($(this).val() == '') $(this).val(defaults[$(this).attr('name')]);
 	});
+	
+	$('div[contenteditable=true]').blur(function(){
+		$.ajax({
+			url  : url_action_add('ajax_set', true),
+			type : 'POST',
+			data : {
+				table:	$(this).attr('data-table'), 
+				column:	$(this).attr('data-column'), 
+				id:		$(this).attr('data-id'), 
+				value:	$(this).html()
+			}
+		});
+	});	
 });
 
 function ajax_publish(which) {

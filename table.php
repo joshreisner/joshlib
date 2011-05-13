@@ -19,7 +19,7 @@ class table {
 		$class			= $this->name;
 		$count_columns	= count($this->columns);
 		$count_rows		= count($values);
-		$counter		= 1; //to determine first_row and last_row
+		$counter		= 1; //to determine first and last
 		$totals			= array(); //var to hold totals, if applicable
 		$return			= ''; //hold the output
 		$bodies			= array();
@@ -61,8 +61,8 @@ class table {
 				$id = (isset($v['id'])) ? $this->name . '-row-' . $v['id'] : false;
 				$class = $row;
 				if (!empty($v['class'])) $class .= ' ' . $v['class']; // . ' ' . $row . '_' . $v['class'];
-				if ($counter == 1) $class .= ' first_row';
-				if ($counter == $count_rows) $class .= ' last_row';
+				if ($counter == 1) $class .= ' first';
+				if ($counter == $count_rows) $class .= ' last';
 				$onclick = (isset($v['link'])) ? 'location.href=\'' . $v['link'] . '\';' : false; //todo deprecate?
 				$inner = '';
 				foreach ($this->columns as $c) $inner .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class'], 'style'=>(($c['width']) ? 'width:' . $c['width'] . 'px;': false)), $v[$c['name']]);

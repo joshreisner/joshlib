@@ -280,15 +280,11 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 				if ($c = db_column($array['table'], $array['column'])) {
 					if (($c['type'] == 'date') || ($c['type'] == 'datetime')) {
 						$array['value'] = format_date($array['value'], 'NULL', 'SQL');
-					//} elseif (($c['type'] == 'mediumblob')) {
-						//if it's an image, be sure to clear the dynamic version (eg clearing img from CMS)
-						//file_delete('/dynamic/' . $array['table'] . '-' . $array['column'] . '-' . $array['id'] . '.jpg');
 					} elseif (empty($array['value']) && (!$c['required'])) {
 						$array['value'] = 'NULL';
 					} else {
-						$array['value'] = '"' . $array['value'] . '"';
+						$array['value'] = "'" . $array['value'] . "'";
 					}
-					
 					if (db_query('UPDATE ' . $array['table'] . ' SET ' . $array['column'] . ' = ' . $array['value'] . ', updated_date = NOW(), updated_user = ' . user() . ' WHERE id = ' . $array['id'])) {
 						echo db_grab('SELECT ' . $array['column'] . ' FROM ' . $array['table'] . ' WHERE id = ' . $array['id']);
 					} else {

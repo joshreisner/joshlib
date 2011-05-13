@@ -212,29 +212,17 @@ function draw_definition_list($array, $arguments=false) {
 	return draw_container('dl', $return, $arguments);
 }
 
-function draw_div($id, $innerhtml=false, $arguments=false, $dbinfo=false) {
+function draw_div($id, $inner=false, $arguments=false, $dbinfo=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	//todo deprecate this in favor of draw_div_id
-	if (!$innerhtml) $innerhtml = '&nbsp;';
-	$return = draw_div_id($id, $innerhtml, $arguments);
+	$arguments['id'] = $id;
 	if ($dbinfo && (@list($table, $column, $dbid) = explode('.', $dbinfo))) { //expects dbinfo in this particular format
-		$return .= lib_get('jeditable') . draw_javascript_src() . draw_javascript('
-			$(document).ready(function() {
-				$("#' . $id . '").editable(url_action_add("ajax_set", true), {
-					id			: "field_name",
-					type		: "textarea",
-					style		: "inherit",
-					submitdata	:	{ table: "' . $table . '", column: "' . $column . '", id: "' . $dbid . '" },
-					cancel	: false,
-					submit	: false,
-					onblur	: "submit",
-					event	: "dblclick",
-					data: function(value, settings) { return value.replace(/<br[\s\/]?>/gi, "\n"); }
-				});
-			});	
-		');
+		$arguments['contenteditable'] = 'true';
+		$arguments['data-table'] = $table;
+		$arguments['data-column'] = $column;
+		$arguments['data-id'] = $dbid;
 	}
-	return $return;
+	return draw_tag('div', $arguments, $inner);
 }
 
 function draw_div_class($class, $innerhtml='', $arguments=false) {
