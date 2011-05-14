@@ -649,18 +649,3 @@ function user($return=false) {
 	if (empty($_SESSION['user_id'])) return $return;
 	return $_SESSION['user_id'];
 }
-
-/* deprecating for php4 support
-function var_name(-$var, -$defined_vars) {
-	//replacing apersands with hyphens
-	//-$defined_vars should be get_defined_vars()
-	//adapted from http://mach13.com/how-to-get-a-variable-name-as-a-string-in-php (thank you)
-    foreach ($defined_vars as $key=>$value) $defined_vars_0[$key] = $value;
-    $save		= $var;
-    $var		= !$var;
-    $diff_keys	= array_keys(array_diff_assoc($defined_vars_0, $defined_vars));
-    $var		= $save;
-    return $diff_keys[0];
-}
-*/
-?>

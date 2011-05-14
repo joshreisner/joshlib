@@ -529,5 +529,3 @@ function file_uploaded_image_orientation($fieldname) {
 	if ($width > $height) return 'landscape';
 	return 'portrait';
 }
-
-?>

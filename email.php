@@ -98,4 +98,3 @@ function email_post($to=false, $subject=false, $from=false) {
 	
 	email($to, draw_page($subject, draw_array($_POST, true), false, true), $subject, $from);
 }
-?>

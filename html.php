@@ -25,5 +25,3 @@ function html_a($link=false, $href='#', $arguments=false, $new_window=false, $ma
 	if ($new_window) $arguments['target'] = '_blank';
 	return draw_tag('a', $arguments, $link);
 }
-
-?>

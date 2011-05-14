@@ -1012,5 +1012,3 @@ function db_words_refresh($specific_tables=false, $words_table='words') {
 	}
 	exit;
 }
-
-?>

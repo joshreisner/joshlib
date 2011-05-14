@@ -61,5 +61,3 @@ function cache_start($filename=false) {
 		return true; //meaning you do need to process
 	}
 }
-
-?>

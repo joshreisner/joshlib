@@ -1259,5 +1259,3 @@ function format_zip($string, $error=false) { //format a ZIP (5-digit)
 	if (strlen($return) > 4) return substr($return, 0, 5);
 	return $error;
 }
-
-?>

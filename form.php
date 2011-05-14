@@ -449,4 +449,3 @@ class form {
 		foreach ($fields as $f) unset($this->fields[$f]);
 	}
 }
-?>

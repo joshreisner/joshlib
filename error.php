@@ -160,5 +160,3 @@ function error_path($str) {
 	if (defined('DIRECTORY_JOSHLIB')) $str = str_replace(DIRECTORY_JOSHLIB, '/joshlib/', $str);
 	return $str;
 }
-
-?>

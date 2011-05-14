@@ -363,4 +363,3 @@ function array_xml($string) {
 	$data = new SimpleXMLElement($string);
 	if (is_object($data)) return array_object($data->children());
 }
-?>
