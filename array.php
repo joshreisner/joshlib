@@ -13,6 +13,9 @@ function array_2d($array) {
 
 function array_ajax($required_values=false) {
 	//returns an array of ajax-posted content
+	//set error output mode to plain text
+	global $_josh;
+	$_josh['error_mode_html'] = false;
 	$array = url_query_parse(file_get_contents('php://input'));
 	foreach ($array as $key=>$value) $array[$key] = format_quotes($value);
 	if ($required_values) {

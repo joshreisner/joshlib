@@ -44,8 +44,11 @@ function error_draw($title, $html) {
 	global $_josh;
 	error_debug('drawing error handling page', __file__, __line__);
 	
-	//suppress HTML output if it's a CRON job
-	if (isset($_josh['request']) && !$_josh['request']) return strip_tags($title . NEWLINE . NEWLINE . $html);
+	//if ajax or cli, return non-html version -- todo, detect cli somewhere else
+	if (
+		(isset($_josh['error_mode_html']) && !$_josh['error_mode_html']) || //ajax
+		(isset($_josh['request']) && !$_josh['request']) //cli
+	) return strip_tags(strToUpper($title) . NEWLINE . $html);
 
 	//add quazi-attractive error element
 	$html = '<div style="background-color:#59c;color:#fff;height:36px;line-height:36px;font-size:24px;padding:0px 20px 0px 20px;position:absolute;top:-36px;left:0px;">Error</div>' . 
@@ -94,7 +97,7 @@ function error_handle($type, $message='', $file=false, $line=false) {
 		
 		$b = $thisfile . ' ' . $function;
 	}
-	$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
+	$message .= NEWLINE . NEWLINE . draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
 
 	//add more stuff to admin message, set from and subject
 	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];

@@ -60,6 +60,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['numbers']				= array('zero','one','two','three','four','five','six','seven','eight','nine');
 	$_josh['date']['format']		= '%b %d, %Y'; //default date Oct 06, 2010 http://php.net/manual/en/function.strftime.php
 	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
+	$_josh['error_mode_html']		= true; //show errors in html (set to false for ajax or cli)
 	
 //constants
 	define('BR', '<br/>');
