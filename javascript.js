@@ -469,7 +469,7 @@ function slideshow(element) {
 		goToSlide:			function() {
 								if (vars.mode == 'fade') {
 									vars.slides.removeClass('selected');
-									$(vars.slides.get(vars.selectedPosition)).addClass('selected').hide().css({zIndex:20}).fadeIn('slow', 'swing', function(){
+									$(vars.slides.get(vars.selectedPosition)).addClass('selected').hide().css({zIndex:20}).fadeIn(2000, 'swing', function(){
 										$(element).find('li:not(.selected)').css({zIndex:0});
 										$(element).find('li.selected').css({zIndex:10});
 									});

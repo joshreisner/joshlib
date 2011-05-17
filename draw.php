@@ -212,7 +212,7 @@ function draw_definition_list($array, $arguments=false) {
 	return draw_container('dl', $return, $arguments);
 }
 
-function draw_div($id, $inner=false, $arguments=false, $dbinfo=false) {
+function draw_div($id, $inner='', $arguments=false, $dbinfo=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	//todo deprecate this in favor of draw_div_id
 	$arguments['id'] = $id;
