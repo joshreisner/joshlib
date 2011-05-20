@@ -215,6 +215,7 @@ function draw_definition_list($array, $arguments=false) {
 function draw_div($id, $inner='', $arguments=false, $dbinfo=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	//todo deprecate this in favor of draw_div_id
+	$arguments = array_arguments($arguments);
 	$arguments['id'] = $id;
 	if ($dbinfo && (@list($table, $column, $dbid) = explode('.', $dbinfo))) { //expects dbinfo in this particular format
 		$arguments['contenteditable'] = 'true';

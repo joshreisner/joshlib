@@ -276,6 +276,14 @@ class form {
 						$return .= draw_link($value);
 					}
 					break;
+				case 'url-local':
+					if ($allow_changes) {
+						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+						if ($required) $this->javascript[] = 'if (form_url_empty(document.' . $this->name . '.' . $name . ')) errors[errors.length] = "the ' . $label . ' field is empty";';
+					} else {
+						$return .= draw_link($value);
+					}
+					break;
 			}
 						
 			//wrap it up

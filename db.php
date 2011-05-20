@@ -152,6 +152,8 @@ function db_column_add($table, $column, $type) {
 		break;
 	
 		case 'file': 
+		case 'image': 
+		case 'image-alt': 
 		$datatype = 'mediumblob';
 		break;
 	
@@ -160,20 +162,8 @@ function db_column_add($table, $column, $type) {
 		$length = 5;
 		break;
 	
-		case 'image': 
-		$datatype = 'mediumblob';
-		break;
-	
 		case 'int': 
 		$datatype = 'int';
-		break;
-	
-		case 'image-alt': 
-		$datatype = 'mediumblob';
-		break;
-	
-		case 'text': 
-		$datatype = 'varchar';		
 		break;
 	
 		case 'textarea':
@@ -181,7 +171,9 @@ function db_column_add($table, $column, $type) {
 		$datatype = 'text';
 		break;
 		
+		case 'text': 
 		case 'url': 
+		case 'url-local': 
 		$datatype = 'varchar';
 		break;
 	}
