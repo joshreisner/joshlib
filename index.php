@@ -293,6 +293,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 					} else {
 						echo 'ERROR';
 					}
+					//delete from write_folder?
 				} else {
 					//column does not exist
 				}
