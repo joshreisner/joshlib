@@ -528,7 +528,7 @@ function lib_get($string) {
 					$("textarea.tinymce").each(function(){
 						$(this).tinymce({
 							// Location of TinyMCE script
-							content_css : "/styles/tinymce.css?" + new Date().getTime(),
+							content_css : "/css/tinymce.css?" + new Date().getTime(),
 							custom_shortcuts : 0,
 							extended_valid_elements : "a[href|target|rel|name],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class|style],p[align|class|style],table[cellspacing,align,border,cellpadding,class],tr[class],td[width,align,class]",
 							plugins : "' . (user() ? 'imagemanager,filemanager,' : '') . 'paste",
@@ -547,7 +547,6 @@ function lib_get($string) {
 			') . $return;
 			file_dir_writable('images');
 			file_dir_writable('files');
-			//$return .= draw_javascript('form_tinymce_init("/styles/tinymce.css", ' . (user() ? 'true' : 'false') . ')');
 		} elseif (($string == 'tablednd') || ($string == 'jeditable') || ($string == 'fancybox') || ($string == 'jscrollpane')) {
 			$return = lib_get('jquery') . $return;
 			if ($string == 'fancybox') {
