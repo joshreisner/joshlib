@@ -134,6 +134,8 @@ function db_column($table, $column) {
 function db_column_add($table, $column, $type) {
 	global $_josh;
 	
+	if (db_column_exists($table, $column)) return false;
+	
 	//type, in this case, means a key from $_josh['field_types'], not mysql datatypes
 	if (!in_array($type, array_keys($_josh['field_types']))) error_handle('unknown data type', __function__ . ' received a request for ' . $type . ' which is not handled.', __file__, __line__);
 	
@@ -188,10 +190,10 @@ function db_column_drop($table, $column) {
 }
 
 function db_column_exists($table, $column) {
+	//return column array info if exists
 	$columns = db_columns($table);
-	foreach ($columns as $c) {
-		if ($c['name'] == $column) return $c;
-	}
+	foreach ($columns as $c) if ($c['name'] == $column) return $c;
+	return false;
 }
 
 function db_column_key($table, $column) {

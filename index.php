@@ -458,6 +458,14 @@ function increment() {
 	return $_josh['increment'];
 }
 
+function language_detect() {
+	//return en, es, fr, ru, etc.
+	if (empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) return false;
+    $code = explode(';', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+    $langcode = explode(',', $langcode['0']);
+    return substr($langcode['0'], 0, 2);
+}
+
 function language_translate($string, $from, $to) {
 	global $_josh;
 	
