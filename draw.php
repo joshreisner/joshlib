@@ -257,13 +257,13 @@ function draw_dl($array, $class=false) {
 	return draw_container('dl', $return, array('class'=>$class));
 }
 
-function draw_doctype() {
+function draw_doctype($lang='en') {
 	return '<!DOCTYPE html>
-        <!--[if IEMobile 7 ]><html class="no-js iem7" manifest="default.appcache?v=1"><![endif]-->
-        <!--[if lt IE 7 ]><html class="no-js ie6" lang="en"><![endif]-->
-        <!--[if IE 7 ]><html class="no-js ie7" lang="en"><![endif]-->
-        <!--[if IE 8 ]><html class="no-js ie8" lang="en"><![endif]-->
-        <!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->';
+        <!--[if IEMobile 7 ]><html class="no-js iem7" lang="' . $lang . '" manifest="default.appcache?v=1"><![endif]-->
+        <!--[if lt IE 7 ]><html class="no-js ie6" lang="' . $lang . '"><![endif]-->
+        <!--[if IE 7 ]><html class="no-js ie7" lang="' . $lang . '"><![endif]-->
+        <!--[if IE 8 ]><html class="no-js ie8" lang="' . $lang . '"><![endif]-->
+        <!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="' . $lang . '"><!--<![endif]-->';
 }
 
 function draw_dump($var, $forceType='', $bCollapsed=false) {
@@ -914,11 +914,11 @@ function draw_meta_utf8() {
 
 function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false) {	
 	global $_josh;
-	//2009 04 07 trying to come up with a simpler, better version of this function
+
 	//type can be text, images or rollovers
 	//match can be path, path_query or folder
-	
-	if (is_string($options)) $options = array_key_promote(db_table($options)); //might be sql	
+	//you can pass a SQL string instead of options
+	if (is_string($options)) $options = array_key_promote(db_table($options)); 
 	
 	if ($add_home) $options = array_merge(array('/'=>'Home'), $options);
 	
@@ -937,6 +937,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	} elseif (($match == '//') || ($match == '')) {
 		$match = '/';
 	}
+
 	error_debug('<b>' . __function__ . '</b> match is ' . $match, __file__, __line__);
 	
 	$selected = false;
@@ -949,7 +950,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		$args = array('name'=>$name, 'class'=>$name);
 		
 		if ($match == 'folder') {
-			//eg /about/page1/ and /about/page2/ will match
+			//so eg /about/page1/ and /about/page2/ will match
 			$urlparts = explode('/', $url);
 			$matching = (@$urlparts[1] == $_josh['request']['folder']);
 			if (substr($url, 0, 5) == 'http:') $matching = false;
@@ -1022,93 +1023,6 @@ function draw_nav_nested($pages, $class='nav', $current_depth=1) {
 	$return = draw_list($li_items, $class, 'ul', false, $classes);
 	if ($current_depth == 1) return $return;
 	return array($return, $selected); //have to pass the fact that there was a selected item up the chain
-}
-
-function draw_navigation($options, $match=false, $type='text', $class='navigation', $folder='/images/navigation/', $override=false) {
-	//2010 04 07 deprecated
-	error_deprecated(__function__ . ' was deprecated on 4/7/2010.  use draw_nav instead');
-	
-	/*useid is for rollover navigation -- use everything after id= instead of slashless url
-	//2010 03 15 jr: useid is changed now to override -- can be 'id' or 'folder'
-	//type could be text, images or rollovers
-	global $_josh;
-	
-	//this is so you can have several sets of rollovers in the same page eg the smarter toddler site
-	if (!isset($_josh['drawn']['navigation'])) $_josh['drawn']['navigation'] = 0;
-	$_josh['drawn']['navigation']++;
-	
-	//skip if empty
-	if (!is_array($options) || !count($options)) return false;
-		
-	$return = array();
-	if ($match === false) {
-		$match = $_josh['request']['path'];
-	} elseif ($match === true) {
-		$match = $_josh['request']['path_query'];
-	} elseif ($match == '//') {
-		//to take care of a common / . folder . / scenario
-		$match = '/';
-	} elseif ($match == 'folder') {
-		//new option
-	}
-	error_debug('<b>' . __function__ . '</b> match is ' . $match, __file__, __line__);
-	$selected = false;
-	$counter = 1;
-	$javascript = NEWLINE;
-	foreach ($options as $url=>$title) {
-		$name = 'option_' . $_josh['drawn']['navigation'] . '_' . $counter;
-		$args = array('name'=>$name, 'class'=>$name);
-		
-		if ($match == 'folder') {
-			//eg /about/page1/ and /about/page2/ will match
-			$urlparts = explode('/', $url);
-			$matching = (@$urlparts[1] == $_josh['request']['folder']);
-		} else {
-			$matching = (str_replace(url_base(), '', $url) == $match);
-		}
-		
-		if ($matching) {
-			$img_state = '_on';
-			$args['class'] .= ' selected';
-			$selected = $counter;
-		} else {
-			$img_state = '_off';
-			if ($type == 'rollovers') {
-				$args['onmouseover'] = 'javascript:img_roll(\'' . $name . '\',\'on\');';
-				$args['onmouseout'] = 'javascript:img_roll(\'' . $name . '\',\'off\');';
-			}
-		}
-		if (($type == 'images') || ($type == 'rollovers')) {
-			if ($override) {
-				if ($override == 'id') {
-					$img = substr($url, strpos($url, 'id=') + 3);
-				} elseif ($override == 'folder') {
-					$urlparts = explode('/', $url);
-					$img = @$urlparts[1];
-					//die('img is ~' . $img . '~');
-				}
-			} else {
-				$img = str_replace('/', '', $url);
-				if ($pos = strpos($img, '?')) $img = substr($img, 0, $pos);
-				if (empty($img)) $img = 'home';
-			}
-			if ($type == 'rollovers') {
-				$javascript .= $name . '_on		 = new Image;' . NEWLINE;
-				$javascript .= $name . '_off	 = new Image;' . NEWLINE;
-				$javascript .= $name . '_on.src	 = "' . $folder . $img . '_on.png";' . NEWLINE;
-				$javascript .= $name . '_off.src = "' . $folder . $img . '_off.png";' . NEWLINE;
-			}
-			$inner = draw_img($folder . $img . $img_state . '.png', false, false, $name);
-		} else { //type == text
-			$inner = $title;		
-		}
-		$return[] = draw_link($url, $inner, false, $args);
-		$counter++;
-	}
-	$return = draw_list($return, $class, 'ul', $selected);
-	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
-	return $return;
-	*/
 }
 
 function draw_p($inner, $arguments=false) {
@@ -1216,10 +1130,8 @@ function draw_tag($tag, $arguments=false, $innerhtml=false, $open=false) {
 	$return = '<' . $tag;
 	$return .= (is_array($arguments)) ? draw_arguments($arguments) : draw_argument('class', $arguments);
 	if ($innerhtml === false) {
-		$return .= ($open || (html() == 5)) ? '>' : '/>';
+		$return .= '/>';
 	} else {
-		//2010 07 08 jr -- removing line below because of minutes in draw_form_date_time
-		//if (is_numeric($innerhtml) && ($innerhtml == 0)) $innerhtml = '&#48;';
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';
 		$return .= '>' . $innerhtml . '</' . $tag . '>';
 	}
@@ -1231,8 +1143,10 @@ function draw_time($timestamp, $format=false, $is_pubdate=false) {
 	return '<time datetime="' . format_date_iso8601($timestamp) . '"' . (($is_pubdate) ? ' pubdate' : '') . '>' . format_date($timestamp, '', $format) . '</time>';
 }
 
-function draw_title($title) {
-	return draw_tag('title', false, strip_tags($title));
+function draw_title($title='') {
+	$title = strip_tags($title);
+	if (!$title) $title = '';
+	return draw_tag('title', false, $title);
 }
 
 function draw_typekit($key='yxt2eld') {
