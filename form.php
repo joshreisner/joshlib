@@ -95,7 +95,7 @@ class form {
 		extract($field);
 		$return = '';
 
-		if (($name == 'secret_key') || ($type == 'image-alt') || ($type == 'file-type')) return false; //not fields you show in a form	
+		if (($name == 'secret_key') || ($type == 'image-alt') || ($type == 'file-type') || ($type == 'latlon')) return false; //not fields you show in a form	
 
 		//value is being set manually		
 		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
@@ -216,6 +216,7 @@ class form {
 					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
 					if ($null_value) $required = false;
 					$return .= draw_form_select($name, $options, $value, $required, $class, $action, $null_value, 60, !$allow_changes) . $additional;
+					if (!$allow_changes) $return .= draw_form_hidden($name, $value);
 					break;
 				case 'submit':
 					if (substr($value, 0, 1) == '/') {
@@ -287,7 +288,10 @@ class form {
 			}
 						
 			//wrap it up
-			$return = draw_div_class('field field_' . $this->counter . ' ' . $type . ' ' . $name . (($class) ? ' ' . $class : ''), $return) . NEWLINE;
+			$classes = array('field', 'field_' . $this->counter, $type, $name);
+			if ($class) $classes[] = $class;
+			if ($required) $classes[] = 'required';
+			$return = draw_div_class(implode(' ', $classes), $return) . NEWLINE;
 			$this->counter++;
 		}
 		return $return;

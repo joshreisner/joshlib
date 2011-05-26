@@ -173,6 +173,7 @@ function db_column_add($table, $column, $type) {
 		$datatype = 'text';
 		break;
 		
+		case 'latlon': 
 		case 'text': 
 		case 'url': 
 		case 'url-local': 

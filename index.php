@@ -98,6 +98,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'image'=>'Image',
 										'image-alt'=>'Image (Alt)',
 										'int'=>'Integer',
+										'latlon'=>'Lat/Lon Coords',
 										//'object'=>'Ordered Object',
 										'text'=>'Text',
 										'textarea'=>'Textarea',
@@ -105,7 +106,6 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'url'=>'URL',
 										'url-local'=>'URL (local)'
 									);
-	$_josh['translatable_field_types']	= array('text', 'textarea', 'textarea-plain');
 	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'publish_date', 'publish_user', 'is_published', 'deleted_date', 'deleted_user', 'is_active', 'precedence');
 
 //get the rest of the library
@@ -428,10 +428,14 @@ function debug() {
 	$_josh['mode'] = 'debug';
 }
 
-function geocode($address, $zip) {
+function geocode($address, $zip=false) {
 	global $_josh;
-	$result = file('http://maps.google.com/maps/geo?q=' . urlencode($address . ', ' . $zip) . '&output=csv&oe=utf8&sensor=false&key=' . $_josh['google']['mapkey']);
-	if (list($status, $accuracy, $latitude, $longitude) = explode(',', utf8_decode($result[0]))) return array($latitude, $longitude);
+	if (!isset($_josh['google']['mapkey'])) error_handle('need google maps api key', 'put it in the config file');
+	if ($zip) $address = $address . ', ' . $zip;
+	$result = file('http://maps.google.com/maps/geo?q=' . urlencode($address) . '&output=csv&oe=utf8&sensor=false&key=' . $_josh['google']['mapkey']);
+	if (list($status, $accuracy, $latitude, $longitude) = explode(',', utf8_decode($result[0]))) {
+		if ($latitude || $longitude) return array($latitude, $longitude);
+	}
 	return false;
 }
 
