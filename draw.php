@@ -590,7 +590,7 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 			$lat += $m['latitude'];
 			$lon += $m['longitude'];
 			$markerstr .= NEWLINE . '
-				var marker = draw_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "' . $m['title'] . '", "' . $m['description'] . '", "' . $m['color'] . '");
+				var marker = map_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "' . $m['title'] . '", "' . $m['description'] . '", "' . $m['color'] . '");
 				map.addOverlay(marker);';
 		}
 	}

@@ -102,7 +102,6 @@ function file_download($content, $filename, $extension) {
 }
 
 function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
-	//function file_dynamic($filename, $lastmod, $query);
 	global $_josh; // mtime = 1242850776, lastmod = 1242682931
 	file_dir_writable('dynamic');
 	//debug();
