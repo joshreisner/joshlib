@@ -244,14 +244,19 @@ function url_query_action($value, $go=true) {
 function url_query_add($adds=false, $go=true, $path=false) { //add specified query arguments
 	global $_josh;
 	if (!$adds) $adds = array();
-	$target = url_base() . (($path) ? $path : $_josh['request']['path']);
-	$adds = array_merge($_GET, $adds);
+	//$target = url_base() . (($path) ? $path : $_josh['request']['path']);
+	if (!$path) {
+		$path = $_josh['request']['path'];
+		$adds = array_merge($_GET, $adds);
+	}
 	$pairs = array();
 	if (count($adds)) foreach ($adds as $key=>$value) if ($value) $pairs[] = $key . '=' . urlencode($value);
-	if (count($pairs)) sort($pairs);
-	if (count($pairs)) $target .= '?' . implode('&', $pairs);
-	if ($go) url_change($target);
-	return $target;
+	if (count($pairs)) {
+		sort($pairs);
+		$path .= '?' . implode('&', $pairs);
+	}
+	if ($go) url_change($path);
+	return $path;
 }
 
 function url_query_drop($deletes=false, $go=true) {
