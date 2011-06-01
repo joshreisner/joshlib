@@ -587,11 +587,15 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 		$lat = 0;
 		$lon = 0;
 		foreach ($markers as $m) {
+			$m['auto'] = (isset($m['auto']) && $m['auto']) ? ', true' : false;
+			if (!isset($m['color'])) $m['color'] = 'red';
 			$lat += $m['latitude'];
 			$lon += $m['longitude'];
+			$m['description'] = str_replace("\r\n", '', nl2br($m['description']));
 			$markerstr .= NEWLINE . '
-				var marker = map_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "' . $m['title'] . '", "' . $m['description'] . '", "' . $m['color'] . '");
+				var marker = map_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "<div class=\"map_marker_wrapper\"><h2>' . $m['title'] . '</h2>' . $m['description'] . '</div>", "' . $m['color'] . '"' . $m['auto'] . ');
 				map.addOverlay(marker);';
+			
 		}
 	}
 	
@@ -602,14 +606,19 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 		$lat = $lat / $count;
 		$lon = $lon / $count;
 	} else {
+		//wha?  rock dove?
 		$lat = 37.4419;
 		$lon = -122.1419;
 	}
-
+	
+	if (($count == 1) && (isset($markers[0]['auto']))) $lat += .007;
+	
 	//todo determine zoom automatically
 	if (!$zoom) $zoom = 11;
 
-	return '<div id="map"></div>' . draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . draw_javascript('
+	return draw_javascript_src() . draw_css('
+		#map img { max-height: inherit; max-width: inherit; }
+	') . '<div id="map"></div>' . draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . draw_javascript('
 		function map_load() {
 			if (GBrowserIsCompatible()) {
 				var map = new GMap2(document.getElementById("map"));
