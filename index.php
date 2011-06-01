@@ -167,8 +167,8 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		if (!isset($_josh['slow']))	$_josh['slow'] = false;
 	}
 	
-	//only checking for iphone right now -- deprecated 4/20/2011
-	//$_josh['request']['mobile']		= (isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone'));
+	//only checking for iOS
+	$_josh['request']['mobile']		= (isset($_SERVER['HTTP_USER_AGENT']) && (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone') || strstr($_SERVER['HTTP_USER_AGENT'], 'iPad')));
  	
  	//referring page
  	$_josh['referrer']				= (isset($_SERVER['HTTP_REFERER']))	? url_parse($_SERVER['HTTP_REFERER']) : false;
