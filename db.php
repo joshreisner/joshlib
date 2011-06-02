@@ -131,56 +131,60 @@ function db_column($table, $column) {
 	return db_column_exists($table, $column); //alias
 }
 
-function db_column_add($table, $column, $type) {
-	global $_josh;
+function db_column_add($table, $column, $type=false, $datatype=false) {
+	//add a column to a table
+	//$type is a josh type as found in system fields
+	//$datatype is an actual SQL datatype
 	
 	if (db_column_exists($table, $column)) return false;
-	
-	//type, in this case, means a key from $_josh['field_types'], not mysql datatypes
-	if (!in_array($type, array_keys($_josh['field_types']))) error_handle('unknown data type', __function__ . ' received a request for ' . $type . ' which is not handled.', __file__, __line__);
-	
-	//handle single-field translations.  multi-field and linked tables are todo
-	$datatype = $length = false;
-	$default = 'DEFAULT NULL';
-	switch ($type) {
-		case 'checkbox': 
-		$datatype = 'tinyint';
-		$default = 'NOT NULL';
-		break;
-	
-		case 'date': 
-		case 'datetime': 
-		$datatype = 'datetime';
-		break;
-	
-		case 'file': 
-		case 'image': 
-		case 'image-alt': 
-		$datatype = 'mediumblob';
-		break;
-	
-		case 'file-type': 
-		$datatype = 'varchar';
-		$length = 5;
-		break;
-	
-		case 'int': 
-		$datatype = 'int';
-		break;
-	
-		case 'textarea':
-		case 'textarea-plain': 
-		$datatype = 'text';
-		break;
-		
-		case 'latlon': 
-		case 'text': 
-		case 'url': 
-		case 'url-local': 
-		$datatype = 'varchar';
-		break;
-	}
 
+	$length = false;
+	$default = 'DEFAULT NULL';
+		
+	//handle single-field translations.  multi-field and linked tables are todo
+	if (!$datatype && $type) {
+		switch ($type) {
+			case 'checkbox': 
+			$datatype = 'tinyint';
+			$default = 'NOT NULL';
+			break;
+		
+			case 'date': 
+			case 'datetime': 
+			$datatype = 'datetime';
+			break;
+		
+			case 'file': 
+			case 'image': 
+			case 'image-alt': 
+			$datatype = 'mediumblob';
+			break;
+		
+			case 'file-type': 
+			$datatype = 'varchar';
+			$length = 5;
+			break;
+		
+			case 'int': 
+			$datatype = 'int';
+			break;
+		
+			case 'textarea':
+			case 'textarea-plain': 
+			$datatype = 'text';
+			break;
+			
+			case 'latlon': 
+			case 'text': 
+			case 'url': 
+			case 'url-local': 
+			$datatype = 'varchar';
+			break;
+	
+			error_handle('unknown data type', __function__ . ' received a request for ' . $type . ' which is not handled.', __file__, __line__);
+		}
+	}
+	
 	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype, $length) . ' ' . $default)) return $column;
 	return false;
 }
@@ -778,10 +782,10 @@ function db_schema_check($schema) {
 			db_table_create($table, $fields, true);
 		} else {
 			//check columns are accurate
-			foreach ($fields as $column=>$type) {
+			foreach ($fields as $column=>$datatype) {
 				if (!db_column_exists($table, $column)) {
 					$passed = false;
-					db_column_add($table, $column, $type);
+					db_column_add($table, $column, false, $datatype);
 				}
 			}
 		}
