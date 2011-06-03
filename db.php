@@ -166,6 +166,7 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			break;
 		
 			case 'int': 
+			case 'select': 
 			$datatype = 'int';
 			break;
 		
