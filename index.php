@@ -613,7 +613,7 @@ function lib_location($string) {
 		return $lib . 'lorem_ipsum.js';
 				
 		case 'modernizr' :
-		return $lib . 'modernizr-1.7.min.js';
+		return $lib . 'modernizr-2.0.min.js';
 				
 		case 'salesforce' :
 		return DIRECTORY_ROOT . $lib . 'phptoolkit-13_1/soapclient/SforceEnterpriseClient.php';
