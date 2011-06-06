@@ -384,6 +384,50 @@ function browser_output($html) {
     return gzencode($html);
 }
 
+function cms_bar($width='98%') {
+	global $_josh;
+	//works with the CMS (code.google.com/p/bb-login) -- gives you an admin bar that controls the site you're on.  
+	//should be called right before </body>
+	//links is an associative array like draw_nav
+
+	//log you in if you already are
+	if (!user() && cookie_get('secret_key') && $r = db_grab('SELECT id, firstname, lastname, email, secret_key, is_admin FROM app_users WHERE secret_key = "' . $_COOKIE['secret_key'] . '" AND is_active = 1')) {
+		$_SESSION['user_id']	= $r['id'];
+		$_SESSION['show_deleted'] = false;
+		$_SESSION['name']		= $r['firstname'];
+		$_SESSION['full_name']	= $r['firstname'] . ' ' . $r['lastname'];
+		$_SESSION['email']		= $r['email'];
+		$_SESSION['is_admin']	= $r['is_admin'];
+		$_SESSION['isLoggedIn']	= true;
+		db_query('UPDATE app_users SET last_login = NOW() WHERE id = ' . $r['id']);		
+	}
+	
+	if (user()) {
+		if (!isset($_josh['cms_links'])) $_josh['cms_links'] = array();
+		$_josh['cms_links'] = array_merge(array('/login/'=>'CMS Home'), $_josh['cms_links']);
+		$_josh['cms_links']['/login/?action=logout&return_to=' . urlencode($_josh['request']['path_query'])] = '&times';
+		return draw_css('
+			html { padding-top:30px; }
+			html #cms_bar { position: absolute; top: 0; width: 100%; height: 28px; background-color: #ffaf14; color: #333; font: 14px/24px Verdana;
+				-webkit-box-shadow: 0px 0px 5px #333; 
+				   -moz-box-shadow: 0px 0px 5px #333; 
+				        box-shadow: 0px 0px 5px #333;
+			}
+			html #cms_bar div { width: ' . $width . '; margin:3px auto; }
+			html #cms_bar div ul.cms_bar_nav { position: inline; list-style-type: none; float: right; }
+			html #cms_bar div ul.cms_bar_nav li { float: left; margin-left: 10px; padding-left: 10px; border-left: 1px solid #ffca62; }
+			html #cms_bar div ul.cms_bar_nav li:first-child { border-left: 0; }
+			html #cms_bar div ul.cms_bar_nav li a { color: #333; }
+		') . 
+		'<div id="cms_bar"><div>Welcome back ' . $_SESSION['name'] . draw_nav($_josh['cms_links'], 'text', 'cms_bar_nav') . '</div></div>';
+	}
+}
+
+function cms_bar_link($url, $title) {
+	global $_josh;
+	$_josh['cms_links'][$url] = $title;
+}
+
 function cookie($name=false, $value=false, $session=false) {
 	global $_josh;
 
