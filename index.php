@@ -28,8 +28,6 @@ USING THE DEBUGGER
 	you can run the debug() function after joshlib has been included to see output of various processes
 	to debug the loading of the joshlib itself, set $_josh['mode'] = 'debug' before you include it
 
-dude
-
 RUNNING ON THE COMMAND LINE
 	joshlib depends on certain $_SERVER variables being present.  add these lines before including joshlib:
 	$_SERVER['HTTP_HOST']		= 'backend.livingcities.org';
