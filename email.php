@@ -25,6 +25,9 @@ function email($to, $message, $subject='Email from Your Website', $from=false, $
 	} else {
 		$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], 25)->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
 	}
+	
+	//die('CC is ' . draw_array($cc));
+	
 	$mailer		= Swift_Mailer::newInstance($transport);
 
 	//define required message properties	
@@ -36,8 +39,8 @@ function email($to, $message, $subject='Email from Your Website', $from=false, $
 		->addPart($message, 'text/html');
 	
 	//optional message properties
-	if ($cc) $message->setCc($cc);
-	if ($bcc) $message->setBcc($bcc);
+	if ($cc) foreach ($cc as $address) $message->addTo($address);
+	if ($bcc) foreach ($bcc as $address) $message->addTo($address);
 	if ($attachments) {
 		if (!is_array($attachments)) $attachments = array($attachments);
 		foreach ($attachments as $a) $message->attach(Swift_Attachment::fromPath($a));
@@ -45,11 +48,11 @@ function email($to, $message, $subject='Email from Your Website', $from=false, $
 
 	error_debug(__function__ . ' attempting to send to ' . implode(', ', $to), __file__, __line__);
 	
-	if (!$count = $mailer->batchSend($message, $failures)) {
-		error_handle('email not sent', __function__ . ' succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
-	} else {
-		error_debug(__function__ . ' sent ' . $count . ' messages successfully', __file__, __line__);
-	}
+	debug();
+	$failures = array();
+	$count = $mailer->batchSend($message, $failures);
+	if (!empty($failures)) error_handle('email failures', __function__ . ' succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
+	error_debug(__function__ . ' sent ' . $count . ' messages successfully', __file__, __line__);
 	
 	return $count;
 }
