@@ -408,7 +408,7 @@ function cms_bar($width='98%') {
 		$_josh['cms_links']['/login/?action=logout&return_to=' . urlencode($_josh['request']['path_query'])] = '&times';
 		return draw_css('
 			body { margin-top: 30px; overflow: visible; position: relative; } 
-			body #cms_bar { background-color: #ffaf14; border-bottom: 1px solid rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.4); color: #333; font: 1.1em Verdana; padding: 0 1%; position: fixed; top: 0; width: 98%; z-index: 10000;
+			body #cms_bar { background-color: #ffaf14; border-bottom: 1px solid rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.4); color: #333; font: 14px Verdana; padding: 0 1%; position: fixed; top: 0; width: 98%; z-index: 10000;
 				-webkit-box-shadow: 0px 0px 5px #333; 
 				   -moz-box-shadow: 0px 0px 5px #333; 
 				        box-shadow: 0px 0px 5px #333;
@@ -416,9 +416,9 @@ function cms_bar($width='98%') {
 			body #cms_bar div.wrapper { width: ' . $width . '; margin: 0 auto; }
 			body #cms_bar div.wrapper span { display: inline-block; height: 30px; line-height: 30px; } 
 			body #cms_bar div.wrapper ul.cms_bar_nav { list-style-type: none; float: right; }
-			body #cms_bar div.wrapper ul.cms_bar_nav li { float: left; margin-left: 10px;border-left: 1px solid #ffca62; }
+			body #cms_bar div.wrapper ul.cms_bar_nav li { float: left; margin-left: 10px; border-left: 1px solid #ffca62; }
 			body #cms_bar div.wrapper ul.cms_bar_nav li:first-child { border-left: 0; }
-			body #cms_bar div.wrapper ul.cms_bar_nav li a { color: #333; display: inline-block; line-height: 30px; }
+			body #cms_bar div.wrapper ul.cms_bar_nav li a { color: #333; display: inline-block; line-height: 30px; padding-left: 10px; }
 		') . 
 		'<div id="cms_bar"><div class="wrapper"><span>Welcome back ' . $_SESSION['name'] . '</span>' . draw_nav($_josh['cms_links'], 'text', 'cms_bar_nav') . '</div></div>';
 	}
