@@ -1,7 +1,7 @@
 <?php
 error_debug('including email.php', __file__, __line__);
 
-function email($to, $message, $subject='Email from Your Website', $from=false, $cc=false, $bcc=false, $attachments=false) {
+function email($to, $message, $subject='Email from Your Website', $from=false, $attachments=false) {
 	//$to can be an array('person1@example.org', 'person2@example.org') or comma-separated string
 	//$from can be array('josh@joshreisner.com'=>'Josh Reisner') or email address
 
@@ -12,8 +12,6 @@ function email($to, $message, $subject='Email from Your Website', $from=false, $
 	
 	//check recipient list
 	if (!$to = email_addresses($to)) return false; //quit if now if there are no good recipients for email
-	$cc = email_addresses($cc);
-	$bcc = email_addresses($bcc);
 	
 	//use swiftmailer class
 	lib_get('swiftmailer');
@@ -38,9 +36,7 @@ function email($to, $message, $subject='Email from Your Website', $from=false, $
 		->setBody(strip_tags(nl2br($message)))
 		->addPart($message, 'text/html');
 	
-	//optional message properties
-	if ($cc) foreach ($cc as $address) $message->addTo($address);
-	if ($bcc) foreach ($bcc as $address) $message->addTo($address);
+	//optional
 	if ($attachments) {
 		if (!is_array($attachments)) $attachments = array($attachments);
 		foreach ($attachments as $a) $message->attach(Swift_Attachment::fromPath($a));

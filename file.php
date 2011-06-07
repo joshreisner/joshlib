@@ -79,7 +79,7 @@ function file_dir_writable($subdirectory=false) {
 	//set permissions
 	if (!is_writable($directory) && !@chmod($directory, 0777)) error_handle('couldn\'t set permissions', 'file_dir_writable needs the ' . $directory . ' to be writable by the webserver.', __file__, __line__);
 	
-	return true;
+	return $directory;
 }
 
 function file_download($content, $filename, $extension) {
@@ -330,10 +330,9 @@ function file_pass($filename) {
 }
 
 function file_put($filename, $content) {
-	global $_josh;
-	file_delete($filename);
 	//arguments should be reversed?
-	$file = @fopen(DIRECTORY_ROOT . $filename, 'w');
+	file_delete($filename);
+	if (!$file = @fopen(DIRECTORY_ROOT . $filename, 'w')) $file = @fopen($filename, 'w');
 	if ($file === false) {
 		error_handle('could not write file', '<b>' . __function__ . '</b> could not open ' . DIRECTORY_ROOT . $filename . ' for writing.  perhaps it is a permissions problem.', __file__, __line__);
 	} else {

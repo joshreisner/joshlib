@@ -17,7 +17,9 @@ class form {
 	var $javascript		= array();
 	
 	function __construct($name=false, $id=false, $submit=true, $cancel=false, $readonly=false) {
-		//$table is the db table you're referencing.  good for putting up a quick form scaffolding
+		global $_josh;
+		
+		//$name is the db table you're referencing.  good for putting up a quick form scaffolding
 		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		//$submit is a boolean, and indicates whether you should auto-add a submit button at the bottom
 		//if you pass $submit as a string, it will title use the text you passed, and title the form that
@@ -28,6 +30,7 @@ class form {
 		$this->cancel	= $cancel;
 		$this->id		= $id;
 		$this->readonly	= $readonly;
+		$this->action	= $_josh['request']['path_query'];
 		
 		if ($name) $this->set_table($name);
 		if ($submit === true) {
@@ -74,7 +77,7 @@ class form {
 		$return = draw_div_class('fieldset', draw_tag('fieldset', false, $return));
 		
 		//wrap in form
-		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$_josh['request']['path_query'], 'name'=>$this->name, 'id'=>$this->name, 'class'=>$this->name, 'onsubmit'=>'javascript:return form_validate(this);'), $return);
+		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$this->action, 'name'=>$this->name, 'id'=>$this->name, 'class'=>$this->name, 'onsubmit'=>'javascript:return form_validate(this);'), $return);
 		
 		//focus on first element
 		if ($focus && !empty($this->focus)) $return .= draw_form_focus($this->focus);
@@ -295,6 +298,10 @@ class form {
 			$this->counter++;
 		}
 		return $return;
+	}
+	
+	function set_action($target) {
+		$this->action = $target;
 	}
 	
 	function set_defaults() {
