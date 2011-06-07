@@ -418,7 +418,9 @@ function cms_bar($width='98%') {
 			body #cms_bar div.wrapper ul.cms_bar_nav { list-style-type: none; float: right; }
 			body #cms_bar div.wrapper ul.cms_bar_nav li { float: left; margin-left: 10px; border-left: 1px solid #ffca62; }
 			body #cms_bar div.wrapper ul.cms_bar_nav li:first-child { border-left: 0; }
-			body #cms_bar div.wrapper ul.cms_bar_nav li a { color: #333; display: inline-block; line-height: 30px; padding-left: 10px; }
+			body #cms_bar div.wrapper ul.cms_bar_nav li a { color: #333; display: inline-block; line-height: 30px; padding-left: 10px; text-decoration: none; }
+			body #cms_bar div.wrapper ul.cms_bar_nav li a:hover { text-decoration: underline; }
+			
 		') . 
 		'<div id="cms_bar"><div class="wrapper"><span>Welcome back ' . $_SESSION['name'] . '</span>' . draw_nav($_josh['cms_links'], 'text', 'cms_bar_nav') . '</div></div>';
 	}
