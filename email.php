@@ -90,8 +90,9 @@ function email_addresses($input) {
 	return $good;
 }
 
-function email_post($to=false, $subject=false, $from=false) {
+function email_array($to=false, $subject=false, $from=false, $array='post') {
 	global $_josh;
+	if ($array == 'post') $array = $_POST;
 	if (!$to) $to = $_josh['email_default'];
 	if (!$subject) $subject = 'Form Submission from ' . $_josh['request']['sanswww'];
 	
@@ -100,4 +101,8 @@ function email_post($to=false, $subject=false, $from=false) {
 	if (isset($_POST['y'])) unset($_POST['y']);
 	
 	email($to, draw_page($subject, draw_array($_POST, true), false, true), $subject, $from);
+}
+
+function email_post($to=false, $subject=false, $from=false) {
+	email_array($to, $subject, $from, 'post');
 }
