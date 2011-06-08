@@ -86,8 +86,9 @@ class form {
 			$("form#' . $this->name . '").validate({submitHandler:function(form){ 
 				if (typeof submit_' . $this->name . ' == "function") {
 					if (submit_' . $this->name . '($("form#' . $this->name . '"))) form.submit();
+				} else {
+					form.submit();
 				}
-				form.submit();
 			}})');
 
 		return $return;
