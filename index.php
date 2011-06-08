@@ -390,39 +390,41 @@ function cms_bar($width='98%') {
 	//should be called right before </body>
 	//links is an associative array like draw_nav
 
-	//log you in if you already are
-	if (!user() && cookie_get('secret_key') && $r = db_grab('SELECT id, firstname, lastname, email, secret_key, is_admin FROM app_users WHERE secret_key = "' . $_COOKIE['secret_key'] . '" AND is_active = 1')) {
-		$_SESSION['user_id']	= $r['id'];
-		$_SESSION['show_deleted'] = false;
-		$_SESSION['name']		= $r['firstname'];
-		$_SESSION['full_name']	= $r['firstname'] . ' ' . $r['lastname'];
-		$_SESSION['email']		= $r['email'];
-		$_SESSION['is_admin']	= $r['is_admin'];
-		$_SESSION['isLoggedIn']	= true;
-		db_query('UPDATE app_users SET last_login = NOW() WHERE id = ' . $r['id']);		
-	}
-	
-	if (user()) {
-		if (!isset($_josh['cms_links'])) $_josh['cms_links'] = array();
-		$_josh['cms_links'] = array_merge(array('/login/'=>'CMS Home'), $_josh['cms_links']);
-		$_josh['cms_links']['/login/?action=logout&return_to=' . urlencode($_josh['request']['path_query'])] = '&times';
-		return draw_css('
-			body { margin-top: 30px; overflow: visible; position: relative; } 
-			body #cms_bar { background-color: #ffaf14; border-bottom: 1px solid rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.4); color: #333; font: 14px Verdana; padding: 0 1%; position: fixed; top: 0; width: 98%; z-index: 10000;
-				-webkit-box-shadow: 0px 0px 5px #333; 
-				   -moz-box-shadow: 0px 0px 5px #333; 
-				        box-shadow: 0px 0px 5px #333;
-			}
-			body #cms_bar div.wrapper { width: ' . $width . '; margin: 0 auto; }
-			body #cms_bar div.wrapper span { display: inline-block; height: 30px; line-height: 30px; } 
-			body #cms_bar div.wrapper ul.cms_bar_nav { list-style-type: none; float: right; }
-			body #cms_bar div.wrapper ul.cms_bar_nav li { float: left; margin-left: 10px; border-left: 1px solid #ffca62; }
-			body #cms_bar div.wrapper ul.cms_bar_nav li:first-child { border-left: 0; }
-			body #cms_bar div.wrapper ul.cms_bar_nav li a { color: #333; display: inline-block; line-height: 30px; padding-left: 10px; text-decoration: none; }
-			body #cms_bar div.wrapper ul.cms_bar_nav li a:hover { text-decoration: underline; }
-			
-		') . 
-		'<div id="cms_bar"><div class="wrapper"><span>Welcome back ' . $_SESSION['name'] . '</span>' . draw_nav($_josh['cms_links'], 'text', 'cms_bar_nav') . '</div></div>';
+	if (cookie_get('secret_key')) {
+		//log in
+		if (!user() && $r = db_grab('SELECT id, firstname, lastname, email, secret_key, is_admin FROM app_users WHERE secret_key = "' . $_COOKIE['secret_key'] . '" AND is_active = 1')) {
+			$_SESSION['user_id']	= $r['id'];
+			$_SESSION['show_deleted'] = false;
+			$_SESSION['name']		= $r['firstname'];
+			$_SESSION['full_name']	= $r['firstname'] . ' ' . $r['lastname'];
+			$_SESSION['email']		= $r['email'];
+			$_SESSION['is_admin']	= $r['is_admin'];
+			$_SESSION['isLoggedIn']	= true;
+			db_query('UPDATE app_users SET last_login = NOW() WHERE id = ' . $r['id']);		
+		}
+		
+		if (user()) {
+			if (!isset($_josh['cms_links'])) $_josh['cms_links'] = array();
+			$_josh['cms_links'] = array_merge(array('/login/'=>'CMS Home'), $_josh['cms_links']);
+			$_josh['cms_links']['/login/?action=logout&return_to=' . urlencode($_josh['request']['path_query'])] = '&times';
+			return draw_css('
+				body { margin-top: 30px; overflow: visible; position: relative; } 
+				body #cms_bar { background-color: #ffaf14; border-bottom: 1px solid rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.4); color: #333; font: 14px Verdana; padding: 0 1%; position: fixed; top: 0; width: 98%; z-index: 10000;
+					-webkit-box-shadow: 0px 0px 5px #333; 
+					   -moz-box-shadow: 0px 0px 5px #333; 
+					        box-shadow: 0px 0px 5px #333;
+				}
+				body #cms_bar div.wrapper { width: ' . $width . '; margin: 0 auto; }
+				body #cms_bar div.wrapper span { display: inline-block; height: 30px; line-height: 30px; } 
+				body #cms_bar div.wrapper ul.cms_bar_nav { list-style-type: none; float: right; }
+				body #cms_bar div.wrapper ul.cms_bar_nav li { float: left; margin-left: 10px; border-left: 1px solid #ffca62; }
+				body #cms_bar div.wrapper ul.cms_bar_nav li:first-child { border-left: 0; }
+				body #cms_bar div.wrapper ul.cms_bar_nav li a { color: #333; display: inline-block; line-height: 30px; padding-left: 10px; text-decoration: none; }
+				body #cms_bar div.wrapper ul.cms_bar_nav li a:hover { text-decoration: underline; }
+				
+			') . 
+			'<div id="cms_bar"><div class="wrapper"><span>Welcome back ' . $_SESSION['name'] . '</span>' . draw_nav($_josh['cms_links'], 'text', 'cms_bar_nav') . '</div></div>';
+		}
 	}
 }
 
