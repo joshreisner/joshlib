@@ -9,20 +9,22 @@ LICENSE
 THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
-	~~TITLE~~~~~~~~~~~~~LANG~~~~LICENSE~VERSION~UPDATED~~~~~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	> codepress			js		LGPL						http://sourceforge.net/projects/codepress/
-	> file_icons
-	> fpdf				php									http://www.fpdf.org/
-	> jquery			js		MIT		1.4.2	2010-08-09	http://jquery.com/
-	> lorem_ipsum		js									http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
-	> salesforce		php									http://developer.force.com/							
-	> simple_html_dom	php		MIT							http://sourceforge.net/projects/simplehtmldom/
-	> swiftmailer		php		LGPL	4.0.6	2010-08-09	http://swiftmailer.org/
-	> tinymce			js		LGPL	3.3.8	2010-08-09	http://tinymce.moxiecode.com/
+	~~TITLE~~~~~~~~~~~~~LANG~~~~LICENSE~~~~~VERSION~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	> codepress			js		LGPL				http://sourceforge.net/projects/codepress/
+	> file_icons		png		-			-		-
+	> fpdf				php							http://www.fpdf.org/
+	> jquery			js		MIT			1.5.2	http://jquery.com/
+	> lorem_ipsum		js							http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
+	> salesforce		php							http://developer.force.com/							
+	> simple_html_dom	php		MIT					http://sourceforge.net/projects/simplehtmldom/
+	> swiftmailer		php		LGPL		4.0.6	http://swiftmailer.org/
+	> tinymce			js		LGPL		3.3.8	http://tinymce.moxiecode.com/
 
 	JQUERY EXTENSIONS (in the jquery folder)
-	> jeditable									2010-08-10	http://www.appelsiini.net/projects/jeditable
-	> table drag and drop		LGPL	0.5		2010-08-09	http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/		
+	> fancybox					MIT/GPL				http://fancybox.net/
+	> jscrollpane				MIT/GPL				http://jscrollpane.kelvinluck.com/
+	> validate					MIT/GPL				http://bassistance.de/jquery-plugins/jquery-plugin-validation/
+	> table drag and drop		LGPL		0.5		http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/		
 
 USING THE DEBUGGER
 	you can run the debug() function after joshlib has been included to see output of various processes
@@ -369,7 +371,7 @@ $_josh['finished_loading'] = true;
 error_debug('joshlib finished loading in ' . format_time_exec(), __file__, __line__, '#def');
 
 
-//special functions that don't yet fit into a category
+//special (misc) functions that don't yet fit into a category
 
 function admin() {
 	//shortcut to say if a session has the is_admin bit set	
@@ -570,7 +572,6 @@ function lib_get($string) {
 		//javascript libraries
 		case 'fancybox' :
 		case 'innershiv' :
-		case 'jeditable' :
 		case 'jquery' :
 		case 'jquery-latest' :
 		case 'jscrollpane' :
@@ -578,6 +579,7 @@ function lib_get($string) {
 		case 'modernizr' :
 		case 'tablednd' :
 		case 'tinymce' :
+		case 'validate' :
 		if (isset($_josh['drawn'][$string])) return false;
 		
 		$_josh['drawn'][$string] = true;
@@ -608,7 +610,7 @@ function lib_get($string) {
 			') . $return;
 			file_dir_writable('images');
 			file_dir_writable('files');
-		} elseif (($string == 'tablednd') || ($string == 'jeditable') || ($string == 'fancybox') || ($string == 'jscrollpane')) {
+		} elseif (($string == 'tablednd') || ($string == 'validate') || ($string == 'fancybox') || ($string == 'jscrollpane')) {
 			$return = lib_get('jquery') . $return;
 			if ($string == 'fancybox') {
 				$return .= draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.mousewheel-3.0.2.pack.js') . 
@@ -621,11 +623,6 @@ function lib_get($string) {
 		}
 		
 		return $return;
-
-		//deprecated
-		case 'prototype' :
-		case 'scriptaculous' :
-		return error_handle('Prototype and Scriptaculous are deprecated', 'As of August 9th 2010, jQuery is the official Javascript framework of Joshlib', __file__, __line__);
 	}
 }
 
@@ -646,9 +643,6 @@ function lib_location($string) {
 		case 'innershiv' :
 		return $lib . 'innershiv.min.js';
 		
-		case 'jeditable' :
-		return DIRECTORY_WRITE . '/lib/jquery/jquery.jeditable.mini.js';
-
 		case 'jquery' :
 		return $lib . 'jquery-1.5.2.min.js';
 		
@@ -678,6 +672,9 @@ function lib_location($string) {
 		
 		case 'tinymce' :
 		return $lib . 'tinymce_3_3_9/jquery.tinymce.js';
+
+		case 'validate' :
+		return DIRECTORY_WRITE . '/lib/jquery/jquery.validate.min.js';
 	}
 }
 

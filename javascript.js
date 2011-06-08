@@ -8,16 +8,6 @@ $(function(){
 	var defaults = {};
 	$('input.default').each(function(){ defaults[$(this).attr('name')] = $(this).val(); });
 	
-	//todo deprecate in favor of html5?
-	$('input.default').click(function(){
-		if ($(this).val() == defaults[$(this).attr('name')]) $(this).val('');
-	});
-
-	//todo deprecate in favor of html5?
-	$('input.default').blur(function(){
-		if ($(this).val() == '') $(this).val(defaults[$(this).attr('name')]);
-	});
-	
 	$('div[contenteditable=true]').blur(function(){
 		$.ajax({
 			url  : url_action_add('ajax_set', true),
@@ -121,10 +111,6 @@ function css_set(object, what) {
 	object.className = what;
 }
 
-function form_checkbox_toggle(which) {
-	document.getElementById(which).checked = !document.getElementById(which).checked;
-}
-
 function form_checkbox_add(options_table, target) {
 	//var which is the options_table
 	var new_value = prompt("Please enter a name for the new checkbox", "");
@@ -192,6 +178,7 @@ function form_date_range_valid(form, start_prefix, end_prefix) {
 }
 
 function form_errors(errors) {
+	//todo deprecate.  no longer being used by the form class in favor of jquery validate
 	var error;
 	if (errors.length == 0) return true;
 	if (errors.length == 1) {
@@ -211,20 +198,13 @@ function form_errors(errors) {
 }
 
 function form_tinymce_clear(field_id) {
+	//todo jquery version?  is this being used?
 	tinyMCE.getInstanceById(field_id).getBody().innerHTML='';
 }
 
 function form_field_email(obj) {
    var regExp = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
    return regExp.test(obj.value);
-}
-
-function form_field_default(which, clear, str) {
-	if (clear && (which.value == str)) {
-		which.value = "";
-	} else if (!clear && (which.value == "")) {
-		which.value = str;
-	}
 }
 
 function form_file_suggest(str, target) {

@@ -421,7 +421,7 @@ function draw_form_img($url, $class='submit') {
 	return draw_tag('input', array('type'=>'image', 'src'=>$url, 'class'=>$class));
 }
 
-function draw_form_label($for, $content, $class) {
+function draw_form_label($for, $content, $class=false) {
 	return draw_tag('label', array('for'=>$for, 'class'=>$class), $content);
 }
 

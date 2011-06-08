@@ -14,7 +14,6 @@ class form {
 	var $readonly		= false;
 	var $focus			= false;
 	var $counter		= 1;
-	var $javascript		= array();
 	
 	function __construct($name=false, $id=false, $submit=true, $cancel=false, $readonly=false) {
 		global $_josh;
@@ -77,18 +76,19 @@ class form {
 		$return = draw_div_class('fieldset', draw_tag('fieldset', false, $return));
 		
 		//wrap in form
-		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$this->action, 'name'=>$this->name, 'id'=>$this->name, 'class'=>$this->name, 'onsubmit'=>'javascript:return form_validate(this);'), $return);
+		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$this->action, 'id'=>$this->name), $return);
 		
 		//focus on first element
 		if ($focus && !empty($this->focus)) $return .= draw_form_focus($this->focus);
-
-		//if javascript, prepend validation function
-		if (count($this->javascript)) $return = draw_javascript('
-			function validate_' . $this->name . '() { 
-				var errors = new Array();
-				' . implode(NEWLINE, $this->javascript) . ' 
-				return form_errors(errors);
-			}') . $return;
+		
+		//run validator
+		$return .= lib_get('validate') . draw_javascript_ready('
+			$("form#' . $this->name . '").validate({submitHandler:function(form){ 
+				if (typeof submit_' . $this->name . ' == "function") {
+					if (submit_' . $this->name . '($("form#' . $this->name . '"))) form.submit();
+				}
+				form.submit();
+			}})');
 
 		return $return;
 	}
@@ -111,7 +111,7 @@ class form {
 		if (!$option_title) $option_title = 'title';
 		
 		//wrap additional
-		if ($additional) $additional = draw_tag('span', array('class'=>'additional'), $additional);
+		if ($additional && ($type != 'checkboxes')) $additional = draw_tag('span', array('class'=>'additional'), $additional);
 		
 		error_debug('<b>' . __function__ . '</b> drawing field ' . $name . ' of type ' . $type, __file__, __line__);
 
@@ -127,7 +127,7 @@ class form {
 			switch ($type) {
 				case 'checkbox':
 					if ($allow_changes) {
-						$return .= draw_div_class('checkbox_option', draw_form_checkbox($name, $value) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $name . '\');">' . $additional . '</span>');
+						$return .= draw_form_checkbox($name, $value);
 					} else {
 						$return .= format_boolean($value);
 					}
@@ -157,9 +157,8 @@ class form {
 					foreach ($options as &$o) {
 						if ($maxlength) $o[$option_title] = format_string($o[$option_title], $maxlength);
 						$chkname = 'chk-' . $name . '-' . $o['id'];
-						$o = draw_form_checkbox($chkname, $o['checked']) . '<span class="option_name" onclick="javascript:form_checkbox_toggle(\'' . $chkname . '\');">' . $o[$option_title] . '</span>';
+						$o = draw_form_checkbox($chkname, $o['checked']) . draw_form_label($chkname, $o[$option_title]);
 					}
-					//if ($allow_changes) $options[] = '<a class="option_add" href="javascript:form_checkbox_add(\'' . $options_table . '\', \'' . $allow_changes . '\');">add new</a>';
 					$return .= draw_list($options, array('id'=>$options_table));
 					break;
 				case 'date':
@@ -232,18 +231,11 @@ class form {
 				case 'int':
 				case 'text':
 					if ($allow_changes) {
-						//accepts insertion point
-						if (!$this->focus) $this->set_focus($name);
-						
+						if (!$this->focus) $this->set_focus($name); //accepts insertion point
 						$args = array('class'=>$type);
-						if (!empty($default)) {
-							$return .= draw_javascript_src();
-							$args['onfocus'] = 'javascript:form_field_default(this, true, "' . $default . '");';
-							$args['onblur'] = 'javascript:form_field_default(this, false, "' . $default . '");';
-						}
+						if (!empty($default)) $args['placeholder'] = $default;
+						if ($required) $args['class'] .= ' required';
 						$return .= draw_form_text($name, $value, $args, $maxlength, false, false) . $additional;
-						
-						if ($required) $this->javascript[] = 'if (form_text_empty(document.' . $this->name . '.' . $name . ')) errors[errors.length] = "the ' . $label . ' field is empty";';
 					} else {
 						$return .= ($name == 'url') ? draw_link($value) : $value;
 					}
@@ -255,17 +247,9 @@ class form {
 						if (!$this->focus) $this->set_focus($name);
 						if ($class) {
 							$args['class'] = $class;
-							if ($class == 'tinymce') {
-								$return .= lib_get('tinymce');
-							} elseif ($class == 'ckeditor') {
-								$return .= lib_get('ckeditor');
-							}
+							if ($class == 'tinymce') $return .= lib_get('tinymce');
 						}
-						if (!empty($default)) {
-							$return .= draw_javascript_src();
-							$args['onfocus'] = 'javascript:form_field_default(this, true, "' . $default . '");';
-							$args['onblur'] = 'javascript:form_field_default(this, false, "' . $default . '");';
-						}
+						if (!empty($default)) $args['placeholder'] = $default;
 						$return .= draw_form_textarea($name, $value, $args);
 					} else {
 						$return .= $value;
@@ -274,16 +258,16 @@ class form {
 				case 'url':
 					if ($allow_changes) {
 						if (!$value) $value = 'http://';
+						if ($required) $class .= ' required';
 						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
-						if ($required) $this->javascript[] = 'if (form_url_empty(document.' . $this->name . '.' . $name . ')) errors[errors.length] = "the ' . $label . ' field is empty";';
 					} else {
 						$return .= draw_link($value);
 					}
 					break;
 				case 'url-local':
 					if ($allow_changes) {
+						if ($required) $class .= ' required';
 						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
-						if ($required) $this->javascript[] = 'if (form_url_empty(document.' . $this->name . '.' . $name . ')) errors[errors.length] = "the ' . $label . ' field is empty";';
 					} else {
 						$return .= draw_link($value);
 					}
@@ -339,11 +323,6 @@ class form {
 		//form is read-only
 		if ($this->readonly) $allow_changes = false;
 		
-		if (($type == 'checkbox') && $allow_changes) {
-			$additional = $label;
-			$label = '&nbsp;';
-		}
-
 		error_debug('<b>' . __function__ . '</b> adding ' . $name . ' of type ' . $type, __file__, __line__);
 
 		//package and save
@@ -395,10 +374,6 @@ class form {
 	
 	function set_hidden($name, $value=false) {
 		$this->set_field(array('name'=>$name, 'value'=>$value, 'type'=>'hidden'));
-	}
-	
-	function set_javascript($js) {
-		$this->javascript[] = $js;
 	}
 	
 	function set_order($strorder='') {
