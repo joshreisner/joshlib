@@ -83,7 +83,7 @@ class form {
 		
 		//run validator
 		$return .= lib_get('validate') . draw_javascript_ready('
-			$("form#' . $this->name . '").validate({submitHandler:function(form){ 
+			$("form#' . $this->name . '").validate({rules: { email:true }, submitHandler:function(form){ 
 				if (typeof submit_' . $this->name . ' == "function") {
 					if (submit_' . $this->name . '($("form#' . $this->name . '"))) form.submit();
 				} else {
@@ -115,6 +115,10 @@ class form {
 		if ($additional && ($type != 'checkboxes')) $additional = draw_tag('span', array('class'=>'additional'), $additional);
 		
 		error_debug('<b>' . __function__ . '</b> drawing field ' . $name . ' of type ' . $type, __file__, __line__);
+		
+		if ($required) $class .= ' required';
+		$class .= ' ' . $type;
+		$class = trim($class);
 
 		//draw the field
 		if ($type == 'hidden') {
@@ -175,6 +179,13 @@ class form {
 						$return .= draw_form_date($name, $value, true, false, $required) . $additional;
 					} else {
 						$return .= format_date_time($value);
+					}
+					break;
+				case 'email':
+					if ($allow_changes) {
+						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
+					} else {
+						$return .= draw_link('mailto:' . $value);
 					}
 					break;
 				case 'file':
@@ -246,10 +257,8 @@ class form {
 					if ($allow_changes) {
 						//accepts insertion point
 						if (!$this->focus) $this->set_focus($name);
-						if ($class) {
-							$args['class'] = $class;
-							if ($class == 'tinymce') $return .= lib_get('tinymce');
-						}
+						$args['class'] = $class;
+						if (stristr($class, 'tinymce')) $return .= lib_get('tinymce');
 						if (!empty($default)) $args['placeholder'] = $default;
 						$return .= draw_form_textarea($name, $value, $args);
 					} else {
@@ -259,7 +268,6 @@ class form {
 				case 'url':
 					if ($allow_changes) {
 						if (!$value) $value = 'http://';
-						if ($required) $class .= ' required';
 						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
 					} else {
 						$return .= draw_link($value);
@@ -267,7 +275,6 @@ class form {
 					break;
 				case 'url-local':
 					if ($allow_changes) {
-						if ($required) $class .= ' required';
 						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
 					} else {
 						$return .= draw_link($value);
@@ -276,10 +283,8 @@ class form {
 			}
 						
 			//wrap it up
-			$classes = array('field', 'field_' . $this->counter, $type, $name);
-			if ($class) $classes[] = $class;
-			if ($required) $classes[] = 'required';
-			$return = draw_div_class(implode(' ', $classes), $return) . NEWLINE;
+			$div_class = implode(' ', array('field', 'field_' . $this->counter, $name, $class));
+			$return = draw_div_class($div_class, $return) . NEWLINE;
 			$this->counter++;
 		}
 		return $return;

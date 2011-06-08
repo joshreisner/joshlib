@@ -510,7 +510,7 @@ function draw_form_submit($message='Submit Form', $class=false) {
 
 function draw_form_text($name, $value='', $args=false, $maxlength=255, $style=false) {
 	$args = array_arguments($args);
-	array_argument($args, 'text');
+	//array_argument($args, 'text');
 	array_argument($args, 'text', 'type');
 	array_argument($args, $name, 'id');
 	array_argument($args, $name, 'name');
