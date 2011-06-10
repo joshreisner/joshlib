@@ -101,13 +101,14 @@ function file_download($content, $filename, $extension) {
 	db_close();
 }
 
-function file_dynamic($table, $column, $id, $extension, $lastmod=false) {
-	global $_josh; // mtime = 1242850776, lastmod = 1242682931
+function file_dynamic($table, $column, $id, $extension, $lastmod=true) {
+	//get an image from the database, return a filename
+	//lastmod is to decide whether the image needs to be updated.  you can pass false to skip updating.
 	file_dir_writable('dynamic');
 	//debug();
 	$filename = DIRECTORY_WRITE . '/dynamic/' . $table . '-' . $column . '-' . $id . '.' . $extension;
 	error_debug(draw_strong(__function__) . ' running for filename = ' . $filename . ' with lastmod ' . $lastmod, __file__, __line__);
-	if (!$lastmod || !file_exists(DIRECTORY_ROOT . $filename) || (strToTime($lastmod) > filemtime(DIRECTORY_ROOT . $filename))) {
+	if (($lastmod !== false) && (($lastmod === true) || !file_exists(DIRECTORY_ROOT . $filename) || (strToTime($lastmod) > filemtime(DIRECTORY_ROOT . $filename)))) {
 		if (!file_exists(DIRECTORY_ROOT . $filename)) error_debug(draw_strong(__function__) . ' ' . DIRECTORY_ROOT . $filename . ' does not exist ', __file__, __line__);		
 		if ($content = db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id)) {
 			file_put($filename, $content);
