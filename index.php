@@ -411,23 +411,31 @@ function cms_bar($width='100%') {
 			$_josh['cms_links']['/login/?action=logout&return_to=' . urlencode($_josh['request']['path_query'])] = '&times';
 			return draw_css('
 				body { margin-top: 31px; overflow: visible; position: relative; } 
-				body #cms_bar { background-color: #ffaf14; /* border-bottom: 1px solid rgba(0,0,0,0.7); border-top: 1px solid rgba(255,255,255,0.4); */ color: #333; font: 14px Verdana; padding: 0; position: fixed; top: 0; width: 100%; z-index: 10000;
+				body #cms_bar { /* background-color: #ffaf14; */ /* border-bottom: 1px solid rgba(0,0,0,0.7); border-top: 1px solid rgba(255,255,255,0.4); */ color: #333; font: 14px Verdana; padding: 0; position: fixed; top: 0; width: 100%; z-index: 10000;
+				  background-color: #ffa114;
+				  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffa114), to(#ffaf14)); 
+				  background-image: -webkit-linear-gradient(top, #ffa114, #ffaf14); 
+				  background-image:    -moz-linear-gradient(top, #ffa114, #ffaf14); 
+				  background-image:     -ms-linear-gradient(top, #ffa114, #ffaf14); 
+				  background-image:      -o-linear-gradient(top, #ffa114, #ffaf14); 
+				  background-image:         linear-gradient(top, #ffa114, #ffaf14);
+				  
 					-webkit-box-shadow: 0px 0px 5px #333; 
 					   -moz-box-shadow: 0px 0px 5px #333; 
-					        box-shadow: 0px 0px 5px #333;
+					        box-shadow: 0px 0px 5px #333, inset 0 1px 1px 0 rgba(255,255,255,0.5);
 				}
 				body #cms_bar div.wrapper { border-bottom: 1px solid rgba(0,0,0,0.4); width: ' . $width . '; margin: 0 auto; }
-				body #cms_bar div.wrapper span { display: inline-block; height: 30px; line-height: 30px; margin-left: 1em; } 
+				body #cms_bar div.wrapper span.cms-message { color: rgba(0,0,0,0.5); display: inline-block; font-style: italic; height: 30px; line-height: 30px; margin-left: 1em; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
 				body #cms_bar div.wrapper ul.cms_bar_nav { list-style-type: none; float: right; }
 				body #cms_bar div.wrapper ul.cms_bar_nav li { float: left; /* margin-left: 10px; */ border-left: 1px solid rgba(0,0,0,0.3); }
-				body #cms_bar div.wrapper ul.cms_bar_nav li a { border-left: 1px solid rgba(255,255,255,0.4); color: #333; display: inline-block; line-height: 30px; padding: 0 10px; text-decoration: none; }
-				body #cms_bar div.wrapper ul.cms_bar_nav li a:hover { background: rgba(0,0,0,0.2); color: #fff; }
-				body #cms_bar div.wrapper ul.cms_bar_nav li.last a { /* border-bottom: 1px solid rgba(0,0,0,0.4); */ border-left: 1px solid rgba(255,255,255,0.2); /* border-top: 1px solid rgba(255,255,255,0.4); */ font-weight: bold; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
+				body #cms_bar div.wrapper ul.cms_bar_nav li a { border-left: 1px solid rgba(255,255,255,0.4); color: #333; display: inline-block; line-height: 30px; padding: 0 10px; text-decoration: none; text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
+				body #cms_bar div.wrapper ul.cms_bar_nav li a:hover { background: rgba(0,0,0,0.2); color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.4); }
+				body #cms_bar div.wrapper ul.cms_bar_nav li.last a { border-left: 1px solid rgba(255,255,255,0.2); color: rgba(0,0,0,0.3); font-weight: bold; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
 				body #cms_bar div.wrapper ul.cms_bar_nav li.last a:hover { background: rgba(0,0,0,0.2); color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.9); } 
 			') . 
 			'<div id="cms_bar">
 				<div class="wrapper">
-					<span>Welcome back ' . $_SESSION['name'] . '</span>' . 
+					<span class="cms-message">Welcome back ' . $_SESSION['name'] . '</span>' . 
 					draw_nav($_josh['cms_links'], 'text', 'cms_bar_nav') . 
 				'</div>
 			</div>';
