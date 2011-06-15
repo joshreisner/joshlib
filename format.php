@@ -379,7 +379,7 @@ function format_html($text, $profile='user') {
 						
 			//kill bad tags
 			//never want these tags, or anything inside them
-			$bad_tags = array('comment', 'form', 'label', 'input', 'link', 'noscript', 'script', 'select', 'unknown'); //new iframe whitelist			
+			$bad_tags = array('comment', 'form', 'label', 'input', 'link', 'noscript', 'script', 'select', 'unknown', 'style'); //new iframe whitelist			
 			if (in_array($e->tag, $bad_tags)) tagUnset($e);		
 			
 			//these are the tags we want.  if you're not one of these, remove but keep your contents eg <NYT_HEADLINE>
