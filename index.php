@@ -94,6 +94,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'checkboxes'=>'Checkboxes',
 										'date'=>'Date',
 										'datetime'=>'Date & Time',
+										'email'=>'Email',
 										'select'=>'Dropdown',
 										'file'=>'File',
 										'file-type'=>'File (Type)',

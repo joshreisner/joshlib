@@ -175,6 +175,7 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			$datatype = 'text';
 			break;
 			
+			case 'email': 
 			case 'latlon': 
 			case 'text': 
 			case 'url': 
