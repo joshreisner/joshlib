@@ -34,6 +34,10 @@ function draw_array($array, $nice=false) {
 	return $return;
 }
 
+function draw_article($content='', $arguments=false) {
+	return draw_tag('article', $arguments, $content);
+}
+
 function draw_audio_embed($src) {
 	return '<embed src="' . $src . '" volume="50" width="314" height="60"><noembed><bgsound src="' . $src . '"/></noembed></embed>';
 }

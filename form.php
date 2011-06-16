@@ -131,11 +131,7 @@ class form {
 			}
 			switch ($type) {
 				case 'checkbox':
-					if ($allow_changes) {
-						$return .= draw_form_checkbox($name, $value);
-					} else {
-						$return .= format_boolean($value);
-					}
+					$return .= ($allow_changes) ? draw_form_checkbox($name, $value) : format_boolean($value);
 					break;
 				case 'checkboxes':
 					if (!$option_title) {
@@ -245,8 +241,8 @@ class form {
 					if ($allow_changes) {
 						if (!$this->focus) $this->set_focus($name); //accepts insertion point
 						$args = array('class'=>$type);
-						if (!empty($default)) $args['placeholder'] = $default;
 						if ($required) $args['class'] .= ' required';
+						if (!empty($default)) $args['placeholder'] = $default;
 						$return .= draw_form_text($name, $value, $args, $maxlength, false, false) . $additional;
 					} else {
 						$return .= ($name == 'url') ? draw_link($value) : $value;

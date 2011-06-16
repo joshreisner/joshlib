@@ -1,5 +1,5 @@
 <?php
-error_debug('including email.php', __file__, __line__);
+error_debug('including html.php', __file__, __line__);
 //i'm going to very carefully rewrite most of the draw.php in here
 
 function html_a($link=false, $href='#', $arguments=false, $new_window=false, $max_length=60) {
@@ -24,4 +24,8 @@ function html_a($link=false, $href='#', $arguments=false, $new_window=false, $ma
 	}
 	if ($new_window) $arguments['target'] = '_blank';
 	return draw_tag('a', $arguments, $link);
+}
+
+function html_article() {
+	
 }
