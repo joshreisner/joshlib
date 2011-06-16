@@ -378,9 +378,13 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 	//assemble date fields
 	$months = array();
 	foreach ($_josh['months'] as $key=>$value) $months[$key + 1] = $value;
-	$return = draw_form_select($namePrefix . 'Month', $months, $month, $required, $class) .
-	draw_form_select($namePrefix . 'Day', array_2d(array_range(1, 31)), $day, $required, $class) .
-	draw_form_select($namePrefix . 'Year', array_2d(array_range(1920, 2015)), $year, $required, $class);
+	
+	$return = draw_div_class('date',
+		draw_form_select($namePrefix . 'Month', $months, $month, $required, $class) .
+		draw_form_select($namePrefix . 'Day', array_2d(array_range(1, 31)), $day, $required, $class) .
+		draw_form_select($namePrefix . 'Year', array_2d(array_range(1920, 2015)), $year, $required, $class)
+	);
+	
 	if ($withTime) {
 		$return .= draw_div_class('time',  
 			draw_form_select($namePrefix . 'Hour', array_2d(array(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)), $hour, $required, $class) .
