@@ -766,7 +766,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	} */
 	
 	//if possible, populate search indexes
-	if ($full_text) db_words($full_text, $id, $table . '_to_words');
+	if ($create_index && $full_text) db_words($full_text, $id, $table . '_to_words');
 	
 	return $id;
 }

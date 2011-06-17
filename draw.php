@@ -38,6 +38,10 @@ function draw_article($content='', $arguments=false) {
 	return draw_tag('article', $arguments, $content);
 }
 
+function draw_aside($content='', $arguments=false) {
+	return draw_tag('aside', $arguments, $content);
+}
+
 function draw_audio_embed($src) {
 	return '<embed src="' . $src . '" volume="50" width="314" height="60"><noembed><bgsound src="' . $src . '"/></noembed></embed>';
 }
@@ -1065,8 +1069,8 @@ function draw_rss_link($address) {
 	return draw_tag('link', array('rel'=>'alternate', 'type'=>'application/rss+xml', 'title'=>'RSS', 'href'=>$address));
 }
 
-function draw_section($inner=false, $arguments=false) {
-	return draw_tag('section', $arguments, $inner);
+function draw_section($content='', $arguments=false) {
+	return draw_tag('section', $arguments, $content);
 }
 
 function draw_span($class, $inner='') {
