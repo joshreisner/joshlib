@@ -374,9 +374,9 @@ error_debug('joshlib finished loading in ' . format_time_exec(), __file__, __lin
 
 //special (misc) functions that don't yet fit into a category
 
-function admin() {
+function admin($key='is_admin') {
 	//shortcut to say if a session has the is_admin bit set	
-	return (isset($_SESSION['is_admin']) && $_SESSION['is_admin']);
+	return (isset($_SESSION[$key]) && $_SESSION[$key]);
 }
 
 function browser_output($html) {
@@ -726,9 +726,9 @@ function posting($form_id=false) {
 	return ($_POST['form_id'] == $form_id);
 }
 
-function user($return=false) {
+function user($return=false, $key='user_id') {
 	//shortcut to say if a session exists and what the id is, or return $return eg NULL for sql
 	if (!isset($_SESSION)) session_start();
-	if (empty($_SESSION['user_id'])) return $return;
-	return $_SESSION['user_id'];
+	if (empty($_SESSION[$key])) return $return;
+	return $_SESSION[$key];
 }
