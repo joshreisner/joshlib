@@ -245,7 +245,7 @@ class form {
 						if (!empty($default)) $args['placeholder'] = $default;
 						$return .= draw_form_text($name, $value, $args, $maxlength, false, false) . $additional;
 					} else {
-						$return .= ($name == 'url') ? draw_link($value) : $value;
+						$return .= ($name == 'url') ? draw_link($value, $value) : $value;
 					}
 					break;
 				case 'textarea':
@@ -266,7 +266,7 @@ class form {
 						if (!$value) $value = 'http://';
 						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
 					} else {
-						$return .= draw_link($value);
+						$return .= draw_link($value, $value);
 					}
 					break;
 				case 'url-local':
