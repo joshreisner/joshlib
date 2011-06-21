@@ -74,6 +74,10 @@ function url_domain($url) {
 	return false;
 }
 
+function url_file_link($file_table, $file_id, $col_title='title', $col_file='file', $col_type='type') {
+	return url_query_add(array('action'=>'file_download', 'file_table'=>$file_table, 'file_id'=>$file_id, 'col_title'=>$col_title, 'col_file'=>$col_file, 'col_type'=>$col_type), false);
+}
+
 function url_drop($deletes=false, $go=true) {
 	//alias for url_query_drop
 	return url_query_drop($deletes, $go);
