@@ -732,7 +732,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 		list($name, $ext, $path) = file_name($path);
 		$arguments['alt'] = format_text_human($name);
 	}
-
+	
 	$image = draw_tag('img', $arguments);
 	array_argument($alt, 'image');
 	if ($link) return draw_link($link, $image, $linknewwindow, $alt);
@@ -747,6 +747,7 @@ function draw_img_random($folder, $link=false, $class=false) {
 
 function draw_img_thumbnail($path, $link, $max) {
 	//$max is maximum width or height
+	if($max == '') $max = 80;
 	
 	//$path can be relative
 	if (!$realpath = realpath($path)) $realpath = realpath(DIRECTORY_ROOT . $path);
@@ -755,10 +756,12 @@ function draw_img_thumbnail($path, $link, $max) {
 	if (!@list($width, $height, $type, $attr) = @getimagesize($realpath)) return '';
 		
 	if ($width >= $height) {
-		return draw_img($path, $link, array('width'=>$max, 'height'=>$height*($max/$width)));
+		$args = array('width'=>$max, 'height'=>$height*($max/$width));
 	} else {
-		return draw_img($path, $link, array('width'=>$width*($max/$height), 'height'=>$max));
+		$args = array('width'=>$width*($max/$height), 'height'=>$max);
 	}
+		
+	return draw_img($path, $link, $args);
 }
 
 function draw_javascript($javascript=false) {
