@@ -619,6 +619,10 @@ function lib_get($string) {
 		$return = draw_javascript_src(lib_location($string));
 
 		if ($string == 'tinymce') {
+			//whether to show full button set or not
+			$tinymce_mode = (user() ? 'advanced' : 'simple');
+			if (isset($_josh['tinymce_mode'])) $tinymce_mode = $_josh['tinymce_mode'];
+			
 			//special statements for tinymce
 			$return = lib_get('jquery') . draw_javascript_ready('
 					$("textarea.tinymce").each(function(){
@@ -627,12 +631,13 @@ function lib_get($string) {
 							content_css : "/css/tinymce.css?" + new Date().getTime(),
 							custom_shortcuts : 0,
 							extended_valid_elements : "a[href|target|rel|name],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class|style],p[align|class|style],table[cellspacing,align,border,cellpadding,class],tr[class],td[width,align,class]",
-							plugins : "' . (user() ? 'imagemanager,filemanager,' : '') . 'paste",
+							plugins : "' . (($tinymce_mode == 'advanced') ? 'imagemanager,filemanager,' : '') . 'paste",
 							relative_urls : false,
 							remove_script_host : false,
+							onchange_callback: function() { tinyMCE.triggerSave(); },
 							script_url : "' . str_replace('jquery.tinymce.js', 'tiny_mce.js', lib_location('tinymce')) . '",
 							theme : "advanced",
-							theme_advanced_buttons1 : "' . (user() ? 
+							theme_advanced_buttons1 : "' . (($tinymce_mode == 'advanced') ? 
 								'styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,outdent,indent,|,link,unlink,image,hr,|,code' : 
 								'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,|,link,unlink'
 							) . '",

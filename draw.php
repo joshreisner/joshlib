@@ -851,7 +851,7 @@ function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false
 	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $arguments);
 }
 
-function draw_list($options, $arguments=false, $type='ul', $selected=false, $classes=false) {
+function draw_list($options, $arguments=false, $parent='ul', $selected=false, $classes=false, $child='li') {
 	//make a ul or an ol out of a one-dimensional array
 	if (!is_array($options) || (!$count = count($options))) return false;
 	$arguments = array_arguments($arguments);
@@ -878,10 +878,10 @@ function draw_list($options, $arguments=false, $type='ul', $selected=false, $cla
 		}
 		
 		
-		$options[$i] = draw_tag('li', $li_args, $options[$i]);
+		$options[$i] = draw_tag($child, $li_args, $options[$i]);
 		$counter++;
 	}
-	return draw_tag($type, $arguments, implode($options, NEWLINE));
+	return draw_tag($parent, $arguments, implode($options, NEWLINE));
 }
 
 function draw_list_columns($options, $columns=2, $arguments=false, $type='ul', $selected=false) {

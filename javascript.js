@@ -261,6 +261,7 @@ function form_url_empty(obj) {
 }
 
 function form_validate(form) {
+	//todo deprecate
 	if (eval("typeof validate_" + form.name + " == 'function'")) {
 		return eval("validate_" + form.name + "(form);");
 	}
