@@ -92,7 +92,6 @@ function file_download($content, $filename, $extension) {
 	//for IE over SSL
 	header('Cache-Control: maxage=1'); //In seconds
 	header('Pragma: public');
-	
 	header('Content-Description: File Transfer');
 	header('Content-Type: ' . file_mime($extension));
 	header('Content-Length: ' . strlen($content));
