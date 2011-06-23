@@ -795,7 +795,7 @@ function draw_javascript_link($target, $text, $id=false, $class=false) {
 
 function draw_javascript_folder_src() {
 	//conditionally include a javascript file based on the current folder
-	$filename = '/scripts/' . url_folder() . '.js';
+	$filename = '/js/' . url_folder() . '.js';
 	if (file_check($filename)) return draw_javascript_src($filename);
 }
 

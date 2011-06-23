@@ -5,8 +5,8 @@ error_debug('including form.php', __file__, __line__);
 class form { 
 	var $name			= false;
 	var $fields			= array();
-	var $title			= false;
-	var $title_prefix	= false; //for intranet
+	var $legend			= false;
+	var $legend_prefix	= false; //for intranet
 	var $id				= false;
 	var $table			= false;
 	var $values			= array();
@@ -21,7 +21,7 @@ class form {
 		//$name is the db table you're referencing.  good for putting up a quick form scaffolding
 		//$id is the id column of the table -- you can add values to the form (say if you are editing)
 		//$submit is a boolean, and indicates whether you should auto-add a submit button at the bottom
-		//if you pass $submit as a string, it will title use the text you passed, and title the form that
+		//if you pass $submit as a string, it will legend use the text you passed, and legend the form that
 		
 		if (!$name) error_handle('form error', 'your form must have a $name.  eg ' . format_code('$f = new form(\'foo\');'), __file__, __line__);
 		
@@ -33,9 +33,9 @@ class form {
 		
 		if ($name) $this->set_table($name);
 		if ($submit === true) {
-			$this->title = $this->submit = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($name));
+			$this->legend = $this->submit = (($id) ? 'Edit ' : 'Add New ') . format_singular(format_text_human($name));
 		} else {
-			$this->title = $this->submit = $submit;
+			$this->legend = $this->submit = $submit;
 		}
 		if ($this->table && $id) $this->set_values(db_grab('SELECT * FROM ' . $this->table . ' WHERE id = ' . $id));
 	}
@@ -63,8 +63,8 @@ class form {
 		}
 
 		//start output
-		if (!$this->title) $this->title = ''; //legend is showing up <legend/>
-		$return = draw_container('legend', draw_container('span', $this->title_prefix . $this->title));
+		if (!$this->legend) $this->legend = ''; //legend is showing up <legend/>
+		$return = draw_container('legend', draw_container('span', $this->legend_prefix . $this->legend));
 		
 		//send form name
 		$this->set_hidden('form_id', $this->name);
@@ -95,7 +95,6 @@ class form {
 	}
 	
 	function draw_row($field) {
-		global $_josh;
 		extract($field);
 		$return = '';
 
@@ -136,7 +135,6 @@ class form {
 				case 'checkboxes':
 					if (!$option_title) {
 						if (empty($options_table)) error_handle('options table not set', 'please specify your options table', __file__, __line__);
-						//$option_title = 'title';
 						if ($options_columns = db_columns($options_table)) {
 							$option_title = $options_columns[1]['name'];
 						} else {
@@ -158,6 +156,7 @@ class form {
 					foreach ($options as &$o) {
 						if ($maxlength) $o[$option_title] = format_string($o[$option_title], $maxlength);
 						$chkname = 'chk-' . $name . '-' . $o['id'];
+						if (!isset($o['checked'])) $o['checked'] = false;
 						$o = draw_form_checkbox($chkname, $o['checked']) . draw_form_label($chkname, $o[$option_title]);
 					}
 					$return .= draw_list($options, array('id'=>$options_table));
@@ -378,6 +377,10 @@ class form {
 		$this->set_field(array('name'=>$name, 'value'=>$value, 'type'=>'hidden'));
 	}
 	
+	function set_legend($legend=false) {
+		if ($legend) $this->legend = $legend;
+	}
+	
 	function set_order($strorder='') {
 		$fields = array_separated($strorder);
 		$return = array();
@@ -424,12 +427,13 @@ class form {
 		}
 	}
 	
-	function set_title($title=false) {
-		if ($title) $this->title = $title;
+	function set_title($legend=false) {
+		/*backwards compatibility*/
+		if ($legend) $this->legend = $legend;
 	}
 	
-	function set_title_prefix($prefix=false) {
-		$this->title_prefix = $prefix;
+	function set_legend_prefix($prefix=false) {
+		$this->legend_prefix = $prefix;
 	}
 	
 	function set_values($values=false) {
