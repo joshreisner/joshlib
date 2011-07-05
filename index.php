@@ -500,7 +500,108 @@ function cookie_get($key) {
 	return format_quotes($_COOKIE[$key]);
 }
 
+/*
+function date_holiday($date=false, $country='us') {
+	//return the name of the holiday on $date, or false
+	//todo refactor (currently designed to get all holidays for a month because it's copied from the intranet)
+	if (!$date) {
+		$date = time();
+	} elseif (!is_int($date) {
+		if (!$date = strtotime($date)) error_handle('could not convert date', __function__ . ' encountered a problem with the date', __file__, __line__);
+	}
+	$month		= date('n', $date);
+	$year		= date('Y', $date);
+	$day		= date('j', $date);
+	$holidays	= array();
+	
+	if ($month == 1) {
+		//new year's day
+		$holidays[1] = 'New Year\'s Day';
+		if (date('w', mktime(0,0,0,1,1,$year)) == 0) $holidays[2] = 'New Year\'s';
+	
+		//martin luther king day -- 3rd monday in jan
+		for ($i = 1; $i < 32; $i++) {
+			if (date('w', mktime(0,0,0,1,$i,$year)) == 1) $count++;
+			if ($count == 3) {
+				$holidays[$i] = 'Martin Luther King Day';
+				break;
+			}
+		}
+	} elseif ($month == 2) {
+		//president's day -- 3rd monday in feb
+		for ($i = 1; $i <= $lastday; $i++) {
+			if (date('w', mktime(0,0,0,2,$i,$year)) == 1) $count++;
+			if ($count == 3) {
+				$holidays[$i] = 'President\'s Day';
+				break;
+			}
+		}
+	} elseif ($month == 5) {
+		//memorial day -- last monday in may
+		for ($i = 31; $i > 0; $i--) {
+			if (date('w', mktime(0,0,0,5,$i,$year)) == 1) {
+				$holidays[$i] = 'Memorial Day';
+				break;
+			}
+		}
+	} elseif ($month == 7) {
+		//fourth of july
+		if (date('w', mktime(0,0,0,7,4,$year)) == 6) $holidays[3] = 'Independence Day';
+		if (date('w', mktime(0,0,0,7,4,$year)) == 0) $holidays[5] = 'Independence Day';
+		$holidays[4] = 'Independence Day';
+	} elseif ($month == 9) {
+		//labor day -- first monday in sept
+		for ($i = 1; $i < 31; $i++) {
+			if (date('w', mktime(0,0,0,9,$i,$year)) == 1) {
+				$holidays[$i] = 'Labor Day';
+				break;
+			}
+		}
+	} elseif ($month == 10) {
+		//columbus day -- second monday in oct
+		for ($i = 1; $i < 32; $i++) {
+			if (date('w', mktime(0,0,0,10,$i,$year)) == 1) $count++;
+			if ($count == 2) {
+				$holidays[$i] = 'Columbus Day';
+				break;
+			}
+		}
+	} elseif ($month == 11) {
+		//thanksgiving -- 4th thursday in nov
+		for ($i = 1; $i < 31; $i++) {
+			if (date('w', mktime(0,0,0,11,$i,$year)) == 4) $count++;
+			if ($count == 4) {
+				$holidays[$i] = 'Thanksgiving';
+				$holidays[$i+1] = 'Day After Thanksgiving';
+				break;
+			}
+		}
+	} elseif ($month == 12) {
+		//obscure possibility that friday after thanksgiving is 12/1
+		for ($i = 1; $i < 31; $i++) {
+			if (date('w', mktime(0,0,0,11,$i,$year)) == 4) $count++;
+			if ($count == 4) {
+				if ($i == 30) $holidays[1] = 'Day After Thanksgiving';
+				break;
+			}
+		}
+	
+		//christmas
+		$holidays[25] = 'Christmas Day';
+		if (date('w', mktime(0,0,0,12,25,$year)) == 6) $holidays[24] = 'Christmas';
+		if (date('w', mktime(0,0,0,12,25,$year)) == 0) $holidays[26] = 'Christmas';
+	
+		//obscure possibility that new year's is on a saturday; friday becomes a holiday
+		if (date('w', mktime(0,0,0,12,31,$year)) == 5) $holidays[31] = 'New Year\'s';
+	}
+	
+	if (isset($holidays[$day])) return $holidays[$day];
+	return false;	
+}
+*/
+
 function daysInMonth($month=false, $year=false) {
+	/*todo rename*/
 	global $_josh;
 	if (!$month) $month = $_josh['month'];
 	if (!$year) $year = $_josh['year'];
