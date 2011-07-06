@@ -260,6 +260,13 @@ function array_remove($needle, $haystack) {
 	return $return;
 }
 
+function array_searchwords($string) {
+	//return a sanitized array of words to search or use format_highlight on
+	$words = trim($string);
+	if (empty($words)) return false;
+	return explode(' ', $words);
+}
+
 function array_send($array, $target) {
 	//POST an array as a JSON post request to a remote site
 	global $_josh;
