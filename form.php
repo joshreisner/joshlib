@@ -381,6 +381,10 @@ class form {
 		if ($legend) $this->legend = $legend;
 	}
 	
+	function set_legend_prefix($prefix=false) {
+		$this->legend_prefix = $prefix;
+	}
+	
 	function set_order($strorder='') {
 		$fields = array_separated($strorder);
 		$return = array();
@@ -432,7 +436,7 @@ class form {
 		if ($legend) $this->legend = $legend;
 	}
 	
-	function set_legend_prefix($prefix=false) {
+	function set_title_prefix($prefix=false) {
 		$this->legend_prefix = $prefix;
 	}
 	
