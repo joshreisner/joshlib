@@ -379,7 +379,7 @@ function format_html($text, $profile='user') {
 						
 			//kill bad tags
 			//never want these tags, or anything inside them
-			$bad_tags = array('comment', 'form', 'label', 'input', 'link', 'noscript', 'script', 'select', 'unknown', 'style'); //new iframe whitelist			
+			$bad_tags = array('comment', 'form', 'label', 'input', 'link', 'noscript', 'script', 'select', 'style', 'textarea', 'unknown'); //new iframe whitelist			
 			if (in_array($e->tag, $bad_tags)) tagUnset($e);		
 			
 			//these are the tags we want.  if you're not one of these, remove but keep your contents eg <NYT_HEADLINE>
@@ -404,9 +404,9 @@ function format_html($text, $profile='user') {
 			} elseif ($e->tag == 'b') {
 				//deprecated tag: replace <b> with <strong>
 				$e->outertext = '<strong>' . $e->innertext . '</strong>';
-			} elseif ($e->tag == 'div') {
+			/* } elseif ($e->tag == 'div') {
 				//no empty divs
-				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = '';
+				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = ''; */
 			} elseif ($e->tag == 'i') {
 				//deprecated tag: replace <i> with <em>
 				$e->outertext = '<em>' . $e->innertext . '</em>';
@@ -414,13 +414,13 @@ function format_html($text, $profile='user') {
 				//be cautious with iframes, they can be malicious
 				if (!in_array(url_domain($e->src, array('google.com', 'vimeo.com', 'youtube.com')))) $e->outertext = '';
 			} elseif (($e->tag == 'p') && (!$e->innertext || ($e->innertext == '&nbsp;'))) {
-				//kill empty p tags
+				//kill empty p tags (msword and tinymce)
 				$e->outertext = '';
-			} elseif ($e->tag == 'span') {
+			/* } elseif ($e->tag == 'span') {
 				//remove empty spans
 				if (!$e->children && !$e->plaintext) {
 					$e->outertext = '';
-				}
+				} */
 			}
 		}
 		
@@ -439,8 +439,6 @@ function format_html($text, $profile='user') {
 	preg_match_all("/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i", $text, $matches);
 	foreach ($matches[0] as $m) $text = str_replace($m, format_ascii($m), $text);
 	
-	
-
 	$text = str_replace('&nbsp;', ' ', $text);
 	
 	return $text;
