@@ -397,8 +397,8 @@ function format_html($text, $profile='user') {
 			if ($e->tag == 'a') {
 				if ($e->parent->tag == 'a') $e->parent->innertext = $e->innertext;
 				if ($local_url = format_text_starts(url_base(), $e->href)) {
-					//local hyperlinks if possible
-					$e->href = $local_url;
+					//local hyperlinks if possible (removing for backend.livingcities.org situation)
+					//$e->href = $local_url;
 				}
 				if ($e->href) $e->href = strip_tags($e->href);
 			} elseif ($e->tag == 'b') {
