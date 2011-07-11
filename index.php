@@ -843,9 +843,10 @@ function posting($form_id=false) {
 	return ($_POST['form_id'] == $form_id);
 }
 
-function user($return=false, $key='user_id') {
+function user($return_if_empty=false) {
 	//shortcut to say if a session exists and what the id is, or return $return eg NULL for sql
+	$key = (defined('SESSION_USER_ID'))	? SESSION_USER_ID : 'user_id';
 	if (!isset($_SESSION)) session_start();
-	if (empty($_SESSION[$key])) return $return;
+	if (empty($_SESSION[$key])) return $return_if_empty;
 	return $_SESSION[$key];
 }
