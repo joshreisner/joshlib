@@ -564,10 +564,14 @@ function table_dnd(name, column, handle) {
 	//jquery and tablednd are required
 	$("#" + name).tableDnD({
         onDrop: function(table, row) {
+			console.log("sending reorder request");
 	        $.ajax({
 				type: "POST",
 				data: "table=" + name + "&column=" + column + "&" + $("#" + name).tableDnDSerialize(),
-				url: url_action_add('ajax_reorder', true)
+				url: url_action_add('ajax_reorder', true),
+				success: function(data){
+					console.log(data);
+				}
 			});
 			var thisclass = "odd";
 			$("#" + name + " tr").each(function(){

@@ -245,7 +245,8 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['editing']	= url_id();
 	
 //handle some ajax calls automatically -- requires user to be logged in
-	if (user() && url_action('ajax_delete,ajax_publish,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,indexes,lib_refresh,phpinfo')) {
+	if (url_action('ajax_delete,ajax_publish,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,indexes,lib_refresh,phpinfo')) {
+		if (!user()) die('user not logged in ' . SESSION_USER_ID);
 		$array = array_ajax();
 		
 		//quick thing for sessions -- why do we need this?

@@ -261,10 +261,11 @@ function array_remove($needle, $haystack) {
 }
 
 function array_searchwords($string) {
-	//return a sanitized array of words to search or use format_highlight on
-	$words = trim($string);
+	//return a sanitized array of words to search with or use format_highlight on
+	global $_josh;
+	$words = trim(strtolower(format_accents_remove(strip_tags($string))));
 	if (empty($words)) return false;
-	return explode(' ', $words);
+	return array_diff(array_unique(explode(' ', $words)), $_josh['ignored_words']);
 }
 
 function array_send($array, $target) {
