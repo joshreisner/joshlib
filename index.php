@@ -784,7 +784,7 @@ function lib_location($string) {
 		return $lib . 'innershiv.min.js';
 		
 		case 'jquery' :
-		return $lib . 'jquery-1.5.2.min.js';
+		return $lib . 'jquery-1.6.2.min.js';
 		
 		case 'jquery-hosted' :
 		return 'http://code.jquery.com/jquery-1.5.2.min.js';
