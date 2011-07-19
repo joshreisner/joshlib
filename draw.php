@@ -252,7 +252,7 @@ function draw_div_id($id, $innerhtml='', $arguments=false) {
 function draw_div_open($id=false, $arguments=false) {
 	$arguments = array_arguments($arguments);
 	$arguments['id'] = $id;
-	return draw_tag('div', $arguments, false, true); 
+	return '<div' . draw_arguments($arguments) . '>';
 }
 
 function draw_div_class_open($class=false) {
