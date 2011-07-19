@@ -5,6 +5,12 @@ potentially just need to add http.php
 */
 error_debug('including url.php', __file__, __line__);
 
+function url($string) {
+	//boolean test whether string is URL
+	//todo make robust
+	return (substr($string, 0, 4) == 'http');
+}
+
 function url_action($matches, $key='action') {
 	//don't know whether this is any good.  matches possible $_GET['action'] values
 	if (isset($_GET[$key])) {
@@ -91,6 +97,8 @@ function url_folder($empty='home') {
 function url_get($url, $username=false, $password=false) {
 	//retrieve remote page data
 	
+	if (!url($url)) return false;
+		
 	//curl_init is the preferred method.  if it's not available, try file()
 	if (!function_exists('curl_init')) return @implode('', @file($url));
 
@@ -110,7 +118,7 @@ function url_get($url, $username=false, $password=false) {
 		'Pragma: ' // browsers keep this blank. 
 	)); 
 	curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
-	$return = curl_exec($ch);
+	$return = trim(curl_exec($ch));
 	
 	//don't report couldn't connect errors, generates too much email
 	if ($error = curl_errno($ch) && ($error != CURLE_COULDNT_CONNECT)) error_handle('CURL Error', curl_error($ch), __file__, __line__);

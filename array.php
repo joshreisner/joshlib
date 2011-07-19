@@ -144,6 +144,34 @@ function array_explode_html($string, $separator) {
 	return $return;
 }
 
+function array_ics($file) {
+	if (url($file)) $file = url_get($file); //file can be a url of a file, or contents
+	$file = str_replace("\r\n ", '', $file); //take care of orphans
+	$file = explode(NEWLINE, $file);
+		
+	$events = array();
+	$event_counter = $line_counter = $are_tracking = 0;
+	foreach ($file as $line) {
+		$line_counter++;
+		if (stristr($line, ':')) {
+			list($key, $value) = explode(':', trim($line));
+			if ($value == 'VEVENT') {
+				if ($key == 'BEGIN') {
+					$are_tracking = true;
+				} elseif ($key == 'END') {
+					$event_counter++;
+					$are_tracking = false;
+				}
+			} elseif ($are_tracking) {
+				$events[$event_counter][$key] = $value;
+			}
+		} else {
+			error_handle(__function__ . ' had issue where line ' . $line_counter . ' contained no spaces (content was "' . $line . '")', __file__, __line__);
+		}
+	}
+	return $events;
+}
+
 function array_insert($array, $position, $value) {
 	//inserts a $value into a flat $array at a particular $position
     $array_clip = array_splice($array, $position);

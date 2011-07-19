@@ -675,6 +675,7 @@ function language_translate($string, $from, $to) {
 	
 		if (!isset($_josh['google_search_api_key'])) error_handle('api key not set', __function__ . ' needs a ' . draw_link('http://code.google.com/apis/ajaxsearch/signup.html', 'Google AJAX search API key'), __file__, __line__);
 		
+		/*
 		$ch = curl_init();
 		$url = 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&langpair=' . $from . '%7C' . $to;
 		
@@ -683,6 +684,9 @@ function language_translate($string, $from, $to) {
 		curl_setopt($ch, CURLOPT_REFERER, $_josh['request']['url']);
 		$body = curl_exec($ch);
 		curl_close($ch);
+		*/
+		
+		$body = url_get('http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&langpair=' . $from . '%7C' . $to);
 		
 		// now, process the JSON string
 		$json = json_decode($body, true);
