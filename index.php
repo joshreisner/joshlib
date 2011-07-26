@@ -242,7 +242,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['posting']	= !empty($_POST);
 	if ($_josh['posting']) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes(str_replace('& ', '&amp; ', $value));
 	
-	$_josh['editing']	= url_id();
+	$_josh['editing']	= url_id(); //necessary?
 	
 //handle some ajax calls automatically -- requires user to be logged in
 	if (url_action('ajax_delete,ajax_publish,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,indexes,lib_refresh,phpinfo')) {
