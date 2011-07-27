@@ -108,7 +108,10 @@ function array_csv($content, $delimiter=',') {
 	foreach ($rows as &$r) {
 		$cells = array_separated($r, $delimiter, true);
 		$thisrow = array();
-		for ($i = 0; $i < $count; $i++) $thisrow[$cols[$i]] = @$cells[$i];
+		for ($i = 0; $i < $count; $i++) {
+			$thisrow[$cols[$i]] = @$cells[$i];
+			if ((substr($thisrow[$cols[$i]], 0, 1) == '"') && (substr($thisrow[$cols[$i]], 0, 1) == '"')) $thisrow[$cols[$i]] = substr($thisrow[$cols[$i]], 1, -1); //strip quotes
+		}
 		$r = $thisrow;
 	}
 	
