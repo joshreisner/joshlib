@@ -1150,10 +1150,12 @@ function draw_table_rows($array, $columns=2) {
 }
 
 function draw_tag($tag, $arguments=false, $innerhtml=false, $open=false) {
-	$tag = strToLower($tag);
+	$tag = trim(strToLower($tag));
 	$return = '<' . $tag;
 	$return .= (is_array($arguments)) ? draw_arguments($arguments) : draw_argument('class', $arguments);
-	if ($innerhtml === false) {
+	
+	$containers = array('div', 'span', 'b', 'strong', 'em', 'i', 'header', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5');
+	if (($innerhtml === false) && !in_array($tag, $containers)) {
 		$return .= '/>';
 	} else {
 		if (($tag == 'td') && empty($innerhtml)) $innerhtml = '&nbsp;';

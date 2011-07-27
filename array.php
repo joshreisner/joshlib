@@ -237,6 +237,19 @@ function array_key_values($array, $key) {
 	return $return;
 }
 
+function array_format_quotes($array) {
+	//beta function.  using it to escape quotes coming from array_csv for upag
+	$return = array();
+	foreach ($array as $key=>$value) {
+		if (is_array($value)) {
+			$return[$key] = array_format_quotes($value);
+		} elseif (is_string($value)) {
+			$return[$key] = format_quotes($value);
+		}
+	}
+	return $return;
+}
+
 function array_object($object) {
 	//converts an object to an associative array recursively.  used by array_xml()
     if (is_object($object)) $object = get_object_vars($object);

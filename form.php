@@ -98,7 +98,7 @@ class form {
 		extract($field);
 		$return = '';
 
-		if (($name == 'secret_key') || ($type == 'image-alt') || ($type == 'file-type') || ($type == 'latlon')) return false; //not fields you show in a form	
+		if (($name == 'secret_key') || ($name == 'last_login') || ($type == 'image-alt') || ($type == 'file-type') || ($type == 'latlon')) return false; //not fields you show in a form	
 
 		//value is being set manually		
 		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
