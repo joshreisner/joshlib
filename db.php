@@ -735,13 +735,13 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	
 	if ($id) {
 		if (isset($array['created_user'])) $query1[] = 'created_user = ' .  $array['created_user']; //could be changing created_user (eg intranet)
-		$query1[] = 'updated_date = ' .  db_date();
+		$query1[] = 'updated_date = ' . ((isset($array['updated_date'])) ? '"' . $array['updated_date'] . '"' : db_date());
 		$query1[] = 'updated_user = ' . ((isset($array['updated_user'])) ? $array['updated_user'] : $userID);
 		//die('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id);
 		if (!db_query('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id)) return false;
 	} else {
 		$query1[] = 'created_date';
-		$query2[] = db_date();
+		$query2[] = ((isset($array['created_date'])) ? '"' . $array['created_date'] . '"' : db_date());
 		$query1[] = 'created_user';
 		$query2[] = ((isset($array['created_user'])) ? $array['created_user'] : $userID);
 		$query1[] = 'is_active';
