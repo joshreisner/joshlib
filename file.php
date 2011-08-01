@@ -474,47 +474,52 @@ function file_unzip($source, $target) {
 	global $_josh;
 	
 	//check to see if the ZIP library is installed
-	if (!function_exists('zip_open')) return error_handle('ZIP library missing', 'trying to unzip a file but the library is not installed.  if you don\'t want to install it, you must manually unzip lib.zip and put the resulting folder inside ' . DIRECTORY_WRITE . ' for joshlib to run.', __file__, __line__);
+	if (!function_exists('zip_open')) {
+		system('unzip -q ' . $source . ' "lib/*" -d ' . DIRECTORY_ROOT . $target);
+		system('touch ' . DIRECTORY_LIB);
+		if (!is_dir(DIRECTORY_LIB)) return error_handle('ZIP Library Missing', 'Joshlib tried to unzip the lib folder but the ZIP extension is not installed and the UNIX unzip command did not work either.  Please manually unzip lib.zip and put the resulting "lib" folder inside ' . DIRECTORY_WRITE, __file__, __line__);
+	} else {
+	    $zip = zip_open($source);
 	
-    $zip = zip_open($source);
-
-    if (!is_resource($zip)) {
-		$errors = array(
-		'Multi-disk zip archives not supported.', 'Renaming temporary file failed.',
-		'Closing zip archive failed',  'Seek error', 'Read error', 'Write error', 'CRC error', 'Containing zip archive was closed', 'No such file.', 'File already exists',
-		'Can\'t open file', 'Failure to create temporary file.', 'Zlib error', 'Memory allocation failure', 'Entry has been changed', 'Compression method not supported.', 
-		'Premature EOF', 'Invalid argument', 'Not a zip archive', 'Internal error', 'Zip archive inconsistent', 'Can\'t remove file', 'Entry has been deleted'
-		);
-		error_handle('ZIP won\'t open', 'zip_open failed with ' . $errors[$zip] . ' for ' . $source, __file__, __line__);
-    }
-
-	while ($zip_entry = zip_read($zip)) {
-		$folder = dirname(zip_entry_name($zip_entry));
-		if (format_text_starts('.', $folder)) continue;
-		if (format_text_starts('__MACOSX', $folder)) continue;
-
-        $completePath = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $folder;
-        $completeName = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . zip_entry_name($zip_entry);
-        if (!file_exists($completeName)) {
-            $tmp = '';
-            foreach(explode(DIRECTORY_SEPARATOR, $folder) as $k) {
-                $tmp .= $k . DIRECTORY_SEPARATOR;
-                if(!is_dir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
-            }
-        }
-        
-        if (zip_entry_open($zip, $zip_entry, 'r')) {
-            if ($fd = @fopen($completeName, 'w+')) {
-                fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
-                fclose($fd);
-            } else {
-                // We think this was an empty directory
-                if(!is_dir($tmp)) mkdir($completeName, 0777);
-            }
-            zip_entry_close($zip_entry);
-        }
-    }
-    zip_close($zip);
+	    if (!is_resource($zip)) {
+			$errors = array(
+			'Multi-disk zip archives not supported.', 'Renaming temporary file failed.',
+			'Closing zip archive failed',  'Seek error', 'Read error', 'Write error', 'CRC error', 'Containing zip archive was closed', 'No such file.', 'File already exists',
+			'Can\'t open file', 'Failure to create temporary file.', 'Zlib error', 'Memory allocation failure', 'Entry has been changed', 'Compression method not supported.', 
+			'Premature EOF', 'Invalid argument', 'Not a zip archive', 'Internal error', 'Zip archive inconsistent', 'Can\'t remove file', 'Entry has been deleted'
+			);
+			error_handle('ZIP won\'t open', 'zip_open failed with ' . $errors[$zip] . ' for ' . $source, __file__, __line__);
+	    }
+	
+		while ($zip_entry = zip_read($zip)) {
+			$folder = dirname(zip_entry_name($zip_entry));
+			if (format_text_starts('.', $folder)) continue;
+			if (format_text_starts('__MACOSX', $folder)) continue;
+	
+	        $completePath = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $folder;
+	        $completeName = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . zip_entry_name($zip_entry);
+	        if (!file_exists($completeName)) {
+	            $tmp = '';
+	            foreach(explode(DIRECTORY_SEPARATOR, $folder) as $k) {
+	                $tmp .= $k . DIRECTORY_SEPARATOR;
+	                if(!is_dir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
+	            }
+	        }
+	        
+	        if (zip_entry_open($zip, $zip_entry, 'r')) {
+	            if ($fd = @fopen($completeName, 'w+')) {
+	                fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
+	                fclose($fd);
+	            } else {
+	                // We think this was an empty directory
+	                if(!is_dir($tmp)) mkdir($completeName, 0777);
+	            }
+	            zip_entry_close($zip_entry);
+	        }
+	    }
+	    zip_close($zip);
+	}
+	
 
 	return true;
 }
