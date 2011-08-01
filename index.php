@@ -142,12 +142,21 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		$_josh['request'] .= $_SERVER['SCRIPT_NAME'];
 		if (isset($_SERVER['QUERY_STRING'])) $_josh['request'] .= '?' . $_SERVER['QUERY_STRING'];
 	}
-	
+
 	$_josh['request'] = url_parse($_josh['request']);
 			
 	//die(draw_array($_josh['request']));
 
-	//special set $_GET['id']
+	//set error reporting level by determining whether this is a dev or live situation
+	if (in_array($_josh['request']['tld'], array('dev', 'diego', 'john', 'josh', 'localhost', 'michael', 'site'))) {
+		$_josh['mode'] = 'dev';
+		//error reporting already set above
+	} else {
+		$_josh['mode'] = 'live';
+		error_reporting(0);
+	}
+
+	//special set $_GET['id'] - todo deprecate?
 	if ($_josh['request']['id'] && !isset($_GET['id'])) $_GET['id'] = $_josh['request']['id'];
 			
 	//cwd
@@ -206,15 +215,6 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 //ensure lib exists--todo autodelete these old lib folders
 	if (is_dir(DIRECTORY_LIB) && (filemtime(DIRECTORY_JOSHLIB . 'lib.zip') > filemtime(DIRECTORY_LIB))) rename(DIRECTORY_LIB, DIRECTORY_LIB . '-old-' . time());
 	if (!is_dir(DIRECTORY_LIB)) file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE);
-
-//set error reporting level by determining whether this is a dev or live situation
-	if (format_text_starts('dev-', $_josh['request']['host']) || format_text_ends('.site', $_josh['request']['host']) || format_text_ends('.dev', $_josh['request']['host'])) {
-		$_josh['mode'] = 'dev';
-		//error reporting already set above
-	} else {
-		$_josh['mode'] = 'live';
-		error_reporting(0);
-	}
 
 //handle https forwarding
 	if (isset($_josh['request']['protocol'])) {

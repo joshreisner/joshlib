@@ -148,7 +148,7 @@ function url_parse($url) {
 	global $_josh;
 	error_debug('<b>url_parse</b> running for  ' . $url, __file__, __line__);
 	
-	$gtlds = array('aero','biz','com','coop','info','jobs','museum','name','net','org','pro','travel','gov','edu','mil','int','site');
+	$gtlds = array('aero','biz','com','coop','info','jobs','museum','name','net','org','pro','travel','gov','edu','mil','int');
 
 	$ctlds = array('ac','ad','ae','af','ag','ai','al','am','an','ao','aq','ar','as','at','au','aw','az','ax','ba','bb','bd','be','bf',
 	'bg','bh','bi','bj','bm','bn','bo','br','bs','bt','bv','bw','by','bz','ca','cc','cd','cf','cg','ch','ci','ck','cl','cm','cn','co',
@@ -170,6 +170,7 @@ function url_parse($url) {
 	$tldarray		= array_merge($gtlds, $ctlds); 
 	$tld_isReady	= false;
 	$return			= parse_url(trim($url));
+	//die(draw_array($return));
 	$return['host']	= strtolower($return['host']); //fixing errors i'm getting on livingcities finding config
 	$domainarray	= explode('.', $return['host']);
 	$top			= count($domainarray);
@@ -189,8 +190,13 @@ function url_parse($url) {
 	}
 
 	if (!isset($return['path'])) $return['path'] = '';
+	if (empty($tld) && ($pos = strpos($return['host'], '.'))) {
+		//$domainname
+		$tld = substr($return['host'], $pos);
+	}
 	$return['domainname']	= $domainname;
 	$return['tld']			= str_replace('.', '', $tld);
+	
 	$return['domain']		= $domainname . $tld;
 	$return['usingwww']		= (substr($return['host'], 0, 4) == 'www.') ? 1 : 0;
 	$return['sanswww']		= ($return['usingwww']) ? substr($return['host'], 4) : $return['host'];
