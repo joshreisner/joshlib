@@ -147,60 +147,45 @@ function url_parse($url) {
 	//todo rename array_url
 	global $_josh;
 	error_debug('<b>url_parse</b> running for  ' . $url, __file__, __line__);
-	
-	$gtlds = array('aero','biz','com','coop','info','jobs','museum','name','net','org','pro','travel','gov','edu','mil','int');
 
-	$ctlds = array('ac','ad','ae','af','ag','ai','al','am','an','ao','aq','ar','as','at','au','aw','az','ax','ba','bb','bd','be','bf',
-	'bg','bh','bi','bj','bm','bn','bo','br','bs','bt','bv','bw','by','bz','ca','cc','cd','cf','cg','ch','ci','ck','cl','cm','cn','co',
-	'cr','cs','cu','cv','cx','cy','cz','de','dj','dk','dm','do','dz','ec','ee','eg','eh','er','es','et','eu','fi','fj','fk','fm','fo',
-	'fr','ga','gb','gd','ge','gf','gg','gh','gi','gl','gm','gn','gp','gq','gr','gs','gt','gu','gw','gy','hk','hm','hn','hr','ht','hu',
-	'id','ie','il','im','in','io','iq','ir','is','it','je','jm','jo','jp','ke','kg','kh','ki','km','kn','kp','kr','kw','ky','kz','la',
-	'lb','lc','li','lk','lr','ls','lt','lu','lv','ly','ma','mc','md','mg','mh','mk','ml','mm','mn','mo','mp','mq','mr','ms','mt','mu',
-	'mv','mw','mx','my','mz','na','nc','ne','nf','ng','ni','nl','no','np','nr','nu','nz','om','pa','pe','pf','pg','ph','pk','pl','pm',
-	'pn','pr','ps','pt','pw','py','qa','re','ro','ru','rw','sa','sb','sc','sd','se','sg','sh','si','sj','sk','sl','sm','sn','so','sr',
-	'st','sv','sy','sz','tc','td','tf','tg','th','tj','tk','tl','tm','tn','to','tp','tr','tt','tv','tw','tz','ua','ug','uk','um','us',
-	'uy','uz','va','vc','ve','vg','vi','vn','vu','wf','ws','ye','yt','yu','za','zm','zw');
-
-	//add protocol if missing.  when would this be missing?
+	//add protocol if missing.  todo add substr
 	if (!strstr($url, 'http://') && !strstr($url, 'https://')) $url = 'http://' . $url; 
 
-	$subs			= ''; 
-	$domainname		= ''; 
-	$tld			= ''; 
-	$tldarray		= array_merge($gtlds, $ctlds); 
-	$tld_isReady	= false;
-	$return			= parse_url(trim($url));
-	//die(draw_array($return));
-	$return['host']	= strtolower($return['host']); //fixing errors i'm getting on livingcities finding config
-	$domainarray	= explode('.', $return['host']);
-	$top			= count($domainarray);
-	
-	for ($i = 0; $i < $top; $i++) {
-		$_domainPart = array_pop($domainarray);
-		if (!$tld_isReady) {
-			if (in_array($_domainPart, $tldarray)) {
-				$tld = '.' . $_domainPart . $tld;
-			} else {
-				$domainname = $_domainPart;
-				$tld_isReady = 1;
-			}
-		} else {
-			$subs = '.' . $_domainPart . $subs;
-		}
-	}
+	//todo test with ?query=string and #hash
 
+	//start with php parsed url
+	$return			= parse_url(trim($url));
+	$return['host']	= strtolower($return['host']);
 	if (!isset($return['path'])) $return['path'] = '';
-	if (empty($tld) && ($pos = strpos($return['host'], '.'))) {
-		//$domainname
-		$tld = substr($return['host'], $pos);
+
+	$cc_tlds = array('ac','ad','ae','af','ag','ai','al','am','an','ao','aq','ar','as','at','au','aw','az','ax','ba','bb','bd','be','bf','bg','bh',
+		'bi','bj','bm','bn','bo','br','bs','bt','bv','bw','by','bz','ca','cc','cd','cf','cg','ch','ci','ck','cl','cm','cn','co','cr','cs','cu','cv',
+		'cx','cy','cz','de','dj','dk','dm','do','dz','ec','ee','eg','eh','er','es','et','eu','fi','fj','fk','fm','fo','fr','ga','gb','gd','ge','gf',
+		'gg','gh','gi','gl','gm','gn','gp','gq','gr','gs','gt','gu','gw','gy','hk','hm','hn','hr','ht','hu','id','ie','il','im','in','io','iq','ir',
+		'is','it','je','jm','jo','jp','ke','kg','kh','ki','km','kn','kp','kr','kw','ky','kz','la','lb','lc','li','lk','lr','ls','lt','lu','lv','ly',
+		'ma','mc','md','mg','mh','mk','ml','mm','mn','mo','mp','mq','mr','ms','mt','mu','mv','mw','mx','my','mz','na','nc','ne','nf','ng','ni','nl',
+		'no','np','nr','nu','nz','om','pa','pe','pf','pg','ph','pk','pl','pm','pn','pr','ps','pt','pw','py','qa','re','ro','ru','rw','sa','sb','sc',
+		'sd','se','sg','sh','si','sj','sk','sl','sm','sn','so','sr','st','sv','sy','sz','tc','td','tf','tg','th','tj','tk','tl','tm','tn','to','tp',
+		'tr','tt','tv','tw','tz','ua','ug','uk','um','us','uy','uz','va','vc','ve','vg','vi','vn','vu','wf','ws','ye','yt','yu','za','zm','zw');
+
+	$domain_parts	= explode('.', $return['host']);
+	$domain_count	= count($domain_parts);
+
+	$return['subdomain']	= '';
+	$return['usingwww']		= ($domain_parts[0] == 'www');
+	$return['sanswww']		= ($return['usingwww']) ? implode('.', array_slice($domain_parts, 1)) : $return['host'];
+
+	if (($domain_count > 2) && in_array($domain_parts[$domain_count-1], $cc_tlds)) { //using cctld
+		$return['tld']			= $domain_parts[$domain_count-2] . '.' . $domain_parts[$domain_count-1];
+		$return['domainname']	= $domain_parts[$domain_count-3];
+		if ($domain_count > 3) $return['subdomain'] = implode('.', array_slice($domain_parts, 0, -3));
+	} else { //not using cctld
+		$return['tld']			= $domain_parts[$domain_count-1];
+		$return['domainname']	= $domain_parts[$domain_count-2];
+		if ($domain_count > 2) $return['subdomain'] = implode('.', array_slice($domain_parts, 0, -2));
 	}
-	$return['domainname']	= $domainname;
-	$return['tld']			= str_replace('.', '', $tld);
 	
-	$return['domain']		= $domainname . $tld;
-	$return['usingwww']		= (substr($return['host'], 0, 4) == 'www.') ? 1 : 0;
-	$return['sanswww']		= ($return['usingwww']) ? substr($return['host'], 4) : $return['host'];
-	$return['subdomain']	= substr($subs, 1);
+	$return['domain']		= $return['domainname'] . '.' . $return['tld'];
 	$return['path']			= str_replace('index.php', '', $return['path']);
 	
 	//get folder, subfolder, subsubfolder (there must be a smoother way)

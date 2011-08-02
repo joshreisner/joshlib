@@ -378,9 +378,6 @@ function file_put_config() {
 	//google variables
 	$return .= '//$_josh[\'google\'][\'mapkey\']		= \'\';' . NEWLINE;
 	$return .= '//$_josh[\'google_search_api_key\']		= \'\';' . NEWLINE;
-	$return .= NEWLINE;
-	
-	$return .= '?>';
 	
 	return file_put($_josh['config'], $return);
 }

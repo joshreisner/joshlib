@@ -48,7 +48,7 @@ function error_draw($title, $html) {
 	if (
 		(isset($_josh['error_mode_html']) && !$_josh['error_mode_html']) || //ajax
 		(isset($_josh['request']) && !$_josh['request']) //cli
-	) return strip_tags(strToUpper($title) . NEWLINE . $html);
+	) return strip_tags(strToUpper($title) . $html);
 
 	//add quazi-attractive error element
 	$html = '<div style="background-color:#59c;color:#fff;height:36px;line-height:36px;font-size:24px;padding:0px 20px 0px 20px;position:absolute;top:-36px;left:0px;">Error</div>' . 
@@ -97,32 +97,29 @@ function error_handle($type, $message='', $file=false, $line=false) {
 		
 		$b = $thisfile . ' ' . $function;
 	}
-	$message .= NEWLINE . NEWLINE . draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
+	$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
+	
+	//notify
+	if ($_josh['mode'] == 'dev') {
+		echo error_draw($type, $message);
+		db_close();
+	//} elseif (!empty($_josh['error_log_api']) && array_send(array('subject'=>$subject, 'message'=>$message, 'url'=>$_josh['request']['url'], 'sanswww'=>$_josh['request']['sanswww']), $_josh['error_log_api'])) {
+		//cool, we sent the request via json and fsockopen!
+	} elseif (!empty($_josh['email_admin'])) {
+		//add more stuff to admin message, set from and subject
+		$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
 
-	//add more stuff to admin message, set from and subject
-	$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
-	if ($_josh['mode'] != 'dev') {
 		$message .= draw_p('Request: ' . draw_link($_josh['request']['url'], $_josh['request']['url'], false, array('style'=>'color:#336699;')));
-		if ($_josh['referrer']) $message .= draw_p('Referrer: ' . draw_link($_josh['referrer']['url'], $_josh['referrer']['url'], false, array('style'=>'color:#336699;')));
+		if (!empty($_josh['referrer'])) $message .= draw_p('Referrer: ' . draw_link($_josh['referrer']['url'], $_josh['referrer']['url'], false, array('style'=>'color:#336699;')));
 		if (isset($_SESSION['email']) && isset($_SESSION['full_name'])) {
 			$message .= draw_p('User: ' . draw_link('mailto:' . $_SESSION['email'], $_SESSION['full_name'], false, array('style'=>'color:#336699;')));
 			$from = array($_SESSION['email']=>$_SESSION['full_name']);
 		}
 		if (isset($_SERVER['HTTP_USER_AGENT'])) $message .= draw_p('Browser: ' . $_SERVER['HTTP_USER_AGENT']);
-	}
-			
-	$subject = '[Joshlib Error] ' . $type;
-	$message = error_draw($type, $message);
-	
-	//notify
-	if ($_josh['mode'] == 'dev') {
-		echo $message;	
-		db_close();
-	} elseif (!empty($_josh['error_log_api']) && array_send(array('subject'=>$subject, 'message'=>$message, 'url'=>$_josh['request']['url'], 'sanswww'=>$_josh['request']['sanswww']), $_josh['error_log_api'])) {
-		//cool, we sent the request via json and fsockopen!
-	} elseif (!empty($_josh['email_admin'])) {
+				
 		//send email to admin
-		email($_josh['email_admin'], $message, $subject, $from);
+		$subject = '[Joshlib Error] ' . $type;
+		email($_josh['email_admin'], error_draw($type, $message), $subject, $from);
 	}
 }
 

@@ -44,7 +44,7 @@ GETTING STARTED
 define('TIME_START', microtime(true));	//start the processing time stopwatch -- use format_time_exec() to access this
 
 //set up error handling.  this needs to go first to handle any subsequent errors
-	error_reporting(E_ALL);
+	error_reporting(E_ALL); //this gets turned off on live sites below
 	ini_set('display_errors', true);
 	ini_set('display_startup_errors', true);
 	if (!isset($_josh['mode'])) $_josh['mode'] = 'live'; //assume live until we can parse the url
