@@ -82,15 +82,17 @@ class form {
 		if ($focus && !empty($this->focus)) $return .= draw_form_focus($this->focus);
 		
 		//run validator
-		$return .= lib_get('validate') . draw_javascript_ready('
-			$("form#' . $this->name . '").validate({rules: { email:true }, submitHandler:function(form){ 
-				if (typeof submit_' . $this->name . ' == "function") {
-					if (submit_' . $this->name . '($("form#' . $this->name . '"))) form.submit();
-				} else {
-					form.submit();
+		$return .= lib_get('validate') . 
+			draw_javascript_ready('
+			$("form#' . $this->name . '").validate({
+				submitHandler:function(form){ 
+					if (typeof submit_' . $this->name . ' == "function") {
+						if (submit_' . $this->name . '($("form#' . $this->name . '"))) form.submit();
+					} else {
+						form.submit();
+					}
 				}
-			}})');
-
+			})');
 		return $return;
 	}
 	
@@ -263,7 +265,7 @@ class form {
 					break;
 				case 'url':
 					if ($allow_changes) {
-						if (!$value) $value = 'http://';
+						//if (!$value) $value = 'http://'; //removing for validate jquery
 						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
 					} else {
 						$return .= draw_link($value, $value);
