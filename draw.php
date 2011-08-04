@@ -1154,7 +1154,7 @@ function draw_tag($tag, $arguments=false, $innerhtml=false, $open=false) {
 	$return = '<' . $tag;
 	$return .= (is_array($arguments)) ? draw_arguments($arguments) : draw_argument('class', $arguments);
 	
-	$containers = array('div', 'span', 'b', 'strong', 'em', 'i', 'header', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5');
+	$containers = array('div', 'span', 'b', 'strong', 'em', 'i', 'header', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'title');
 	if (($innerhtml === false) && !in_array($tag, $containers)) {
 		$return .= '/>';
 	} else {
