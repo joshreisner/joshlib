@@ -439,7 +439,7 @@ function cms_bar($width='100%') {
 				}
 				body #cms_bar div.wrapper { width: ' . $width . '; margin: 0 auto; }
 				body #cms_bar div.wrapper span.cms-message { color: rgba(0,0,0,0.5); display: inline-block; /* font-style: italic; */ height: 30px; line-height: 30px; margin-left: 1em; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
-				body #cms_bar div.wrapper ul.cms_bar_nav { list-style-type: none; float: right; }
+				body #cms_bar div.wrapper ul.cms_bar_nav { list-style-type: none; float: right; margin: 0; padding: 0; }
 				body #cms_bar div.wrapper ul.cms_bar_nav li { float: left; /* margin-left: 10px; */ border-left: 1px solid rgba(0,0,0,0.3); }
 				body #cms_bar div.wrapper ul.cms_bar_nav li a { border-left: 1px solid rgba(255,255,255,0.4); color: #333; display: inline-block; line-height: 26px; padding: 2px 10px; text-decoration: none; text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
 				body #cms_bar div.wrapper ul.cms_bar_nav li a:hover { background: rgba(0,0,0,0.15); color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.4); }
