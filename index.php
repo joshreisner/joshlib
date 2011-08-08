@@ -601,6 +601,18 @@ function date_holiday($date=false, $country='us') {
 }
 */
 
+function api_stock($symbol) {
+	if ($file = array_rss('http://www.google.com/ig/api?stock=' . $symbol)) {
+		$array = array();
+		foreach ($file['finance'] as $key=>$value) {
+			if ($key == '@attributes') continue;
+			$array[$key] = $value['@attributes']['data'];
+		}
+		return $array;
+	}
+	return false;
+}
+
 function daysInMonth($month=false, $year=false) {
 	/*todo rename*/
 	global $_josh;
