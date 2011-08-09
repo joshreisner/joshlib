@@ -398,7 +398,7 @@ function format_html($text, $profile='user') {
 				if ($e->parent->tag == 'a') $e->parent->innertext = $e->innertext;
 				if ($local_url = format_text_starts(url_base(), $e->href)) {
 					//local hyperlinks if possible (removing for backend.livingcities.org situation)
-					//$e->href = $local_url;
+					if (url_base() != 'http://backend.livingcities.org') $e->href = $local_url;
 				}
 				if ($e->href) $e->href = strip_tags($e->href);
 			} elseif ($e->tag == 'b') {
@@ -626,7 +626,6 @@ function format_html_trim($text) {
 	$html->clear();
 	unset($html);
 	
-	
 	$html = str_get_html($text);
 
 	//get rid of any sub-divs
@@ -638,6 +637,37 @@ function format_html_trim($text) {
 	$html->clear();
 	
 	return $text;
+}
+
+function format_image($path) {
+	//function to take any image and return JPG encoded binary.  could send to format image resize at that point
+	//requires the imagemagick convert unix command
+	
+	if (!$file = file_get($path)) return false;
+	
+	$type = file_ext($path);
+	$target_name = DIRECTORY_WRITE . '/temp-target.jpg';
+	
+	if (($type == 'jpg') || ($type == 'jpeg')) {
+		return $file;
+	} elseif (($type == 'gif') || ($type == 'png')) {
+		//convert
+		exec('convert ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name);
+	} elseif ($type == 'pdf') {
+		//return a screenshot of the first page
+		exec('convert ' . realpath($path) . '[0] ' . DIRECTORY_ROOT . $target_name);
+	} else {
+		error_handle('unhandled image convert', __function__ . ' ran into a problem converting ' . $path, __file__, __line__);
+		return false;
+	}
+		
+	if ($source = file_get($target_name)) {
+		file_delete($target_name);
+		return $source;
+	} else {
+		error_handle('ImageMagick Not Installed', __function__ . ' requires the ' . draw_link('http://www.imagemagick.org/', 'ImageMagick PHP library') . ' to work on the command line.  Please install it and try again.  ', __file__, __line__);
+		return false;
+	}
 }
 
 function format_image_resize($source, $max_width=false, $max_height=false) {
@@ -669,8 +699,10 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 			imagejpeg($tmp, DIRECTORY_ROOT . $target_name, 100);
 			imagedestroy($tmp);
 			imagedestroy($image);
-		}	
+		}
 	}
+	
+	
 
 	//save to file, is file-based operation, unfortunately
 	$source_name = DIRECTORY_WRITE . '/temp-source.jpg';
