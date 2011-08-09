@@ -470,7 +470,7 @@ function slideshow(element) {
 							},
 		hasAuto:			$(element).hasClass('auto'),
         hasBullets:			$(element).hasClass('bullets'),
-        interval:			($(element).hasClass('slow')) ? 6000 : 3000,
+        interval:			($(element).attr('data-timer')) ? $(element).attr('data-timer') : 3000,
         isContinuous:		$(element).hasClass('continuous'),
         isLinear:			$(element).hasClass('linear'),
 		manageController:	function() {
