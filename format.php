@@ -639,14 +639,15 @@ function format_html_trim($text) {
 	return $text;
 }
 
-function format_image($path) {
+function format_image($path, $type=false) {
 	global $_josh;
 	//function to take any image and return JPG encoded binary.  could send to format image resize at that point
+	//type should be used if you're sending a temp name (eg file upload)
 	//requires the imagemagick convert unix command
 	
 	if (!$file = file_get($path)) return false;
 	
-	$type = file_ext($path);
+	if (!$type) $type = file_ext($path);
 	$target_name = DIRECTORY_WRITE . '/temp-target.jpg';
 	
 	if (($type == 'jpg') || ($type == 'jpeg')) {

@@ -227,23 +227,24 @@ function file_get_max($pretty=true) {
 }
 
 function file_get_type_id($filename, $table='documents_types') {
-	//2010 06 07 jr – think we should deprecate in favor of extension columns like pdf, html, doc, xlsx etc
+	error_deprecated(__FUNCTION__ . ' is deprecated now in favor of extension columns like pdf, html, doc, xlsx etc');
 	list($filename, $extension) = file_name($filename);
-	if (!$type_id = db_grab('SELECT id FROM ' . $table . ' WHERE extension = "' . $extension . '"')) {
-		return db_query('INSERT INTO ' . $table . ' ( extension ) VALUES ( "' . $extension . '" )');
-	}
+	if (!$type_id = db_grab('SELECT id FROM ' . $table . ' WHERE extension = "' . $extension . '"')) return db_query('INSERT INTO ' . $table . ' ( extension ) VALUES ( "' . $extension . '" )');
 	return $type_id;
 }
 
 function file_get_uploaded($fieldname, $types_table=false) {
-	//todo deprecate types_table / type system
 	if (!isset($_FILES[$fieldname])) return false;
 	if ($_FILES[$fieldname]['error'] && ($_FILES[$fieldname]['error'] == 4)) return false;
 	if ($_FILES[$fieldname]['error']) error_handle('file_get_uploaded upload error', 'file max is ' . file_get_max() . draw_array($_FILES), __file__, __line__);
+	
 	$content = file_get($_FILES[$fieldname]['tmp_name']);
-	error_debug('<b>file_get_uploaded</b> running ~ user is uploading a file of ' . $_FILES[$fieldname]['size'], __file__, __line__);
+	error_debug(__function__ . ' running ~ user is uploading a file of ' . $_FILES[$fieldname]['size'], __file__, __line__);
 	@unlink($_FILES[$fieldname]['tmp_name']);
+
+	//deprecated
 	if ($types_table) return array($content, file_get_type_id($_FILES[$fieldname]['name'], $types_table));
+
 	return $content;
 }
 
@@ -280,12 +281,6 @@ function file_include($filename) {
 	}
 	return false;
 }
-
-/* function file_is($filename) {
-	error_deprecated(__FUNCTION__ . ' is deprecated now in favor of using file_check');
-	global $_josh;
-	return file_exists(DIRECTORY_ROOT . $filename);
-}*/
 
 function file_mime($ext) {
 	$types = array(
