@@ -63,6 +63,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['date']['format']		= '%b %d, %Y'; //default date Oct 06, 2010 http://php.net/manual/en/function.strftime.php
 	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
 	$_josh['error_mode_html']		= true; //show errors in html (set to false for ajax or cli)
+	$_josh['path_imagemagick']		= '/usr/local/bin/'; // it's /opt/local/bin/ on a mac, specify that in your config
 	
 //constants
 	define('BR', '<br/>');

@@ -640,6 +640,7 @@ function format_html_trim($text) {
 }
 
 function format_image($path) {
+	global $_josh;
 	//function to take any image and return JPG encoded binary.  could send to format image resize at that point
 	//requires the imagemagick convert unix command
 	
@@ -652,10 +653,10 @@ function format_image($path) {
 		return $file;
 	} elseif (($type == 'gif') || ($type == 'png')) {
 		//convert
-		exec('convert ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name);
+		exec($_josh['path_imagemagick'] . 'convert ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name);
 	} elseif ($type == 'pdf') {
 		//return a screenshot of the first page
-		exec('convert ' . realpath($path) . '[0] ' . DIRECTORY_ROOT . $target_name);
+		exec($_josh['path_imagemagick'] . 'convert ' . realpath($path) . '[0] ' . DIRECTORY_ROOT . $target_name);
 	} else {
 		error_handle('unhandled image convert', __function__ . ' ran into a problem converting ' . $path, __file__, __line__);
 		return false;
@@ -1108,14 +1109,17 @@ function format_text_starts($needle, $haystack) {
 }
 
 function format_thumbnail_pdf($source, $width=false, $height=false) {
+	global $_josh;
+	
 	//returns a JPG thumbnail for supplied PDF content in $source
+	//todo make legacy function, deprecate
 	
 	$source_name = DIRECTORY_WRITE . '/temp-source.pdf';
 	$target_name = DIRECTORY_WRITE . '/temp-target.jpg';
 	
 	file_put($source_name, $source);
 	
-	exec('/usr/local/bin/convert ' . DIRECTORY_ROOT . $source_name . '[0] ' . DIRECTORY_ROOT . $target_name);
+	exec($_josh['path_imagemagick'] . 'convert ' . DIRECTORY_ROOT . $source_name . '[0] ' . DIRECTORY_ROOT . $target_name);
 		
 	if ($source = file_get($target_name)) {
 		//operation worked
