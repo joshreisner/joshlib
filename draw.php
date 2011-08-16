@@ -271,7 +271,7 @@ function draw_doctype($lang='en') {
         <!--[if lt IE 7 ]><html class="no-js ie ie6" lang="' . $lang . '"><![endif]-->
         <!--[if IE 7 ]><html class="no-js ie ie7" lang="' . $lang . '"><![endif]-->
         <!--[if IE 8 ]><html class="no-js ie ie8" lang="' . $lang . '"><![endif]-->
-        <!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js ie" lang="' . $lang . '"><!--<![endif]-->';
+        <!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="' . $lang . '"><!--<![endif]-->';
 }
 
 function draw_dump($var, $forceType='', $bCollapsed=false) {
