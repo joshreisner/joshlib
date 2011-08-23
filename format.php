@@ -690,10 +690,15 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 		function crop($new_width, $new_height, $target_name) {
 			//crop an image and save to the $target_name
 			list($width, $height) = getimagesize(DIRECTORY_ROOT . $target_name);
+
+			//by default, crop from center
 			$offsetx = ($width - $new_width) / 2;
 			$offsety = ($height - $new_height) / 2;
 			if ($offsetx < 0) $offsetx = 0;
 			if ($offsety < 0) $offsety = 0;
+
+			//this crops from top-left
+			//$offsetx = $offsety = 0; 
 			
 			$tmp = imagecreatetruecolor($new_width, $new_height);
 			if (!$image = @imagecreatefromjpeg(DIRECTORY_ROOT . $target_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name, __file__, __line__);
@@ -703,8 +708,6 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 			imagedestroy($image);
 		}
 	}
-	
-	
 
 	//save to file, is file-based operation, unfortunately
 	$source_name = DIRECTORY_WRITE . '/temp-source.jpg';
