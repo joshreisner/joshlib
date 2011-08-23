@@ -474,18 +474,20 @@ function slideshow(element) {
         isContinuous:		$(element).hasClass('continuous'),
         isLinear:			$(element).hasClass('linear'),
 		manageController:	function() {
-								$(vars.controller.find('li.number').removeClass('selected').get(vars.selectedPosition)).addClass('selected');
-								
-								if (vars.selectedPosition == 0) {
-									vars.controller.find('li.prev').addClass('inactive');
-								} else {
-									vars.controller.find('li.prev').removeClass('inactive');
-								}
-								
-								if (vars.selectedPosition == vars.totalSlides-1) {
-									vars.controller.find('li.next').addClass('inactive');
-								} else {
-									vars.controller.find('li.next').removeClass('inactive');
+								if (vars.totalSlides > 1) {
+									$(vars.controller.find('li.number').removeClass('selected').get(vars.selectedPosition)).addClass('selected');
+									
+									if (vars.selectedPosition == 0) {
+										vars.controller.find('li.prev').addClass('inactive');
+									} else {
+										vars.controller.find('li.prev').removeClass('inactive');
+									}
+									
+									if (vars.selectedPosition == vars.totalSlides-1) {
+										vars.controller.find('li.next').addClass('inactive');
+									} else {
+										vars.controller.find('li.next').removeClass('inactive');
+									}
 								}
 							}, 
         mode:				($(element).hasClass('fade')) ? 'fade' : 'move',
@@ -532,7 +534,7 @@ function slideshow(element) {
 	vars.manageController();
 
 	//if auto set timer
-	if (vars.hasAuto) vars.timer = setInterval(vars.autoSlide, vars.interval);
+	if (vars.hasAuto && (vars.totalSlides > 1)) vars.timer = setInterval(vars.autoSlide, vars.interval);
 
 	//controller clicks
 	vars.parent.find('ul.controller li').click(function() {
