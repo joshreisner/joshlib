@@ -406,10 +406,10 @@ function cms_bar($width='100%') {
 	//should be called right before </body>
 	//links is an associative array like draw_nav
 
-	if (cookie_get('secret_key')) {
+	if (cookie_get('cms_key')) {
 		//log in
-		if (!user() && $r = db_grab('SELECT id, firstname, lastname, email, secret_key, is_admin FROM app_users WHERE secret_key = "' . $_COOKIE['secret_key'] . '" AND is_active = 1')) {
-			$_SESSION['user_id']	= $r['id'];
+		if (!user(false, 'cms_user_id') && $r = db_grab('SELECT id, firstname, lastname, email, secret_key, is_admin FROM app_users WHERE secret_key = "' . $_COOKIE['cms_key'] . '" AND is_active = 1')) {
+			$_SESSION['cms_user_id']	= $r['id'];
 			$_SESSION['show_deleted'] = false;
 			$_SESSION['name']		= $r['firstname'];
 			$_SESSION['full_name']	= $r['firstname'] . ' ' . $r['lastname'];
@@ -419,7 +419,7 @@ function cms_bar($width='100%') {
 			db_query('UPDATE app_users SET last_login = NOW() WHERE id = ' . $r['id']);		
 		}
 		
-		if (user()) {
+		if (user(false, 'cms_user_id')) {
 			if (!isset($_josh['cms_links'])) $_josh['cms_links'] = array();
 			$_josh['cms_links'] = array_merge(array('/login/'=>'CMS Home'), $_josh['cms_links']);
 			$_josh['cms_links']['/login/?action=logout&return_to=' . urlencode($_josh['request']['path_query'])] = '&times';
@@ -455,6 +455,14 @@ function cms_bar($width='100%') {
 				body #cms_bar div.wrapper ul.cms_bar_nav li.last a { color: rgba(0,0,0,0.3); font-weight: bold; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
 				body #cms_bar div.wrapper ul.cms_bar_nav li.last a:hover { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.9); } 
 			') . 
+			/*
+			lib_get('jquery') . 
+			draw_javascript_ready('
+				$("ul.cms_bar_nav li.last a").click(function(){
+					$("#cms_bar").hide();
+				});
+			') . 
+			*/
 			'<div id="cms_bar">
 				<div class="wrapper">
 					<span class="cms-message">Welcome back ' . $_SESSION['name'] . '</span>' . 
@@ -861,13 +869,13 @@ function posting($form_id=false) {
 	return ($_POST['form_id'] == $form_id);
 }
 
-function user($return_if_empty=false) {
+function user($return_if_empty=false, $key=false) {
 	//shortcut to say if a session exists and what the id is, or return $return eg NULL for sql
-	$key = (defined('SESSION_USER_ID'))	? SESSION_USER_ID : 'user_id';
+	if (!$key) $key = (defined('SESSION_USER_ID'))	? SESSION_USER_ID : 'user_id';
 	if (!isset($_SESSION)) {
 		if (headers_sent()) return false;
 		session_start();
 	}
-	if (empty($_SESSION[$key])) return $return_if_empty;
+	if (empty($_SESSION[$key]) || ($_SESSION[$key] === false)) return $return_if_empty;
 	return $_SESSION[$key];
 }
