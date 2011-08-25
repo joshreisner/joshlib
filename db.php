@@ -532,7 +532,14 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 	if (isset($_josh['basedblanguage']) && ($_josh['basedblanguage'] != $_josh['db']['language'])) $query = db_translate($query, $_josh['basedblanguage'], $_josh['db']['language']);
 	
 	if ($_josh['db']['language'] == 'mysql') {
-		if ($limit) $query .= ' LIMIT ' . $limit;
+		if ($limit)	{
+			if (strstr('|', $limit)) {
+				list($limit, $offset) = explode('|', $limit);
+				$query .= ' LIMIT ' . $limit;
+			} else {
+				$query .= ' LIMIT ' . $limit;
+			}
+		}
 		$result = @mysql_query($query, $_josh['db']['pointer']);
 		$error = mysql_error();
 	} elseif ($_josh['db']['language'] == 'mssql') {
