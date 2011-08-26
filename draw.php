@@ -1095,7 +1095,7 @@ function draw_strong($inner, $arguments=false) {
 
 function draw_swf($path, $width, $height, $alternate='') {
 	//standards-compliant satay method (http://www.alistapart.com/articles/flashsatay)
-	return '<object type="application/x-shockwave-flash" data="' . $path . '" width="' . $width . '" height="' . $height . '"><param name="movie" value="' . $path . '" />' . $alternate . '</object>';
+	return '<object type="application/x-shockwave-flash" data="' . $path . '" width="' . $width . '" height="' . $height . '"><param name="movie" value="' . $path . '" /><param name="wmode" value="opaque">' . $alternate . '</object>';
 }
 
 function draw_table($array, $name='untitled_table', $css=false) {
