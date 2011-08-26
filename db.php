@@ -533,9 +533,9 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 	
 	if ($_josh['db']['language'] == 'mysql') {
 		if ($limit)	{
-			if (strstr('|', $limit)) {
-				list($limit, $offset) = explode('|', $limit);
-				$query .= ' LIMIT ' . $limit;
+			if (strstr($limit, ',')) {
+				list($limit, $offset) = explode(',', $limit);
+				$query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
 			} else {
 				$query .= ' LIMIT ' . $limit;
 			}
