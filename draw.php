@@ -606,7 +606,7 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 			$lon += $m['longitude'];
 			$m['description'] = str_replace("\r\n", '', nl2br($m['description']));
 			$markerstr .= NEWLINE . '
-				var marker = map_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "<div class=\"map_marker_wrapper\"><h2>' . $m['title'] . '</h2>' . $m['description'] . '</div>", "' . $m['color'] . '"' . $m['auto'] . ');
+				var marker = map_marker(' . $m['latitude'] . ', ' . $m['longitude'] . ', "<h2 style=\"font-weight:bold;font-size:120%;margin:0;padding:5px 0 2px;font-family: Arial, Helvetica; \">' . $m['title'] . '</h2><p style=\"line-height:16px; font-size: 100%; font-family: Arial, Helvetica; margin: 0; padding: 0 0 20px; vertical-align:top; letter-spacing: .02em;\">' . $m['description'] . '</p>", "' . $m['color'] . '"' . $m['auto'] . ');
 				map.addOverlay(marker);';
 			
 		}
@@ -629,9 +629,11 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 	//todo determine zoom automatically
 	if (!$zoom) $zoom = 11;
 
-	return draw_javascript_src() . draw_css('
+	return draw_javascript_src() . 	'<div id="map"></div>' . draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . 	
+	draw_css('
 		#map img { max-height: inherit; max-width: inherit; }
-	') . '<div id="map"></div>' . draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . draw_javascript('
+	') . 
+	draw_javascript('
 		function map_load() {
 			if (GBrowserIsCompatible()) {
 				var map = new GMap2(document.getElementById("map"));
