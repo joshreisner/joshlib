@@ -1013,7 +1013,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		$return = draw_list($return, $class, 'ul', $selected, $classes);
 	}
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
-	if (html() == 5) $return = draw_tag('nav', array('id'=>$class), $return);
+	$return = draw_tag('nav', array('id'=>$class), $return);
 	return $return;
 }
 
