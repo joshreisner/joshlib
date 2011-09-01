@@ -586,7 +586,7 @@ function draw_google_chart($data, $type='line', $colors=false, $width=250, $heig
 	
 }
 
-function draw_google_map($markers=false, $center=false, $zoom=false) {
+function draw_google_map($markers=false, $center=false, $zoom=false, $control=true) {
 	//haven't figured out the appropriate place to store all this stuff.  this calls a javascript function which should be local
 	//markers must be an array with latitude, longitude, title, description, color
 	global $_josh;
@@ -624,7 +624,11 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 		$lon = -122.1419;
 	}
 	
-	if (($count == 1) && (isset($markers[0]['auto']))) $lat += .007;
+	//tweak centering for maps with an automarker.  todo: tweak for different levels of zoom
+	if (($count == 1) && (isset($markers[0]['auto']))) {
+		$lat += .007;
+		$lon += .0035;
+	}
 	
 	//todo determine zoom automatically
 	if (!$zoom) $zoom = 11;
@@ -638,7 +642,7 @@ function draw_google_map($markers=false, $center=false, $zoom=false) {
 			if (GBrowserIsCompatible()) {
 				var map = new GMap2(document.getElementById("map"));
 				map.setCenter(new GLatLng(' . $lat . ', ' . $lon . '), ' . $zoom . ');
-				map.addControl(new GLargeMapControl());
+				' . ($control ? 'map.addControl(new GLargeMapControl());' : '') . '
 				' . $markerstr . '
 			}
 			window.onunload = GUnload;
