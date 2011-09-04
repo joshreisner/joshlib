@@ -410,12 +410,12 @@ function cms_bar($width='100%') {
 		//log in
 		if (!user(false, 'cms_user_id') && $r = db_grab('SELECT id, firstname, lastname, email, secret_key, is_admin FROM app_users WHERE secret_key = "' . $_COOKIE['cms_key'] . '" AND is_active = 1')) {
 			$_SESSION['cms_user_id']	= $r['id'];
-			$_SESSION['show_deleted'] = false;
-			$_SESSION['name']		= $r['firstname'];
-			$_SESSION['full_name']	= $r['firstname'] . ' ' . $r['lastname'];
-			$_SESSION['email']		= $r['email'];
-			$_SESSION['is_admin']	= $r['is_admin'];
-			$_SESSION['isLoggedIn']	= true;
+			$_SESSION['show_deleted']	= false;
+			$_SESSION['cms_name']		= $r['firstname'];
+			$_SESSION['full_name']		= $r['firstname'] . ' ' . $r['lastname'];
+			$_SESSION['email']			= $r['email'];
+			$_SESSION['is_admin']		= $r['is_admin'];
+			$_SESSION['isLoggedIn']		= true;
 			db_query('UPDATE app_users SET last_login = NOW() WHERE id = ' . $r['id']);		
 		}
 		
@@ -466,7 +466,7 @@ function cms_bar($width='100%') {
 			*/
 			'<div id="cms-bar">
 				<div class="cms-wrapper">
-					<span class="cms-message">Welcome back ' . $_SESSION['name'] . '</span>' . 
+					<span class="cms-message">Welcome back ' . $_SESSION['cms_name'] . '</span>' . 
 					draw_nav($_josh['cms_links'], 'text', 'cms-bar-nav') . 
 				'</div>
 			</div>';
