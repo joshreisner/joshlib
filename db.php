@@ -42,28 +42,32 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 function db_backup($limit=false) {
 	//outputs a gzip backup of the current database
 	global $_josh;
-	
-	//default filename is /_site/backups/YYYY-MM-DD.sql -- delete any existing file of that name
+	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
+
+	//check up on the folder
+	file_dir_writable('backups');
 	$folder = DIRECTORY_WRITE . '/backups/';
-	$target = $folder . date('Y-m-d') . '.gz';
-	file_delete($target);
-	
 	if ($limit) {
-		//limit the number of backup files that live in this directory
+		//limit the number of backup files that can live in this folder
 		if ($files = file_folder($folder, '.gz')) {
 			$delete = count($files) - $limit + 1;
 			for ($i = 0; $i < $delete; $i++) file_delete($files[$i]['path_name']);
 		}
 	}
 	
-	//only works with mysql right now
-	extract($_josh['db']);
-	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
-
+	//filename is /_site/backups/YYYY-MM-DD.sql -- delete any existing file of that name
+	$target = $folder . date('Y-m-d') . '.gz';
+	file_delete($target);
+	
 	//build command, socket hack, execute
-	$command = 'mysqldump --opt --host="' . $location . '" --user="' . $username . '" --password="' . $password . '" "' . $database . '" | gzip > ' . DIRECTORY_ROOT . $target;
-	if (isset($_josh['mysqldump_path'])) $command = $_josh['mysqldump_path'] . $command;
+	$command = 'mysqldump --opt --host="' . $_josh['db']['location'] . '" --user="' . $_josh['db']['username'] . '" --password="' . $_josh['db']['password'] . '" "' . $_josh['db']['database'] . '" | gzip > ' . DIRECTORY_ROOT . $target;
 	$command = str_replace(':', '" --socket="', $command);
+	
+	//sometimes a path to mysqldump is required.  eg on macs, it's /usr/local/mysql/bin/.  specify it in the config file, if necessary
+	if (isset($_josh['mysqldump_path'])) $command = $_josh['mysqldump_path'] . $command;
+
+	//execute	
+	error_debug('<b>' . __function__ . '</b> about to run ' . $command, __file__, __line__);	
 	system($command);
 	
 	if (file_check($target) > 200) { //sometimes when it fails, mysqldump creates a file that's 20B
