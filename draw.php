@@ -1002,7 +1002,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		}
 		
 		if (($type == 'images') || ($type == 'rollovers')) {
-			$img = '/assets/images/' . $class . '/' . format_text_code($title);
+			$img = '/images/' . $class . '/' . format_text_code($title);
 			if ($type == 'rollovers') $javascript .= $name . '_on		 = new Image;' . NEWLINE . $name . '_off	 = new Image;' . NEWLINE . $name . '_on.src	 = "' . $img . '_on.png";' . NEWLINE . $name . '_off.src = "' . $img . '_off.png";' . NEWLINE;
 			$inner = draw_img($img . (($type == 'rollovers') ? $img_state : false) . '.png', false, $title, $name);
 		} else { //type == text
@@ -1017,7 +1017,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		$return = draw_list($return, $class, 'ul', $selected, $classes);
 	}
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
-	$return = draw_tag('nav', array('id'=>$class), $return);
+	$return = draw_tag('nav', array('class'=>$class), $return);
 	return $return;
 }
 
