@@ -439,8 +439,8 @@ function cms_bar($width='100%') {
 					        box-shadow: 0px 0px 5px #333, inset 0 1px 1px 0 rgba(255,255,255,0.5);
 				}
 				body #cms-bar div.cms-wrapper { width: ' . $width . '; margin: 0 auto; }
-				body #cms-bar div.cms-wrapper span.cms-message { color: rgba(0,0,0,0.5); display: inline-block; /* font-style: italic; */ height: 30px; line-height: 30px; margin-left: 1em; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
-				body #cms-bar div.cms-wrapper nav { display: inline; }
+				body #cms-bar div.cms-wrapper span.cms-message { color: rgba(0,0,0,0.5); float: left; /* font-style: italic; */ height: 30px; line-height: 30px; margin-left: 1em; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
+				body #cms-bar div.cms-wrapper nav { float: right; }
 				body #cms-bar div.cms-wrapper nav ul.cms-bar-nav { list-style-type: none; float: right; margin: 0; padding: 0; }
 				body #cms-bar div.cms-wrapper nav ul.cms-bar-nav li { float: left; /* margin-left: 10px; */ border-left: 1px solid rgba(0,0,0,0.3); }
 				body #cms-bar div.cms-wrapper nav ul.cms-bar-nav li a { border-left: 1px solid rgba(255,255,255,0.4); color: #333; display: inline-block; line-height: 26px; padding: 2px 10px; text-decoration: none; text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
