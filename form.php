@@ -105,8 +105,8 @@ class form {
 		//value is being set manually		
 		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
 		
-		//values has default
-		if (!$value && $default) $value = $default;
+		//values has default (doesn't work for checkbox?)
+		if (!$value && $default && ($type != 'checkbox')) $value = $default;
 				
 		//won't always need this
 		if (!$options_table) $options_table = 'options_' . str_replace('_id', '', $name);
@@ -126,13 +126,13 @@ class form {
 			$return .= draw_form_hidden($name, $value);
 		} else {
 			$args = array();
-			if ($label) {
+			if ($label && ($type != 'checkbox')) { //checkbox labels should go on right side
 				if ($additional && (($type == 'checkboxes') || ($type == 'textarea'))) $label .= $additional;
 				$return .= draw_tag('label', array('for'=>$name), $label);
 			}
 			switch ($type) {
 				case 'checkbox':
-					$return .= ($allow_changes) ? draw_form_checkbox($name, $value) : format_boolean($value);
+					$return .= ($allow_changes) ? draw_form_checkbox($name, $value) . draw_tag('label', array('for'=>$name), $label) : format_boolean($value);
 					break;
 				case 'checkboxes':
 					if (!$option_title) {
@@ -398,6 +398,10 @@ class form {
 			}
 		}
 		$this->fields = array_merge($return, $this->fields);
+	}
+	
+	function set_submit($value) {
+		$this->submit = $value;
 	}
 	
 	function set_table($table) {
