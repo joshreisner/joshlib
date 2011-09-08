@@ -484,7 +484,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	}
 
 	//set utf8 -- todo mssql 2005
-	if ($_josh['db']['language'] == 'mysql') mysql_set_charset('utf8', $_josh['db']['pointer']);
+	if (($_josh['db']['language'] == 'mysql') && function_exists('mysql_set_charset')) mysql_set_charset('utf8', $_josh['db']['pointer']);
 	
 	//select db
 	db_switch();
