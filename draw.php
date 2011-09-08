@@ -943,7 +943,7 @@ function draw_meta_utf8() {
 	
 }
 
-function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false) {	
+function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false, $use_nav_tag=true) {	
 	global $_josh;
 
 	//type can be text, images or rollovers
@@ -1017,7 +1017,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		$return = draw_list($return, $class, 'ul', $selected, $classes);
 	}
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
-	$return = draw_tag('nav', array('class'=>$class), $return);
+	if ($use_nav_tag) $return = draw_tag('nav', array('class'=>$class), $return);
 	return $return;
 }
 
