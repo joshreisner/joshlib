@@ -453,16 +453,19 @@ function slideshow(element) {
 									$(vars.slides.get(vars.selectedPosition)).addClass('selected').hide().css({zIndex:20}).fadeIn(2000, 'swing', function(){
 										$(element).find('li:not(.selected)').css({zIndex:0});
 										$(element).find('li.selected').css({zIndex:10});
+										if (vars.hasAuto) vars.timer = setTimeout(vars.autoSlide, vars.interval);
 									});
 								} else {
 									if (vars.isContinuous && (vars.selectedPosition == 0)) {
 										//move to special last slide
 										$(element).animate({ 'marginLeft': vars.slideWidth * (-vars.totalSlides)}, 400, function(){
 											$(element).css('marginLeft', '0px');
+											if (vars.hasAuto) vars.timer = setTimeout(vars.autoSlide, vars.interval);
 										});
 									} else {
 										$(element).animate({ 'marginLeft': vars.slideWidth * (-vars.selectedPosition)}, 400, function(){
 											if (typeof slideshowTransitionCompleted == 'function') slideshowTransitionCompleted($(element));
+											if (vars.hasAuto) vars.timer = setTimeout(vars.autoSlide, vars.interval);
 										});
 									}
 									$(vars.slides.removeClass('selected').get(vars.selectedPosition)).addClass('selected');
@@ -534,7 +537,7 @@ function slideshow(element) {
 	vars.manageController();
 
 	//if auto set timer
-	if (vars.hasAuto && (vars.totalSlides > 1)) vars.timer = setInterval(vars.autoSlide, vars.interval);
+	if (vars.hasAuto && (vars.totalSlides > 1)) vars.timer = setTimeout(vars.autoSlide, vars.interval);
 
 	//controller clicks
 	vars.parent.find('ul.controller li').click(function() {
