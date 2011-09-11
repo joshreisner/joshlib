@@ -190,7 +190,7 @@ function draw_css($content) {
 	return draw_tag('style', array('type'=>'text/css'), $content);
 }
 
-function draw_css_src($location='/styles/screen.css', $media=false) {
+function draw_css_src($location='/css/global.css', $media=false) {
 	//special 'ie' mode for internet explorer
 	$ie = ($media == 'ie');
 	if ($ie) $media = 'screen';
