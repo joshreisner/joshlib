@@ -484,7 +484,14 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	}
 
 	//set utf8 -- todo mssql 2005
-	if (($_josh['db']['language'] == 'mysql') && function_exists('mysql_set_charset')) mysql_set_charset('utf8', $_josh['db']['pointer']);
+	if ($_josh['db']['language'] == 'mysql') {
+		if (function_exists('mysql_set_charset')) {
+			mysql_set_charset('utf8', $_josh['db']['pointer']);
+		} else {
+			mysql_query('SET CHARACTER SET utf8');
+		    mysql_query('SET NAMES utf8');
+		}
+	}
 	
 	//select db
 	db_switch();
