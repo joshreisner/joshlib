@@ -551,7 +551,7 @@ function draw_form_textarea($name, $value='', $args=false) {
 function draw_google_analytics($id) {
 	global $_josh;
 	error_debug('drawing google tracker', __file__, __line__);
-	if ($_josh['mode'] != 'live') return false;
+	if ($_josh['mode'] != 'live') return '<!-- google analytics hidden because running in dev mode -->';
 	return draw_javascript_src((($_josh['request']['protocol'] == 'https') ? 'https://ssl' : 'http://www') . '.google-analytics.com/ga.js') . draw_javascript('try {
 			var pageTracker = _gat._getTracker("' . $id. '");
 			pageTracker._setDomainName(".' . $_josh['request']['domain'] . '");
