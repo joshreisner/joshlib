@@ -633,9 +633,13 @@ function draw_google_map($markers=false, $center=false, $zoom=false, $control=tr
 	//todo determine zoom automatically
 	if (!$zoom) $zoom = 11;
 
-	return draw_javascript_src() . 	'<div id="map"></div>' . draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . 	
+	lib_get('modernizr'); //requires modernizr
+	
+	return draw_javascript_src() . draw_javascript_src('http://maps.google.com/maps?file=api&amp;v=2&amp;key=' . $_josh['google']['mapkey']) . '<div id="map"></div>' . 	
 	draw_css('
-		#map img { max-height: inherit; max-width: inherit; }
+		div#map img { max-height: inherit; max-width: inherit; }
+		.ie div#map img { max-height: none; max-width: none; }
+		
 	') . 
 	draw_javascript('
 		function map_load() {
