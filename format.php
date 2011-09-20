@@ -882,6 +882,9 @@ function format_pluralize($entity, $count=2) {
 	} elseif (substr(strtolower($entity), -6) == ' media') {
 		//needs no change
 		return $entity;
+	} elseif (in_array($entity, array('day'))) {
+		//nonstandard behavior
+		return $entity . 's';	
 	} elseif (substr($entity, -1) == 'y') {
 		//ends in an ies
 		return substr($entity, 0, ($length - 1)) . 'ies';
@@ -963,11 +966,13 @@ function format_post_urls($fieldnames) {
 	foreach ($fields as $field) $_POST[$field] = format_null(format_url($_POST[$field]));
 }
 
+/* commented on 9/20/2011
 function format_q($quantity, $entity, $capitalize=true) {
 	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because alias not useful enough to warrant bloat');
 	//alias for format_quantitize
 	return format_quantitize($quantity, $entity, $capitalize);
 }
+*/
 
 function format_quantity($quantity, $title_case=true) {
 	global $_josh;
@@ -1213,6 +1218,25 @@ function format_time_business($start, $end=false) {
 		return '<i>just opened</i>';
 	} else {
 		return implode(', ', $return);
+	}
+}
+
+function format_time_elapsed($timestamp) {
+	if (!is_int($timestamp)) $timestamp = strtotime($timestamp);
+	$elapsed = date("U") - $timestamp;
+	
+	if ($elapsed > 604800) {
+		return format_quantitize(round($elapsed / 604800), 'week') . ' ago';
+	} elseif ($elapsed > 86400) {
+		return format_quantitize(round($elapsed / 86400), 'day') . ' ago';
+	} elseif ($elapsed > 3600) {
+		return format_quantitize(round($elapsed / 3600), 'hour') . ' ago';
+	} elseif ($elapsed > 60) {
+		return format_quantitize(round($elapsed / 60), 'minute') . ' ago';
+	} elseif ($elapsed > 0) {
+		return 'Just Now';	
+	} else { 
+		return 'Future';
 	}
 }
 

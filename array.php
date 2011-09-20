@@ -418,8 +418,8 @@ function array_twitter($handle) {
 		}
 		$status['title'] = implode(' ', $words);
 		
-		$status['date']		= $status['pubDate'];
-		$status['id']		= substr($status['guid'], strrpos($status['guid'], '/') + 1);
+		$status['date']			= $status['pubDate'];
+		$status['twitter_id']	= substr($status['guid'], strrpos($status['guid'], '/') + 1);
 		unset($status['description']);
 		unset($status['guid']);
 		unset($status['pubDate']);
