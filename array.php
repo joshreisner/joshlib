@@ -402,6 +402,34 @@ function array_to_lower($array) {
 	return $array;
 }
 
+function array_twitter($handle) {
+	if (!$xml = array_rss('https://twitter.com/statuses/user_timeline/' . $handle . '.rss')) return false;
+
+	//die(draw_array($xml['channel']));
+
+	foreach ($xml['channel']['item'] as &$status) {
+		$status['title']	= format_html_links(substr($status['title'], strpos($status['title'], ':') + 1));
+		
+		//link twitter handles
+		$words = explode(' ', $status['title']);
+		foreach ($words as &$w) {
+			if (substr($w, 0, 1) == '@') $w = draw_link('https://twitter.com/#!/' . substr($w, 1), $w);
+			if (substr($w, 0, 1) == '#') $w = draw_link('https://twitter.com/#!/search?q=%23' . substr($w, 1), $w);
+		}
+		$status['title'] = implode(' ', $words);
+		
+		$status['date']		= $status['pubDate'];
+		$status['id']		= substr($status['guid'], strrpos($status['guid'], '/') + 1);
+		unset($status['description']);
+		unset($status['guid']);
+		unset($status['pubDate']);
+	}
+	
+	//die(draw_array($xml['channel']['item']));	
+	
+	return $xml['channel']['item'];	
+}
+
 function array_random($array) {
 	//returns a random value from a one-dimensional array
 	return $array[rand(0, count($array)-1)];
