@@ -375,8 +375,10 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		if (!isset($_GET['col_title']))	$_GET['col_title']	= 'title';
 		if (!isset($_GET['col_file']))	$_GET['col_file']	= 'file';
 		if (!isset($_GET['col_type']))	$_GET['col_type']	= 'type';
-		if ($file = db_grab('SELECT ' . $_GET['col_title'] . ' title, ' . $_GET['col_file'] . ' file, ' . $_GET['col_type'] . ' type FROM ' . $_GET['file_table'] . ' WHERE is_active = 1 AND is_published = 1 AND id = ' . $_GET['file_id'])) {
+		if ($file = db_grab('SELECT ' . $_GET['col_title'] . ' title, ' . $_GET['col_file'] . ' file, ' . $_GET['col_type'] . ' type FROM ' . $_GET['file_table'] . ' WHERE is_active = 1 AND id = ' . $_GET['file_id'])) {
 			file_download($file['file'], $file['title'], $file['type']);
+		} else {
+			echo 'could not get file';
 		}
 		exit;
 	}
