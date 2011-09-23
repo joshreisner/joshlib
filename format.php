@@ -465,7 +465,7 @@ function format_html_img($url, $text=false) {
 	if ($text) {
 		$text = str_get_html($text);
 		$images = array();
-		$supported_types = array('jpg', 'gif', 'tif', 'png', 'jpeg');
+		$supported_types = array('jpg', 'tif', 'png', 'jpeg');
 		
 		//first, look for facebook share title http://developers.facebook.com/docs/share/
 		$blocks = $text->find('meta');
