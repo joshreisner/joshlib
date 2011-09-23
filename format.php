@@ -455,9 +455,11 @@ function format_html_entities($string) {
 }
 
 function format_html_img($url, $text=false) {
-	//returns the largest (jpg) image from the specified $url or within the provided $text
+	//returns the largest image from the specified $url or within the provided $text
 	//you have to provide the URL because it might need to correct the images
 	lib_get('simple_html_dom');
+	
+	$supported_image_types = array('jpg', 'jpeg', 'gif', 'png');
 	
 	if (!$text) $text = url_get($url);
 	
@@ -466,7 +468,7 @@ function format_html_img($url, $text=false) {
 		
 		//first, look for facebook share title http://developers.facebook.com/docs/share/
 		$blocks = $text->find('meta');
-		foreach ($blocks as $b) if (($b->property == 'og:image') && (file_type($b->content) == 'jpg')) return trim($b->content);
+		foreach ($blocks as $b) if (($b->property == 'og:image') && in_array(file_type($b->content), $supported_image_types)) return trim($b->content);
 	
 		//quick search for <link rel="image_src">
 		$blocks = $text->find('link');
