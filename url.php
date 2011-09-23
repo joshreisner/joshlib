@@ -95,7 +95,9 @@ function url_folder($empty='home') {
 }
 
 function url_get($url, $username=false, $password=false) {
-	//retrieve remote page data
+	global $_josh;
+	
+	//retrieve remote page contemts
 	
 	if (!url($url)) return false;
 		
@@ -117,7 +119,8 @@ function url_get($url, $username=false, $password=false) {
 		'Accept-Language: en-us,en;q=0.5',
 		'Pragma: ' // browsers keep this blank. 
 	)); 
-	curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
+	//curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
+	curl_setopt($ch, CURLOPT_REFERER, $_josh['request']['url']);
 	$return = trim(curl_exec($ch));
 	
 	//don't report couldn't connect errors, generates too much email
