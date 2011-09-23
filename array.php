@@ -405,7 +405,7 @@ function array_to_lower($array) {
 function array_twitter($handle) {
 	if (!$xml = array_rss('https://twitter.com/statuses/user_timeline/' . $handle . '.rss')) return false;
 
-	//die(draw_array($xml['channel']));
+	if (!isset($xml['channel'])) return false;
 
 	foreach ($xml['channel']['item'] as &$status) {
 		$status['title']	= format_html_links(substr($status['title'], strpos($status['title'], ':') + 1));
