@@ -111,6 +111,7 @@ function url_get($url, $username=false, $password=false) {
 	if ($username && $password) curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . base64_encode($username . ':' . $password)));
 	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)');
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		'GET / HTTP/1.1',
 		'Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5', 
 		'Cache-Control: max-age=0',
 		'Connection: keep-alive',
@@ -119,7 +120,7 @@ function url_get($url, $username=false, $password=false) {
 		'Accept-Language: en-us,en;q=0.5',
 		'Pragma: ' // browsers keep this blank. 
 	)); 
-	//curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
+	//curl_setopt($ch, CURLOPT_REFERER, 'http://www.bureaublank.com/');
 	curl_setopt($ch, CURLOPT_REFERER, $_josh['request']['url']);
 	$return = trim(curl_exec($ch));
 	

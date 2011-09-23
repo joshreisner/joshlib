@@ -455,31 +455,40 @@ function format_html_entities($string) {
 }
 
 function format_html_img($url, $text=false) {
-	//returns the largest image from the specified $url or within the provided $text
+	//returns the largest (jpg) image from the specified $url or within the provided $text
 	//you have to provide the URL because it might need to correct the images
 	lib_get('simple_html_dom');
-	
-	$supported_image_types = array('jpg', 'jpeg', 'gif', 'png');
+	$found = array();	
 	
 	if (!$text) $text = url_get($url);
 	
 	if ($text) {
 		$text = str_get_html($text);
+		$images = array();
+		$supported_types = array('jpg', 'gif', 'tif', 'png', 'jpeg');
 		
 		//first, look for facebook share title http://developers.facebook.com/docs/share/
 		$blocks = $text->find('meta');
-		foreach ($blocks as $b) if (($b->property == 'og:image') && in_array(file_type($b->content), $supported_image_types)) return trim($b->content);
+		foreach ($blocks as $b) if (($b->property == 'og:image') && (file_type($b->content) == 'jpg')) return trim($b->content);
 	
-		//quick search for <link rel="image_src">
+		//quick search for <link rel="image_src">, 
 		$blocks = $text->find('link');
-		foreach ($blocks as $b) if (($b->rel == 'image_src') && $b->href && (file_type($b->href) == 'jpg')) return $b->href;
-
+		foreach ($blocks as $b) if (($b->rel == 'image_src') && $b->href && (file_type($b->href) == 'jpg')) { 
+			if($b->width && $b->height) {
+				$area = $b->width * $b->height;
+				max_num($area);
+				error_debug('<b>' . __function__ . '</b> <link> using ' . htmlentities($b) . ' with area ' . $area, __file__, __line__);
+				$images[$area] = $b->href;
+			}
+		}
+		
 		//loop through images		
 		$blocks = $text->find('img');
+		
 		error_debug('<b>' . __function__ . '</b> found ' . count($blocks) . ' images within ' . strlen($text) . ' char text', __file__, __line__);
-		$images = array();
+		
 		foreach ($blocks as $b) {
-			if ($b->width && $b->height && (file_type($b->src) == 'jpg')) {
+			if ($b->width && $b->height && (in_array(file_type($b->src), $supported_types))) {
 				$area = $b->width * $b->height;
 				max_num($area);
 				error_debug('<b>' . __function__ . '</b> using ' . htmlentities($b) . ' with area ' . $area, __file__, __line__);
