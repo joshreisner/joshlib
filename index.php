@@ -416,7 +416,7 @@ function cms_bar($width='100%') {
 			$_SESSION['cms_name']		= $r['firstname'];
 			$_SESSION['full_name']		= $r['firstname'] . ' ' . $r['lastname'];
 			$_SESSION['email']			= $r['email'];
-			$_SESSION['is_admin']		= $r['is_admin'];
+			$_SESSION['cms_is_admin']		= $r['is_admin'];
 			$_SESSION['isLoggedIn']		= true;
 			db_query('UPDATE app_users SET last_login = NOW() WHERE id = ' . $r['id']);		
 		}
