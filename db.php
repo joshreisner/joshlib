@@ -169,6 +169,10 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			$length = 5;
 			break;
 		
+			case 'file-size': 
+			$datatype = 'int';
+			break;
+		
 			case 'int': 
 			case 'select': 
 			$datatype = 'int';
