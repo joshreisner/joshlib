@@ -1004,7 +1004,7 @@ function db_words($text, $object_id, $join_table='objects_to_words', $words_tabl
 	
 	db_query('DELETE FROM ' . $join_table . ' WHERE object_id = ' . $object_id);
 	foreach ($words_unique as $word) {
-		if (!$word_id = db_grab('SELECT id FROM words WHERE word = "' . $word . '"')) $word_id = db_query('INSERT INTO words ( word ) VALUES ( "' . $word . '" )');
+		if (!$word_id = db_grab('SELECT id FROM ' . $words_table . ' WHERE word = "' . $word . '"')) $word_id = db_query('INSERT INTO ' . $words_table . ' ( word ) VALUES ( "' . $word . '" )');
 		db_query('INSERT INTO ' . $join_table . ' ( word_id, object_id, count ) VALUES ( ' . $word_id . ', ' . $object_id . ', ' . array_instances($words, $word) . ' )');
 	}
 }
