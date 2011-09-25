@@ -11,14 +11,18 @@ THIRD PARTY SOFTWARE
 	
 	~~TITLE~~~~~~~~~~~~~LANG~~~~LICENSE~~~~~VERSION~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	> codepress			js		LGPL				http://sourceforge.net/projects/codepress/
+	> dBug				php		
 	> file_icons		png		-			-		-
-	> fpdf				php							http://www.fpdf.org/
+	> fpdf				php							http://fpdf.org/
+	> innershiv			js		
 	> jquery			js		MIT			1.5.2	http://jquery.com/
 	> lorem_ipsum		js							http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
 	> salesforce		php							http://developer.force.com/							
 	> simple_html_dom	php		MIT					http://sourceforge.net/projects/simplehtmldom/
+	> swfobject			js		MIT			2.2		http://code.google.com/p/swfobject/
 	> swiftmailer		php		LGPL		4.0.6	http://swiftmailer.org/
 	> tinymce			js		LGPL		3.3.8	http://tinymce.moxiecode.com/
+	> uploadify			js		MIT			3.0.0	http://uploadify.com/
 
 	JQUERY EXTENSIONS (in the jquery folder)
 	> fancybox					MIT/GPL				http://fancybox.net/
@@ -744,6 +748,7 @@ function lib_get($string) {
 		case 'tablednd' :
 		case 'tinymce' :
 		case 'validate' :
+		case 'uploadify' :
 		if (isset($_josh['drawn'][$string])) return false;
 		
 		$_josh['drawn'][$string] = true;
@@ -779,7 +784,7 @@ function lib_get($string) {
 			') . $return;
 			file_dir_writable('images');
 			file_dir_writable('files');
-		} elseif (($string == 'tablednd') || ($string == 'validate') || ($string == 'fancybox') || ($string == 'jscrollpane')) {
+		} elseif (($string == 'tablednd') || ($string == 'validate') || ($string == 'fancybox') || ($string == 'jscrollpane') || ($string == 'uploadify')) {
 			$return = lib_get('jquery') . $return;
 			if ($string == 'fancybox') {
 				$return .= draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.mousewheel-3.0.2.pack.js') . 
@@ -788,6 +793,23 @@ function lib_get($string) {
 				$return = draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.css') . 
 					$return . 
 					draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.mousewheel.js');
+			} elseif ($string == 'uploadify') {
+				file_dir_writable('uploads');
+				$return .= draw_css_src(DIRECTORY_WRITE . '/lib/uploadify/uploadify.css') . 
+					lib_get('swfobject') . 
+					draw_javascript_ready('
+						$("a.uploadify").each(function(){
+							//alert($(this).attr("href"));
+							$(this).uploadify({
+								"swf"  			: "' . DIRECTORY_WRITE . '/lib/uploadify/uploadify.swf",
+								"uploader"		: $(this).attr("href"),
+								"checkExisting"	: "' . DIRECTORY_WRITE . '/lib/uploadify/uploadify-check-exists.php",
+								"cancelImage"	: "' . DIRECTORY_WRITE . '/lib/uploadify/uploadify-cancel.png",
+								"auto"      	: true,
+								"onError"		: function(event, ID, fileObj, errorObj) { alert(errorObj.type + "::" + errorObj.info); }
+							});
+						});
+					');
 			}
 		}
 		
@@ -836,12 +858,21 @@ function lib_location($string) {
 		case 'swiftmailer' :
 		return DIRECTORY_ROOT . $lib . 'swift_required.php';
 		
+		case 'swfobject' :
+		return DIRECTORY_ROOT . $lib . 'swfobject.js';
+		
 		case 'tablednd' :
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.tablednd_0_5.js';
 		
 		case 'tinymce' :
 		return $lib . 'tinymce_3_3_9/jquery.tinymce.js';
 
+		case 'swfobject' :
+		return DIRECTORY_ROOT . $lib . 'swfobject.js';
+
+		case 'uploadify' :
+		return DIRECTORY_WRITE . '/lib/uploadify/jquery.uploadify.min.js';
+		
 		case 'validate' :
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.validate.min.js';
 	}
