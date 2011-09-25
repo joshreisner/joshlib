@@ -463,20 +463,12 @@ function cms_bar($width='100%') {
 				body #cms-bar div.cms-wrapper nav ul.cms-bar-nav li.last a { color: rgba(0,0,0,0.3); font-weight: bold; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
 				body #cms-bar div.cms-wrapper nav ul.cms-bar-nav li.last a:hover { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.9); } 
 			') . 
-			/*
-			lib_get('jquery') . 
-			draw_javascript_ready('
-				$("ul.cms-bar-nav li.last a").click(function(){
-					$("#cms-bar").hide();
-				});
-			') . 
-			*/
-			'<div id="cms-bar">
-				<div class="cms-wrapper">
-					<span class="cms-message">Welcome back ' . $_SESSION['cms_name'] . '</span>' . 
-					draw_nav($_josh['cms_links'], 'text', 'cms-bar-nav') . 
-				'</div>
-			</div>';
+			draw_div('cms-bar',
+				draw_div_class('cms-wrapper',
+					draw_span('cms-message', 'Welcome back ' . $_SESSION['cms_name']) . 
+					draw_nav($_josh['cms_links'], 'text', 'cms-bar-nav')
+				)
+			);
 		}
 	}
 }
@@ -678,7 +670,7 @@ function increment() {
 }
 
 function language_detect() {
-	//return en, es, fr, ru, etc.
+	//return en, es, fr, ru from browser settings
 	if (empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) return false;
     $code = explode(';', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
     $code = explode(',', $code[0]);
@@ -704,17 +696,6 @@ function language_translate($string, $from, $to) {
 	
 		if (!isset($_josh['google_search_api_key'])) error_handle('api key not set', __function__ . ' needs a ' . draw_link('http://code.google.com/apis/ajaxsearch/signup.html', 'Google AJAX search API key'), __file__, __line__);
 		
-		/*
-		$ch = curl_init();
-		$url = 'http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&langpair=' . $from . '%7C' . $to;
-		
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_REFERER, $_josh['request']['url']);
-		$body = curl_exec($ch);
-		curl_close($ch);
-		*/
-		
 		$body = url_get('http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&langpair=' . $from . '%7C' . $to);
 		
 		// now, process the JSON string
@@ -728,9 +709,19 @@ function language_translate($string, $from, $to) {
 function lib_get($string) {
 	global $_josh;
 	
+	//string can also be comma-separated or array
+	if (stristr($string, ',')) $string = array_separated($string);
+	if (is_array($string)) {
+		$return = '';
+		foreach ($string as $s) $return .= lib_get($s);
+		return $return;
+	}
+	
+	$string = strtolower($string);
+	
 	switch ($string) {
 		//php libraries
-		case 'dBug' :
+		case 'dbug' :
 		case 'fpdf' :
 		case 'salesforce' :
 		case 'simple_html_dom' :
