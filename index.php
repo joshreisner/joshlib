@@ -736,6 +736,7 @@ function lib_get($string) {
 		case 'jscrollpane' :
 		case 'lorem_ipsum' :
 		case 'modernizr' :
+		case 'swfobject' : 
 		case 'tablednd' :
 		case 'tinymce' :
 		case 'validate' :
@@ -850,16 +851,13 @@ function lib_location($string) {
 		return DIRECTORY_ROOT . $lib . 'swift_required.php';
 		
 		case 'swfobject' :
-		return DIRECTORY_ROOT . $lib . 'swfobject.js';
+		return $lib . 'swfobject.js';
 		
 		case 'tablednd' :
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.tablednd_0_5.js';
 		
 		case 'tinymce' :
 		return $lib . 'tinymce_3_3_9/jquery.tinymce.js';
-
-		case 'swfobject' :
-		return DIRECTORY_ROOT . $lib . 'swfobject.js';
 
 		case 'uploadify' :
 		return DIRECTORY_WRITE . '/lib/uploadify/jquery.uploadify.min.js';
