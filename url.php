@@ -120,8 +120,8 @@ function url_get($url, $username=false, $password=false) {
 		'Accept-Language: en-us,en;q=0.5',
 		'Pragma: ' // browsers keep this blank. 
 	)); 
-	//curl_setopt($ch, CURLOPT_REFERER, 'http://www.bureaublank.com/');
-	curl_setopt($ch, CURLOPT_REFERER, $_josh['request']['url']);
+	curl_setopt($ch, CURLOPT_REFERER, 'http://www.google.com/');
+	//curl_setopt($ch, CURLOPT_REFERER, $_josh['request']['url']);
 	$return = trim(curl_exec($ch));
 	
 	//don't report couldn't connect errors, generates too much email
