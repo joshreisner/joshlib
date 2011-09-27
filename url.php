@@ -74,10 +74,24 @@ function url_change_post($target='') {
 	url_change($target);
 }
 
-function url_domain($url) {
-	//return just the domain from a URL
-	if ($url = url_parse($url)) return $url['domain'];
-	return false;
+function url_domain($url=false) {
+	if ($url) {
+		$url = url_parse($url);
+	} else {
+		global $_josh;
+		$url = $_josh['request'];
+	}
+	return $url['domain'];
+}
+
+function url_domainname($url=false) {
+	if ($url) {
+		$url = url_parse($url);
+	} else {
+		global $_josh;
+		$url = $_josh['request'];
+	}
+	return $url['domainname'];
 }
 
 function url_file_link($file_table, $file_id, $col_title='title', $col_file='file', $col_type='type') {
@@ -305,6 +319,16 @@ function url_query_parse($querystring) {
 		}
 	}
 	return $return;
+}
+
+function url_sanswww($url=false) {
+	if ($url) {
+		$url = url_parse($url);
+	} else {
+		global $_josh;
+		$url = $_josh['request'];
+	}
+	return $url['sanswww'];
 }
 
 function url_subfolder($empty=false) {
