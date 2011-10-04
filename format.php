@@ -340,8 +340,9 @@ function format_highlight($haystack, $needles=false) {
 function format_html($text, $profile='user') {
 	//profile can be public, user or admin, with decreasing restrictions
 	//todo tie this programmically to user() and admin()
-	
+
 	//replace links not already in <a> tags
+/*
 	$bits = preg_split('/(<a(?:\s+[^>]*)?>.*?<\/a>|<[a-z][^>]*>)/is', $text, null, PREG_SPLIT_DELIM_CAPTURE);
 	$reconstructed = '';
 	foreach ($bits as $bit) {
@@ -349,12 +350,13 @@ function format_html($text, $profile='user') {
 		$reconstructed .= $bit;
 	}	
 	$text = $reconstructed;
+*/
 	
 	lib_get('simple_html_dom');
 	$html = str_get_html($text);
 	
 	if (($profile == 'public') || ($profile == 'user')) $html->set_callback('cleanupUser');
-	if ($profile == 'public') $html->set_callback('cleanupPublic');
+	//if ($profile == 'public') $html->set_callback('cleanupPublic');
 	//$html->set_callback('cleanupAdmin');
 		
 	if (!function_exists('cleanupAdmin')) {
@@ -384,7 +386,7 @@ function format_html($text, $profile='user') {
 			
 			//these are the tags we want.  if you're not one of these, remove but keep your contents eg <NYT_HEADLINE>
 			if (!in_array($e->tag, array(
-				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'dir', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'i', 'img',
+				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'dir', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'i', 'iframe', 'img',
 				'p', 'section', 'span', 'strike', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
 				'object', 'embed', 'param'
 			))) $e->outertext = ($e->innertext) ? $e->innertext : '';
@@ -397,30 +399,22 @@ function format_html($text, $profile='user') {
 			if ($e->tag == 'a') {
 				if ($e->parent->tag == 'a') $e->parent->innertext = $e->innertext;
 				if ($local_url = format_text_starts(url_base(), $e->href)) {
-					//local hyperlinks if possible (removing for backend.livingcities.org situation)
+					//local hyperlinks if possible (except backend.livingcities.org situation)
 					if (url_base() != 'http://backend.livingcities.org') $e->href = $local_url;
 				}
 				if ($e->href) $e->href = strip_tags($e->href);
 			} elseif ($e->tag == 'b') {
 				//deprecated tag: replace <b> with <strong>
 				$e->outertext = '<strong>' . $e->innertext . '</strong>';
-			/* } elseif ($e->tag == 'div') {
-				//no empty divs
-				if (!$e->children && !strlen(trim($e->plaintext))) $e->outertext = ''; */
 			} elseif ($e->tag == 'i') {
 				//deprecated tag: replace <i> with <em>
 				$e->outertext = '<em>' . $e->innertext . '</em>';
 			} elseif ($e->tag == 'iframe') {
 				//be cautious with iframes, they can be malicious
-				if (!in_array(url_domain($e->src, array('google.com', 'vimeo.com', 'youtube.com')))) $e->outertext = '';
+				if (!in_array(url_domain($e->src), array('google.com', 'vimeo.com', 'youtube.com'))) $e->outertext = '';
 			} elseif (($e->tag == 'p') && (!$e->innertext || ($e->innertext == '&nbsp;'))) {
 				//kill empty p tags (msword and tinymce)
 				$e->outertext = '';
-			/* } elseif ($e->tag == 'span') {
-				//remove empty spans
-				if (!$e->children && !$e->plaintext) {
-					$e->outertext = '';
-				} */
 			}
 		}
 		

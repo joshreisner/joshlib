@@ -758,7 +758,7 @@ function lib_get($string) {
 							// Location of TinyMCE script
 							content_css : "/css/tinymce.css?" + new Date().getTime(),
 							custom_shortcuts : 0,
-							extended_valid_elements : "a[href|target|rel|name|class],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],font[face|size|color|style],span[align|class|style],p[align|class|style],table[cellspacing|align|border|cellpadding|class],tr[class],td[width|align|class]",
+							extended_valid_elements : "a[href|target|rel|name|class],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],iframe[src|width|height|frameborder|webkitAllowFullScreen|allowFullScreen],font[face|size|color|style],span[align|class|style],p[align|class|style],table[cellspacing|align|border|cellpadding|class],tr[class],td[width|align|class]",
 							plugins : "' . (($tinymce_mode == 'advanced') ? 'imagemanager,filemanager,' : '') . 'paste",
 							relative_urls : false,
 							remove_script_host : false,
