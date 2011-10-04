@@ -166,6 +166,10 @@ function url_parse($url) {
 	global $_josh;
 	error_debug('<b>url_parse</b> running for  ' . $url, __file__, __line__);
 
+	//hacking fix
+	$url = str_replace('"', '', $url);
+	
+
 	//add protocol if missing.  todo add substr
 	if (!strstr($url, 'http://') && !strstr($url, 'https://')) $url = 'http://' . $url; 
 
