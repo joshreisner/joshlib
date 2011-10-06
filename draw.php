@@ -1120,7 +1120,7 @@ function draw_table($array, $name='untitled_table', $css=false) {
 	//create a new table class, fill it with keys from the array
 	$t = new table($name);
 	$columns = array_keys($array[0]);
-	foreach ($columns as $c) $t->set_column($c);
+	foreach ($columns as $c) if ($c != 'group') $t->set_column($c);
 	$return = $t->draw($array);
 	
 	//if css is set, prepend css
