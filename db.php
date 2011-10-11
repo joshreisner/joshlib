@@ -229,7 +229,7 @@ function db_column_type($datatype, $length=false, $decimals=false) {
 	$datatype = strToUpper($datatype);
 	
 	//these have no explicit length
-	if (in_array($datatype, array('DATE', 'DATETIME', 'MEDIUMBLOB', 'TEXT'))) return $datatype;
+	if (in_array($datatype, array('DATE', 'DATETIME', 'MEDIUMBLOB', 'LONGBLOB', 'TEXT'))) return $datatype;
 	
 	//these do
 	if (!$length) {
@@ -628,14 +628,14 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 					$value = format_null(format_numeric($array[$c['name']], false));
 				} elseif ($c['type'] == 'int') { //integer
 					$value = format_null(format_numeric($array[$c['name']], true));
-				} elseif (($c['type'] == 'mediumblob') && ($c['type'] == 'longblob') && ($c['name'] == 'password')) {
+				} elseif (($c['type'] == 'mediumblob') && ($c['name'] == 'password')) {
 					if ($id) {
 						$query1[] = $c['name'] . ' = ' . db_pwdencrypt($value);
 					} else {
 						$query1[] = $c['name'];
 						$query2[] = db_pwdencrypt($value);
 					}
-				} elseif (($c['type'] == 'mediumblob') || ($c['type'] == 'image')) { //document
+				} elseif (($c['type'] == 'mediumblob') || ($c['type'] == 'longblob') || ($c['type'] == 'image')) { //document
 					$value = format_binary($array[$c['name']]);
 					//die('length is ' . strlen($array[$c['name']]));
 				} elseif ($c['type'] == 'varchar') { //text
@@ -689,7 +689,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 					$query1[] = $c['name'];
 					$query2[] = $value;
 				}
-			} elseif (($c['type'] == 'mediumblob') && ($file = file_get_uploaded($c['name']))) {
+			} elseif (in_array($c['type'], array('mediumblob', 'longblob')) && ($file = file_get_uploaded($c['name']))) {
 				//file isn't getting passed in (after resizing eg), but was uploaded
 				$value = format_binary($file);		
 				if ($id) {

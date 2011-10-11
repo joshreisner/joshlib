@@ -425,7 +425,7 @@ class form {
 					$this->set_field(array('type'=>'date', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
 				} elseif ($c['type'] == 'datetime') {
 					$this->set_field(array('type'=>'datetime', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required']));
-				} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob')) {
+				} elseif (($c['type'] == 'image') || ($c['type'] == 'mediumblob') || ($c['type'] == 'longblob')) {
 					$this->set_field(array('type'=>'file', 'name'=>$c['name'], 'additional'=>$c['comments']));
 				} elseif ($c['type'] == 'int') {
 					if ($c['name'] == 'precedence') {

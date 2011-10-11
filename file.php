@@ -248,6 +248,36 @@ function file_get_uploaded($fieldname, $types_table=false) {
 	return $content;
 }
 
+function file_ical($event) {
+	//check event array has necessary infoz
+	extract($event);
+	if (!isset($title) || !isset($start) || !isset($end)) error_handle(__function__ . ' input missing', 'title, start and end are required', __file__, __line__);
+	
+	//todo standardize dates into function -- what format is this?
+	if (!is_int($start))	$start	= strtotime($start);
+	if (!is_int($end))		$end	= strtotime($end);
+	
+	//build file content
+	$content = 'BEGIN:VCALENDAR
+PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN
+VERSION:1.0
+BEGIN:VEVENT
+DTSTART:' . date('Ymd', $start) . 'T' . date('His', $start) . 'Z
+DTEND:' . date('Ymd', $end) . 'T' . date('His', $end) . 'Z
+LOCATION;ENCODING=QUOTED-PRINTABLE:' . quoted_printable_encode($location) . '
+UID:040000008200E00074C5B7101A82E008000000007013489B94BDC7010000000000000000100
+ 00000B666717844BEC34380335F09614244DD
+DESCRIPTION;ENCODING=QUOTED-PRINTABLE:' . quoted_printable_encode($title) . '=0D=0AEvent Date/Time:=0D=0A' . quoted_printable_encode(format_date_time_range($start, $end)) . '=0D=0A=0D=0ALocation:=0D=0A' . quoted_printable_encode($location) . '=0D=0A315 East Warren Avenue=0D=0ADetroit=0D=0A=0D=0AEvent Contact:=0D=0ALiving Cities, Inc=0D=0A=
+=0D=0A
+SUMMARY;ENCODING=QUOTED-PRINTABLE:' . quoted_printable_encode($title) . '
+PRIORITY:3
+END:VEVENT
+END:VCALENDAR
+';
+	
+	file_download($content, $title, 'vcs');
+}
+
 function file_icon($filename_or_ext, $link=false, $type='16x16') {
 	//show the icon for a given filename
 	if (empty($filename_or_ext)) return false;
