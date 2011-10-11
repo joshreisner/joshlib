@@ -257,6 +257,11 @@ function file_ical($event) {
 	if (!is_int($start))	$start	= strtotime($start);
 	if (!is_int($end))		$end	= strtotime($end);
 	
+	//other optional variables
+	if (!isset($location))		$location		= '';
+	if (!isset($description))	$description	= '';
+	if (!isset($uid))			$uid			= uniqid();
+	
 	//build file content
 	$content = 'BEGIN:VCALENDAR
 PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN
@@ -265,10 +270,8 @@ BEGIN:VEVENT
 DTSTART:' . date('Ymd', $start) . 'T' . date('His', $start) . 'Z
 DTEND:' . date('Ymd', $end) . 'T' . date('His', $end) . 'Z
 LOCATION;ENCODING=QUOTED-PRINTABLE:' . quoted_printable_encode($location) . '
-UID:040000008200E00074C5B7101A82E008000000007013489B94BDC7010000000000000000100
- 00000B666717844BEC34380335F09614244DD
-DESCRIPTION;ENCODING=QUOTED-PRINTABLE:' . quoted_printable_encode($title) . '=0D=0AEvent Date/Time:=0D=0A' . quoted_printable_encode(format_date_time_range($start, $end)) . '=0D=0A=0D=0ALocation:=0D=0A' . quoted_printable_encode($location) . '=0D=0A315 East Warren Avenue=0D=0ADetroit=0D=0A=0D=0AEvent Contact:=0D=0ALiving Cities, Inc=0D=0A=
-=0D=0A
+UID:' . $uid . '
+DESCRIPTION;ENCODING=QUOTED-PRINTABLE:' . quoted_printable_encode($description) . '
 SUMMARY;ENCODING=QUOTED-PRINTABLE:' . quoted_printable_encode($title) . '
 PRIORITY:3
 END:VEVENT

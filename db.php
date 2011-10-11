@@ -626,7 +626,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 				//we have a value to save for this column
 				if (($c['type'] == 'decimal') || ($c['type'] == 'float')) {
 					$value = format_null(format_numeric($array[$c['name']], false));
-				} elseif ($c['type'] == 'int') { //integer
+				} elseif (($c['type'] == 'int') || ($c['type'] == 'bigint')) { //integer
 					$value = format_null(format_numeric($array[$c['name']], true));
 				} elseif (($c['type'] == 'mediumblob') && ($c['name'] == 'password')) {
 					if ($id) {
