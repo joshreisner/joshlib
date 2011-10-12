@@ -257,6 +257,12 @@ function file_ical($event) {
 	if (!is_int($start))	$start	= strtotime($start);
 	if (!is_int($end))		$end	= strtotime($end);
 	
+	//todo, implement better (negative numbers, or time zone code)
+	if (isset($event['gmt_offset'])) {
+		$start	+= $event['gmt_offset'] * 3600;
+		$end	+= $event['gmt_offset'] * 3600;
+	}
+	
 	//other optional variables
 	if (!isset($location))		$location		= '';
 	if (!isset($description))	$description	= '';
