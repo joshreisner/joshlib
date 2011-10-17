@@ -395,6 +395,11 @@ function db_id() {
 	}
 }
 
+function db_import($file) {
+	//todo test whether double quotes are required
+	passthru("nohup mysql -h " . $_josh['db']['location'] . " -u " . $_josh['db']['username'] . " -p" . $_josh['db']['password'] . " " . $_josh['db']['database'] . " < " . DIRECTORY_ROOT . $file);
+}
+
 function db_key() {
 	global $_josh;
 	if ($_josh['db']['language'] == 'mssql') {
