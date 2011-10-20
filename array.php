@@ -307,9 +307,16 @@ function array_remove($needle, $haystack) {
 function array_searchwords($string) {
 	//return a sanitized array of words to search with or use format_highlight on
 	global $_josh;
-	$words = trim(strtolower(format_accents_remove(strip_tags($string))));
-	if (empty($words)) return false;
-	return array_diff(array_unique(explode(' ', $words)), $_josh['ignored_words']);
+	
+	//sanitize string
+	$string = trim(strtolower(format_accents_remove(strip_tags($string))));
+	$string = str_replace('"', '', $string);
+	$string = str_replace("'", '', $string);
+	
+	//create array
+	$words = array_diff(array_unique(explode(' ', $string)), $_josh['ignored_words']);
+	
+	return (!count($words)) ? false : $words;
 }
 
 function array_send($array, $target) {
