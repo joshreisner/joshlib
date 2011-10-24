@@ -1125,7 +1125,7 @@ function draw_table($array, $name='untitled_table', $css=false) {
 	
 	//if css is set, prepend css
 	if ($css) $return = draw_css('
-		table				{ font-family:Verdana; font-size:12px; color:#444; border:1px solid #bbb; }
+		table				{ font-family:Verdana; font-size:12px; color:#444; border:0; }
 		table td, table th	{ padding:4px 11px 4px 7px; border-bottom:1px solid #bbb; }
 		th					{ text-align:left; font-weight:normal; background-color:#ddd; }
 		table td.delete, table th.delete		{ width:20px; min-width:20px; }
