@@ -250,6 +250,7 @@ function file_get_uploaded($fieldname, $types_table=false) {
 
 function file_ical($event) {
 	//check event array has necessary infoz
+	//eg $event = array('title'=>'Diego\'s Birthday', 'start'=>'2011-08-04 00:00:00', 'end'=>'2011-08-04 23:59:59');
 	extract($event);
 	if (!isset($title) || !isset($start) || !isset($end)) error_handle(__function__ . ' input missing', 'title, start and end are required', __file__, __line__);
 	
