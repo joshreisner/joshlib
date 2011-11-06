@@ -1087,6 +1087,10 @@ function draw_section($content='', $arguments=false) {
 	return draw_tag('section', $arguments, $content);
 }
 
+function draw_small($inner, $arguments=false) {
+	return draw_tag('small', $arguments, $inner);
+}
+
 function draw_span($class, $inner='') {
 	//eg draw_span('title', $r) == draw_container('span', $r['title'], array('class'=>'title')) == '<span class="title">' . $r['title'] . '</span>'
 	if (is_array($inner)) {
