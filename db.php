@@ -153,6 +153,11 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			$default = 'NOT NULL';
 			break;
 		
+			case 'color': 
+			$datatype = 'varchar';
+			$length = 7;
+			break;
+		
 			case 'date': 
 			case 'datetime': 
 			$datatype = 'datetime';

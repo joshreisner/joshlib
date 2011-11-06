@@ -97,6 +97,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['field_types']			= array(
 										'checkbox'=>'Checkbox',
 										'checkboxes'=>'Checkboxes',
+										'color'=>'Color',
 										'date'=>'Date',
 										'datetime'=>'Date & Time',
 										'email'=>'Email',
@@ -108,7 +109,6 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'image-alt'=>'Image (Alt)',
 										'int'=>'Integer',
 										'latlon'=>'Lat/Lon Coords',
-										//'object'=>'Ordered Object',
 										'text'=>'Text',
 										'textarea'=>'Textarea',
 										'textarea-plain'=>'Textarea (Plain)',
@@ -733,6 +733,7 @@ function lib_get($string) {
 		case 'innershiv' :
 		case 'jquery' :
 		case 'jquery-latest' :
+		case 'jscolor' :
 		case 'jscrollpane' :
 		case 'lorem_ipsum' :
 		case 'modernizr' :
@@ -832,6 +833,9 @@ function lib_location($string) {
 		case 'jquery-hosted' :
 		return 'http://code.jquery.com/jquery-1.5.2.min.js';
 		
+		case 'jscolor' :
+		return DIRECTORY_WRITE . '/lib/jscolor/jscolor.js';
+
 		case 'jscrollpane' :
 		return DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.min.js';
 

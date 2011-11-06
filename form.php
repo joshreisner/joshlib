@@ -200,9 +200,7 @@ class form {
 					$return .= '<div class="note">' . $additional . '</div>';
 					break;
 				case 'password':
-					//accepts insertion point
-					if (!$this->focus) $this->set_focus($name);
-					
+					if (!$this->focus) $this->set_focus($name); //can accept insertion point
 					$return .= draw_form_password($name, $value, $class, 255, false) . $additional;
 					break;
 				case 'radio':
@@ -238,16 +236,24 @@ class form {
 						$return .= draw_form_submit($value, $class) . $additional;
 					}
 					break;
+				case 'color':
 				case 'int':
 				case 'text':
+				case 'url':
+				case 'url-local':
 					if ($allow_changes) {
 						if (!$this->focus) $this->set_focus($name); //accepts insertion point
 						$args = array('class'=>$type);
+						if ($type == 'color') {
+							//js color picker
+							$return .= lib_get('jscolor'); 
+							$args['class'] .= ' {hash:true}';
+						}
 						if ($required) $args['class'] .= ' required';
 						if (!empty($default)) $args['placeholder'] = $default;
 						$return .= draw_form_text($name, $value, $args, $maxlength, false, false) . $additional;
 					} else {
-						$return .= ($name == 'url') ? draw_link($value, $value) : $value;
+						$return .= (($type == 'url') || ($type == 'url-local')) ? draw_link($value, $value) : $value;
 					}
 					break;
 				case 'textarea':
@@ -261,21 +267,6 @@ class form {
 						$return .= draw_form_textarea($name, $value, $args);
 					} else {
 						$return .= $value;
-					}
-					break;
-				case 'url':
-					if ($allow_changes) {
-						//if (!$value) $value = 'http://'; //removing for validate jquery
-						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
-					} else {
-						$return .= draw_link($value, $value);
-					}
-					break;
-				case 'url-local':
-					if ($allow_changes) {
-						$return .= draw_form_text($name, $value, $class, $maxlength, false, false) . $additional;
-					} else {
-						$return .= draw_link($value);
 					}
 					break;
 			}
