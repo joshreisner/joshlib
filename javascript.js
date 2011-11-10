@@ -3,19 +3,19 @@
 
 $(function(){
 	//automatically load new slideshows
-	$('ul.slideshow').each(function(){ new slideshow($(this)); });
+	$("ul.slideshow").each(function(){ new slideshow($(this)); });
 	
 	var defaults = {};
-	$('input.default').each(function(){ defaults[$(this).attr('name')] = $(this).val(); });
+	$("input.default").each(function(){ defaults[$(this).attr("name")] = $(this).val(); });
 	
-	$('div[contenteditable=true]').blur(function(){
+	$("div[contenteditable=true]").blur(function(){
 		$.ajax({
-			url  : url_action_add('ajax_set', true),
-			type : 'POST',
+			url  : url_action_add("ajax_set", true),
+			type : "POST",
 			data : {
-				table:	$(this).attr('data-table'), 
-				column:	$(this).attr('data-column'), 
-				id:		$(this).attr('data-id'), 
+				table:	$(this).attr("data-table"), 
+				column:	$(this).attr("data-column"), 
+				id:		$(this).attr("data-id"), 
 				value:	$(this).html()
 			}
 		});
