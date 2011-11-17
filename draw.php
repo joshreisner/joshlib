@@ -279,7 +279,7 @@ function draw_dump($var, $forceType='', $bCollapsed=false) {
 	//use $forceType='xml' for xml otherwise it will be recognized as a string
 	//use $bCollapsed=true for collapsed view
 	//get dBug class
-	lib_get('dBug');
+	lib_get('dbug');
 	
 	new dBug($var, $forceType, $bCollapsed);
 }
@@ -288,7 +288,7 @@ function draw_exit($var, $forceType='', $bCollapsed=false) {
 	//use $forceType='xml' for xml otherwise it will be recognized as a string
 	//use $bCollapsed=true for collapsed view
 	//get dBug class
-	lib_get('dBug');
+	lib_get('dbug');
 	
 	new dBug($var, $forceType, $bCollapsed);
 	exit();

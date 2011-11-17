@@ -11,7 +11,7 @@ THIRD PARTY SOFTWARE
 	
 	~~TITLE~~~~~~~~~~~~~LANG~~~~LICENSE~~~~~VERSION~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	> codepress			js		LGPL				http://sourceforge.net/projects/codepress/
-	> dBug				php		
+	> dbug				php		
 	> file_icons		png		-			-		-
 	> fpdf				php							http://fpdf.org/
 	> innershiv			js		
@@ -815,8 +815,8 @@ function lib_location($string) {
 	$lib = DIRECTORY_WRITE . '/lib/' . $string . '/';
 
 	switch ($string) {
-		case 'dBug' : 
-		return DIRECTORY_ROOT . $lib . 'dBug.php';
+		case 'dbug' : 
+		return DIRECTORY_ROOT . $lib . 'dbug.php';
 		
 		case 'fancybox' : 
 		return DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox-1.3.1.js';
