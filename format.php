@@ -722,6 +722,11 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 	//get source image dimensions
 	list($width, $height) = getimagesize(DIRECTORY_ROOT . $source_name);
 	
+	if(!$width || !$height) {
+		// image is probably corrupt
+		error_handle('image corrupt', 'the uploaded image cannot be read, try opening the image in photo editing software, re-saving it, and then try again', __file__, __line__);
+	}
+	
 	//execute differently depending on target parameters	
 	if ($max_width && $max_height) {
 		//resizing both
