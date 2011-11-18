@@ -724,7 +724,8 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 	
 	if(!$width || !$height) {
 		// image is probably corrupt
-		error_handle('image corrupt', 'the uploaded image cannot be read, try opening the image in photo editing software, re-saving it, and then try again', __file__, __line__);
+		echo draw_page('image corrupt', 'the uploaded image cannot be read, try opening the image in photo editing software, re-saving it, and then try again');
+		exit();
 	}
 	
 	//execute differently depending on target parameters	
