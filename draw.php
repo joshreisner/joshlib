@@ -190,11 +190,14 @@ function draw_css($content) {
 	return draw_tag('style', array('type'=>'text/css'), $content);
 }
 
-function draw_css_src($location='/css/global.css', $media=false) {
+function draw_css_src($location='/css/global.css', $media=false, $manage_caching=true) {
 	//special 'ie' mode for internet explorer
 	$ie = ($media == 'ie');
 	if ($ie) $media = 'screen';
-	if ($filemtime = @filemtime(DIRECTORY_ROOT . $location)) $location .= '?' . $filemtime; //refresh browser cache when the stylesheet is updated
+	
+	//refresh browser cache when the stylesheet is updated
+	if ($manage_caching && ($filemtime = @filemtime(DIRECTORY_ROOT . $location))) $location .= '?' . $filemtime;
+	
 	$return = draw_tag('link', array('rel'=>'stylesheet', 'type'=>'text/css', 'media'=>$media, 'href'=>$location));
 	if ($ie) $return = '<!--[if IE]>' . $return . '<![endif]-->';
 	return $return;
@@ -265,14 +268,15 @@ function draw_dl($array, $class=false) {
 	return draw_container('dl', $return, array('class'=>$class));
 }
 
-function draw_doctype($lang='en') {
+function draw_doctype($lang='en', $manifest=false) {
+	if ($manifest) $manifest = ' manifest="' . $manifest . '"';
 	return '<!DOCTYPE html>
-        <!--[if IEMobile 7 ]><html class="no-js ie iem7" lang="' . $lang . '" manifest="default.appcache?v=1"><![endif]-->
-        <!--[if lt IE 7 ]><html class="no-js ie ie6" lang="' . $lang . '"><![endif]-->
-        <!--[if IE 7 ]><html class="no-js ie ie7" lang="' . $lang . '"><![endif]-->
-        <!--[if IE 8 ]><html class="no-js ie ie8" lang="' . $lang . '"><![endif]-->
-        <!--[if IE 9 ]><html class="no-js ie ie9" lang="' . $lang . '"><![endif]-->
-        <!--[if (gt IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="' . $lang . '"><!--<![endif]-->';
+        <!--[if IEMobile 7 ]><html class="no-js ie iem7" lang="' . $lang . '"' . $manifest . '><![endif]-->
+        <!--[if lt IE 7 ]><html class="no-js ie ie6" lang="' . $lang . '"' . $manifest . '><![endif]-->
+        <!--[if IE 7 ]><html class="no-js ie ie7" lang="' . $lang . '"' . $manifest . '><![endif]-->
+        <!--[if IE 8 ]><html class="no-js ie ie8" lang="' . $lang . '"' . $manifest . '><![endif]-->
+        <!--[if IE 9 ]><html class="no-js ie ie9" lang="' . $lang . '"' . $manifest . '><![endif]-->
+        <!--[if (gt IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="' . $lang . '"' . $manifest . '><!--<![endif]-->';
 }
 
 function draw_dump($var, $forceType='', $bCollapsed=false) {
