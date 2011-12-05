@@ -93,11 +93,11 @@ function email_array($to=false, $subject=false, $from=false, $array='post') {
 	if (!$to) $to = $_josh['email_default'];
 	if (!$subject) $subject = 'Form Submission from ' . $_josh['request']['sanswww'];
 	
-	//form submit image produces these, which are confusing to users
-	if (isset($_POST['x'])) unset($_POST['x']);
-	if (isset($_POST['y'])) unset($_POST['y']);
+	//cleanup form variables
+	$confusing_vars = array('x', 'y', 'return_to', 'form_id');
+	foreach ($confusing_vars as $c) if (isset($array[$c])) unset($array[$c]);
 	
-	email($to, draw_page($subject, draw_array($_POST, true), false, true), $subject, $from);
+	email($to, draw_page($subject, draw_array($array, true), false, true), $subject, $from);
 }
 
 function email_post($to=false, $subject=false, $from=false) {
