@@ -866,9 +866,10 @@ function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false
 	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $arguments);
 }
 
-function draw_list($options, $arguments=false, $parent='ul', $selected=false, $classes=false, $child='li') {
+function draw_list($options, $arguments=false, $parent='ul', $selected=false, $classes=false, $child='li', $separator='') {
 	//make a ul or an ol out of a one-dimensional array
 	if (!is_array($options) || (!$count = count($options))) return false;
+	if (!empty($separator)) $separator = draw_tag($child, 'separator', $separator);
 	$arguments = array_arguments($arguments);
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
@@ -896,7 +897,7 @@ function draw_list($options, $arguments=false, $parent='ul', $selected=false, $c
 		$options[$i] = draw_tag($child, $li_args, $options[$i]);
 		$counter++;
 	}
-	return draw_tag($parent, $arguments, implode($options, ''));
+	return draw_tag($parent, $arguments, implode($options, $separator));
 }
 
 function draw_list_columns($options, $columns=2, $arguments=false, $type='ul', $selected=false) {
@@ -951,7 +952,7 @@ function draw_meta_utf8() {
 	
 }
 
-function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false, $use_nav_tag=true) {	
+function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false, $use_nav_tag=true, $separator='') {	
 	global $_josh;
 
 	//type can be text, images or rollovers
@@ -1022,7 +1023,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	if ($sets) {
 		$return = draw_list_sets($return, $sets, $class, 'ul', $selected);
 	} else {
-		$return = draw_list($return, $class, 'ul', $selected, $classes);
+		$return = draw_list($return, $class, 'ul', $selected, $classes, 'li', $separator);		
 	}
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
 	if ($use_nav_tag) $return = draw_tag('nav', array('class'=>$class), $return);
@@ -1058,7 +1059,6 @@ function draw_nav_nested($pages, $class='nav', $current_depth=1) {
 		$li_items[] = $return;
 	}
 		
-	//function draw_list($options, $arguments=false, $type='ul', $selected=false, $classes=false) {
 	$return = draw_list($li_items, $class, 'ul', false, $classes);
 	if ($current_depth == 1) return $return;
 	return array($return, $selected); //have to pass the fact that there was a selected item up the chain

@@ -785,6 +785,14 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 	return $return;
 }
 
+function format_inches($inches) {
+	//for naomi osnos dec 4, 2011
+	if ($inches < 12) return $inches . '"';
+	$return = round($inches / 12) . '\'';
+	if ($inches = $inches % 12) $return .= ' ' . $inches . '"';
+	return $return;
+}
+
 function format_js_desanitize() {
 	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because css should be used for rollovers from now on');
 	//javascript function for decoding sanitized strings

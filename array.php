@@ -448,6 +448,12 @@ function array_rss($url) {
 	return false;
 }
 
+function array_value_exists($array, $needle) {
+	//for naomi, checks a given 1d array and returns first match
+	foreach ($array as $key=>$value) if ($needle == $value) return $key;
+	return false;
+}
+
 function array_xml($string) {
 	//reads xml data into an associative array
 	$data = new SimpleXMLElement($string);
