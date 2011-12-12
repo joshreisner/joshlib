@@ -1282,9 +1282,12 @@ function format_title($str, $force_upper=false) {
 	$return = array();
 	$lower = array('a', 'an', 'and', 'but', 'for', 'from', 'if', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'via', 'with');
 	$mixed = array('DBs', 'CBOs', 'iPhone', 'iPhones', 'IDs', 'IPs', 'LLCs', 'MySQL', 'SSNs', 'TinyMCE', 'URLs', 'WordPress');
-	$upper = array('ADA', 'ASAP', 'BIF', 'CCT', 'CMS', 'CSS', 'DB', 'DC', 'EBO', 'FSS', 'FTP', 'HR', 'HTML', 'I', 'IE', 'II', 'III', 'IP', 'IV', 
-		'LLC', 'NHP', 'NVN', 'OMG', 'ONYC', 'OS', 'PC', 'PDF', 'PHP', 'PLC', 'RSS', 'SF', 'SFS', 'SQL', 'SSI', 'SSN', 'SVN', 'SWF', 'TANF', 'URL', 'U.S.', 
+	$upper = array('ADA', 'API', 'ASAP', 'CMS', 'CSS', 'DB', 'DC', 'FTP', 'HR', 'HTML', 'I', 'IE', 'II', 'III', 'IP', 'IV', 
+		'LLC', 'OMG', 'ONYC', 'OS', 'PC', 'PDF', 'PHP', 'RSS', 'SF', 'SFS', 'SQL', 'SSI', 'SSN', 'SVN', 'SWF', 'URL', 'U.S.', 
 		'V', 'VI', 'VII', 'VIII', 'WTF', 'X', 'XML');
+		
+	//seedco 
+	$upper = array_merge($upper, array('BIF', 'CCT', 'EBO', 'FSS', 'NHP', 'NVN', 'PLC', 'TANF'));
 		
 	if ($force_upper) {
 		$force_upper = array_separated($force_upper);
