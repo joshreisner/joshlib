@@ -1281,12 +1281,13 @@ function format_title($str, $force_upper=false) {
 	error_debug('<b>format_title</b> starting with ' . $str, __file__, __line__);
 	$return = array();
 	$lower = array('a', 'an', 'and', 'but', 'for', 'from', 'if', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'via', 'with');
-	$mixed = array('DBs', 'CBOs', 'iPhone', 'iPhones', 'IDs', 'IPs', 'LLCs', 'MySQL', 'SSNs', 'TinyMCE', 'URLs', 'WordPress');
+	$mixed = array('DBs', 'iPhone', 'iPhones', 'IDs', 'IPs', 'LLCs', 'MySQL', 'SSNs', 'TinyMCE', 'URLs', 'WordPress');
 	$upper = array('ADA', 'API', 'ASAP', 'CMS', 'CSS', 'DB', 'DC', 'FTP', 'HR', 'HTML', 'I', 'IE', 'II', 'III', 'IP', 'IV', 
 		'LLC', 'OMG', 'ONYC', 'OS', 'PC', 'PDF', 'PHP', 'RSS', 'SF', 'SFS', 'SQL', 'SSI', 'SSN', 'SVN', 'SWF', 'URL', 'U.S.', 
 		'V', 'VI', 'VII', 'VIII', 'WTF', 'X', 'XML');
 		
 	//seedco 
+	$mixed = array_merge($mixed, array('CBOs'));
 	$upper = array_merge($upper, array('BIF', 'CCT', 'EBO', 'FSS', 'NHP', 'NVN', 'PLC', 'TANF'));
 		
 	if ($force_upper) {
