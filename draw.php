@@ -956,7 +956,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	global $_josh;
 
 	//type can be text, images or rollovers
-	//match can be path, path_query or folder
+	//match can be path, path_query, folder, or array
 	//you can pass a SQL string instead of options
 	if (is_string($options)) $options = array_key_promote(db_table($options)); 
 	
@@ -994,6 +994,14 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 			$urlparts = explode('/', $url);
 			$matching = (@$urlparts[1] == $_josh['request']['folder']);
 			if (substr($url, 0, 5) == 'http:') $matching = false;
+		} elseif (is_array($match)) {
+			//new mode.  you can match values against the query string
+			$querystring = url_query_parse($url);
+			//echo draw_array($querystring);
+			$matching = true;
+			foreach ($match as $key=>$value) {
+				if (!isset($querystring[$key]) || ($querystring[$key] != $value)) $matching = false;
+			}
 		} else {
 			$matching = (str_replace(url_base(), '', $url) == $match);
 		}
@@ -1020,11 +1028,9 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		$return[] = draw_link($url, $inner, false, $args);
 		$counter++;
 	}
-	if ($sets) {
-		$return = draw_list_sets($return, $sets, $class, 'ul', $selected);
-	} else {
-		$return = draw_list($return, $class, 'ul', $selected, $classes, 'li', $separator);		
-	}
+	
+	$return = ($sets) ? draw_list_sets($return, $sets, $class, 'ul', $selected) : draw_list($return, $class, 'ul', $selected, $classes, 'li', $separator);
+	
 	if ($type == 'rollovers') $return = draw_javascript_src() . draw_javascript('if (document.images) {' . $javascript . '}') . $return;
 	if ($use_nav_tag) $return = draw_tag('nav', array('class'=>$class), $return);
 	return $return;
