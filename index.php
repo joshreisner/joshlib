@@ -15,7 +15,7 @@ THIRD PARTY SOFTWARE
 	> file_icons		png		-			-		-
 	> fpdf				php							http://fpdf.org/
 	> innershiv			js		
-	> jquery			js		MIT			1.5.2	http://jquery.com/
+	> jquery			js		MIT			1.7.1	http://jquery.com/
 	> lorem_ipsum		js							http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
 	> salesforce		php							http://developer.force.com/							
 	> simple_html_dom	php		MIT					http://sourceforge.net/projects/simplehtmldom/
@@ -25,7 +25,7 @@ THIRD PARTY SOFTWARE
 	> uploadify			js		MIT			3.0.0	http://uploadify.com/
 
 	JQUERY EXTENSIONS (in the jquery folder)
-	> fancybox					MIT/GPL				http://fancybox.net/
+	> fancybox					CC ANC 3.0	2.0.4	http://fancyapps.com/fancybox/
 	> jscrollpane				MIT/GPL				http://jscrollpane.kelvinluck.com/
 	> validate					MIT/GPL				http://bassistance.de/jquery-plugins/jquery-plugin-validation/
 	> table drag and drop		LGPL		0.5		http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/		
@@ -780,8 +780,8 @@ function lib_get($string) {
 		} elseif (($string == 'tablednd') || ($string == 'validate') || ($string == 'fancybox') || ($string == 'jscrollpane') || ($string == 'uploadify')) {
 			$return = lib_get('jquery') . $return;
 			if ($string == 'fancybox') {
-				$return .= draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.mousewheel-3.0.2.pack.js') . 
-					draw_css_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox-1.3.1.css');
+				$return .= draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jquery.mousewheel-3.0.6.pack.js') . 
+					draw_css_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox.css');
 			} elseif ($string == 'jscrollpane') {
 				$return = draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.css') . 
 					$return . 
@@ -819,7 +819,7 @@ function lib_location($string) {
 		return DIRECTORY_ROOT . $lib . 'dbug.php';
 		
 		case 'fancybox' : 
-		return DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox-1.3.1.js';
+		return DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox.pack.js';
 		
 		case 'fpdf' :
 		return DIRECTORY_ROOT . $lib . 'fpdf-1.6.php';
@@ -828,7 +828,7 @@ function lib_location($string) {
 		return $lib . 'innershiv.min.js';
 		
 		case 'jquery' :
-		return $lib . 'jquery-1.6.2.min.js';
+		return $lib . 'jquery-1.7.1.min.js';
 		
 		case 'jquery-hosted' :
 		return 'http://code.jquery.com/jquery-1.5.2.min.js';
