@@ -629,7 +629,7 @@ function draw_google_map($markers=false, $center=false, $zoom=false, $control=tr
 	}
 	
 	//tweak centering for maps with an automarker.  todo: tweak for different levels of zoom
-	if (($count == 1) && (isset($markers[0]['auto']))) {
+	if ($markers && ($count == 1) && (isset($markers[0]['auto']))) {
 		$lat += .007;
 		$lon += .0035;
 	}
