@@ -410,9 +410,10 @@ function file_put_config() {
 	$return .= '//$_josh[\'smtp\'][\'password\']		= \'\';' . NEWLINE;
 	$return .= NEWLINE;
 	
-	//google variables
+	//google api variables
 	$return .= '//$_josh[\'google\'][\'mapkey\']		= \'\';' . NEWLINE;
 	$return .= '//$_josh[\'google_search_api_key\']		= \'\';' . NEWLINE;
+	$return .= '//$_josh[\'google_translate_api_key\']		= \'\';' . NEWLINE;
 	
 	return file_put($_josh['config'], $return);
 }

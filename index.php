@@ -677,17 +677,20 @@ function language_detect() {
     return substr($code[0], 0, 2);
 }
 
-function language_translate($string, $from, $to) {
+function language_translate($string, $source, $target) {
 	global $_josh;
 	
 	//make sure there's something to translate
 	if (empty($string)) return '';
+	
+	if (empty($_josh['google_translate_api_key'])) error_handle('translate API key required', 'Google translate is now a paid service.  Provide an ' . draw_link('http://code.google.com/apis/language/translate/overview.html', 'API key') . ' in the config file.');
 	
 	//unescape in case of post
 	$string = str_replace("''", "'", $string);
 	
 	//todo figure out how to do this with POST since the limit is higher
 	//todo figure out exactly what the limit is
+	//todo investigate implied possibility of doing multiple translations in a single pass
 	
 	$chunks = array_chunk_html($string, 1450);
 	$string = '';
@@ -696,12 +699,16 @@ function language_translate($string, $from, $to) {
 	
 		if (!isset($_josh['google_search_api_key'])) error_handle('api key not set', __function__ . ' needs a ' . draw_link('http://code.google.com/apis/ajaxsearch/signup.html', 'Google AJAX search API key'), __file__, __line__);
 		
-		$body = url_get('http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&langpair=' . $from . '%7C' . $to);
+		$body = url_get('https://www.googleapis.com/language/translate/v2?key=' . $_josh['google_translate_api_key'] . '&q=' . urlencode($c) . '&key=' . $_josh['google_search_api_key'] . '&source=' . $source . '&target=' . $target);
 		
 		// now, process the JSON string
 		$json = json_decode($body, true);
-		if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string length was ' . strlen($c) . BR . BR . $c . BR . BR . '.  json was ' . $json . draw_array($json), __file__, __line__);
-		$string .= $json['responseData']['translatedText'];
+		//die(draw_array($json));
+		
+		//new google translate uses different error messages
+		//if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string length was ' . strlen($c) . BR . BR . $c . BR . BR . '.  json was ' . $json . draw_array($json), __file__, __line__);
+
+		$string .= $json['data']['translations'][0]['translatedText'];
 	}
 	return format_quotes($string);
 }
