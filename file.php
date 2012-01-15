@@ -227,7 +227,7 @@ function file_get_max($pretty=true) {
 }
 
 function file_get_type_id($filename, $table='documents_types') {
-	error_deprecated(__FUNCTION__ . ' is deprecated now in favor of extension columns like pdf, html, doc, xlsx etc');
+	//error_deprecated(__FUNCTION__ . ' is deprecated now in favor of extension columns like pdf, html, doc, xlsx etc');
 	list($filename, $extension) = file_name($filename);
 	if (!$type_id = db_grab('SELECT id FROM ' . $table . ' WHERE extension = "' . $extension . '"')) return db_query('INSERT INTO ' . $table . ' ( extension ) VALUES ( "' . $extension . '" )');
 	return $type_id;
