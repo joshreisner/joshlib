@@ -4,7 +4,7 @@ error_debug('including format.php', __file__, __line__);
 
 function format_accents_encode($string) {
 	//not sure if this is necessary anymore with the conversion to utf8
-	//update it is, email not supporting utf8
+	//update: it is, email not supporting utf8
 	$string = str_replace('“', '&ldquo;',	$string);
 	$string = str_replace('”', '&rdquo;',	$string);
 	$string = str_replace('‘', '&lsquo;',	$string);
@@ -834,15 +834,9 @@ function format_more($string, $link=false, $separator='<p>[more]</p>') {
 	return $string;
 }
 
-/* function format_nobr($string='') {
-	//should have been draw_nobr anyway
-	error_deprecated(__FUNCTION__ . ' was deprecated on 10/28/2009 because it\'s invalid html -- use table width instead, or white-space: nowrap');
-	return '<nobr>' . $string . '</nobr>';
-}*/
-
-function format_null($value='') {
-	//could also be a db function?
-	if (empty($value)) return 'NULL';
+function format_null($value) {
+	//should this really be named db_null()?
+	if (!strlen($value)) return 'NULL'; //don't use empty() here because 0s will be replaced with NULLs
 	if (!is_numeric($value)) return '\'' . $value . '\'';
 	return $value;
 }
@@ -862,17 +856,17 @@ format_numeric forces out a number from a string
 */
 
 function format_numeric($value, $integer=false) {
-	//take possibly string function and reduce it to just the numeric elements
+	//takes a string and reduces to just its numeric elements
 	$characters = '0123456789';
 	$value = $value . ''; //force it to be a string
 	if (!$integer) $characters .= '.';
 	$newval = '';
 	for ($i = 0; $i < strlen($value); $i++) if (strpos($characters, $value[$i]) !== false) $newval .= $value[$i];
-	if (empty($newval)) {
-		error_debug('<b>format_numeric</b> received $value and is sending back false', __file__, __line__);
+	if (!strlen($newval)) {
+		error_debug('<b>format_numeric</b> received ' . $value . ' and is sending back false', __file__, __line__);
 		return false;
 	} else {
-		error_debug('<b>format_numeric</b> received $value and is sending back ' . $newval, __file__, __line__);
+		error_debug('<b>format_numeric</b> received ' . $value . ' and is sending back ' . $newval, __file__, __line__);
 		return $newval - 0;
 	}
 }
@@ -984,14 +978,6 @@ function format_post_urls($fieldnames) {
 	$fields = array_separated($fieldnames);
 	foreach ($fields as $field) $_POST[$field] = format_null(format_url($_POST[$field]));
 }
-
-/* commented on 9/20/2011
-function format_q($quantity, $entity, $capitalize=true) {
-	error_deprecated(__FUNCTION__ . ' was deprecated on 3/11/2010 because alias not useful enough to warrant bloat');
-	//alias for format_quantitize
-	return format_quantitize($quantity, $entity, $capitalize);
-}
-*/
 
 function format_quantity($quantity, $title_case=true) {
 	global $_josh;
@@ -1325,6 +1311,7 @@ function format_url($str='') {
 }
 
 function format_verify($variable, $type='int') {
+	error_debug(__function__ . ' running for variable ' . $variable . ' of type ' . $type, __file__, __line__);
 	if ($type == 'int') {
 		if (!is_numeric($variable)) return false;
 		return ((string) $variable) === ((string)(int) $variable);

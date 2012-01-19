@@ -376,19 +376,16 @@ function db_found($result) {
 
 function db_grab($query, $checking=false) {
 	global $_josh;
-	error_debug('<b>db_grab</b> running', __file__, __line__);
+	error_debug('<b>' . __function__ . '</b> running', __file__, __line__);
 	$result = db_query($query, 1, $checking);
-	if (!db_found($result)) {
-		error_debug('grabbing value', __file__, __line__);
-		return false;
-	} else {
-		$r = db_fetch($result);
-		if (count($r) == 1) {
-			$key = array_keys($r);
-			$r = $r[$key[0]]; //if returning just one value, make it scalar
-		}
-		return $r;
+	if (!db_found($result)) return false;
+	
+	$r = db_fetch($result);
+	if (count($r) == 1) {
+		$key = array_keys($r);
+		$r = $r[$key[0]]; //if returning just one value, make it scalar
 	}
+	return $r;
 }
 
 function db_id() {
@@ -638,6 +635,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 					$value = format_null(format_numeric($array[$c['name']], false));
 				} elseif (($c['type'] == 'int') || ($c['type'] == 'bigint')) { //integer
 					$value = format_null(format_numeric($array[$c['name']], true));
+					error_debug('<b>' . __function__ . '</b> checked int, value is ' . $value, __file__, __line__);
 				} elseif (($c['type'] == 'mediumblob') && ($c['name'] == 'password')) {
 					if ($id) {
 						$query1[] = $c['name'] . ' = ' . db_pwdencrypt($value);
