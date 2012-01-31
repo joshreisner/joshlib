@@ -56,7 +56,7 @@ function db_backup($limit=false) {
 	}
 	
 	//filename is /_site/backups/YYYY-MM-DD.sql -- delete any existing file of that name
-	$target = $folder . date('Y-m-d') . '.gz';
+	$target = $folder . date('Y-m-d') . '.sql.gz';
 	file_delete($target);
 	
 	//build command, socket hack, execute
