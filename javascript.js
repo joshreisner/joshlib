@@ -424,6 +424,8 @@ function scroll_to(newPallet, dont_clear_interval) {
 }
 
 function slideshow(element) {
+  window.onblur = function() {window.blurred = true;};
+  window.onfocus = function() {window.blurred = false;};
 	/*
 	slideshow function by josh, diego and michael
 	call by <ul class="slideshow arrows bullets move continuous slow">
@@ -434,7 +436,12 @@ function slideshow(element) {
 		autoClear:			function() {
 								clearTimeout(vars.timer);
 							},
-		autoSlide: 			function() {
+		autoSlide: 			function() {		 
+		            // fix c/o http://stackoverflow.com/questions/5766263/run-settimeout-only-when-tab-is-active
+          		  if(window.blurred) {
+                    setTimeout(vars.autoSlide, 100);
+                    return;
+                }
 								//goToNext basically
 								vars.deselectedPosition	= vars.selectedPosition;
 								vars.selectedPosition++;
