@@ -342,7 +342,7 @@ function format_html($text, $profile='user') {
 	//todo tie this programmically to user() and admin()
 
 	//replace links not already in <a> tags
-/*
+	//why was this commented?
 	$bits = preg_split('/(<a(?:\s+[^>]*)?>.*?<\/a>|<[a-z][^>]*>)/is', $text, null, PREG_SPLIT_DELIM_CAPTURE);
 	$reconstructed = '';
 	foreach ($bits as $bit) {
@@ -350,7 +350,6 @@ function format_html($text, $profile='user') {
 		$reconstructed .= $bit;
 	}	
 	$text = $reconstructed;
-*/
 	
 	lib_get('simple_html_dom');
 	$html = str_get_html($text);
@@ -385,9 +384,10 @@ function format_html($text, $profile='user') {
 			if (in_array($e->tag, $bad_tags)) tagUnset($e);		
 			
 			//these are the tags we want.  if you're not one of these, remove but keep your contents eg <NYT_HEADLINE>
+			//what's a <text> tag?  maybe this means actual text to simple_html_dom
 			if (!in_array($e->tag, array(
-				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'dir', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'i', 'iframe', 'img',
-				'p', 'section', 'span', 'strike', 'strong', 'text', 'table', 'tr', 'td', 'th', 'ol', 'ul', 'li',
+				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'caption', 'dir', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'i', 'iframe', 'img',
+				'ol', 'li', 'p', 'section', 'span', 'strike', 'strong', 'tbody', 'text', 'table', 'td', 'th', 'tr', 'ul',
 				'object', 'embed', 'param'
 			))) $e->outertext = ($e->innertext) ? $e->innertext : '';
 					

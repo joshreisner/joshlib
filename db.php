@@ -42,7 +42,7 @@ function db_array($sql, $array=false, $prepend_id=false, $prepend_value=false, $
 function db_backup($limit=false) {
 	//outputs a gzip backup of the current database
 	global $_josh;
-	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
+	if (db_language() != 'mysql') error_handle('Language Not Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
 
 	//check up on the folder
 	file_dir_writable('backups');
@@ -55,45 +55,32 @@ function db_backup($limit=false) {
 		}
 	}
 	
-	//filename is /_site/backups/YYYY-MM-DD.sql -- delete any existing file of that name
+	//filename is /_write_folder/backups/YYYY-MM-DD.sql.gz -- delete any existing file of that name
 	$target = $folder . date('Y-m-d') . '.sql.gz';
 	file_delete($target);
 	
 	//build command, socket hack, execute
+	//todo add command for DROP TABLE IF EXISTS
 	$command = 'mysqldump --opt --host="' . $_josh['db']['location'] . '" --user="' . $_josh['db']['username'] . '" --password="' . $_josh['db']['password'] . '" "' . $_josh['db']['database'] . '" | gzip > ' . DIRECTORY_ROOT . $target;
 	$command = str_replace(':', '" --socket="', $command);
 	
 	//sometimes a path to mysqldump is required.  eg on macs, it's /usr/local/mysql/bin/.  specify it in the config file, if necessary
-	if (isset($_josh['mysqldump_path'])) $command = $_josh['mysqldump_path'] . $command;
+	if (isset($_josh['mysql_path'])) $command = $_josh['mysql_path'] . $command;
 
 	//execute	
-	error_debug('<b>' . __function__ . '</b> about to run ' . $command, __file__, __line__);	
 	system($command);
 	
 	if (file_check($target) > 200) { //sometimes when it fails, mysqldump creates a file that's 20B
 		//export was a success.  return the path for linking.
+		error_debug('<b>' . __function__ . '</b> successfully ran ' . $command . ', creating file: ' . $target, __file__, __line__);	
 		return $target;
 	} else {
 		//export failed
+		error_handle('export failed', '<b>' . __function__ . '</b> was not successful executing ' . $command, __file__, __line__);
 		file_delete($target);
 		return false;
 	}
 }
-
-/* function db_check($table, $column=false) {
-	error_deprecated(__function__ . ' was deprecated on 10/16/2010 for disuse and because it\'s of questionable utility');
-	global $_josh;
-	db_switch('information_schema');
-	if ($column) {
-		$column = ' AND column_name = "' . $column . '"';
-		$target = 'columns';
-	} else {
-		$target = 'tables';
-	}
-	$return = db_grab('SELECT * FROM ' . $target . ' WHERE table_schema = "' . $_josh['db']['database'] . '" AND table_name = "' . $table . '"' . $column);
-	db_switch();
-	return $return;
-} */
 
 function db_checkboxes($name, $linking_table, $object_col, $option_col, $object_id) {
 	//for example db_checkboxes('doc', 'documents_to_categories', 'document_id', 'category_id', $id);
@@ -101,14 +88,6 @@ function db_checkboxes($name, $linking_table, $object_col, $option_col, $object_
 	$categories = array_checkboxes($name);
 	foreach ($categories as $category_id) db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $object_id . ', ' . $category_id . ' )');
 }
-
-/*deprecated 10/16/2010 due to disuse
-function db_clear($tables=false) { //cant find where this is called from.  obsolete?
-	global $_josh;
-	$sql = ($_josh['db']['language'] == 'mssql') ? 'SELECT name FROM sysobjects WHERE type="u" AND status > 0' : 'SHOW TABLES FROM ' . $_josh['db']['database'];
-	$tables = ($tables) ? explode(',', $tables) : db_array($sql);
-	foreach ($tables as $t) db_query('DELETE FROM ' . $t);
-}*/
 
 function db_close($keepalive=false) { //close connection and quit
 	global $_josh;
@@ -132,7 +111,8 @@ function db_close($keepalive=false) { //close connection and quit
 }
 
 function db_column($table, $column) {
-	return db_column_exists($table, $column); //alias
+	//alias for db_column_exists, deprecate?
+	return db_column_exists($table, $column);
 }
 
 function db_column_add($table, $column, $type=false, $datatype=false) {
@@ -398,11 +378,26 @@ function db_id() {
 }
 
 function db_import($file) {
-	//todo test whether double quotes are required
-	passthru("nohup mysql -h " . $_josh['db']['location'] . " -u " . $_josh['db']['username'] . " -p" . $_josh['db']['password'] . " " . $_josh['db']['database'] . " < " . DIRECTORY_ROOT . $file);
+	//todo add gunzip and error handling
+	///usr/local/mysql/bin/mysql -h "localhost" -u "root" "earnbenefits" < /Users/joshreisner/Desktop/2012-01-31.sql
+
+	global $_josh;
+	$command = 'mysql -h "' . $_josh['db']['location'] . '" -u "' . $_josh['db']['username'] . '"';
+
+	//password could be empty
+	if (!empty($_josh['db']['password'])) $command .= ' -p' . $_josh['db']['password'];
+	
+	$command .= ' "' . $_josh['db']['database'] . '" < ' . DIRECTORY_ROOT . $file;
+	
+	//prepend path to mysql if necessary
+	if (isset($_josh['mysql_path'])) $command = $_josh['mysql_path'] . $command;
+
+	system($command);
 }
 
 function db_key() {
+	//return a random alphanumberic 'key' -- often used in cookies to remember users
+	//tables with secret_key fields will autopopulate this if db_save() is called
 	global $_josh;
 	if ($_josh['db']['language'] == 'mssql') {
 		return ''; //todo: not yet implemented for mssql
@@ -412,6 +407,8 @@ function db_key() {
 }
 
 function db_keys_from($table, $exclude_table=false) {
+	//detects foreign keys
+	//need to check usage, might be able to deprecate
 	global $_josh;
 
 	$exclude_table = ($exclude_table) ? 'AND referenced_table_name <> "' . $exclude_table . '"' : '';
@@ -434,6 +431,8 @@ function db_keys_from($table, $exclude_table=false) {
 }
 
 function db_keys_to($table) {
+	//inverse of db_keys_from, detects foreign keys
+	//todo check usage, might be able to deprecate
 	global $_josh;
 	$keys = db_table('SELECT
 			constraint_name,
@@ -451,12 +450,14 @@ function db_keys_to($table) {
 }
 
 function db_language($set_language=false) {
+	//return or set the db_language, eg mysql, mssql
 	global $_josh;
 	if ($set_language) $_josh['db']['language'] = $set_language;
 	return $_josh['db']['language'];
 }
 
 function db_num_fields($result) {
+	//returns the number of fields in a resultset
 	if (db_language() == 'mysql') {
 		return mysql_num_fields($result);
 	} else {
@@ -465,10 +466,11 @@ function db_num_fields($result) {
 }
 
 function db_open($location=false, $username=false, $password=false, $database=false, $language=false) {
+	//creates connection to database.  will be invoked automatically by db_query, not necessary to put this in your code
 	global $_josh;
 	
 	//skip if already connected
-	if (db_connected()) return;
+	if (db_connected()) return true;
 
 	error_debug('<b>db_open</b> running', __file__, __line__);
 
@@ -523,7 +525,8 @@ function db_option($table, $value) {
 	error_handle(__function__ . ' error', 'could not add db_option' . $value . ' to table ' . $table, __file__, __line__);
 }
 
-function db_pwdcompare($string, $field) {
+function db_pwdcompare($string, $field='password') {
+	//check encrypted password against a string
 	global $_josh;
 	error_debug('<b>db_pwdcompare</b> running', __file__, __line__);
 	if ($_josh['db']['language'] == 'mssql') {
@@ -538,6 +541,7 @@ function db_pwdcompare($string, $field) {
 }
 
 function db_pwdencrypt($string) {
+	//encrypt a password for insertion into the database
 	global $_josh;
 	error_debug('<b>db_pwdcompare</b> running', __file__, __line__);
 	if ($_josh['db']['language'] == 'mssql') {
