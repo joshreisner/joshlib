@@ -10,6 +10,7 @@ THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
 	~~TITLE~~~~~~~~~~~~~LANG~~~~LICENSE~~~~~VERSION~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	> bootstrap			js/css						http://twitter.github.com/boostrap
 	> codepress			js		LGPL				http://sourceforge.net/projects/codepress/
 	> dbug				php		
 	> file_icons		png		-			-		-
@@ -735,7 +736,8 @@ function lib_get($string) {
 		case 'swiftmailer' :
 		return @include_once(lib_location($string));
 		
-		//javascript libraries
+		//javascript/css libraries
+		case 'bootstrap' :
 		case 'fancybox' :
 		case 'innershiv' :
 		case 'jquery' :
@@ -784,9 +786,11 @@ function lib_get($string) {
 			') . $return;
 			file_dir_writable('images');
 			file_dir_writable('files');
-		} elseif (($string == 'tablednd') || ($string == 'validate') || ($string == 'fancybox') || ($string == 'jscrollpane') || ($string == 'uploadify')) {
+		} elseif (($string == 'bootstrap') || ($string == 'tablednd') || ($string == 'validate') || ($string == 'fancybox') || ($string == 'jscrollpane') || ($string == 'uploadify')) {
 			$return = lib_get('jquery') . $return;
-			if ($string == 'fancybox') {
+			if ($string == 'bootstrap') {
+				$return = draw_css_src(DIRECTORY_WRITE . '/lib/bootstrap/css/bootstrap.min.css') . $return;
+			} elseif ($string == 'fancybox') {
 				$return .= draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jquery.mousewheel-3.0.6.pack.js') . 
 					draw_css_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox.css');
 			} elseif ($string == 'jscrollpane') {
@@ -822,6 +826,9 @@ function lib_location($string) {
 	$lib = DIRECTORY_WRITE . '/lib/' . $string . '/';
 
 	switch ($string) {
+		case 'bootstrap' : 
+		return DIRECTORY_WRITE . '/lib/bootstrap/js/bootstrap.min.js';
+		
 		case 'dbug' : 
 		return DIRECTORY_ROOT . $lib . 'dbug.php';
 		

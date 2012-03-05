@@ -866,10 +866,10 @@ function draw_link_ajax_set($table, $column, $id, $value, $str, $arguments=false
 	return draw_link('javascript:ajax_set(\'' . $table . '\',\'' . $column . '\',\'' . $id . '\',\'' . $value . '\');', $str, false, $arguments);
 }
 
-function draw_list($options, $arguments=false, $parent='ul', $selected=false, $classes=false, $child='li', $separator='') {
+function draw_list($options, $arguments=false, $parent='ul', $selected=false, $classes=false, $child='li', $separator=false) {
 	//make a ul or an ol out of a one-dimensional array
 	if (!is_array($options) || (!$count = count($options))) return false;
-	if (!empty($separator)) $separator = draw_tag($child, 'separator', $separator);
+	if ($separator !== false) $separator = draw_tag($child, 'separator divider-vertical', $separator);
 	$arguments = array_arguments($arguments);
 	$counter = 1;
 	for ($i = 0; $i < $count; $i++) {
@@ -885,7 +885,7 @@ function draw_list($options, $arguments=false, $parent='ul', $selected=false, $c
 		if ($counter == 1)			array_argument($li_args, 'first');
 		if ($counter % 2)			{ array_argument($li_args, 'odd'); } else { array_argument($li_args, 'even'); }
 		if ($counter == $count)		array_argument($li_args, 'last');
-		if ($selected == ($i + 1))	array_argument($li_args, 'selected');
+		if ($selected == ($i + 1))	array_argument($li_args, 'selected active');
 		if (empty($options[$i]))	array_argument($li_args, 'empty');
 		if ($options[$i] == false) {
 			$options[$i] = ''; //don't pass a false value, li must be a container
@@ -952,7 +952,7 @@ function draw_meta_utf8() {
 	
 }
 
-function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false, $use_nav_tag=true, $separator='') {	
+function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false, $use_nav_tag=true, $separator=false) {	
 	global $_josh;
 
 	//type can be text, images or rollovers
@@ -1008,7 +1008,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		
 		if ($matching) {
 			$img_state = '_on';
-			$args['class'] .= ' selected';
+			$args['class'] .= ' selected active';
 			$selected = $counter;
 		} else {
 			$img_state = '_off';
