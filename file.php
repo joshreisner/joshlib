@@ -111,6 +111,7 @@ function file_dynamic($table, $column, $id, $extension, $lastmod=true) {
 		if (!file_exists(DIRECTORY_ROOT . $filename)) error_debug(draw_strong(__function__) . ' ' . DIRECTORY_ROOT . $filename . ' does not exist ', __file__, __line__);		
 		if ($content = db_grab('SELECT ' . $column . ' FROM ' . $table . ' WHERE id = ' . $id)) {
 			file_put($filename, $content);
+			chmod(DIRECTORY_ROOT . $filename, 0755); //set file permissions per AHIC
 		} else {
 			error_debug('<b>' . __function__ . '</b> returning false because ' . $table . '.' . $column . ' was empty for id ' . $id, __file__, __line__);
 			return false;
