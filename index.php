@@ -204,14 +204,16 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (!isset($_josh['email_default']))	$_josh['email_default']		= ((empty($_josh['request']['subdomain'])) ? 'www' : $_josh['request']['subdomain']) . '@' . $_josh['request']['domain'];
 	if (!isset($_josh['error_log_api']))	$_josh['error_log_api']		= false;
 		
-//get configuration variables
+//establish write directory
 	if (!defined('DIRECTORY_WRITE')) define('DIRECTORY_WRITE', '/_' . $_josh['request']['sanswww']);
 	if (!defined('DIRECTORY_LIB')) define('DIRECTORY_LIB', DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib');
+	if (!is_dir(DIRECTORY_WRITE)) file_dir_writable();
+
+//get configuration variables from config file
 	if (!isset($_josh['config'])) $_josh['config'] = DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
 	if (!file_check($_josh['config'])) {
 		//if config file doesn't exist, create one
 		error_debug('couldn\'t find config file, attempting to create one', __file__, __line__);
-		file_dir_writable();
 		file_put_config();
 	}
 	if (!include(DIRECTORY_ROOT . $_josh['config'])) die('Could not create config file, please check the permissions on ' . DIRECTORY_ROOT . '.');
@@ -221,7 +223,9 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 
 //ensure lib exists--todo autodelete these old lib folders
 	if (is_dir(DIRECTORY_LIB) && (filemtime(DIRECTORY_JOSHLIB . 'lib.zip') > filemtime(DIRECTORY_LIB))) rename(DIRECTORY_LIB, DIRECTORY_LIB . '-old-' . time());
-	if (!is_dir(DIRECTORY_LIB)) file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE);
+	if (!is_dir(DIRECTORY_LIB) && !file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE)) {
+		error_handle('Could not unzip library.  Please manually unzip it.', __file__, __line__);
+	}
 
 //handle https forwarding
 	if (isset($_josh['request']['protocol'])) {

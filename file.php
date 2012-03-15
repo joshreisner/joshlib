@@ -23,7 +23,6 @@ function file_array($content, $filename=false) {
 }
 
 function file_check($filename) {
-	global $_josh;
 	return @filesize(DIRECTORY_ROOT . $filename);
 }
 
@@ -138,7 +137,6 @@ function file_ext($filename) {
 }
 
 function file_folder($folder=false, $endfilter=false, $simple=false) {
-	global $_josh;
 	error_debug('<b>file folder</b> running with ' . $folder, __file__, __line__);
 	
 	//default to current folder
@@ -341,7 +339,6 @@ function file_mime($ext) {
 }
 
 function file_name($filepath) {
-	global $_josh;
 	error_debug('file_name receiving filepath = ' . $filepath, __file__, __line__);
 	$pathparts	= explode('/', $filepath);
 	$file		= array_pop($pathparts);
@@ -354,10 +351,9 @@ function file_name($filepath) {
 }
 
 function file_pass($filename) {
-	//is this strictly necessary?  what's this for?
-	global $_josh;
+	//open a file and tell the browser to download it
+	//is this function necessary?  is it being used?
 	$content		= file_get($filename);
-	//die($filename);
 	$nameparts		= explode(DIRECTORY_SEPARATOR, $filename);
 	$filenameparts	= explode('.', $nameparts[count($nameparts) - 1]);
 	$extension		= array_pop($filenameparts);
@@ -505,16 +501,20 @@ function file_type($filename) {
 }
 
 function file_unzip($source, $target) {
-	global $_josh;
+	//unzip a file
 	
 	//check to see if the ZIP library is installed
 	if (!function_exists('zip_open')) {
+		//todo check that this works for things other than lib.zip, need to find an environment where the zip functions aren't installed
 		system('unzip -q ' . $source . ' "lib/*" -d ' . DIRECTORY_ROOT . $target);
-		system('touch ' . DIRECTORY_LIB);
-		if (!is_dir(DIRECTORY_LIB)) return error_handle('ZIP Library Missing', 'Joshlib tried to unzip the lib folder but the ZIP extension is not installed and the UNIX unzip command did not work either.  Please manually unzip lib.zip and put the resulting "lib" folder inside ' . DIRECTORY_WRITE, __file__, __line__);
+		system('touch ' . DIRECTORY_ROOT . $target); //set the updated date of the unzipped file as the ZIP functions would have
+		if (!is_dir(DIRECTORY_ROOT . $target)) {
+			error_debug('<b>' . __function__ . '</b> failed to unzip ' . $source . ' using UNIX unzip and the ZIP PHP library is not installed.', __file__, __line__);
+			return false;
+		}
 	} else {
 	    $zip = zip_open($source);
-	
+
 	    if (!is_resource($zip)) {
 			$errors = array(
 			'Multi-disk zip archives not supported.', 'Renaming temporary file failed.',
@@ -524,19 +524,20 @@ function file_unzip($source, $target) {
 			);
 			error_handle('ZIP won\'t open', 'zip_open failed with ' . $errors[$zip] . ' for ' . $source, __file__, __line__);
 	    }
-	
+		
 		while ($zip_entry = zip_read($zip)) {
 			$folder = dirname(zip_entry_name($zip_entry));
 			if (format_text_starts('.', $folder)) continue;
 			if (format_text_starts('__MACOSX', $folder)) continue;
 	
 	        $completePath = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $folder;
+	        if (!isset($parentDirectory)) $parentDirectory = $completePath; //save this for the end
 	        $completeName = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . zip_entry_name($zip_entry);
 	        if (!file_exists($completeName)) {
 	            $tmp = '';
 	            foreach(explode(DIRECTORY_SEPARATOR, $folder) as $k) {
 	                $tmp .= $k . DIRECTORY_SEPARATOR;
-	                if(!is_dir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
+	                if (!is_dir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
 	            }
 	        }
 	        
@@ -553,9 +554,9 @@ function file_unzip($source, $target) {
 	    }
 	    zip_close($zip);
 	}
-	
 
-	return true;
+	//return true or false	
+	return (is_dir($parentDirectory));
 }
 
 function file_uploaded_image_orientation($fieldname) {
