@@ -21,7 +21,7 @@ function draw_array($array, $nice=false) {
 	foreach ($array as $key=>$value) {
 		$key = urldecode($key);
 		if ($nice && (strToLower($key) == 'j')) continue;
-		$value = format_quotes($value);
+		//$value = format_quotes($value);
 		if (strToLower($key) == 'email') $value = '<a href="mailto:' . $value . '">' . $value . '</a>';
 		if (is_array($value)) $value = draw_array($value, $nice);
 		$return  .= '<tr><td style="background-color:#eee;"><b>';

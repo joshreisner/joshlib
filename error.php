@@ -71,9 +71,7 @@ function error_handle($type, $message='', $file=false, $line=false) {
 	//don't let this happen recursively
 	if (isset($_josh['handling_error']) && $_josh['handling_error']) return false;
 	$_josh['handling_error'] = true;
-	
-	if ($_josh['mode'] == 'debug') exit;
-	
+		
 	//show backtrace stack
 	$backtrace = array_reverse(debug_backtrace());
 		
@@ -100,7 +98,7 @@ function error_handle($type, $message='', $file=false, $line=false) {
 	$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
 	
 	//notify
-	if ($_josh['mode'] == 'dev') {
+	if ($_josh['mode'] != 'live') {
 		echo error_draw($type, $message);
 		db_close();
 	//} elseif (!empty($_josh['error_log_api']) && array_send(array('subject'=>$subject, 'message'=>$message, 'url'=>$_josh['request']['url'], 'sanswww'=>$_josh['request']['sanswww']), $_josh['error_log_api'])) {

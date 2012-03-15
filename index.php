@@ -152,15 +152,14 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 
 	$_josh['request'] = url_parse($_josh['request']);
 			
-	//die(draw_array($_josh['request']));
-
 	//set error reporting level by determining whether this is a dev or live situation
-	if (in_array($_josh['request']['tld'], array('dev', 'diego', 'john', 'josh', 'localhost', 'michael', 'site'))) {
-		$_josh['mode'] = 'dev';
-		//error reporting already set above
-	} else {
-		$_josh['mode'] = 'live';
-		error_reporting(0);
+	if ($_josh['mode'] != 'debug') {
+		if (in_array($_josh['request']['tld'], array('dev', 'diego', 'john', 'josh', 'localhost', 'michael', 'site'))) {
+			$_josh['mode'] = 'dev';
+		} else {
+			$_josh['mode'] = 'live';
+			error_reporting(0);
+		}
 	}
 
 	//special set $_GET['id'] - todo deprecate?
@@ -207,7 +206,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 //establish write directory
 	if (!defined('DIRECTORY_WRITE')) define('DIRECTORY_WRITE', '/_' . $_josh['request']['sanswww']);
 	if (!defined('DIRECTORY_LIB')) define('DIRECTORY_LIB', DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib');
-	if (!is_dir(DIRECTORY_WRITE)) file_dir_writable();
+	if (!is_dir(DIRECTORY_ROOT . DIRECTORY_WRITE)) file_dir_writable();
 
 //get configuration variables from config file
 	if (!isset($_josh['config'])) $_josh['config'] = DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
@@ -222,7 +221,10 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (isset($_josh['host']) && ($_josh['host'] != $_josh['request']['host'])) url_change($_josh['request']['protocol'] . '://' . $_josh['host'] . $_josh['request']['path_query']);
 
 //ensure lib exists--todo autodelete these old lib folders
-	if (is_dir(DIRECTORY_LIB) && (filemtime(DIRECTORY_JOSHLIB . 'lib.zip') > filemtime(DIRECTORY_LIB))) rename(DIRECTORY_LIB, DIRECTORY_LIB . '-old-' . time());
+	if (is_dir(DIRECTORY_LIB) && (filemtime(DIRECTORY_JOSHLIB . 'lib.zip') > filemtime(DIRECTORY_LIB))) {
+		error_debug('going to rename ' . DIRECTORY_LIB . ' because it is older (' . format_date_time(filemtime(DIRECTORY_LIB)) . ') than lib.zip (' . format_date_time(filemtime(DIRECTORY_JOSHLIB . 'lib.zip')) . ').', __file__, __line__);	
+		rename(DIRECTORY_LIB, DIRECTORY_LIB . '-old-' . time());
+	}
 	if (!is_dir(DIRECTORY_LIB) && !file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE)) {
 		error_handle('Could not unzip library.  Please manually unzip it.', __file__, __line__);
 	}

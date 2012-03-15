@@ -340,7 +340,7 @@ function file_mime($ext) {
 
 function file_name($filepath) {
 	error_debug('file_name receiving filepath = ' . $filepath, __file__, __line__);
-	$pathparts	= explode('/', $filepath);
+	$pathparts	= explode(DIRECTORY_SEPARATOR, $filepath);
 	$file		= array_pop($pathparts);
 	$path		= implode(DIRECTORY_SEPARATOR, $pathparts);
 	$fileparts	= explode('.', $file);
@@ -501,62 +501,27 @@ function file_type($filename) {
 }
 
 function file_unzip($source, $target) {
-	//unzip a file
-	
-	//check to see if the ZIP library is installed
-	if (!function_exists('zip_open')) {
-		//todo check that this works for things other than lib.zip, need to find an environment where the zip functions aren't installed
-		system('unzip -q ' . $source . ' "lib/*" -d ' . DIRECTORY_ROOT . $target);
-		system('touch ' . DIRECTORY_ROOT . $target); //set the updated date of the unzipped file as the ZIP functions would have
-		if (!is_dir(DIRECTORY_ROOT . $target)) {
-			error_debug('<b>' . __function__ . '</b> failed to unzip ' . $source . ' using UNIX unzip and the ZIP PHP library is not installed.', __file__, __line__);
-			return false;
-		}
-	} else {
-	    $zip = zip_open($source);
+	//unzip a file with the UNIX command, which is a bit opaque.  we can't be sure what it was we just unzipped, if the file has been renamed
+	//php ZIP functions have been removed
+	system('unzip -q ' . $source . ' -d ' . DIRECTORY_ROOT . $target);
 
-	    if (!is_resource($zip)) {
-			$errors = array(
-			'Multi-disk zip archives not supported.', 'Renaming temporary file failed.',
-			'Closing zip archive failed',  'Seek error', 'Read error', 'Write error', 'CRC error', 'Containing zip archive was closed', 'No such file.', 'File already exists',
-			'Can\'t open file', 'Failure to create temporary file.', 'Zlib error', 'Memory allocation failure', 'Entry has been changed', 'Compression method not supported.', 
-			'Premature EOF', 'Invalid argument', 'Not a zip archive', 'Internal error', 'Zip archive inconsistent', 'Can\'t remove file', 'Entry has been deleted'
-			);
-			error_handle('ZIP won\'t open', 'zip_open failed with ' . $errors[$zip] . ' for ' . $source, __file__, __line__);
-	    }
-		
-		while ($zip_entry = zip_read($zip)) {
-			$folder = dirname(zip_entry_name($zip_entry));
-			if (format_text_starts('.', $folder)) continue;
-			if (format_text_starts('__MACOSX', $folder)) continue;
+	list($filename, $extension, $path) = file_name($source);
+	$parentDirectory = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $filename; //guess what the file was
 	
-	        $completePath = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $folder;
-	        if (!isset($parentDirectory)) $parentDirectory = $completePath; //save this for the end
-	        $completeName = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . zip_entry_name($zip_entry);
-	        if (!file_exists($completeName)) {
-	            $tmp = '';
-	            foreach(explode(DIRECTORY_SEPARATOR, $folder) as $k) {
-	                $tmp .= $k . DIRECTORY_SEPARATOR;
-	                if (!is_dir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp)) mkdir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $tmp, 0777);
-	            }
-	        }
-	        
-	        if (zip_entry_open($zip, $zip_entry, 'r')) {
-	            if ($fd = @fopen($completeName, 'w+')) {
-	                fwrite($fd, zip_entry_read($zip_entry, zip_entry_filesize($zip_entry)));
-	                fclose($fd);
-	            } else {
-	                // We think this was an empty directory
-	                if(!is_dir($tmp)) mkdir($completeName, 0777);
-	            }
-	            zip_entry_close($zip_entry);
-	        }
-	    }
-	    zip_close($zip);
+	if (is_dir(DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . '__MACOSX')) {
+		//special annoying folder created by MAC zipping
+		system('rm -rf ' . DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . '__MACOSX');
 	}
-
-	//return true or false	
-	return (is_dir($parentDirectory));
+	
+	//try to clean up
+	if (!is_dir($parentDirectory)) {
+		error_debug('<b>' . __function__ . '</b> failed to unzip ' . $source . ' to ' . $parentDirectory . ' using UNIX unzip.', __file__, __line__);
+		return false;
+	} else {
+		touch($parentDirectory); //set updated time
+		error_debug('<b>' . __function__ . '</b> unzipped ' . $source . ' to ' . $parentDirectory . ' using UNIX unzip.  The last modified time is now ' . format_date_time(filemtime(DIRECTORY_ROOT . $target)), __file__, __line__);
+		return true;
+	}
 }
 
 function file_uploaded_image_orientation($fieldname) {
