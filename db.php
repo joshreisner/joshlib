@@ -480,7 +480,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	if ($password) $_josh['db']['password'] = $password;
 	if ($database) $_josh['db']['database'] = $database;
 	if ($language) $_josh['db']['language'] = $language;
-		
+	
 	//connect to db
 	error_debug('<b>db_open</b> trying to connect ' . $_josh['db']['language'] . ' on ' . $_josh['db']['location'], __file__, __line__);
 	if ($_josh['db']['language'] == 'mysql') {
@@ -551,7 +551,7 @@ function db_pwdencrypt($string) {
 	}
 }
 
-function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) {
+function db_query($sql, $limit=false, $suppress_error=false) {
 	global $_josh;
 	db_open();
 	$query = trim($sql);
@@ -575,7 +575,11 @@ function db_query($sql, $limit=false, $suppress_error=false, $rechecking=false) 
 
 	if ($error) {
 		//check for dbCheck--this is a local function you can define to check the db schema to see if it needs an update
-		if (!$rechecking && function_exists('dbCheck') && dbCheck()) return db_query($sql, $limit, $suppress_error, true);
+		if (!isset($_josh['db']['checked']) || !$_josh['db']['checked']) { //prevent recursion
+			if (function_exists('dbCheck')) dbCheck();
+			$_josh['db']['checked'] = true;
+			return db_query($sql, $limit, $suppress_error);
+		}
 		
 		//report error
 		if (strlen($query) > 2000) $query = substr($query, 0, 2000);
@@ -857,7 +861,7 @@ function db_table($sql, $limit=false, $suppress_error=false) {
 	return $return;
 }
 
-function db_table_create($tablename, $fields=false, $rechecking=false) {
+function db_table_create($tablename, $fields=false) {
 	//create table based on array schema
 	
 	//exists
@@ -886,7 +890,7 @@ function db_table_create($tablename, $fields=false, $rechecking=false) {
 		  `deleted_user` int(11) DEFAULT NULL,
 		  `is_active` tinyint(4) NOT NULL,
 		  `precedence` int(11) DEFAULT NULL,
-		  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;', false, false, $rechecking)) return $tablename;
+		  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;')) return $tablename;
 	
 	//or not
 	error_handle('could not create table' . $tablename, __file__, __line__);
@@ -913,7 +917,7 @@ function db_table_duplicate($old, $new) {
 
 function db_table_exists($name) {
 	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
-	return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\'', false, false, true)); //avoiding function recursion with dbCheck
+	return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\''));
 }
 
 function db_table_from_array($array, $table_name=false) {
