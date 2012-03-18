@@ -59,6 +59,8 @@ function db_backup($limit=false) {
 	$target = $folder . date('Y-m-d') . '.sql.gz';
 	file_delete($target);
 	
+	//debug(false);
+	
 	//build command, socket hack, execute
 	//todo add command for DROP TABLE IF EXISTS
 	$command = 'mysqldump --opt --host="' . $_josh['db']['location'] . '" --user="' . $_josh['db']['username'] . '" --password="' . $_josh['db']['password'] . '" "' . $_josh['db']['database'] . '" | gzip > ' . DIRECTORY_ROOT . $target;

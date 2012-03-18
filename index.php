@@ -637,8 +637,9 @@ function daysInMonth($month=false, $year=false) {
 	return date('d', mktime(0,0,0, $month + 1, 0, $year));
 }
 
-function debug() {
+function debug($html=true) {
 	global $_josh;
+	$_josh['error_mode_html'] = $html;
 	$_josh['mode'] = 'debug';
 }
 
