@@ -882,7 +882,7 @@ function lib_location($string) {
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.tablednd_0_5.js';
 		
 		case 'tinymce' :
-		return $lib . 'tinymce_3_3_9/jquery.tinymce.js';
+		return $lib . 'jscripts/tiny_mce/jquery.tinymce.js';
 
 		case 'uploadify' :
 		return DIRECTORY_WRITE . '/lib/uploadify/jquery.uploadify.min.js';
