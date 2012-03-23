@@ -581,6 +581,7 @@ function table_dnd(name, column, handle) {
 				data: "table=" + name + "&column=" + column + "&" + $("#" + name).tableDnDSerialize(),
 				url: url_action_add('ajax_reorder', true),
 				success: function(data){
+					//console.log(data);
 				}
 			});
 			var thisclass = "odd";
