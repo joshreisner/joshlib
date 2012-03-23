@@ -14,6 +14,7 @@ class form {
 	var $readonly		= false;
 	var $focus			= false;
 	var $counter		= 1;
+	var $validate		= true; //validator turned on by default
 	
 	function __construct($name=false, $id=false, $submit=true, $cancel=false, $readonly=false) {
 		global $_josh;
@@ -82,17 +83,20 @@ class form {
 		if ($focus && !empty($this->focus)) $return .= draw_form_focus($this->focus);
 		
 		//run validator
-		$return .= lib_get('validate') . 
-			draw_javascript_ready('
-			$("form#' . $this->name . '").validate({
-				submitHandler:function(form){ 
-					if (typeof submit_' . $this->name . ' == "function") {
-						if (submit_' . $this->name . '($("form#' . $this->name . '"))) form.submit();
-					} else {
-						form.submit();
+		if ($this->validate) {
+			$return .= lib_get('validate') . 
+				draw_javascript_ready('
+				$("form#' . $this->name . '").validate({
+					submitHandler:function(form){ 
+						if (typeof submit_' . $this->name . ' == "function") {
+							if (submit_' . $this->name . '($("form#' . $this->name . '"))) form.submit();
+						} else {
+							form.submit();
+						}
 					}
-				}
-			})');
+				})');
+		}
+
 		return $return;
 	}
 	
@@ -436,6 +440,10 @@ class form {
 	
 	function set_title_prefix($prefix=false) {
 		$this->legend_prefix = $prefix;
+	}
+	
+	function set_validate($validate=true) {
+		$this->validate = $validate;
 	}
 	
 	function set_values($values=false) {

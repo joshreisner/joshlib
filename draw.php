@@ -259,7 +259,7 @@ function draw_div_open($id=false, $arguments=false) {
 }
 
 function draw_div_class_open($class=false) {
-	return draw_tag('div', array('class'=>$class), false, true); 
+	return draw_div_open(false, $class);
 }
 
 function draw_dl($array, $class=false) {
