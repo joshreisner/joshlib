@@ -955,7 +955,9 @@ function draw_meta_utf8() {
 function draw_nav($options, $type='text', $class='nav', $match='path', $sets=false, $add_home=false, $use_nav_tag=true, $separator=false) {	
 	global $_josh;
 
-	//type can be text, images or rollovers
+	//type can be text only now be text.  images and rollover modes are now deprecated
+	if ($type != 'text') error_deprecated(__FUNCTION__ . ' can only accept "text" as a $type parameter as of 3/23/2012');
+	
 	//match can be path, path_query, folder, or array
 	//you can pass a SQL string instead of options
 	if (is_string($options)) $options = array_key_promote(db_table($options)); 
@@ -966,8 +968,10 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	$return = $classes = array();
 		
 	//this is so you can have several sets of rollovers in the same page eg the smarter toddler site
+	/* deprecated
 	if (!isset($_josh['drawn']['navigation'])) $_josh['drawn']['navigation'] = 0;
 	$_josh['drawn']['navigation']++;
+	*/
 	
 	//determine matching target
 	if ($match == 'path') {
@@ -986,8 +990,8 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	foreach ($options as $url=>$title) {
 		$classes[] = format_class($url);
 		
-		$name = 'option_' . $_josh['drawn']['navigation'] . '_' . $counter;
-		$args = array('name'=>$name, 'class'=>$name);
+		//$name = 'option_' . $_josh['drawn']['navigation'] . '_' . $counter; //deprecated
+		$args = array(/* 'name'=>$name,  'class'=>$name*/);
 		
 		if ($match == 'folder') {
 			//so eg /about/page1/ and /about/page2/ will match
@@ -1007,24 +1011,28 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 		}
 		
 		if ($matching) {
-			$img_state = '_on';
-			$args['class'] .= ' selected active';
+			/* $img_state = '_on'; */
+			$args['class'] = ' selected active';
 			$selected = $counter;
 		} else {
+/*
 			$img_state = '_off';
 			if ($type == 'rollovers') {
 				$args['onmouseover'] = 'javascript:img_roll(\'' . $name . '\',\'on\');';
 				$args['onmouseout'] = 'javascript:img_roll(\'' . $name . '\',\'off\');';
 			}
+*/
 		}
 		
+/*
 		if (($type == 'images') || ($type == 'rollovers')) {
 			$img = '/images/' . $class . '/' . format_text_code($title);
 			if ($type == 'rollovers') $javascript .= $name . '_on		 = new Image;' . NEWLINE . $name . '_off	 = new Image;' . NEWLINE . $name . '_on.src	 = "' . $img . '_on.png";' . NEWLINE . $name . '_off.src = "' . $img . '_off.png";' . NEWLINE;
 			$inner = draw_img($img . (($type == 'rollovers') ? $img_state : false) . '.png', false, $title, $name);
 		} else { //type == text
+*/
 			$inner = $title;		
-		}
+//		}
 		$return[] = draw_link($url, $inner, false, $args);
 		$counter++;
 	}
