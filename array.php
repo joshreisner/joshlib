@@ -222,6 +222,7 @@ function array_key_group($array, $key='group') {
 
 function array_key_promote($array) {
 	//makes a two-column resultset into an associative array. used by draw_nav()
+	if (!is_array($array)) return false;
 	$return = array();
 	foreach ($array as $a) {
 		$keys = array_keys($a);
