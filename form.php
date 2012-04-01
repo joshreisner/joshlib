@@ -245,6 +245,7 @@ class form {
 				case 'text':
 				case 'url':
 				case 'url-local':
+					if (!$maxlength) $maxlength = 255;
 					if ($allow_changes) {
 						if (!$this->focus) $this->set_focus($name); //accepts insertion point
 						$args = array('class'=>$type);
