@@ -1202,9 +1202,10 @@ function draw_time($timestamp, $format=false, $is_pubdate=false) {
 	return '<time datetime="' . format_date_iso8601($timestamp) . '"' . (($is_pubdate) ? ' pubdate' : '') . '>' . format_date($timestamp, '', $format) . '</time>';
 }
 
-function draw_title($title='') {
+function draw_title($title=false) {
+	global $_josh;
+	if (!$title && !empty($_josh['app_name'])) $title = $_josh['app_name'];
 	$title = strip_tags($title);
-	if (!$title) $title = '';
 	return draw_tag('title', false, $title);
 }
 

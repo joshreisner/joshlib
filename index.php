@@ -192,6 +192,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
  	$_josh['referrer']				= (isset($_SERVER['HTTP_REFERER']))	? url_parse($_SERVER['HTTP_REFERER']) : false;
 	
 //set defaults for configuration for variables
+	if (!isset($_josh['app_name']))			$_josh['app_name']			= 'Untitled Application';
 	if (!isset($_josh['db']['location']))	$_josh['db']['location']	= 'localhost';
 	if (!isset($_josh['db']['language']))	$_josh['db']['language']	= 'mysql';
 	if (!isset($_josh['db']['database']))	$_josh['db']['database']	= $_josh['request']['domainname'];
@@ -400,6 +401,16 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 
 
 //special (misc) functions that don't yet fit into a category
+
+function _div($args=false, $content='') {
+	$args = array_arguments($args);
+	return draw_tag('div', $args, $content);
+}
+
+function _h1($args=false, $content='') {
+	$args = array_arguments($args);
+	return draw_tag('h1', $args, $content);
+}
 
 function admin($key='is_admin') {
 	//shortcut to say if a session has the is_admin bit set	

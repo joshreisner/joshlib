@@ -381,6 +381,9 @@ function file_put_config() {
 	
 	$return	 = '<?php' . NEWLINE;
 	
+	//app name [new]
+	$return .= '$_josh[\'app_name\']			= \'' . $_josh['app_name'] . '\'; //the name of your site' . NEWLINE;
+	
 	//db variables
 	$return .= '$_josh[\'db\'][\'location\']	= \'' . $_josh['db']['location'] . '\'; //server' . NEWLINE;
 	$return .= '$_josh[\'db\'][\'language\']	= \'' . $_josh['db']['language'] . '\'; //mysql or mssql' . NEWLINE;
@@ -391,7 +394,7 @@ function file_put_config() {
 	$return .= NEWLINE;
 	
 	//error variables
-	$return .= '$_josh[\'error_log_api\']		= ' . (($_josh['error_log_api']) ? $_josh['error_log_api'] : 'false') . '; //error logging url, eg http://tasks.joshreisner.com/errorapi.php' . NEWLINE;
+	$return .= '//$_josh[\'error_log_api\']		= \'http://errors.joshreisner.com/log.php\'; //error logging url' . NEWLINE;
 	$return .= '$_josh[\'email_default\']		= \'' . $_josh['email_default'] . '\'; //regular site emails come from this address' . NEWLINE;
 	$return .= '$_josh[\'email_admin\']		= \'' . $_josh['email_admin'] . '\'; //error emails go to this address' . NEWLINE;
 	$return .= NEWLINE;
