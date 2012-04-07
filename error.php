@@ -97,13 +97,29 @@ function error_handle($type, $message='', $file=false, $line=false) {
 	}
 	$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
 	
-	//notify
+	//notify in your face if dev
 	if ($_josh['mode'] != 'live') {
 		echo error_draw($type, $message);
 		db_close();
-	//} elseif (!empty($_josh['error_log_api']) && array_send(array('subject'=>$subject, 'message'=>$message, 'url'=>$_josh['request']['url'], 'sanswww'=>$_josh['request']['sanswww']), $_josh['error_log_api'])) {
-		//cool, we sent the request via json and fsockopen!
-	} elseif (!empty($_josh['email_admin'])) {
+	}
+	
+	//notify over api if specified
+	if (!empty($_josh['error_log_api'])) {
+		$array = array(
+			'title'=>$type,
+			'description'=>$message,
+			'app_name'=>@$_josh['app_name'],
+			'url'=>$_josh['request']['url'],
+			'sanswww'=>$_josh['request']['sanswww'],
+			'user_email'=>@$_SESSION['email'],
+			'user_name'=>@$_SESSION['full_name']
+		);
+		
+		array_send($array, $_josh['error_log_api']);
+	}
+
+	//notify by email if email_admin is specified
+	if (!empty($_josh['email_admin'])) {
 		//add more stuff to admin message, set from and subject
 		$from = (isset($_josh['email_default'])) ? $_josh['email_default'] : $_josh['email_admin'];
 

@@ -55,7 +55,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	if (!isset($_josh['mode'])) $_josh['mode'] = 'live'; //assume live until we can parse the url
 	define('DIRECTORY_JOSHLIB', dirname(__file__) . DIRECTORY_SEPARATOR);
 	require(DIRECTORY_JOSHLIB . 'error.php');
-	set_error_handler('error_handle_php');
+	set_error_handler('error_handle_php', E_ALL);
 	set_exception_handler('error_handle_exception');
 	error_debug('<b>index</b> error handling is set up', __file__, __line__);
 	

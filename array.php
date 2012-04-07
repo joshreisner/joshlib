@@ -323,7 +323,7 @@ function array_searchwords($string) {
 function array_send($array, $target) {
 	//POST an array as a JSON post request to a remote site
 	global $_josh;
-		
+	
 	//prepare POSTdata
 	if (is_array($array)) {
 		//must have JSON
@@ -336,16 +336,16 @@ function array_send($array, $target) {
 	$target = url_parse($target);
 
 	//check to make sure is REMOTE host -- can't be posting to yrself
-	if ($target['host'] == $_josh['request']['host']) continue;
+	//if ($target['host'] == $_josh['request']['host']) return;
 		
 	if ($pointer = fsockopen($target['host'], 80, $errno, $errstr, 30)) {
 		error_debug('<b>' . __function__ . '</b> has a stream to ' . $target['host'], __file__, __line__);
-		fputs($pointer, 'POST ' . $target['path_query'] . ' HTTP/1.0\r\n');
-		fputs($pointer, 'Host: ' . $target['host'] . '\r\n');
-		fputs($pointer, 'Content-type: application/json; charset=utf-8\r\n');
-		fputs($pointer, 'Content-length: ' . strlen($postdata) . '\r\n');
-		fputs($pointer, 'User-agent: Mozilla/4.0 (compatible: MSIE 7.0; Windows NT 6.0)\r\n');
-		fputs($pointer, 'Connection: close\r\n\r\n');
+		fputs($pointer, 'POST ' . $target['path_query'] . ' HTTP/1.0' . NEWLINE);
+		fputs($pointer, 'Host: ' . $target['host'] . NEWLINE);
+		fputs($pointer, 'Content-type: application/json; charset=utf-8' . NEWLINE);
+		fputs($pointer, 'Content-length: ' . strlen($postdata) . NEWLINE);
+		fputs($pointer, 'User-agent: Mozilla/4.0 (compatible: MSIE 7.0; Windows NT 6.0)' . NEWLINE);
+		fputs($pointer, 'Connection: close' . NEWLINE . NEWLINE);
 		fputs($pointer, $postdata);
 		
 		//get server response and strip it of http headers
@@ -355,8 +355,7 @@ function array_send($array, $target) {
 		error_debug('<b>' . __function__ . '</b> was returned ' . $response, __file__, __line__);
 		$response = substr($response, strpos($response, '\r\n\r\n') + 4);
 	}
-	echo $response;
-	return false;	
+	return $response;
 }
 
 function array_separated($content, $separator=',', $preserve_nulls=false) {
