@@ -116,7 +116,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 										'url'=>'URL',
 										'url-local'=>'URL (local)'
 									);
-	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'publish_date', 'publish_user', 'is_published', 'deleted_date', 'deleted_user', 'is_active', 'precedence');
+	$_josh['system_columns']		= array('id', 'created_date', 'created_user', 'updated_date', 'updated_user', 'publish_date', 'publish_user', 'is_published', 'deleted_date', 'deleted_user', 'is_active', 'precedence', 'subsequence');
 
 //get the rest of the library
 	require(DIRECTORY_JOSHLIB . 'array.php');
