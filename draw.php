@@ -1204,9 +1204,8 @@ function draw_time($timestamp, $format=false, $is_pubdate=false) {
 
 function draw_title($title=false) {
 	global $_josh;
-	if (!$title && !empty($_josh['app_name'])) $title = $_josh['app_name'];
-	$title = strip_tags($title);
-	return draw_tag('title', false, $title);
+	if ((empty($title) || strToLower($title) == 'home') && !empty($_josh['app_name'])) $title = $_josh['app_name'];
+	return draw_tag('title', false, strip_tags($title));
 }
 
 function draw_typekit($key='yxt2eld') {
