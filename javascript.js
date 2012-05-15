@@ -570,6 +570,15 @@ function slideshow(element) {
 		vars.autoClear();
 		vars.goToSlide();
 	});
+	
+	$(window).resize(function() {
+		vars.slideWidth = $(element).find('li').width();
+        vars.slideHeight = $(element).find('li').height();
+		if (vars.mode == 'move') {
+			$(element).css({ 'marginLeft': vars.slideWidth * (-vars.selectedPosition)})
+				.parent('div.slideshow').css({ 'width':vars.slideWidth, 'height':vars.slideHeight, 'overflow':'hidden' });
+		}	
+	});
 }
 	
 function table_dnd(name, column, handle) {
