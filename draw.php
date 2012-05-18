@@ -91,9 +91,9 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 			if (!isset($id)) $id = 'idempty'; //id should really be defined
 			$toggling = ($toggling) ? 'javascript:toggleEvent(' . $id . ');' : false;
 			if (!empty($e['link'])) $e['title'] = draw_link($e['link'], $e['title'], false, array('id'=>'calendar_link_' . $id, 'onmouseover'=>$toggling, 'onmouseout'=>$toggling));
-			if (!empty($e['description'])) $e['title'] .= draw_div_class('description', $e['description'], array('id'=>'event_' . $id . '_description'));
+			if (!empty($e['description'])) $e['title'] .= draw_div(array('id'=>'event_' . $id . '_description', 'class'=>'description'), $e['description']);
 			$style = (isset($e['color'])) ? 'background-color:#' . $e['color'] : false;
-			return draw_div_class('event', $e['title'], array('style'=>$style, 'id'=>'event_' . $id));		
+			return draw_div_class(array('style'=>$style, 'id'=>'event_' . $id, 'class'=>'event'), $e['title']);		
 		}
 	}
 
@@ -145,7 +145,7 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 		if ($type == 'table') {
 			$return .= draw_container('td', $days_long[$i], 'header ' . $days_short[$i]);
 		} else {
-			$return .= draw_div_class('header ' . $days_short[$i], $days_long[$i]);
+			$return .= draw_div('header ' . $days_short[$i], $days_long[$i]);
 		}
 	}
 	if ($type == 'table') $return .= '</tr>';
@@ -163,13 +163,13 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 						((isset($cal_events[$thisday]) && $linknumbers) ? draw_link('javascript:calendarNumberLink(' . $month . ',' . $thisday . ',' . $year . ');', $thisday) : $thisday) . '</div>' . @$cal_events[$thisday],
 						 $class . ' ' . $days_short[$day-1]);
 				} else {
-					$return .= draw_div_class($class . ' ' . $days_short[$day-1], '<div class="number">' . ((isset($cal_events[$thisday]) && $linknumbers) ? draw_link('javascript:calendarNumberLink(' . $month . ',' . $thisday . ',' . $year . ');', $thisday) : $thisday) . '</div>' . @$cal_events[$thisday]);
+					$return .= draw_div($class . ' ' . $days_short[$day-1], '<div class="number">' . ((isset($cal_events[$thisday]) && $linknumbers) ? draw_link('javascript:calendarNumberLink(' . $month . ',' . $thisday . ',' . $year . ');', $thisday) : $thisday) . '</div>' . @$cal_events[$thisday]);
 				}
 			} else {
 				if ($type == 'table') {
 					$return .= draw_container('td', '', 'blank ' . $days_short[$day-1]);
 				} else {
-					$return .= draw_div_class('day blank ' . $days_short[$day-1]);
+					$return .= draw_div('day blank ' . $days_short[$day-1]);
 				}
 			}
 		}
@@ -178,7 +178,7 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 	if ($type == 'table') {
 		return draw_container('table', $return, array('class'=>$divclass, 'cellspacing'=>'0'));
 	} else {
-		return draw_div_class($divclass, $return);
+		return draw_div($divclass, $return);
 	}
 }
 
@@ -223,11 +223,11 @@ function draw_definition_list($array, $arguments=false) {
 	return draw_container('dl', $return, $arguments);
 }
 
-function draw_div($id, $inner='', $arguments=false, $dbinfo=false) {
+function draw_div($arguments=false, $inner='', $dbinfo=false) {
 	//convenience function specifically for DIVs, since they're so ubiquitous
-	//todo deprecate this in favor of draw_div_id
 	$arguments = array_arguments($arguments);
-	$arguments['id'] = $id;
+
+	//makes a contenteditable field out of the DIV
 	if ($dbinfo && (@list($table, $column, $dbid) = explode('.', $dbinfo))) { //expects dbinfo in this particular format
 		$arguments['contenteditable'] = 'true';
 		$arguments['data-table'] = $table;
@@ -238,7 +238,7 @@ function draw_div($id, $inner='', $arguments=false, $dbinfo=false) {
 }
 
 function draw_div_class($class, $innerhtml='', $arguments=false) {
-	//convenience function specifically for DIVs, since they're so ubiquitous
+	//todo deprecate
 	$arguments = array_arguments($arguments);
 	array_argument($arguments, $class);
 	if (empty($innerhtml)) $arguments['class'] .= ' empty';
@@ -246,6 +246,7 @@ function draw_div_class($class, $innerhtml='', $arguments=false) {
 }
 
 function draw_div_id($id, $innerhtml='', $arguments=false) {
+	error_deprecated('draw_div_id has been deprecated on 5/18/2012.  please use draw_div instead, eg draw_div(\'#container\', \'this is a really nice container.\')');
 	//convenience function specifically for DIVs, since they're so ubiquitous
 	$arguments = array_arguments($arguments);
 	$arguments['id'] = $id;
@@ -253,12 +254,14 @@ function draw_div_id($id, $innerhtml='', $arguments=false) {
 }
 
 function draw_div_open($id=false, $arguments=false) {
+	//todo revise to new structure
 	$arguments = array_arguments($arguments);
 	$arguments['id'] = $id;
 	return '<div' . draw_arguments($arguments) . '>';
 }
 
 function draw_div_class_open($class=false) {
+	//todo deprecate
 	return draw_div_open(false, $class);
 }
 
@@ -392,20 +395,20 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 	$months = array();
 	foreach ($_josh['months'] as $key=>$value) $months[$key + 1] = $value;
 	
-	$return = draw_div_class('date',
+	$return = draw_div('date',
 		draw_form_select($namePrefix . 'Month', $months, $month, $required, $class) .
 		draw_form_select($namePrefix . 'Day', array_2d(array_range(1, 31)), $day, $required, $class) .
 		draw_form_select($namePrefix . 'Year', array_2d(array_range(1920, 2015)), $year, $required, $class)
 	);
 	
 	if ($withTime) {
-		$return .= draw_div_class('time',  
+		$return .= draw_div('time',  
 			draw_form_select($namePrefix . 'Hour', array_2d(array(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)), $hour, $required, $class) .
 			draw_form_select($namePrefix . 'Minute', array_2d(array('00', 15, 30, 45)), $minute, $required, $class) .
 			draw_form_select($namePrefix . 'AMPM', array_2d(array('AM', 'PM')), $ampm, $required, $class)
 		);
 	}
-	return draw_div_class('date', $return);
+	return draw_div('date', $return);
 }
 
 function draw_form_date_cal($name, $value=false) {

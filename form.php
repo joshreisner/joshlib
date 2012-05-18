@@ -74,7 +74,7 @@ class form {
 		foreach ($this->fields as $field) $return .= $this->draw_row($field);
 
 		//wrap in unnecessary fieldset
-		$return = draw_div_class('fieldset', draw_tag('fieldset', false, $return));
+		$return = draw_div('fieldset', draw_tag('fieldset', false, $return));
 		
 		//wrap in form
 		$return = draw_tag('form', array('method'=>'post', 'enctype'=>'multipart/form-data', 'accept-charset'=>'UTF-8', 'action'=>$this->action, 'id'=>$this->name), $return);
@@ -278,7 +278,7 @@ class form {
 						
 			//wrap it up
 			$div_class = implode(' ', array('field', 'field_' . $this->counter, $name, $class));
-			$return = draw_div_class($div_class, $return) . NEWLINE;
+			$return = draw_div($div_class, $return) . NEWLINE;
 			$this->counter++;
 		}
 		return $return;

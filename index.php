@@ -481,8 +481,8 @@ function cms_bar($width='100%') {
 				body #cms-bar div.cms-wrapper nav ul.cms-bar-nav li.last a { color: rgba(0,0,0,0.3); font-weight: bold; text-shadow: 0 1px 0 rgba(255,255,255,0.3); } 
 				body #cms-bar div.cms-wrapper nav ul.cms-bar-nav li.last a:hover { color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.9); } 
 			') . 
-			draw_div('cms-bar',
-				draw_div_class('cms-wrapper',
+			draw_div('#cms-bar',
+				draw_div('cms-wrapper',
 					draw_span('cms-message', 'Welcome back ' . $_SESSION['cms_name']) . 
 					draw_nav($_josh['cms_links'], 'text', 'cms-bar-nav')
 				)

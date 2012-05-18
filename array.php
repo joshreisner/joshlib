@@ -38,7 +38,13 @@ function array_argument(&$array, $value, $key='class', $separator=' ') {
 function array_arguments($arguments=false) {
 	//for constructing an array of tag arguments, used by draw_ functions.
 	if (!$arguments) return array();
-	if (is_string($arguments)) return array(((substr($arguments, 0, 1) == '#') ? 'id' : 'class')=>$arguments);
+	if (is_string($arguments)) {
+		if (substr($arguments, 0, 1) == '#') {
+			return array('id'=>substr($arguments, 1));
+		} else {
+			return array('class'=>$arguments);
+		}
+	}
 	return $arguments;
 }
 
