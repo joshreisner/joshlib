@@ -9,21 +9,22 @@ LICENSE
 THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
-	~~TITLE~~~~~~~~~~~~~LANG~~~~LICENSE~~~~~VERSION~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	> bootstrap			js/css						http://twitter.github.com/boostrap
-	> codepress			js		LGPL				http://sourceforge.net/projects/codepress/
-	> dbug				php		
-	> file_icons		png		-			-		-
-	> fpdf				php							http://fpdf.org/
-	> innershiv			js		
-	> jquery			js		MIT			1.7.1	http://jquery.com/
-	> lorem_ipsum		js							http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
-	> salesforce		php							http://developer.force.com/							
-	> simple_html_dom	php		MIT					http://sourceforge.net/projects/simplehtmldom/
-	> swfobject			js		MIT			2.2		http://code.google.com/p/swfobject/
-	> swiftmailer		php		LGPL		4.0.6	http://swiftmailer.org/
-	> tinymce			js		LGPL		3.3.8	http://tinymce.moxiecode.com/
-	> uploadify			js		MIT			3.0.0	http://uploadify.com/
+	~~TITLE~~~~~~~~~~~~~~~~~LANG~~~~LICENSE~~~~~VERSION~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	> bootstrap				js/css						http://twitter.github.com/boostrap
+	> codepress				js		LGPL				http://sourceforge.net/projects/codepress/
+	> dbug					php		
+	> file_icons			png		-			-		-
+	> fpdf					php							http://fpdf.org/
+	> google-code-prettify	js/css	Apache 2			http://code.google.com/p/google-code-prettify/
+	> innershiv				js		
+	> jquery				js		MIT			1.7.1	http://jquery.com/
+	> lorem_ipsum			js							http://develobert.blogspot.com/2007/11/automated-lorem-ipsum-generator.html
+	> salesforce			php							http://developer.force.com/							
+	> simple_html_dom		php		MIT					http://sourceforge.net/projects/simplehtmldom/
+	> swfobject				js		MIT			2.2		http://code.google.com/p/swfobject/
+	> swiftmailer			php		LGPL		4.0.6	http://swiftmailer.org/
+	> tinymce				js		LGPL		3.3.8	http://tinymce.moxiecode.com/
+	> uploadify				js		MIT			3.0.0	http://uploadify.com/
 
 	JQUERY EXTENSIONS (in the jquery folder)
 	> fancybox					CC ANC 3.0	2.0.4	http://fancyapps.com/fancybox/
@@ -226,7 +227,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 		error_debug('going to rename ' . DIRECTORY_LIB . ' because it is older (' . format_date_time(filemtime(DIRECTORY_LIB)) . ') than lib.zip (' . format_date_time(filemtime(DIRECTORY_JOSHLIB . 'lib.zip')) . ').', __file__, __line__);	
 		rename(DIRECTORY_LIB, DIRECTORY_LIB . '-old-' . time());
 	}
-	if (!is_dir(DIRECTORY_LIB) && !file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE)) {
+	if (!is_dir(DIRECTORY_LIB) && !file_unzip(DIRECTORY_JOSHLIB . 'lib.zip', DIRECTORY_WRITE, true)) {
 		error_handle('Could not unzip library.  Please manually unzip it.', __file__, __line__);
 	}
 
@@ -745,6 +746,9 @@ function lib_get($string) {
 	
 	$string = strtolower($string);
 	
+	//shortcuts
+	if ($string == 'prettify') $string = 'google-code-prettify';
+	
 	switch ($string) {
 		//php libraries
 		case 'dbug' :
@@ -757,6 +761,7 @@ function lib_get($string) {
 		//javascript/css libraries
 		case 'bootstrap' :
 		case 'fancybox' :
+		case 'google-code-prettify' : 
 		case 'innershiv' :
 		case 'jquery' :
 		case 'jquery-latest' :
@@ -804,13 +809,15 @@ function lib_get($string) {
 			') . $return;
 			file_dir_writable('images');
 			file_dir_writable('files');
-		} elseif (($string == 'bootstrap') || ($string == 'tablednd') || ($string == 'validate') || ($string == 'fancybox') || ($string == 'jscrollpane') || ($string == 'uploadify')) {
+		} elseif (in_array($string, array('bootstrap', 'google-code-prettify', 'tablednd', 'validate', 'fancybox', 'jscrollpane', 'uploadify'))) {
 			$return = lib_get('jquery') . $return;
 			if ($string == 'bootstrap') {
 				$return = draw_css_src(DIRECTORY_WRITE . '/lib/bootstrap/css/bootstrap.min.css') . $return;
 			} elseif ($string == 'fancybox') {
 				$return .= draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jquery.mousewheel-3.0.6.pack.js') . 
 					draw_css_src(DIRECTORY_WRITE . '/lib/jquery/fancybox/jquery.fancybox.css');
+			} elseif ($string == 'google-code-prettify') {
+				$return = /* draw_css_src(DIRECTORY_WRITE . '/lib/google-code-prettify/prettify.css') .  */$return . draw_javascript_ready('prettyPrint()');
 			} elseif ($string == 'jscrollpane') {
 				$return = draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.css') . 
 					$return . 
@@ -855,6 +862,9 @@ function lib_location($string) {
 		
 		case 'fpdf' :
 		return DIRECTORY_ROOT . $lib . 'fpdf-1.6.php';
+		
+		case 'google-code-prettify' : 
+		return DIRECTORY_WRITE . '/lib/google-code-prettify/prettify.js';
 		
 		case 'innershiv' :
 		return $lib . 'innershiv.min.js';
