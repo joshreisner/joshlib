@@ -451,7 +451,7 @@ function cms_bar($width='100%') {
 			$_josh['cms_links']['/login/?action=logout&return_to=' . urlencode($_josh['request']['path_query'])] = '&times';
 			return draw_css('
 				body { margin-top: 31px; overflow: visible; position: relative; } 
-				body #cms-bar { border-bottom: 1px solid rgba(0,0,0,0.4); color: #333; font: 14px Verdana; padding: 0; position: fixed; text-align: left; top: 0; width: 100%; z-index: 10000;
+				body #cms-bar { border-bottom: 1px solid rgba(0,0,0,0.4); color: #333; font: 14px Verdana; padding: 0; position: fixed; text-align: left; top: 0; left: 0; width: 100%; z-index: 10000;
 				  background-color: #ffa114;
 				  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffa114), to(#ffaf14)); 
 				  background-image: -webkit-linear-gradient(top, #ffa114, #ffaf14); 
