@@ -10,7 +10,7 @@ THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
 	~~TITLE~~~~~~~~~~~~~~~~~LANG~~~~LICENSE~~~~~VERSION~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	> bootstrap				js/css						http://twitter.github.com/boostrap
+	> bootstrap				js/css				2.0.3	http://twitter.github.com/boostrap
 	> codepress				js		LGPL				http://sourceforge.net/projects/codepress/
 	> dbug					php		
 	> file_icons			png		-			-		-
