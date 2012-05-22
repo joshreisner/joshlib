@@ -470,6 +470,7 @@ function slideshow(element) {
 											if (vars.hasAuto) vars.timer = setTimeout(vars.autoSlide, vars.interval);
 										});
 									} else {
+										if (typeof slideshowTransitionStarted == 'function') slideshowTransitionStarted($(element));
 										$(element).animate({ 'marginLeft': vars.slideWidth * (-vars.selectedPosition)}, 400, function(){
 											if (typeof slideshowTransitionCompleted == 'function') slideshowTransitionCompleted($(element));
 											if (vars.hasAuto) vars.timer = setTimeout(vars.autoSlide, vars.interval);
