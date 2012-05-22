@@ -104,7 +104,7 @@ class form {
 		extract($field);
 		$return = '';
 
-		if (($name == 'secret_key') || ($name == 'last_login') || ($type == 'image-alt') || ($type == 'file-type') || ($type == 'latlon')) return false; //not fields you show in a form	
+		if (($name == 'secret_key') || ($name == 'last_login') || ($type == 'image-alt') || ($type == 'file-type')) return false; //not fields you show in a form	
 
 		//value is being set manually		
 		if (!$value && isset($this->values[$name])) $value = $this->values[$name];
@@ -199,6 +199,28 @@ class form {
 				case 'group':
 					$return .= $value;
 					break;
+				case 'latlon':
+				  $coors = explode(',', $value);
+				  if(count($coors) == 3) list($lat, $lon, $zoom) = $coors;
+				  if(empty($lat)) $lat = 0;
+				  if(empty($lon)) $lon = 0;
+          if(empty($zoom)) $zoom = 0;       
+				  
+				  $return .= lib_get('latlon-picker') . '<div class="gllpLatlonPicker" style="margin-left:110px;">
+        		  <div class="input-prepend">
+                <span class="add-on">Latitude</span><input class="span1 gllpLatitude" name="'.$name.'_lat" type="text" value="'.$lat.'">
+                <span class="add-on">Longitude</span><input class="span1 gllpLongitude" name="'.$name.'_lon" type="text" value="'.$lon.'">
+                <span class="add-on">Zoom</span><input class="span1 gllpZoom" name="'.$name.'_zoom" type="text" value="'.$zoom.'">
+                <input type="button" class="gllpUpdateButton btn" value="update map">
+              </div>
+              
+              <div class="gllpMap">Google Maps</div>
+              
+              <div class="input-append">
+                <input class="span3 gllpSearchField" type="text"><button class="btn gllpSearchButton" type="button">Search Map</button>
+              </div>         	
+        	</div>';
+				  break;
 				case 'note':
 					//todo deprecate
 					$return .= '<div class="note">' . $additional . '</div>';

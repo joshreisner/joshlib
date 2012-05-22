@@ -71,6 +71,7 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 	$_josh['error_mode_html']		= true; //show errors in html (set to false for ajax or cli)
 	$_josh['path_imagemagick']		= '/usr/local/bin/'; // it's /opt/local/bin/ on a mac, specify that in your config
 	
+	
 //constants
 	define('BR', '<br/>');
 	define('TAB', "\t");
@@ -82,6 +83,9 @@ define('TIME_START', microtime(true));	//start the processing time stopwatch -- 
 //page draw status
 	$_josh['drawn']					= array();	//array for including javascript only once, eg $_josh['drawn']['tinymce'] = true;
 
+//template paths
+  $_josh['haml_path'] = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
+  
 //ignore these words when making search indexes | todo make this local to search function
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
 										'as','at','be','because','been','before','being','between','both','but','by','came','can','come',
@@ -758,6 +762,11 @@ function lib_get($string) {
 		case 'swiftmailer' :
 		return @include_once(lib_location($string));
 		
+		case 'phphaml' :
+		include_once(lib_location($string));
+    phphaml\Library::autoload();
+    return;
+        
 		//javascript/css libraries
 		case 'bootstrap' :
 		case 'fancybox' :
@@ -767,6 +776,7 @@ function lib_get($string) {
 		case 'jquery-latest' :
 		case 'jscolor' :
 		case 'jscrollpane' :
+		case 'latlon-picker' :
 		case 'lorem_ipsum' :
 		case 'modernizr' :
 		case 'swfobject' : 
@@ -809,7 +819,7 @@ function lib_get($string) {
 			') . $return;
 			file_dir_writable('images');
 			file_dir_writable('files');
-		} elseif (in_array($string, array('bootstrap', 'google-code-prettify', 'tablednd', 'validate', 'fancybox', 'jscrollpane', 'uploadify'))) {
+		} elseif (in_array($string, array('bootstrap', 'google-code-prettify', 'latlon-picker', 'tablednd', 'validate', 'fancybox', 'jscrollpane', 'uploadify'))) {
 			$return = lib_get('jquery') . $return;
 			if ($string == 'bootstrap') {
 				$return = draw_css_src(DIRECTORY_WRITE . '/lib/bootstrap/css/bootstrap.min.css') . $return;
@@ -820,8 +830,9 @@ function lib_get($string) {
 				$return = /* draw_css_src(DIRECTORY_WRITE . '/lib/google-code-prettify/prettify.css') .  */$return . draw_javascript_ready('prettyPrint()');
 			} elseif ($string == 'jscrollpane') {
 				$return = draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.css') . 
-					$return . 
-					draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.mousewheel.js');
+				  $return . draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.mousewheel.js');			
+			} elseif ($string == 'latlon-picker') {
+			  $return = draw_javascript_src('http://maps.googleapis.com/maps/api/js?sensor=false') . draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jquery.gmaps-latlon-picker.css') . $return;			  
 			} elseif ($string == 'uploadify') {
 				file_dir_writable('uploads');
 				$return .= draw_css_src(DIRECTORY_WRITE . '/lib/uploadify/uploadify.css') . 
@@ -883,10 +894,16 @@ function lib_location($string) {
 
 		case 'lorem_ipsum' :
 		return $lib . 'lorem_ipsum.js';
-				
+		
+		case 'latlon-picker' :
+		return DIRECTORY_WRITE . '/lib/jquery/jquery.gmaps-latlon-picker.js';
+    		
 		case 'modernizr' :
 		return $lib . 'modernizr-2.0.min.js';
-				
+		
+		case 'phphaml' :
+		return DIRECTORY_ROOT . $lib . 'library.php';
+    
 		case 'salesforce' :
 		return DIRECTORY_ROOT . $lib . 'phptoolkit-13_1/soapclient/SforceEnterpriseClient.php';
 		

@@ -676,6 +676,19 @@ function draw_google_tracker($id) {
 	return draw_google_analytics($id);
 }
 
+function draw_haml($template, $layout='layout', $path=false) {
+  global $_josh;
+  lib_get('phphaml');
+  
+  if(!$path) $path = $_josh['haml_path'];
+  
+  $parser = new phphaml\haml\Parser(file_get_contents($path . "$template.haml"));
+  $_josh['_yield'] = $parser->render();
+  
+  $parser = new phphaml\haml\Parser(file_get_contents($path . "$layout.haml"));
+  return $parser->render();
+}
+
 function draw_h1($content, $arguments=false) {
 	return draw_tag('h1', $arguments, $content);
 }
@@ -1213,4 +1226,12 @@ function draw_title($title=false) {
 
 function draw_typekit($key='yxt2eld') {
 	return draw_javascript_src('http://use.typekit.com/' . $key . '.js') . draw_javascript('try{Typekit.load();}catch(e){}');
+}
+
+function draw_yield() {
+  global $_josh;
+  if(!isset($_josh['_yield'])) return false;
+  $yield = $_josh['_yield'];
+  unset($_josh['_yield']);
+  return $yield;
 }
