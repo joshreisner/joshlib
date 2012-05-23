@@ -507,7 +507,9 @@ function file_unzip($source, $target, $chmod=false) {
 	//unzip a file with the UNIX command, which is a bit opaque.  we can't be sure what it was we just unzipped, if the file has been renamed
 	//php ZIP functions have been removed
 	system('unzip -q ' . $source . ' -d ' . DIRECTORY_ROOT . $target);
-	if ($chmod) system('chmod -R 777 ' . DIRECTORY_ROOT . $target);
+	
+	//this is causing problems on icdsoft (500 server errors on tinymce imagemanager and filemanager
+	//if ($chmod) system('chmod -R 777 ' . DIRECTORY_ROOT . $target);
 
 	list($filename, $extension, $path) = file_name($source);
 	$parentDirectory = DIRECTORY_ROOT . $target . DIRECTORY_SEPARATOR . $filename; //guess what the file was
