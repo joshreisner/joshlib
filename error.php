@@ -1,6 +1,5 @@
 <?php
 //a collection of functions that help handle errors
-//reviewed 10/16/2010
 
 error_debug('Starting Joshlib', __file__, __line__);
 error_debug('including error.php', __file__, __line__);
