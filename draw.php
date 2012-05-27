@@ -1060,7 +1060,7 @@ function draw_nav($options, $type='text', $class='nav', $match='path', $sets=fal
 	return $return;
 }
 
-function draw_nav_nested($pages, $class='nav', $current_depth=1) {
+function draw_nav_nested($pages, $class='nav', $current_depth=1, $match='path') {
 	global $request;
 	$selected = false;
 	$li_items = $classes = array();
@@ -1069,7 +1069,7 @@ function draw_nav_nested($pages, $class='nav', $current_depth=1) {
 		$li_class = '';
 		
 		//get selected
-		if ($request['path'] == $p['url']) {
+		if ($request[$match] == $p['url']) {
 			$li_class = 'selected';
 			$selected = true;
 		}
@@ -1077,7 +1077,7 @@ function draw_nav_nested($pages, $class='nav', $current_depth=1) {
 		$return = draw_link($p['url'], $p['title']);
 		
 		if (count($p['children'])) {
-			list($str, $descendant_selected) = draw_nav_nested($p['children'], false, $current_depth + 1);
+			list($str, $descendant_selected) = draw_nav_nested($p['children'], false, $current_depth + 1, $match);
 			$return .= $str;
 			if ($descendant_selected) {
 				$li_class = 'descendant-selected';
