@@ -424,12 +424,14 @@ function scroll_to(newPallet, dont_clear_interval) {
 }
 
 function slideshow(element) {
-  window.onblur = function() {window.blurred = true;};
-  window.onfocus = function() {window.blurred = false;};
 	/*
 	slideshow function by josh, diego and michael
 	call by <ul class="slideshow arrows bullets move continuous slow">
 	*/
+
+	window.onblur = function() { window.blurred = true; }
+	window.onfocus = function() { window.blurred = false; }
+
 	$(element).wrap('<div class="slideshow_container" />').wrap('<div class="slideshow" />');
 	$(element).css({listStyleType:'none'});
     var vars = {
@@ -437,11 +439,12 @@ function slideshow(element) {
 								clearTimeout(vars.timer);
 							},
 		autoSlide: 			function() {		 
-		            // fix c/o http://stackoverflow.com/questions/5766263/run-settimeout-only-when-tab-is-active
-          		  if(window.blurred) {
-                    setTimeout(vars.autoSlide, 100);
-                    return;
-                }
+					            //fix c/o http://stackoverflow.com/questions/5766263/run-settimeout-only-when-tab-is-active
+								if (window.blurred) {
+									setTimeout(vars.autoSlide, 100);
+									return;
+								}
+								
 								//goToNext basically
 								vars.deselectedPosition	= vars.selectedPosition;
 								vars.selectedPosition++;
@@ -531,7 +534,12 @@ function slideshow(element) {
 		var controllerHTML = '<ul class="controller"><li class="arrows prev">Prev</li>';
 		for (i = 0; i < vars.totalSlides; i++) controllerHTML += '<li class="number">' + (vars.hasBullets ? '&bull;' : i + 1) + '</li>';
 		controllerHTML += '<li class="arrows next">Next</li></ul>';
-		vars.parent.prepend(controllerHTML);
+		
+		if ($(element).hasClass('after')) {
+			vars.parent.append(controllerHTML);
+		} else {
+			vars.parent.prepend(controllerHTML);
+		}
 		vars.controller = vars.parent.find('ul.controller');
 		
 		if ((vars.mode == 'move') && vars.isContinuous) {
