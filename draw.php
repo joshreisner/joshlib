@@ -182,6 +182,20 @@ function draw_calendar($month=false, $year=false, $events=false, $divclass='cale
 	}
 }
 
+function draw_chrome_frame() {
+	//should be inserted into the head element
+	global $_josh;
+	return '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<!--[if lt IE 7]>
+			<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+			<script>
+			window.attachEvent("onload", function() {
+				CFInstall.check({ mode: "overlay", destination: "' . $_josh['request']['url'] . '" });
+			});
+			</script>
+		<![endif]-->';	
+}
+
 function draw_comment($str) {
 	return NEWLINE . NEWLINE . '<!-- ' . $str . ' -->' . NEWLINE . NEWLINE;
 }
@@ -591,6 +605,11 @@ function draw_google_chart($data, $type='line', $colors=false, $width=250, $heig
 
 	return '<img src="http://chart.apis.google.com/chart?' . implode('&', $pairs) . '" width="' . $width . '" height="' . $height . '" border="0" class="chart">';
 	
+}
+
+function draw_google_chrome_frame() {
+	//alias
+	return draw_chrome_frame();
 }
 
 function draw_google_map($markers=false, $center=false, $zoom=false, $control=true) {
