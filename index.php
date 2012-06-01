@@ -438,13 +438,13 @@ function cms_bar($width='100%') {
 
 	if (cookie_get('cms_key')) {
 		//log in
-		if (!user(false, 'cms_user_id') && $r = db_grab('SELECT id, firstname, lastname, email, secret_key, is_admin FROM app_users WHERE secret_key = "' . $_COOKIE['cms_key'] . '" AND is_active = 1')) {
+		if (!user(false, 'cms_user_id') && $r = db_grab('SELECT id, firstname, lastname, email, secret_key, role FROM app_users WHERE secret_key = "' . $_COOKIE['cms_key'] . '" AND is_active = 1')) {
 			$_SESSION['cms_user_id']	= $r['id'];
 			$_SESSION['show_deleted']	= false;
 			$_SESSION['cms_name']		= $r['firstname'];
 			$_SESSION['full_name']		= $r['firstname'] . ' ' . $r['lastname'];
 			$_SESSION['email']			= $r['email'];
-			$_SESSION['cms_is_admin']		= $r['is_admin'];
+			$_SESSION['role']			= $r['role'];
 			$_SESSION['isLoggedIn']		= true;
 			db_query('UPDATE app_users SET last_login = NOW() WHERE id = ' . $r['id']);		
 		}
