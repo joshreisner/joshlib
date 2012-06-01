@@ -237,12 +237,16 @@ class form {
 						}
 						$options = db_array($sql);
 					}
-					$return .= '<div class="radio">';
+					$return .= '<ul class="radio">';
+					
+					//todo what's append?
 					if ($append) while (list($addkey, $addval) = each($append)) $options[$addkey] = $addval;
+					
 					foreach ($options as $id=>$description) {
-						$return .= '<div class="radio_option">' . draw_form_radio($name, $id, ($value == $id), $class) . $description . '</div>';
+						$return .= draw_li(draw_form_radio($name, $id, ($value == $id), $class, $description));
 					}
-					$return .= '</div>';
+					
+					$return .= '</ul>';
 					break;
 				case 'select':
 					if (!$options) {
