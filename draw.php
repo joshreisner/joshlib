@@ -701,10 +701,10 @@ function draw_haml($template, $layout='layout', $path=false) {
   
   if(!$path) $path = $_josh['haml_path'];
   
-  $parser = new phphaml\haml\Parser(file_get_contents($path . "$template.haml"));
+  //$parser = new phphaml\haml\Parser(file_get_contents($path . "$template.haml"));
   $_josh['_yield'] = $parser->render();
   
-  $parser = new phphaml\haml\Parser(file_get_contents($path . "$layout.haml"));
+  //$parser = new phphaml\haml\Parser(file_get_contents($path . "$layout.haml"));
   return $parser->render();
 }
 

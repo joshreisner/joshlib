@@ -764,8 +764,8 @@ function lib_get($string) {
 		
 		case 'phphaml' :
 		include_once(lib_location($string));
-    phphaml\Library::autoload();
-    return;
+		//phphaml\Library::autoload();
+		return;
         
 		//javascript/css libraries
 		case 'bootstrap' :
@@ -783,6 +783,7 @@ function lib_get($string) {
 		case 'tablednd' :
 		case 'tinymce' :
 		case 'validate' :
+		case 'wysihtml5' : 
 		case 'uploadify' :
 		if (isset($_josh['drawn'][$string])) return false;
 		
@@ -819,7 +820,7 @@ function lib_get($string) {
 			') . $return;
 			file_dir_writable('images');
 			file_dir_writable('files');
-		} elseif (in_array($string, array('bootstrap', 'google-code-prettify', 'latlon-picker', 'tablednd', 'validate', 'fancybox', 'jscrollpane', 'uploadify'))) {
+		} elseif (in_array($string, array('bootstrap', 'google-code-prettify', 'latlon-picker', 'tablednd', 'validate', 'wysihtml5', 'fancybox', 'jscrollpane', 'uploadify'))) {
 			$return = lib_get('jquery') . $return;
 			if ($string == 'bootstrap') {
 				$return = draw_css_src(DIRECTORY_WRITE . '/lib/bootstrap/css/bootstrap.min.css') . $return;
@@ -830,9 +831,11 @@ function lib_get($string) {
 				$return = /* draw_css_src(DIRECTORY_WRITE . '/lib/google-code-prettify/prettify.css') .  */$return . draw_javascript_ready('prettyPrint()');
 			} elseif ($string == 'jscrollpane') {
 				$return = draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.jscrollpane.css') . 
-				  $return . draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.mousewheel.js');			
+				$return . draw_javascript_src(DIRECTORY_WRITE . '/lib/jquery/jscrollpane/jquery.mousewheel.js');			
 			} elseif ($string == 'latlon-picker') {
-			  $return = draw_javascript_src('http://maps.googleapis.com/maps/api/js?sensor=false') . draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jquery.gmaps-latlon-picker.css') . $return;			  
+				$return = draw_javascript_src('http://maps.googleapis.com/maps/api/js?sensor=false') . draw_css_src(DIRECTORY_WRITE . '/lib/jquery/jquery.gmaps-latlon-picker.css') . $return;			  
+			} elseif ($string == 'wysihtml5') {
+				$return = draw_javascript_src(DIRECTORY_WRITE . '/lib/wysihtml5/parser_rules/advanced.js') . $return;
 			} elseif ($string == 'uploadify') {
 				file_dir_writable('uploads');
 				$return .= draw_css_src(DIRECTORY_WRITE . '/lib/uploadify/uploadify.css') . 
@@ -927,6 +930,9 @@ function lib_location($string) {
 		
 		case 'validate' :
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.validate.min.js';
+		
+		case 'wysihtml5' : 
+		return $lib . 'dist/wysihtml5-0.3.0.min.js';
 	}
 }
 
