@@ -25,6 +25,7 @@ THIRD PARTY SOFTWARE
 	> swiftmailer			php		LGPL		4.0.6	http://swiftmailer.org/
 	> tinymce				js		LGPL		3.3.8	http://tinymce.moxiecode.com/
 	> uploadify				js		MIT			3.0.0	http://uploadify.com/
+	> wysihtml5				js/css	MIT					http://xing.github.com/wysihtml5/
 
 	JQUERY EXTENSIONS (in the jquery folder)
 	> fancybox					CC ANC 3.0	2.0.4	http://fancyapps.com/fancybox/
