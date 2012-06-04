@@ -1,5 +1,6 @@
 <?php
-define('TIME_START', microtime(true));	//start the processing time stopwatch -- use format_time_exec() to access this
+//start the processing time stopwatch -- use format_time_exec() to access this
+	define('TIME_START', microtime(true));
 
 //set up error handling.  this needs to go first to handle any subsequent errors
 	error_reporting(E_ALL); //this gets turned off on live sites below
