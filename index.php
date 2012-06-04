@@ -24,7 +24,6 @@
 	$_josh['error_mode_html']		= true; //show errors in html (set to false for ajax or cli)
 	$_josh['path_imagemagick']		= '/usr/local/bin/'; // it's /opt/local/bin/ on a mac, specify that in your config
 	
-	
 //constants
 	define('BR', '<br/>');
 	define('TAB', "\t");
