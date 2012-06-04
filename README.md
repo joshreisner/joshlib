@@ -1,10 +1,10 @@
-WELCOME TO JOSHLIB!
-https://github.com/joshreisner/joshlib (wiki / documentation / report issues here)
+## WELCOME TO JOSHLIB!
+https://github.com/joshreisner/joshlib
 
-LICENSE
+## LICENSE
 all files other than lib.zip are available to the public under LGPL
 	
-THIRD PARTY SOFTWARE
+## THIRD PARTY SOFTWARE
 	included in lib.zip.  thank you so much to each of the contributors for these excellent packages
 	
 	~~TITLE~~~~~~~~~~~~~~~~~LANG~~~~LICENSE~~~~~VERSION~DEVELOPER~URL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,11 +30,11 @@ THIRD PARTY SOFTWARE
 	> validate					MIT/GPL				http://bassistance.de/jquery-plugins/jquery-plugin-validation/
 	> table drag and drop		LGPL		0.5		http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/		
 
-USING THE DEBUGGER
+## USING THE DEBUGGER
 	you can run the debug() function after joshlib has been included to see output of various processes
 	to debug the loading of the joshlib itself, set $_josh['mode'] = 'debug' before you include it
 
-RUNNING ON THE COMMAND LINE
+## RUNNING ON THE COMMAND LINE
 	joshlib depends on certain $_SERVER variables being present.  add these lines before including joshlib:
 	$_SERVER['HTTP_HOST']		= 'backend.livingcities.org';
 	$_SERVER['SCRIPT_NAME']		= '/salesforce/index.php';
