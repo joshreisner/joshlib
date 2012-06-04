@@ -1,4 +1,4 @@
-## Welcome to Joshlib
+## Welcome to Joshlib!
 https://github.com/joshreisner/joshlib
 
 ## License
