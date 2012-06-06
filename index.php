@@ -712,12 +712,8 @@ function lib_get($string) {
 		case 'salesforce' :
 		case 'simple_html_dom' :
 		case 'swiftmailer' :
+		case 'phamlp' :
 		return @include_once(lib_location($string));
-		
-		case 'phphaml' :
-		include_once(lib_location($string));
-		//phphaml\Library::autoload();
-		return;
         
 		//javascript/css libraries
 		case 'bootstrap' :
@@ -856,9 +852,9 @@ function lib_location($string) {
 		case 'modernizr' :
 		return $lib . 'modernizr-2.0.min.js';
 		
-		case 'phphaml' :
-		return DIRECTORY_ROOT . $lib . 'library.php';
-    
+		case 'phamlp' :
+		return DIRECTORY_ROOT . $lib . 'haml/HamlParser.php';
+
 		case 'salesforce' :
 		return DIRECTORY_ROOT . $lib . 'phptoolkit-13_1/soapclient/SforceEnterpriseClient.php';
 		

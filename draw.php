@@ -697,15 +697,21 @@ function draw_google_tracker($id) {
 
 function draw_haml($template, $layout='layout', $path=false) {
   global $_josh;
-  lib_get('phphaml');
+  lib_get('phamlp');
+  file_dir_writable('haml');
+
+  $haml = new HamlParser();
   
+  $compiled_path = DIRECTORY_ROOT . DIRECTORY_WRITE . '/haml/';
   if(!$path) $path = $_josh['haml_path'];
-  
-  //$parser = new phphaml\haml\Parser(file_get_contents($path . "$template.haml"));
-  $_josh['_yield'] = $parser->render();
-  
-  //$parser = new phphaml\haml\Parser(file_get_contents($path . "$layout.haml"));
-  return $parser->render();
+
+  $layout = $haml->parse($path . "$layout.haml");
+  $haml = str_replace('<?php echo draw_yield(); ?>', $haml->parse($path . "$template.haml"), $layout);
+  file_put($compiled_path . "/_$template.php", $haml);
+
+  ob_start();
+  include($compiled_path . "_$template.php");
+  return ob_get_clean();
 }
 
 function draw_h1($content, $arguments=false) {
@@ -1245,12 +1251,4 @@ function draw_title($title=false) {
 
 function draw_typekit($key='yxt2eld') {
 	return draw_javascript_src('http://use.typekit.com/' . $key . '.js') . draw_javascript('try{Typekit.load();}catch(e){}');
-}
-
-function draw_yield() {
-  global $_josh;
-  if(!isset($_josh['_yield'])) return false;
-  $yield = $_josh['_yield'];
-  unset($_josh['_yield']);
-  return $yield;
 }
