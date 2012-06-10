@@ -1059,6 +1059,13 @@ function format_string($string, $target=30, $append='&hellip; ') {
 	$str_new = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 	$encoded = ($str_new != $string);
 	$str_new = str_replace(NEWLINE, ' ', strip_tags(trim($str_new)));
+	
+	if (!function_exists('mb_strlen')) {
+		function mb_strlen($str) {
+			return strlen($str);
+		}
+	}
+	
 	if (mb_strlen($str_new, 'utf-8') > $target) {
 		$words = explode(' ', $str_new);
 		$length = 0;

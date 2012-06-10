@@ -14,7 +14,7 @@ class table {
 		$this->title = $title;
 	}
 	
-	function draw($values, $errmsg='Sorry, no results!', $total=false) {
+	function draw($values, $errmsg=false, $total=false) {
 		global $_josh;
 		$class			= $this->name;
 		$count_columns	= count($this->columns);
@@ -30,6 +30,7 @@ class table {
 			$return .= $this->draw_header(false) . $this->draw_empty('Sorry, no columns defined!');
 		} elseif (!$count_rows) {
 			//no rows, return errmsg
+			if (!$errmsg) return false; //this should be the default behavior
 			$return .= $this->draw_header(false) . $this->draw_empty($errmsg);
 		} else {
 			$return .= $this->draw_header();
