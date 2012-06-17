@@ -87,7 +87,17 @@ class form {
 			$return .= lib_get('validate') . 
 				draw_javascript_ready('
 				$("form#' . $this->name . '").validate({
-					submitHandler:function(form){ 
+					highlight: function(element, errorClass, validClass) {
+						$(element).addClass(errorClass).removeClass(validClass);
+						$(element).closest("div.field").addClass(errorClass);
+						//$(element.form).find("label[for=" + element.id + "]").addClass(errorClass);
+					},
+					unhighlight: function(element, errorClass, validClass) {
+						$(element).removeClass(errorClass).addClass(validClass);
+						$(element).closest("div.field").removeClass(errorClass);
+						//$(element.form).find("label[for=" + element.id + "]").removeClass(errorClass);
+					},
+					submitHandler: function(form){ 
 						if (typeof submit_' . $this->name . ' == "function") {
 							if (submit_' . $this->name . '($("form#' . $this->name . '"))) form.submit();
 						} else {
@@ -117,7 +127,7 @@ class form {
 		if (!$option_title) $option_title = 'title';
 		
 		//wrap additional
-		if ($additional && ($type != 'checkboxes')) $additional = draw_tag('span', array('class'=>'additional'), $additional);
+		if ($additional && ($type != 'checkboxes')) $additional = draw_tag('span', array('class'=>'additional help-inline'), $additional);
 		
 		error_debug('<b>' . __function__ . '</b> drawing field ' . $name . ' of type ' . $type, __file__, __line__);
 		
@@ -263,7 +273,8 @@ class form {
 						//if the button text starts with a / then the implication is it's an image
 						$return .= draw_form_img($value, $class) . $additional;						
 					} else {
-						$return .= draw_form_submit($value, $class) . $additional;
+						//bootstrap adding btn class to all input type="submit" fields
+						$return .= draw_form_submit($value, ((empty($class)) ? 'btn' : $class . ' btn')) . $additional;
 					}
 					break;
 				case 'color':
@@ -303,7 +314,7 @@ class form {
 			}
 						
 			//wrap it up
-			$div_class = implode(' ', array('field', 'field_' . $this->counter, $name, $class));
+			$div_class = implode(' ', array('field', 'control-group', 'field_' . $this->counter, $name, $class));
 			$return = draw_div($div_class, $return) . NEWLINE;
 			$this->counter++;
 		}
