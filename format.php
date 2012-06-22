@@ -684,7 +684,6 @@ function format_image_resize($source, $max_width=false, $max_height=false) {
 	if (!function_exists('resize')) {
 		function resize($new_width, $new_height, $source_name, $target_name, $width, $height) {
 			//resize an image and save to the $target_name
-			ini_set('memory_limit', '500M');
 			$tmp = imagecreatetruecolor($new_width, $new_height);
 			if (!$image = imagecreatefromjpeg(DIRECTORY_ROOT . $source_name)) error_handle('could not create image', 'the system could not create an image from ' . $source_name, __file__, __line__);
 			imagecopyresampled($tmp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);

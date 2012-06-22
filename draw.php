@@ -305,6 +305,10 @@ function draw_dump($var, $forceType='', $bCollapsed=false) {
 	new dBug($var, $forceType, $bCollapsed);
 }
 
+function draw_em($string) {
+	return draw_tag('em', false, $string);
+}
+
 function draw_exit($var, $forceType='', $bCollapsed=false) {
 	//use $forceType='xml' for xml otherwise it will be recognized as a string
 	//use $bCollapsed=true for collapsed view
