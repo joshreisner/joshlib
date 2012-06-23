@@ -205,6 +205,27 @@ function format_date_time($timestamp=false, $error='', $separator=' ', $suppress
 	return $return . $separator . $time;
 }
 
+function format_date_range($start, $end, $separator='&ndash;') {
+	//return a string date range, like Jan 21-22 2010, or Jan 8 from 11-11:30am
+	if (!is_integer($start)) $start	= strtotime($start);
+	if (!is_integer($end)) $end	= strtotime($end);
+	
+	if (date('Y', $start) == date('Y', $end)) {
+		if (date('n', $start) == date('n', $end)) {
+			if (date('j', $start) == date('j', $end)) {
+				//same day
+				return format_date($start);
+			}
+			//same month
+			return strftime('%b', $start) . ' ' . strftime('%e', $start) . $separator . strftime('%e', $end) . ', ' . strftime('%Y', $end);
+		}
+		//same year
+		return strftime('%b %e', $start) . $separator . strftime('%b %e', $end)  . ', ' . strftime('%Y', $end);
+	}
+	//same year
+	return strftime('%b %e, %Y', $start) . $separator . strftime('%b %e, %Y', $end);
+}
+
 function format_date_time_range($start, $end) {
 	//return a string date range, like Jan 21-22 2010, or Jan 8 from 11-11:30am
 	if (!is_integer($start)) $start	= strtotime($start);
