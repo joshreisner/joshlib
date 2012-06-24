@@ -171,6 +171,7 @@ class form {
 						$options = db_table($sql);					
 					}
 					foreach ($options as &$o) {
+						$o[$option_title] = strip_tags($o[$option_title]);
 						if ($maxlength) $o[$option_title] = format_string($o[$option_title], $maxlength);
 						$chkname = 'chk-' . $name . '-' . $o['id'];
 						if (!isset($o['checked'])) $o['checked'] = false;
