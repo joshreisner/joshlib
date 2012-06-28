@@ -750,8 +750,8 @@ function lib_get($string) {
 							// Location of TinyMCE script
 							content_css : "/css/tinymce.css?" + new Date().getTime(),
 							custom_shortcuts : 0,
-							extended_valid_elements : "a[href|target|rel|name|class],caption,dd[class],dl[class],dt[class],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],iframe[src|width|height|frameborder|webkitAllowFullScreen|allowFullScreen],font[face|size|color|style],span[align|class|style],p[align|class|style],table[cellspacing|align|border|cellpadding|class],tbody,td[align|class|colspan],th[class],tr[class]",
-							plugins : "' . (($tinymce_mode == 'advanced') ? 'imagemanager,filemanager,' : '') . 'paste",
+							extended_valid_elements : "a[href|target|rel|name|class],caption,dd[class],dl[class],dt[class],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],iframe[src|width|height|frameborder|webkitAllowFullScreen|allowFullScreen],font[face|size|color|style],span[align|class|style],p[align|class],table[cellspacing|align|border|cellpadding|class],tbody,td[align|class|colspan],th[class],tr[class]",
+							plugins : "' . (($tinymce_mode == 'advanced') ? 'imagemanager,filemanager,' : '') . 'paste,legacyoutput",
 							relative_urls : false,
 							remove_script_host : false,
 							onchange_callback: function() { tinyMCE.triggerSave(); },
