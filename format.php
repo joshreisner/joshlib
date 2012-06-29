@@ -682,10 +682,10 @@ function format_image($path, $type=false) {
 		return $file;
 	} elseif (($type == 'gif') || ($type == 'png')) {
 		//convert
-		exec($imagick . 'convert ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name);
+		exec($imagick . ' ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name);
 	} elseif ($type == 'pdf') {
 		//return a screenshot of the first page
-		exec($imagick . 'convert ' . realpath($path) . '[0] ' . DIRECTORY_ROOT . $target_name);
+		exec($imagick . ' ' . realpath($path) . '[0] ' . DIRECTORY_ROOT . $target_name);
 	} else {
 		error_handle('unhandled image convert', __function__ . ' ran into a problem converting ' . $path, __file__, __line__);
 		return false;
