@@ -676,14 +676,16 @@ function format_image($path, $type=false) {
 	if (!$type) $type = file_ext($path);
 	$target_name = DIRECTORY_WRITE . '/temp-target.jpg';
 	
+	$imagick = exec('which convert');
+
 	if (($type == 'jpg') || ($type == 'jpeg')) {
 		return $file;
 	} elseif (($type == 'gif') || ($type == 'png')) {
 		//convert
-		exec($_josh['path_imagemagick'] . 'convert ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name);
+		exec($imagick . 'convert ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name);
 	} elseif ($type == 'pdf') {
 		//return a screenshot of the first page
-		exec($_josh['path_imagemagick'] . 'convert ' . realpath($path) . '[0] ' . DIRECTORY_ROOT . $target_name);
+		exec($imagick . 'convert ' . realpath($path) . '[0] ' . DIRECTORY_ROOT . $target_name);
 	} else {
 		error_handle('unhandled image convert', __function__ . ' ran into a problem converting ' . $path, __file__, __line__);
 		return false;
