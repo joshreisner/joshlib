@@ -22,7 +22,8 @@ function email($to, $message, $subject='Email from Your Website', $from=false, $
 		$transport = Swift_MailTransport::newInstance();
 	} else {
 		if (empty($_josh['smtp']['socket'])) $_josh['smtp']['socket'] = 25;
-		$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], $_josh['smtp']['socket'])->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
+		$security = ($_josh['smtp']['socket'] == 25) ? null : 'ssl';
+		$transport	= Swift_SmtpTransport::newInstance($_josh['smtp']['location'], $_josh['smtp']['socket'], $security)->setUsername($_josh['smtp']['username'])->setPassword($_josh['smtp']['password']);
 	}
 	
 	//die('CC is ' . draw_array($cc));
