@@ -281,6 +281,7 @@ class form {
 				case 'color':
 				case 'int':
 				case 'text':
+				case 'typeahead':
 				case 'url':
 				case 'url-local':
 					if (!$maxlength) $maxlength = 255;
@@ -291,6 +292,15 @@ class form {
 							//js color picker
 							$return .= lib_get('jscolor'); 
 							$args['class'] .= ' {hash:true}';
+						} elseif ($type == 'typeahead') {
+							//bootstrap typeahead thingy
+							if (count($options)) {
+								$return .= lib_get('bootstrap');
+								foreach ($options as &$o) $o = '"' . str_replace('"', '', $o) . '"';
+								$return .= draw_javascript_ready('
+									$("input[name=' . $name . ']").typeahead({source:[' . implode(',', $options) . ']});
+								');
+							}
 						}
 						if ($required) $args['class'] .= ' required';
 						if (!empty($default)) $args['placeholder'] = $default;
