@@ -64,11 +64,11 @@ class table {
 				if (!empty($v['class'])) $class .= ' ' . $v['class']; // . ' ' . $row . '_' . $v['class'];
 				if ($counter == 1) $class .= ' first';
 				if ($counter == $count_rows) $class .= ' last';
-				//$onclick = (isset($v['link'])) ? 'location.href=\'' . $v['link'] . '\';' : false; //todo deprecate?
+
 				$inner = '';
 				foreach ($this->columns as $c) $inner .= draw_tag('td', array('class'=>$c['name'] . ' ' . $c['class'], 'style'=>(($c['width']) ? 'width:' . $c['width'] . 'px;': false)), $v[$c['name']]);
 				
-				$bodies[$bodycounter]['rows'][] = draw_tag('tr', array('id'=>$id, 'class'=>$class/* , 'onclick'=>$onclick */), $inner);
+				$bodies[$bodycounter]['rows'][] = draw_tag('tr', array('id'=>$id, 'class'=>$class), $inner);
 				
 				$row = ($row == 'even') ? 'odd' : 'even';
 				$counter++;

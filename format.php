@@ -880,7 +880,7 @@ format_numeric forces out a number from a string
 
 function format_numeric($value, $integer=false) {
 	//takes a string and reduces to just its numeric elements
-	$characters = '0123456789';
+	$characters = '-0123456789';
 	$value = $value . ''; //force it to be a string
 	if (!$integer) $characters .= '.';
 	$newval = '';
