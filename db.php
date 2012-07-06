@@ -918,8 +918,9 @@ function db_table_duplicate($old, $new) {
 }
 
 function db_table_exists($name) {
-	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
-	return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\''));
+	return in_array($name, db_tables());
+	//if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
+	//return db_found(db_query('SHOW TABLES LIKE \'' . $name . '\''));
 }
 
 function db_table_from_array($array, $table_name=false) {
@@ -975,11 +976,17 @@ function db_table_rename($before, $after) {
 
 function db_tables() {
 	global $_josh;
-	if (db_language() == 'mssql') error_handle('MSSQL Not Yet Supported', __function__ . ' is only currently implemented in MySQL.', __file__, __line__);
-	$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
-	foreach ($tables as &$t) $t = strToLower($t['Tables_in_' . $_josh['db']['database']]);
-	sort($tables);
-	return $tables;
+	if (db_language() == 'mssql') {
+		$tables = db_table('sp_tables @table_type = "\'TABLE\'"');
+		foreach ($tables as &$t) $t = $t['TABLE_NAME'];
+		sort($tables);
+		return $tables;
+	} elseif (db_language() == 'mysql') {
+		$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
+		foreach ($tables as &$t) $t = strToLower($t['Tables_in_' . $_josh['db']['database']]);
+		sort($tables);
+		return $tables;
+	}
 }
 
 function db_translate($sql, $from, $to) {

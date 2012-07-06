@@ -26,7 +26,23 @@ function file_check($filename) {
 	return @filesize(DIRECTORY_ROOT . $filename);
 }
 
+function file_csv($content, $filename=false) {
+	//output function -- creates a tab-delimited csv from an associative array
+	$header = false;
+	$rows = '';
+	foreach ($content as $line) {
+		if (!$header) $header = implode(TAB, array_keys($line)) . NEWLINE;
+		foreach($line as $key=>$value) $line[$key] = str_replace(TAB, '     ', $value); //remove tabs
+		$rows .= implode(TAB, $line) . NEWLINE;
+	}
+	$content = $header . $rows;
+	if ($filename) file_download($content, $filename, 'csv');
+	return $content;
+}
+
+/*obsoleting 2012-07-05
 function file_csv($filename) {
+	//should be named array_csv, think this is obsolete
 	//potential replacement to array_csv.  running into problems with delimiters being inside quotes, want to use fgetcsv() for this purpose
 	$count = false;
 	$return = $cols = array();
@@ -47,7 +63,7 @@ function file_csv($filename) {
 	    fclose($handle);
 	}
 	return $return;
-}
+}*/
 
 function file_delete($filename) {
 	if (!file_exists(DIRECTORY_ROOT . $filename)) return false;

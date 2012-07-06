@@ -1256,3 +1256,24 @@ function draw_title($title=false) {
 function draw_typekit($key='yxt2eld') {
 	return draw_javascript_src('http://use.typekit.com/' . $key . '.js') . draw_javascript('try{Typekit.load();}catch(e){}');
 }
+
+function draw_video($url, $width=false, $height=false) {
+	//takes a url and gives you back a video
+
+	if (!$width && !$height) {
+		$width = 560;
+		$height = 315;
+	} elseif (!$width) {
+		$width = ceil((560 / 315) * $height);
+	} elseif (!$height) {
+		$height = ceil((315 / 560) * $width);
+	}
+
+	$url = url_parse($url);
+	if ($url['host'] == 'youtu.be') {
+		return '<iframe width="' . $width . '" height="' . $height . '" src="http://www.youtube.com/embed' . $url['path'] . '" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe>';
+	} elseif ($url['host'] == 'vimeo.com') {
+		return '<iframe width="' . $width . '" height="' . $height . '" src="http://player.vimeo.com/video' . $url['path'] . '" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowfullscreen></iframe>';
+	}
+	
+}
