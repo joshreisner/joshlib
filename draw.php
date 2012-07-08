@@ -259,6 +259,11 @@ function draw_div_class($class, $innerhtml='', $arguments=false) {
 	return draw_tag('div', $arguments, $innerhtml);
 }
 
+function draw_div_class_open($class=false) {
+	//todo deprecate
+	return draw_div_open($class);
+}
+
 function draw_div_id($id, $innerhtml='', $arguments=false) {
 	error_deprecated('draw_div_id has been deprecated on 5/18/2012.  please use draw_div instead, eg draw_div(\'#container\', \'this is a really nice container.\')');
 	//convenience function specifically for DIVs, since they're so ubiquitous
@@ -270,11 +275,6 @@ function draw_div_id($id, $innerhtml='', $arguments=false) {
 function draw_div_open($arguments=false) {
 	$arguments = array_arguments($arguments);
 	return '<div' . draw_arguments($arguments) . '>';
-}
-
-function draw_div_class_open($class=false) {
-	//todo deprecate
-	return draw_div_open(false, $class);
 }
 
 function draw_dl($array, $class=false) {
