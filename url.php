@@ -275,7 +275,7 @@ function url_query_add($adds=false, $go=true, $path=false) { //add specified que
 		$adds = array_merge($_GET, $adds);
 	}
 	$pairs = array();
-	if (count($adds)) foreach ($adds as $key=>$value) if ($value) $pairs[] = $key . '=' . urlencode($value);
+	if (count($adds)) foreach ($adds as $key=>$value) if ($value !== false) $pairs[] = $key . '=' . urlencode($value);
 	if (count($pairs)) {
 		sort($pairs);
 		$path .= '?' . implode('&', $pairs);

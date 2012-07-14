@@ -826,14 +826,20 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 		$query2[] = ((isset($array['created_user'])) ? $array['created_user'] : $userID);
 		$query1[] = 'is_active';
 		$query2[] = 1;
-		$query1[] = 'precedence';
-		if (isset($array['precedence'])) {
-			$query2[] = $array['precedence'];
-			db_query('UPDATE ' . $table . ' SET precedence = precedence + 1 WHERE precedence >= ' . $array['precedence']);
-		} else {
-			//otherwise append to list
-			$query2[] = db_grab('SELECT MAX(precedence) FROM ' . $table) + 1;
+
+		//precedence
+		if (db_column_exists($table, 'precedence')) {
+			$query1[] = 'precedence';
+			if (isset($array['precedence'])) {
+				$query2[] = $array['precedence'];
+				db_query('UPDATE ' . $table . ' SET precedence = precedence + 1 WHERE precedence >= ' . $array['precedence']);
+			} else {
+				//otherwise append to list
+				$query2[] = db_grab('SELECT MAX(precedence) FROM ' . $table) + 1;
+			}
 		}
+
+
 		$query = 'INSERT INTO ' . $table . ' ( ' . implode(', ', $query1) . ' ) VALUES ( ' . implode(', ', $query2) . ' )';
 		$id = db_query($query);
 	}
