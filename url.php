@@ -208,7 +208,9 @@ function url_parse($url) {
 	}
 	
 	$return['domain']		= $return['domainname'] . '.' . $return['tld'];
-	$return['path']			= str_replace('index.php', '', $return['path']);
+
+	//clean out directory index when possible
+	$return['path']			= (substr($return['path'], -9) == 'index.php') ? substr($return['path'], 0, strlen($return['path'] - 9)) : $return['path'];
 	
 	//get folder, subfolder, subsubfolder (there must be a smoother way)
 	$urlparts = explode('/', $return['path']);

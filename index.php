@@ -129,16 +129,13 @@
 	if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) {
 		define('PLATFORM', 'win');
 		define('NEWLINE', "\r\n");
-		//phpinfo();
 
-		//get document root
-		if (home()) {
-			define('DIRECTORY_ROOT', substr(str_replace($_josh['request']['path'], '', str_replace('\index.php', '\\', $_SERVER['PATH_TRANSLATED'])), 0, -1));
-		} else {
-			define('DIRECTORY_ROOT', str_replace(str_replace('/', '\\', $_josh['request']['path']), '', str_replace('\index.php', '\\', $_SERVER['PATH_TRANSLATED'])));
-		}
+		//IIS doesn't have a DOCUMENT_ROOT server var
+		$root = (substr($_SERVER['PATH_TRANSLATED'], -9) == 'index.php') ? substr($_SERVER['PATH_TRANSLATED'], 0, strlen($_SERVER['PATH_TRANSLATED'] - 10)) : $_SERVER['PATH_TRANSLATED'];
+		$root = substr($root, 0, strlen($root) - strlen($request['path']));
+		define('DIRECTORY_ROOT', $root);
 
-		$_josh['slow']				= true;
+		$_josh['slow'] = true; //not sure why header redirect wouldn't work on windows
 
 		//IIS handles 404s differently than apache--not sure if this should go above the request-path
 		if (!empty($_SERVER['QUERY_STRING']) && ($url = format_text_starts('404;', $_SERVER['QUERY_STRING']))) $_josh['request'] = url_parse(str_replace(':80', '', $url));
@@ -146,7 +143,8 @@
 	} else { //platform is UNIX or Mac
 		define('PLATFORM', 'unix');
 		define('NEWLINE', "\n");
-		define('DIRECTORY_ROOT', $_SERVER['DOCUMENT_ROOT']); //eg 
+		define('DIRECTORY_ROOT', $_SERVER['DOCUMENT_ROOT']);
+		
 		if (!isset($_josh['slow']))	$_josh['slow'] = false;
 	}
 
