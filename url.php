@@ -210,7 +210,7 @@ function url_parse($url) {
 	$return['domain']		= $return['domainname'] . '.' . $return['tld'];
 
 	//clean out directory index when possible
-	$return['path']			= (substr($return['path'], -9) == 'index.php') ? substr($return['path'], 0, strlen($return['path'] - 9)) : $return['path'];
+	if ($remainder = format_text_ends(DIRECTORY_INDEX, $return['path'])) $return['path'] = $remainder;
 	
 	//get folder, subfolder, subsubfolder (there must be a smoother way)
 	$urlparts = explode('/', $return['path']);

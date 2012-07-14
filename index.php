@@ -89,6 +89,10 @@
 	require(DIRECTORY_JOSHLIB . 'url.php');
 
 //parse environment variables
+
+	//index.php is normally the directory index file
+	if (!defined('DIRECTORY_INDEX')) define('DIRECTORY_INDEX', 'index.php');
+
 	if (!isset($_SERVER['DOCUMENT_ROOT']) || !isset($_SERVER['HTTP_HOST']) || !isset($_SERVER['SCRIPT_NAME'])) error_handle('environment variables not set', 'joshlib requires $_SERVER[\'DOCUMENT_ROOT\'], $_SERVER[\'HTTP_HOST\'] and $_SERVER[\'SCRIPT_NAME\'] to function properly.  please define these before proceeding.', __file__, __line__);
 
 	//build request as string, then set it to array with url_parse
@@ -129,11 +133,12 @@
 	if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) {
 		define('PLATFORM', 'win');
 		define('NEWLINE', "\r\n");
+		define('DIRECTORY_ROOT', $_SERVER['DOCUMENT_ROOT']);
 
-		//IIS doesn't have a DOCUMENT_ROOT server var
-		$root = (substr($_SERVER['PATH_TRANSLATED'], -9) == 'index.php') ? substr($_SERVER['PATH_TRANSLATED'], 0, strlen($_SERVER['PATH_TRANSLATED'] - 10)) : $_SERVER['PATH_TRANSLATED'];
+		/*IIS doesn't have a DOCUMENT_ROOT server var - WAIT YES IT DOES
+		if (!$root = format_text_ends(DIRECTORY_INDEX, $_SERVER['PATH_TRANSLATED'])) $root = $_SERVER['PATH_TRANSLATED'];
 		$root = substr($root, 0, strlen($root) - strlen($request['path']));
-		define('DIRECTORY_ROOT', $root);
+		define('DIRECTORY_ROOT', $root);*/
 
 		$_josh['slow'] = true; //not sure why header redirect wouldn't work on windows
 
@@ -144,7 +149,7 @@
 		define('PLATFORM', 'unix');
 		define('NEWLINE', "\n");
 		define('DIRECTORY_ROOT', $_SERVER['DOCUMENT_ROOT']);
-		
+
 		if (!isset($_josh['slow']))	$_josh['slow'] = false;
 	}
 
