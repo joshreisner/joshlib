@@ -286,7 +286,7 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 function db_connected() {
 	//return boolean if database is connected or not -- stop referring to pointer
 	global $_josh;
-	return (isset($_josh['db']['pointer']) && is_resource($_josh['db']['pointer']));
+	return (isset($_josh['db']['pointer']) && (is_resource($_josh['db']['pointer']) || is_object($_josh['db']['pointer'])));
 }
 
 function db_date() {
@@ -322,7 +322,9 @@ function db_delete($table, $id=false) {
 
 function db_fetch($result) {
 	global $_josh;
-	if ($_josh['db']['language'] == 'mysql') {
+	if ($_josh['db']['pdo']) {
+		return $result->fetch(PDO::FETCH_ASSOC);
+	} elseif ($_josh['db']['language'] == 'mysql') {
 		return mysql_fetch_assoc($result);
 	} elseif ($_josh['db']['language'] == 'mssql') {
 		return mssql_fetch_assoc($result);
@@ -349,7 +351,9 @@ function db_field_type($result, $i) {
 
 function db_found($result) {
 	global $_josh;
-	if ($_josh['db']['language'] == 'mysql') {
+	if ($_josh['db']['pdo']) {
+		return $result->rowCount();
+	} elseif ($_josh['db']['language'] == 'mysql') {
 		return @mysql_num_rows($result);
 	} elseif ($_josh['db']['language'] == 'mssql') {
 		return @mssql_num_rows($result);
@@ -360,6 +364,7 @@ function db_grab($query, $checking=false) {
 	global $_josh;
 	error_debug('<b>' . __function__ . '</b> running', __file__, __line__);
 	$result = db_query($query, 1, $checking);
+
 	if (!db_found($result)) return false;
 	
 	$r = db_fetch($result);
@@ -372,7 +377,9 @@ function db_grab($query, $checking=false) {
 
 function db_id() {
 	global $_josh;
-	if ($_josh['db']['language'] == 'mysql') {
+	if ($_josh['db']['pdo']) {
+		return $_josh['db']['pointer']->lastInsertId();
+	} elseif ($_josh['db']['language'] == 'mysql') {
 		return mysql_insert_id();
 	} elseif ($_josh['db']['language'] == 'mssql') {
 		return db_grab('SELECT @@IDENTITY');
@@ -470,7 +477,7 @@ function db_num_fields($result) {
 function db_open($location=false, $username=false, $password=false, $database=false, $language=false) {
 	//creates connection to database.  will be invoked automatically by db_query, not necessary to put this in your code
 	global $_josh;
-	
+
 	//skip if already connected
 	if (db_connected()) return true;
 
@@ -486,10 +493,41 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 	//connect to db
 	error_debug('<b>db_open</b> trying to connect ' . $_josh['db']['language'] . ' on ' . $_josh['db']['location'], __file__, __line__);
 	if ($_josh['db']['language'] == 'mysql') {
-		$_josh['db']['pointer'] = @mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
+		if (extension_loaded('pdo_mysql')) {
+			$_josh['db']['pdo'] = true;
+			try {
+				$_josh['db']['pointer'] = new PDO('mysql:host=' . $_josh['db']['location'] . ';dbname=' . $_josh['db']['database'] . ';', $_josh['db']['username'], $_josh['db']['password'], array(PDO::MYSQL_ATTR_INIT_COMMAND=>'SET NAMES utf8'));
+				$_josh['db']['pointer']->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );  
+			} catch (PDOException $e) {
+				print 'Error!:' . $e->getMessage() . '<br>';
+				die();
+				//todo error handle
+			}
+		} else {
+			$_josh['db']['pdo'] = false;
+			$_josh['db']['pointer'] = @mysql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
+			if (function_exists('mysql_set_charset')) {
+				mysql_set_charset('utf8', $_josh['db']['pointer']);
+			} else {
+				mysql_query('SET CHARACTER SET utf8');
+			    mysql_query('SET NAMES utf8');
+			}
+		}
 	} elseif ($_josh['db']['language'] == 'mssql') {
-		$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
-		//mssql 2000 doesn't support utf8
+		if (extension_loaded('pdo_mssql')) {
+			$_josh['db']['pdo'] = true;
+			try {
+				$_josh['db']['pointer'] = new PDO('sqlsrv:Server=' . $_josh['db']['location'] . ';Database=' . $_josh['db']['database'] . ';', $_josh['db']['username'], $_josh['db']['password']);
+			} catch (PDOException $e) {
+				print 'Error!:' . $e->getMessage() . '<br>';
+				die();
+				//todo error handle
+			}
+		} else {
+			$_josh['db']['pdo'] = false;
+			$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
+			//mssql 2000 doesn't support utf8
+		}
 	}
 
 	//handle error
@@ -497,19 +535,9 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 		error_handle('Database Connection', 'Most likely, you have not yet configured the variables in ' . $_josh['config'] . '.  Or the database could be down.', __file__, __line__);
 		exit; //to prevent massive repetition
 	}
-
-	//set utf8 -- todo mssql 2005
-	if ($_josh['db']['language'] == 'mysql') {
-		if (function_exists('mysql_set_charset')) {
-			mysql_set_charset('utf8', $_josh['db']['pointer']);
-		} else {
-			mysql_query('SET CHARACTER SET utf8');
-		    mysql_query('SET NAMES utf8');
-		}
-	}
 	
 	//select db
-	db_switch();
+	if (!$_josh['db']['pdo']) db_switch();
 	
 	return db_connected();
 }
@@ -556,22 +584,34 @@ function db_pwdencrypt($string) {
 function db_query($sql, $limit=false, $suppress_error=false) {
 	global $_josh;
 	db_open();
+
 	$query = trim($sql);
 	if (isset($_josh['basedblanguage']) && ($_josh['basedblanguage'] != $_josh['db']['language'])) $query = db_translate($query, $_josh['basedblanguage'], $_josh['db']['language']);
 	
-	if ($_josh['db']['language'] == 'mysql') {
-		if ($limit)	{
+	if ($limit) {
+		if ($_josh['db']['language'] == 'mysql') {
 			if (strstr($limit, ',')) {
 				list($limit, $offset) = explode(',', $limit);
 				$query .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
 			} else {
 				$query .= ' LIMIT ' . $limit;
 			}
+		} elseif ($_josh['db']['language'] == 'mssql') {
+			$query = 'SELECT TOP ' . $limit . substr($query, 6);
 		}
+	}
+
+	if ($_josh['db']['pdo']) {
+		try {
+			$result = $_josh['db']['pointer']->query($query);
+			$error = false;
+		} catch (PDOException $e) {
+			$error = $e->getMessage();
+		}
+	} elseif ($_josh['db']['language'] == 'mysql') {
 		$result = @mysql_query($query, $_josh['db']['pointer']);
 		$error = mysql_error();
 	} elseif ($_josh['db']['language'] == 'mssql') {
-		if ($limit) $query = 'SELECT TOP ' . $limit . substr($query, 6);
 		$error = ($result = @mssql_query($query, $_josh['db']['pointer'])) ? false : mssql_get_last_message();
 	}
 
@@ -1030,7 +1070,7 @@ function db_words($text, $object_id, $join_table='objects_to_words', $words_tabl
 	
 	$words_unique = array_unique($words);
 	//die(draw_array($words) . '<hr><pre>' . $text . '</pre>');
-	
+
 	db_query('DELETE FROM ' . $join_table . ' WHERE object_id = ' . $object_id);
 	foreach ($words_unique as $word) {
 		if (!$word_id = db_grab('SELECT id FROM ' . $words_table . ' WHERE word = "' . $word . '"')) $word_id = db_query('INSERT INTO ' . $words_table . ' ( word ) VALUES ( "' . $word . '" )');

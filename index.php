@@ -129,7 +129,15 @@
 	if (isset($_SERVER['SERVER_SOFTWARE']) && strstr($_SERVER['SERVER_SOFTWARE'], 'Microsoft')) {
 		define('PLATFORM', 'win');
 		define('NEWLINE', "\r\n");
-		define('DIRECTORY_ROOT', str_replace($_josh['request']['path'], '', $_SERVER['PATH_TRANSLATED']));
+		//phpinfo();
+
+		//get document root
+		if (home()) {
+			define('DIRECTORY_ROOT', substr(str_replace($_josh['request']['path'], '', str_replace('\index.php', '\\', $_SERVER['PATH_TRANSLATED'])), 0, -1));
+		} else {
+			define('DIRECTORY_ROOT', str_replace(str_replace('/', '\\', $_josh['request']['path']), '', str_replace('\index.php', '\\', $_SERVER['PATH_TRANSLATED'])));
+		}
+
 		$_josh['slow']				= true;
 
 		//IIS handles 404s differently than apache--not sure if this should go above the request-path
@@ -141,7 +149,7 @@
 		define('DIRECTORY_ROOT', $_SERVER['DOCUMENT_ROOT']); //eg 
 		if (!isset($_josh['slow']))	$_josh['slow'] = false;
 	}
-	
+
 	//only checking for iOS
 	$_josh['request']['mobile']		= (isset($_SERVER['HTTP_USER_AGENT']) && (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone') || strstr($_SERVER['HTTP_USER_AGENT'], 'iPad')));
  	
@@ -166,6 +174,7 @@
 	if (!defined('DIRECTORY_LIB')) define('DIRECTORY_LIB', DIRECTORY_ROOT . DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'lib');
 	if (!is_dir(DIRECTORY_ROOT . DIRECTORY_WRITE)) file_dir_writable();
 
+
 //get configuration variables from config file
 	if (!isset($_josh['config'])) $_josh['config'] = DIRECTORY_WRITE . DIRECTORY_SEPARATOR . 'config.php'; //eg /_example.com/config.php
 	if (!file_check($_josh['config'])) {
@@ -175,8 +184,13 @@
 	}
 	if (!include(DIRECTORY_ROOT . $_josh['config'])) die('Could not create config file, please check the permissions on ' . DIRECTORY_ROOT . '.');
 	
+
 //check to make sure we're on the correct domain, might have read host variable from config file
-	if (isset($_josh['host']) && ($_josh['host'] != $_josh['request']['host'])) url_change($_josh['request']['protocol'] . '://' . $_josh['host'] . $_josh['request']['path_query']);
+	if (isset($_josh['host']) && ($_josh['host'] != $_josh['request']['host'])) {
+		die('dne');
+		url_change($_josh['request']['protocol'] . '://' . $_josh['host'] . $_josh['request']['path_query']);
+	}
+
 
 //ensure lib exists--todo autodelete these old lib folders
 	if (is_dir(DIRECTORY_LIB) && (filemtime(DIRECTORY_JOSHLIB . 'lib.zip') > filemtime(DIRECTORY_LIB))) {
@@ -215,6 +229,7 @@
 	
 	$_josh['editing']	= url_id(); //necessary?
 	
+
 //handle some ajax calls automatically -- requires user to be logged in
 	if (url_action('ajax_delete,ajax_publish,ajax_reorder,ajax_set,flushcache,db_check,db_fix,debug,indexes,lib_refresh,phpinfo')) {
 		if (!user()) die('user not logged in ' . SESSION_USER_ID);

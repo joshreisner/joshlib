@@ -203,7 +203,7 @@ function url_parse($url) {
 		if ($domain_count > 3) $return['subdomain'] = implode('.', array_slice($domain_parts, 0, -3));
 	} else { //not using cctld
 		$return['tld']			= $domain_parts[$domain_count-1];
-		$return['domainname']	= $domain_parts[$domain_count-2];
+		$return['domainname']	= @$domain_parts[$domain_count-2];
 		if ($domain_count > 2) $return['subdomain'] = implode('.', array_slice($domain_parts, 0, -2));
 	}
 	
@@ -290,7 +290,7 @@ function url_query_drop($deletes=false, $go=true) {
 	//deletes could also be a comma-separated list
 	global $_josh;
 	$get = $_GET;
-	$target = url_base() . $_josh['request']['path'];
+	$target = $_josh['request']['path'];
 	if ($deletes) {
 		if (!is_array($deletes)) $deletes = array_separated($deletes);
 		foreach ($deletes as $key) {
