@@ -1125,17 +1125,26 @@ function draw_p($inner, $arguments=false) {
 	return draw_tag('p', $arguments, $inner);
 }
 
-function draw_page($title, $html) {
+function draw_page($title, $html, $tab=false) {
 	//this is for joshserver and error handling, eventually for setup your site messages
-	return '<html><head>' . draw_meta_utf8() . draw_title($title) . '</head>
-			<body style="margin:0px;">
+	if ($tab) {
+		$tab = '<div style="width:400px;overflow:auto;"><div style="background-color:#59c;color:#fff;height:36px;line-height:36px;font-size:24px;padding:0px 20px 0px 20px;float:left;">' . $tab . '</div></div>';
+	}
+	return '
+		<html>
+			<head>' . draw_meta_utf8() . draw_title($title) . '</head>
+			<body style="margin:0;">
 				<table width="100%" height="100%" cellpadding="20" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
-					<tr><td align="center">
-					<div style="background-color:#fff;text-align:left;padding:10px 20px 10px 20px;width:360px;min-height:230px;position:relative;">
-						<h1 style="color:#444; font-weight:normal; font-size:24px; line-height:30px;">' . $title . '</h1>' . 
-						$html . '
-					</div>
-				</td></tr></table>
+					<tr>
+						<td align="center">
+							' . $tab . '
+							<div style="background-color:#fff;text-align:left;padding:10px 20px 10px 20px;width:360px;min-height:230px;">
+								<h1 style="color:#444; font-weight:normal; font-size:24px; line-height:30px;">' . $title . '</h1>' . 
+								$html . '
+							</div>
+						</td>
+					</tr>
+				</table>
 			</body>
 		</html>';
 }

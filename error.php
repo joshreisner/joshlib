@@ -45,11 +45,10 @@ if (!function_exists('error_draw')) {
 			(isset($_josh['request']) && !$_josh['request']) //cli
 		) return strip_tags(strToUpper($title) . $html);
 
-		//add quazi-attractive error element
-		$html = '<div style="background-color:#59c;color:#fff;height:36px;line-height:36px;font-size:24px;padding:0px 20px 0px 20px;position:absolute;top:-36px;left:0px;">Error</div>' . 
-			str_replace('<a href=', '<a style="color:#59c;" href=', $html);
+		//format links
+		$html = str_replace('<a href=', '<a style="color:#59c;" href=', $html);
 		
-		if (function_exists('draw_page')) return draw_page($title, $html);
+		if (function_exists('draw_page')) return draw_page($title, $html, 'Error');
 
 		//if we're at this point, it means the error is happening before the includes in joshlib
 		echo '<h1>' . $title . '</h1>' . $html;
