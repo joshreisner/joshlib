@@ -1134,7 +1134,7 @@ function draw_page($title, $html, $tab=false) {
 		<html>
 			<head>' . draw_meta_utf8() . draw_title($title) . '</head>
 			<body style="margin:0;">
-				<table width="100%" height="100%" cellpadding="20" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
+				<table width="100%" height="100%" cellpadding="30" cellspacing="0" border="0" style="background-color:#ddd; font-family:verdana, arial, sans-serif; font-size:13px; line-height:20px; color:#444;">
 					<tr>
 						<td align="center">
 							' . $tab . '
