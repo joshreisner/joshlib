@@ -124,12 +124,17 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 	
 	if (db_column_exists($table, $column)) return false;
 
-	$length = false;
+	$length = $decimals = false;
 	$default = 'DEFAULT NULL';
 		
 	//handle single-field translations.  multi-field and linked tables are todo
 	if (!$datatype && $type) {
 		switch ($type) {
+			case 'char': //single character field
+			$datatype = 'char';
+			$length = 1;
+			break;
+		
 			case 'checkbox': 
 			$datatype = 'tinyint';
 			$default = 'NOT NULL';
@@ -141,6 +146,9 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			break;
 		
 			case 'date': 
+			$datatype = 'date';
+			break;
+
 			case 'datetime': 
 			$datatype = 'datetime';
 			break;
@@ -165,6 +173,11 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			$datatype = 'int';
 			break;
 		
+			case 'money':
+			$datatype = 'decimal';
+			$decimals = 2;
+			break;
+	
 			case 'textarea':
 			case 'textarea-plain': 
 			$datatype = 'text';
@@ -177,12 +190,12 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			case 'url-local': 
 			$datatype = 'varchar';
 			break;
-	
+
 			error_handle('unknown data type', __function__ . ' received a request for ' . $type . ' which is not handled.', __file__, __line__);
 		}
 	}
 	
-	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype, $length) . ' ' . $default)) return $column;
+	if ($datatype && db_query('ALTER TABLE ' . $table . ' ADD ' . $column . ' ' . db_column_type($datatype, $length, $decimals) . ' ' . $default)) return $column;
 	return false;
 }
 
@@ -212,7 +225,7 @@ function db_column_rename($table, $before, $after) {
 
 function db_column_type($datatype, $length=false, $decimals=false) {
 	//edit $datatype declaration in sql statement
-	//$datatype in this case is a mysql datatype
+	//$datatype in this case is a mysql/mssql datatype
 	$datatype = strToUpper($datatype);
 	
 	//these have no explicit length
@@ -260,7 +273,7 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 			$return[] = ($includeMetaData) ? compact('name','type','required','auto','default','comments','length','decimals') : $name;
 		}
 	} else {
-		$result = db_table('SELECT 
+		$columns = db_table('SELECT 
 				c.name, 
 				t.name type, 
 				CASE WHEN c.isnullable = 0 THEN 1 ELSE 0 END required, 
@@ -273,11 +286,10 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 			LEFT JOIN sysproperties s ON c.colid = s.smallid
 			WHERE o.name = "' . $tablename . '"
 			ORDER BY c.colorder');
-		$count = count($result);
-		for ($i = 0; $i < $count; $i++) {
-			if ($omitSystemFields && (in_array($result[$i]['name'], $_josh['system_columns']))) continue;
-			if ($result[$i]['default']) $result[$i]['default'] = substr($result[$i]['default'], 1, strlen($result[$i]['default']) - 2);
-			array_push($return, $result[$i]);
+		foreach ($columns as &$c) {
+			if ($omitSystemFields && (in_array($c['name'], $_josh['system_columns']))) continue;
+			if ($c['default']) $c['default'] = substr($c['default'], 1, strlen($c['default']) - 2); //stripping off first and last?
+			$return[] = ($includeMetaData) ? $c : $c['name'];
 		}
 	}
 	return $return;
@@ -467,7 +479,10 @@ function db_language($set_language=false) {
 
 function db_num_fields($result) {
 	//returns the number of fields in a resultset
-	if (db_language() == 'mysql') {
+	global $_josh;
+	if ($_josh['db']['pdo']) {
+		return $result->columnCount();
+	} elseif (db_language() == 'mysql') {
 		return mysql_num_fields($result);
 	} else {
 		return mssql_num_fields($result);
