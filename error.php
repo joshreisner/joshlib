@@ -14,8 +14,9 @@ if (!function_exists('error_debug')) {
 		//timer
 		$time = round(microtime(true) - $_josh['time_lastdebug'], 3);
 		$time = ($time < .001) ? '' : $time . 's';
+		if (function_exists('error_path')) $file = error_path($file);
 		echo '<div style="background-color:' . $bgcolor . ';text-align:left;float:left;clear:left;margin:10px;padding:10px;border:2px dashed #6699cc;font-family:verdana;color:#000;font-size:15px;min-height:70px;z-index:400;position:relative;">
-				<div style="font-weight:normal;font-size:12px;margin-bottom:7px;color:#888;">', error_path($file), ' line ', $line, '
+				<div style="font-weight:normal;font-size:12px;margin-bottom:7px;color:#888;">', $file, ' line ', $line, '
 					<div style="float:right;color:#ccc;">', $time, '</div>
 				</div>', 
 				$message, 
@@ -101,6 +102,7 @@ if (!function_exists('error_handle')) {
 		
 		//notify over api if specified
 		if (!empty($_josh['error_log_api'])) {
+			error_debug('attempting to send error message to API: ' . $_josh['error_log_api']);
 			$array = array(
 				'title'=>$type,
 				'description'=>$message,

@@ -1006,7 +1006,7 @@ function format_quantity($quantity, $title_case=true) {
 	global $_josh;
 	if ($quantity == 0) {
 		$return = 'no';
-	} elseif ($quantity < 10) {
+	} elseif (($quantity > 0) && ($quantity < 10)) {
 		$return = $_josh['numbers'][$quantity];
 	} else {
 		$return = $quantity;

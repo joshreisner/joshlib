@@ -273,19 +273,19 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 			$return[] = ($includeMetaData) ? compact('name','type','required','auto','default','comments','length','decimals') : $name;
 		}
 	} else {
-		$columns = db_table('SELECT 
-				c.name, 
-				t.name type, 
-				CASE WHEN c.isnullable = 0 THEN 1 ELSE 0 END required, 
-				m.text [default],
-				s.value comments
-			FROM syscolumns c
-			JOIN sysobjects o ON o.id = c.id
-			JOIN systypes t on c.xtype = t.xtype
-			LEFT JOIN syscomments m on c.cdefault = m.id
-			LEFT JOIN sysproperties s ON c.colid = s.smallid
-			WHERE o.name = "' . $tablename . '"
-			ORDER BY c.colorder');
+		if (!$columns = db_table('SELECT 
+					c.name, 
+					t.name type, 
+					CASE WHEN c.isnullable = 0 THEN 1 ELSE 0 END required, 
+					m.text [default],
+					s.value comments
+				FROM syscolumns c
+				JOIN sysobjects o ON o.id = c.id
+				JOIN systypes t on c.xtype = t.xtype
+				LEFT JOIN syscomments m on c.cdefault = m.id
+				LEFT JOIN sysproperties s ON c.colid = s.smallid
+				WHERE o.name = "' . $tablename . '"
+				ORDER BY c.colorder')) return false;
 		foreach ($columns as &$c) {
 			if ($omitSystemFields && (in_array($c['name'], $_josh['system_columns']))) continue;
 			if ($c['default']) $c['default'] = substr($c['default'], 1, strlen($c['default']) - 2); //stripping off first and last?
@@ -364,6 +364,7 @@ function db_field_type($result, $i) {
 function db_found($result) {
 	global $_josh;
 	if ($_josh['db']['pdo']) {
+		if (!is_object($result)) return 0;
 		return $result->rowCount();
 	} elseif ($_josh['db']['language'] == 'mysql') {
 		return @mysql_num_rows($result);
@@ -529,7 +530,8 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 			}
 		}
 	} elseif ($_josh['db']['language'] == 'mssql') {
-		if (extension_loaded('pdo_mssql')) {
+		if (extension_loaded('pdo_sqlsrv')) {
+			error_debug('<b>db_open</b> attempting to use pdo', __file__, __line__);
 			$_josh['db']['pdo'] = true;
 			try {
 				$_josh['db']['pointer'] = new PDO('sqlsrv:Server=' . $_josh['db']['location'] . ';Database=' . $_josh['db']['database'] . ';', $_josh['db']['username'], $_josh['db']['password']);
@@ -539,6 +541,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 				//todo error handle
 			}
 		} else {
+			error_debug('<b>db_open</b> attempting to use mssql_connect', __file__, __line__);
 			$_josh['db']['pdo'] = false;
 			$_josh['db']['pointer'] = @mssql_connect($_josh['db']['location'], $_josh['db']['username'], $_josh['db']['password']);
 			//mssql 2000 doesn't support utf8
