@@ -254,6 +254,10 @@ function db_column_type_set($table, $column, $newtype) {
 function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) {
 	global $_josh;
 	error_debug('<b>db_columns</b> running', __file__, __line__);
+
+	//check for cached columns
+	if (isset($_josh['columns'][$tablename])) return $_josh['columns'][$tablename];
+
 	if (!db_table_exists($tablename)) return false;
 	
 	$return = array();
@@ -292,6 +296,8 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 			$return[] = ($includeMetaData) ? $c : $c['name'];
 		}
 	}
+
+	$_josh['columns'][$tablename] = $return;
 	return $return;
 }
 
@@ -689,7 +695,7 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 			error_debug('<b>db_save</b> looking at column ' . $c['name'] . ', of type ' . $c['type'], __file__, __line__);
 			
 			//making bits always required, never null
-			if (($c['type'] == 'tinyint') || ($c['type'] == 'bit')) { //bit
+			if (($c['type'] == 'tinyint') || ($c['type'] == 'bit') || ($c['type'] == 'smallint')) { //bit
 				$value = format_boolean(empty($array[$c['name']]), '0|1');
 				if ($id) {
 					$query1[] = $c['name'] . ' = ' . $value;
@@ -832,18 +838,25 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 	}
 	
 	if ($id) {
+		//updating existing record
 		if (isset($array['created_user'])) $query1[] = 'created_user = ' .  $array['created_user']; //could be changing created_user (eg intranet)
-		$query1[] = 'updated_date = ' . ((isset($array['updated_date'])) ? '"' . $array['updated_date'] . '"' : db_date());
-		$query1[] = 'updated_user = ' . ((isset($array['updated_user'])) ? $array['updated_user'] : $userID);
-		//die('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id);
+		if (db_column_exists($table, 'updated_date')) $query1[] = 'updated_date = ' . ((isset($array['updated_date'])) ? '"' . $array['updated_date'] . '"' : db_date());
+		if (db_column_exists($table, 'updated_user')) $query1[] = 'updated_user = ' . ((isset($array['updated_user'])) ? $array['updated_user'] : $userID);
 		if (!db_query('UPDATE ' . $table . ' SET ' . implode(', ', $query1) . ' WHERE id = ' . $id)) return false;
 	} else {
-		$query1[] = 'created_date';
-		$query2[] = ((isset($array['created_date'])) ? '"' . $array['created_date'] . '"' : db_date());
-		$query1[] = 'created_user';
-		$query2[] = ((isset($array['created_user'])) ? $array['created_user'] : $userID);
-		$query1[] = 'is_active';
-		$query2[] = 1;
+		//adding new record
+		if (db_column_exists($table, 'created_date')) {
+			$query1[] = 'created_date';
+			$query2[] = ((isset($array['created_date'])) ? '"' . $array['created_date'] . '"' : db_date());
+		}
+		if (db_column_exists($table, 'created_user')) {
+			$query1[] = 'created_user';
+			$query2[] = ((isset($array['created_user'])) ? $array['created_user'] : $userID);
+		}
+		if (db_column_exists($table, 'is_active')) {
+			$query1[] = 'is_active';
+			$query2[] = 1;
+		}
 
 		//precedence
 		if (db_column_exists($table, 'precedence')) {
@@ -857,17 +870,9 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 			}
 		}
 
-
 		$query = 'INSERT INTO ' . $table . ' ( ' . implode(', ', $query1) . ' ) VALUES ( ' . implode(', ', $query2) . ' )';
 		$id = db_query($query);
 	}
-	
-	/* handle checkboxes based on foreign key situation, deprecated.  godaddy: SELECT command denied to user 
-	if ($keys = db_keys_to($table)) {
-		foreach ($keys as $key) {
-			db_checkboxes($key['ref_table'], $key['table_name'], $key['column_name'], $key['name'], $id);
-		}
-	} */
 	
 	//if possible, populate search indexes
 	if ($create_index && $full_text) db_words($full_text, $id, $table . '_to_words');
