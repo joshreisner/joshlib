@@ -1074,6 +1074,7 @@ function format_size_bytes($size) {
 }
 
 function format_ssn($str) {
+	$str = str_pad(format_numeric(str_replace('-', '', $str)), 9, '0', STR_PAD_LEFT);
 	return substr($str, 0, 3) . '-' . substr($str, 3, 2) . '-' . substr($str, 5, 4);
 }
 

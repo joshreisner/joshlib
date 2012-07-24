@@ -231,6 +231,9 @@ function db_column_type($datatype, $length=false, $decimals=false) {
 	//these have no explicit length
 	if (in_array($datatype, array('DATE', 'DATETIME', 'MEDIUMBLOB', 'LONGBLOB', 'TEXT'))) return $datatype;
 	
+	//mssql INT can have no length
+	if ((db_language() == 'mssql') && ($datatype == 'INT')) return $datatype;
+
 	//these do
 	if (!$length) {
 		$maxes = array('INT'=>11, 'DECIMAL'=>11, 'TINYINT'=>4, 'VARCHAR'=>255);
