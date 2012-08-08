@@ -378,8 +378,8 @@ function draw_form_checkboxes($name, $linking_table=false, $object_col=false, $o
 	}
 	$return = '<table cellspacing="0" class="checkboxes">';
 	while ($r = db_fetch($result)) {
-		$return .= '<tr><td>' . draw_form_checkbox('chk_' . $name . '_' . $r['id'], $r['checked']) . '</td>';
-		$return .= '<td>&nbsp;' . $r['value'] . '</td></tr>';
+		$return .= '<tr><td>' . draw_form_checkbox('chk-' . $name . '-' . $r['id'], $r['checked']) . '</td>';
+		$return .= '<td>&nbsp;<label for="' . 'chk-' . $name . '-' . $r['id'] . '">' . $r['value'] . '</label></td></tr>';
 	}
 	$return .= '</table>';
 	return $return;

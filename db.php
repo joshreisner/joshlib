@@ -88,6 +88,7 @@ function db_checkboxes($name, $linking_table, $object_col, $option_col, $object_
 	//for example db_checkboxes('doc', 'documents_to_categories', 'document_id', 'category_id', $id);
 	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $object_id);
 	$categories = array_checkboxes($name);
+	error_debug('<b>' . __function__ . '</b> for ' . $name . ' is ' . draw_array($categories), __file__, __line__);
 	foreach ($categories as $category_id) db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $object_id . ', ' . $category_id . ' )');
 }
 

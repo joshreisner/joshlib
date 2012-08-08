@@ -102,7 +102,7 @@ if (!function_exists('error_handle')) {
 		
 		//notify over api if specified
 		if (!empty($_josh['error_log_api'])) {
-			error_debug('attempting to send error message to API: ' . $_josh['error_log_api']);
+			error_debug('attempting to send error message to API: ' . $_josh['error_log_api'], __file__, __line__);
 			$array = array(
 				'title'=>$type,
 				'description'=>$message,

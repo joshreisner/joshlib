@@ -455,11 +455,11 @@ class form {
 			foreach ($cols as $c) {
 				if ($c['type'] == 'varchar') {
 					if ($c['name'] == 'password') {
-						$this->set_field(array('type'=>'password', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required'], 'maxlength'=>$c['length']));
+						$this->set_field(array('type'=>'password', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required'], 'maxlength'=>@$c['length']));
 					} elseif ($c['name'] == 'secret_key') {
 						//hide this field
 					} else {
-						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required'], 'maxlength'=>$c['length']));
+						$this->set_field(array('type'=>'text', 'name'=>$c['name'], 'additional'=>$c['comments'], 'required'=>$c['required'], 'maxlength'=>@$c['length']));
 					}
 				} elseif ($c['type'] == 'text') {
 					$this->set_field(array('type'=>'textarea', 'name'=>$c['name'], 'class'=>'tinymce'));
