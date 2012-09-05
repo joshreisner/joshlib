@@ -963,13 +963,8 @@ function draw_list_db($table_or_sql, $linkprefix='', $arguments=false, $type='ul
 
 function draw_list_sets($options, $length=2, $arguments=false, $type='ul', $selected=false) {
 	//return a list broken into sublists by the number of options, eg draw_list_sets with 2 is 
-	$sets = array();
-	$columns = ceil(count($options) / $length);
-	for ($i = 0; $i < $columns; $i++) {
-		$suboptions = array_slice($options, $i * $length, $length);
-		error_debug('drew list on ' . $i * $length . ' ' . $length . ' ' . count($suboptions), __file__, __line__);
-		$sets[] = draw_list($suboptions);
-	}
+	$sets = array_sets($options, $length);
+	foreach ($sets as &$s) $s = draw_list($s);
 	return draw_list($sets, $arguments, $type, $selected);
 }
 

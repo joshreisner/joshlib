@@ -376,6 +376,14 @@ function array_separated($content, $separator=',', $preserve_nulls=false) {
 	return $return;
 }
 
+function array_sets($items, $length=2) {
+	//split an array into an array of sub-arrays of $length length
+	$sets = array();
+	$count = ceil(count($items) / $length);
+	for ($i = 0; $i < $count; $i++) $sets[] = array_slice($items, $i * $length, $length);
+	return $sets;
+}
+
 function array_slice_assoc($array, $start=false, $length=false) {
 	//returns a subsection of an array, like array_slice, but works with associative arrays.  used in NBI and PSA
 	$keys = array_slice(array_keys($array), $start, $length);
