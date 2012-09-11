@@ -190,7 +190,6 @@
 
 //check to make sure we're on the correct domain, might have read host variable from config file
 	if (isset($_josh['host']) && ($_josh['host'] != $_josh['request']['host'])) {
-		die('dne');
 		url_change($_josh['request']['protocol'] . '://' . $_josh['host'] . $_josh['request']['path_query']);
 	}
 
