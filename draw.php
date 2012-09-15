@@ -414,7 +414,7 @@ function draw_form_date($namePrefix, $timestamp=false, $withTime=false, $class=f
 	$return = draw_div('date',
 		draw_form_select($namePrefix . 'Month', $months, $month, $required, $class) .
 		draw_form_select($namePrefix . 'Day', array_2d(array_range(1, 31)), $day, $required, $class) .
-		draw_form_select($namePrefix . 'Year', array_2d(array_range(1920, 2015)), $year, $required, $class)
+		draw_form_select($namePrefix . 'Year', array_2d(array_range($_josh['year'] - 90, $_josh['year'] + 10)), $year, $required, $class)
 	);
 	
 	if ($withTime) {
