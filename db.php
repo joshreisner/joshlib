@@ -137,7 +137,11 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			break;
 		
 			case 'checkbox': 
-			$datatype = 'tinyint';
+			if (db_language() == 'mssql') {
+				$datatype = 'bit';				
+			} else {
+				$datatype = 'tinyint';
+			}
 			$default = 'NOT NULL';
 			break;
 		
