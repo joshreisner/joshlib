@@ -747,6 +747,8 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	//$path can be relative
 	if (!$realpath = realpath($path)) $realpath = realpath(DIRECTORY_ROOT . $path);
 	
+	$filemtime = filemtime($realpath);
+
 	//get width and height
 	$image = @getimagesize($realpath);
 	if (!$image) return '';
@@ -784,6 +786,9 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 	
 	//fix slashes on windows
 	$arguments['src'] = str_replace('\\', '/', $arguments['src']);
+
+	//manage caching
+	$arguments['src'] .= '?' . $filemtime;
 	
 	//force alt text for w3 validation
 	if (empty($arguments['alt'])) {
