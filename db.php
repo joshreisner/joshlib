@@ -1088,10 +1088,10 @@ function db_undelete($table, $id=false) {
 	db_query('UPDATE ' . $table . ' SET deleted_date = NULL, deleted_user = NULL, updated_user = ' . user('NULL') . ', updated_date = NOW(), is_active = 1 WHERE id = ' . $id);
 }
 
-function db_updated($table='') {
+function db_updated($table='', $alias='updated') {
 	//$table generally means a disambuiguator, eg SELECT t.id or SELECT table_name.id
 	if (!empty($table)) $table .= '.';
-	return 'IFNULL(' . $table . 'updated_date, ' . $table . 'created_date) updated';
+	return 'IFNULL(' . $table . 'updated_date, ' . $table . 'created_date) ' . $alias;
 }
 
 function db_words($text, $object_id, $join_table='objects_to_words', $words_table='words') {

@@ -178,10 +178,12 @@ function format_date_rss($timestamp=false) {
 function format_date_sql($month, $day=false, $year=false, $hour=false, $minute=false, $second=false) {	
 	//format a date for sql
 
-	if (!$day) {
-		//new functionality; month could be a timestamp that needs to be converted a sql-ready date 
+	if (!$day || !$year) {
+		/* new functionality; month could be a timestamp that needs to be converted a sql-ready date 
+		update 9/25/12: since when can this accept a month and nothing else?  updating to return null for FSS
 		if (empty($month)) return 'NULL';
-		$date = strToTime($month);
+		$date = strToTime($month);*/
+		return 'NULL';
 	} elseif (!$hour) {
 		//restore old defaults
 		$hour = 0;
@@ -957,7 +959,8 @@ function format_post_date($str, $array=false) {
 			if ($hour != 12) $hour +=12;
 		}
 	}
-	error_debug('<b>format_post_date</b> for $str into mdyhms: $month, $day, $year, $hour, $minute, $second', __file__, __line__);
+
+	error_debug('<b>format_post_date</b> for ' . $str . ' into mdyhms: ' . $month . ', ' . $day . ', ' . $year . ', ' . $hour . ', ' . $minute . ', ' . $second, __file__, __line__);
 	return format_date_sql($month, $day, $year, $hour, $minute, $second);
 }
 
