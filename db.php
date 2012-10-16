@@ -142,7 +142,7 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			} else {
 				$datatype = 'tinyint';
 			}
-			$default = 'NOT NULL';
+			$default = 'NOT NULL DEFAULT 0';
 			break;
 		
 			case 'color': 
@@ -236,8 +236,8 @@ function db_column_type($datatype, $length=false, $decimals=false) {
 	//these have no explicit length
 	if (in_array($datatype, array('DATE', 'DATETIME', 'MEDIUMBLOB', 'LONGBLOB', 'TEXT'))) return $datatype;
 	
-	//mssql INT can have no length
-	if ((db_language() == 'mssql') && ($datatype == 'INT')) return $datatype;
+	//mssql INT and bit have no length
+	if ((db_language() == 'mssql') && in_array($datatype, array('INT', 'BIT'))) return $datatype;
 
 	//these do
 	if (!$length) {
@@ -1097,6 +1097,11 @@ function db_updated($table='', $alias='updated') {
 function db_words($text, $object_id, $join_table='objects_to_words', $words_table='words') {
 	//maintain an index of words for searching.  requires a words table and a linking table
 	global $_josh;
+
+	//quick patch for mssql (since it's not using db_table_create, and that isn't mssql-compliant anyway)
+	if (db_language() == 'mssql') {
+		if (!db_table_exists($words_table) || !db_table_exists($join_table)) return false;
+	}
 
 	//todo make part of db_table_create
 	if (!db_table_exists($words_table)) db_query('CREATE TABLE `' . $words_table . '` ( `id` int(11) NOT NULL AUTO_INCREMENT, `word` varchar(255) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');

@@ -700,7 +700,7 @@ function language_translate($string, $source, $target) {
 		
 		//new google translate uses different error messages
 		//if ($json['responseStatus'] != '200') error_handle('google translate bad result', 'the text string length was ' . strlen($c) . BR . BR . $c . BR . BR . '.  json was ' . $json . draw_array($json), __file__, __line__);
-
+		error_debug('<b>lanuage_translate</b> json response was ' . draw_array($json), __file__, __line__);
 		$string .= $json['data']['translations'][0]['translatedText'];
 	}
 	return format_quotes($string);
