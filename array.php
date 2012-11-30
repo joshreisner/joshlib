@@ -434,7 +434,7 @@ function array_to_lower($array) {
 }
 
 function array_twitter($handle) {
-	if (!$xml = array_rss('https://twitter.com/statuses/user_timeline/' . $handle . '.rss')) return false;
+	if (!$xml = array_rss('https://api.twitter.com/1/statuses/user_timeline.rss?screen_name=' . $handle)) return false;
 
 	if (!isset($xml['channel'])) return false;
 
