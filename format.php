@@ -1167,6 +1167,8 @@ function format_thumbnail_pdf($source, $width=false, $height=false) {
 	
 	file_put($source_name, $source);
 	
+	if (empty($_josh['path_imagemagick'])) $_josh['path_imagemagick'] = '';
+	
 	exec($_josh['path_imagemagick'] . 'convert ' . DIRECTORY_ROOT . $source_name . '[0] ' . DIRECTORY_ROOT . $target_name);
 		
 	if ($source = file_get($target_name)) {
@@ -1174,7 +1176,7 @@ function format_thumbnail_pdf($source, $width=false, $height=false) {
 		if ($width || $height) $source = format_image_resize($source, $width, $height);
 	} else {
 		//did not work
-		error_handle('ImageMagick Not Installed', __function__ . ' requires the ' . draw_link('http://www.imagemagick.org/', 'ImageMagick PHP library') . ' to work on the command line.  Please install it and try again.  ', __file__, __line__);
+		error_handle('ImageMagick Not Installed', __function__ . ' requires the ' . draw_link('http://www.imagemagick.org/', 'ImageMagick PHP library') . ' to work on the command line.  Please install it and try again.  On a Mac, consider installing imagemagick and ghostscript via MacPorts.', __file__, __line__);
 	}
 	
 	//clean up
