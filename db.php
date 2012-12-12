@@ -928,7 +928,11 @@ function db_switch($target=false) {
 	if ($_josh['db']['language'] == 'mssql') {
 		mssql_select_db($target, $_josh['db']['pointer']);
 	} elseif ($_josh['db']['language'] == 'mysql') {
-		if (!mysql_select_db($target, $_josh['db']['pointer'])) $_josh['db']['pointer'] = false;
+		if ($_josh['db']['pdo']) {
+			db_query('USE ' . $target);
+		} else {
+			if (!mysql_select_db($target, $_josh['db']['pointer'])) $_josh['db']['pointer'] = false;
+		}
 	}
 	$_josh['db']['switched'] = ($target == $_josh['db']['database']) ? false : true;
 }
