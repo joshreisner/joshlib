@@ -6,7 +6,7 @@ potentially just need to add http.php
 error_debug('including url.php', __file__, __line__);
 
 function url($string) {
-	//boolean test whether string is URL
+	//boolean test whether string is valid URL
 	//todo make robust
 	return (substr($string, 0, 4) == 'http');
 }
@@ -341,6 +341,41 @@ function url_sanswww($url=false) {
 function url_subfolder($empty=false) {
 	global $_josh;
 	return (empty($_josh['request']['subfolder'])) ? $empty : $_josh['request']['subfolder'];
+}
+
+function url_thumbnail($url, $width=300, $output=false) {
+	//return (or output) a thumbnail of the specified $url using the thumbalizr api
+	//authored Jan 17, 2013 for Brad Ascalon (included in BB Login)
+	global $_josh;
+	
+	if (empty($_josh['thumbalizr']['api_key'])) error_handle('Thumbalizr Key Needed', 'Please go to ' . draw_link('http://www.thumbalizr.com/', 'Thumbalizr') . ' and sign up for an api key and enter it in your config as $_josh[\'thumbalizr\'][\'api_key\'].', __function__, __line__);
+	
+	//get img from thumbalizr
+	$img = file_get_contents('http://api.thumbalizr.com/?api_key=' . $_josh['thumbalizr']['api_key'] . '&quality=90&width=' . $width . '&encoding=jpg&delay=8&mode=screen&bwidth=1280&bheight=1024&url=' . $url);
+	
+	//get headers
+	$headers='';
+	foreach ($http_response_header as $tmp) {
+ 		if (strpos($tmp,'X-Thumbalizr-') !== false) { 
+ 			$tmp1 = explode('X-Thumbalizr-', $tmp);
+ 			$tmp2 = explode(': ', $tmp1[1]);
+ 			$headers[$tmp2[0]] = $tmp2[1]; 
+ 		}
+	}	
+	//die(draw_array($headers));
+
+	//output
+	if ($headers['Status'] != 'OK') {
+		error_handle('Thumbalizr Fail', 'An image could not be generated from URL: ' . $url, __function__, __line__);
+		return false;
+	}
+		
+	if (!$output) return $img;
+	
+	//output as image
+	header('Content-type: image/jpeg');
+	foreach($headers as $key=>$value) header('X-Thumbalizr-'. $key . ': ' . $value);
+	echo $img;
 }
 
 function url_tld($empty=false) {
