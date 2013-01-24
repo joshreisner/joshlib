@@ -285,7 +285,8 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 			$return[] = ($includeMetaData) ? compact('name','type','required','auto','default','comments','length','decimals') : $name;
 		}
 	} else {
-		if (!$columns = db_table('SELECT 
+		//echo db_grab('SELECT SERVERPROPERTY("productversion")');	
+		/*if (!$columns = db_table('SELECT 
 					c.name, 
 					t.name type, 
 					CASE WHEN c.isnullable = 0 THEN 1 ELSE 0 END required, 
@@ -297,7 +298,16 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 				LEFT JOIN syscomments m on c.cdefault = m.id
 				LEFT JOIN sysproperties s ON c.colid = s.smallid
 				WHERE o.name = "' . $tablename . '"
-				ORDER BY c.colorder')) return false;
+				ORDER BY c.colorder')) return false;*/
+		if (!$columns = db_table('SELECT 
+					column_name name, 
+					data_type type, 
+					CASE WHEN is_nullable = "NO" THEN 1 ELSE 0 END required, 
+					column_default [default],
+					"" comments
+				FROM INFORMATION_SCHEMA.COLUMNS
+				WHERE table_name = "' . $tablename . '"
+				ORDER BY ordinal_position')) return false;
 		foreach ($columns as &$c) {
 			if ($omitSystemFields && (in_array($c['name'], $_josh['system_columns']))) continue;
 			if ($c['default']) $c['default'] = substr($c['default'], 1, strlen($c['default']) - 2); //stripping off first and last?
