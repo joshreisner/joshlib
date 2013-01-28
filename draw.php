@@ -804,7 +804,7 @@ function draw_img($path, $link=false, $alt=false, $name=false, $linknewwindow=fa
 
 function draw_img_random($folder, $link=false, $class=false) {
 	//tweak for godaddy, DIRECTORY_ROOT is sometimes inconsistent
-	$file = array_random(file_folder('/images/random/', 'jpg,jpeg,gif,png'));
+	$file = array_random(file_folder($folder, 'jpg,jpeg,gif,png'));
 	return draw_img($folder . $file['name']);
 }
 
