@@ -213,6 +213,9 @@ function url_parse($url) {
 	//clean out directory index when possible
 	if ($remainder = format_text_ends(DIRECTORY_INDEX, $return['path'])) $return['path'] = $remainder;
 	
+	//fix request for situations where you're doing folder.php to represent /folder/
+	if ($_SERVER['PHP_SELF'] == $return['path'] . '/') $return['path'] = str_replace('.php', '/', $return['path']);
+	
 	//get folder, subfolder, subsubfolder (there must be a smoother way)
 	$urlparts = explode('/', $return['path']);
 	$urlcount = count($urlparts);
@@ -230,7 +233,7 @@ function url_parse($url) {
 		//special GET for mod_rewrite pages -- id == 13 if http://foo.com/bar/13
 		$return['id'] = (format_check($urlparts[$urlcount-1])) ? $urlparts[$urlcount-1] : false;
 	}
-
+	
 	//add query string to path_query
 	$return['path_query']	= $return['path'];
 	if (isset($return['query'])) {
@@ -261,6 +264,8 @@ function url_parse($url) {
 		error_debug('<b>url_parse</b> is returning ' . draw_array($return), __file__, __line__);
 	}
 	
+	//die(draw_array($return));
+
 	return $return;
 }
 
@@ -366,7 +371,7 @@ function url_thumbnail($url, $width=300, $output=false) {
 
 	//output
 	if ($headers['Status'] != 'OK') {
-		error_handle('Thumbalizr Fail', 'An image could not be generated from URL: ' . $url, __function__, __line__);
+		error_handle('Thumbalizr Fail', 'An image could not be generated from URL: ' . $url . draw_array($headers), __function__, __line__);
 		return false;
 	}
 		
