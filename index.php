@@ -227,7 +227,15 @@
 		}
 	}
 	$_josh['posting']	= !empty($_POST);
-	if ($_josh['posting']) foreach($_POST as $key=>$value) $_POST[$key] = format_quotes(str_replace('& ', '&amp; ', $value));
+	
+	//basic string sanitizing
+	if ($_josh['posting']) {
+		foreach($_POST as $key=>$value) {
+			if (is_string($_POST[$key])) { //per michael
+				$_POST[$key] = format_quotes(str_replace('& ', '&amp; ', $value));				
+			}
+		}
+	}
 	
 	$_josh['editing']	= url_id(); //necessary?
 	
