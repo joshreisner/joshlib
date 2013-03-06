@@ -35,7 +35,7 @@
 	$_josh['drawn']					= array();	//array for including javascript only once, eg $_josh['drawn']['tinymce'] = true;
 
 //template paths
-  $_josh['haml_path'] = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
+	$_josh['haml_path'] = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
   
 //ignore these words when making search indexes | todo make this local to search function
 	$_josh['ignored_words']			= array('1','2','3','4','5','6','7','8','9','0','about','after','all','also','an','and','another','any','are',
