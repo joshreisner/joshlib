@@ -194,7 +194,7 @@ function format_date_sql($month, $day=false, $year=false, $hour=false, $minute=f
 		$date = mktime($hour, $minute, $second, $month, $day, $year);
 	}
 	
-	return '"' . date('Y-m-d H:i:00', $date) . '"';
+	return '\'' . date('Y-m-d H:i:00', $date) . '\'';
 }
 
 function format_date_time($timestamp=false, $error='', $separator=' ', $suppressMidnight=true, $relativetime=true) {

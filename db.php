@@ -559,6 +559,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 			$_josh['db']['pdo'] = true;
 			try {
 				$_josh['db']['pointer'] = new PDO('sqlsrv:Server=' . $_josh['db']['location'] . ';Database=' . $_josh['db']['database'] . ';', $_josh['db']['username'], $_josh['db']['password']);
+				$_josh['db']['pointer']->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );  
 			} catch (PDOException $e) {
 				print 'Error!:' . $e->getMessage() . '<br>';
 				die();
