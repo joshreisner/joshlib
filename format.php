@@ -679,12 +679,14 @@ function format_image($path, $type=false) {
 	$target_name = DIRECTORY_WRITE . '/temp-target.jpg';
 	
 	$imagick = exec('which convert');
-
+	if (empty($imagick)) $imagick = '/usr/local/bin/convert'; //not able to get correct path on my mac now
+	
 	if (($type == 'jpg') || ($type == 'jpeg')) {
 		return $file;
 	} elseif (($type == 'gif') || ($type == 'png')) {
 		//convert
-		exec($imagick . ' ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name);
+		$cmd = $imagick . ' ' . realpath($path) . ' ' . DIRECTORY_ROOT . $target_name;
+		exec($cmd);
 	} elseif ($type == 'pdf') {
 		//return a screenshot of the first page
 		exec($imagick . ' ' . realpath($path) . '[0] ' . DIRECTORY_ROOT . $target_name);
