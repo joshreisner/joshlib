@@ -62,6 +62,8 @@ if (!function_exists('error_handle')) {
 		global $_josh;
 		error_debug('ERROR! type is:' . $type . ' and message is: ' . $message, __file__, __line__);
 		
+		$originalmessage = $message; //preserve for later (todo: refactor)
+		
 		//possiblity this var isn't set yet
 		if (!isset($_josh['mode']))			$_josh['mode'] = 'live';
 		
@@ -94,6 +96,32 @@ if (!function_exists('error_handle')) {
 		}
 		$message .= draw_list($backtrace, array('style'=>'border-top:1px solid #ddd;padding:10px 0 0 20px;'), 'ol');
 		
+		//record error if file location is specified
+		if (!empty($_josh['error_log_file'])) {
+			if (file_exists(DIRECTORY_ROOT . $_josh['error_log_file'])) {
+				$errors = array_csv(file_get($_josh['error_log_file']), TAB);
+			} else {
+				$errors = array();
+			}
+			
+			//get backtrace again because it got messed up earlier
+			$backtrace = array_pop(debug_backtrace());
+
+			$errors[] = array(
+				'timestamp'=>time(), 
+				'title'=>$type, 
+				'description'=>$originalmessage, 
+				'user'=>@$_SESSION['full_name'], 
+				'url'=>$_josh['request']['url'], 
+				'referrer'=>$_josh['referrer']['url'], 
+				'file'=>str_replace(DIRECTORY_ROOT, '', $backtrace['file']), 
+				'line'=>$backtrace['line']
+			);
+			
+			//die(draw_table($errors, false, true));
+			file_put($_josh['error_log_file'], file_csv($errors));
+		}
+
 		//notify in your face if dev
 		if ($_josh['mode'] != 'live') {
 			echo error_draw($type, $message);

@@ -104,7 +104,7 @@ function array_csv($content, $delimiter=',', $optional_fields=false) {
 	//makes an associative array out of a delimited file, assumes first line is header
 	
 	//set up header
-	$rows	= array_separated($content, "\r", true);
+	$rows	= array_separated(trim($content), NEWLINE);
 	$cols	= explode($delimiter, array_shift($rows));
 	error_debug(count($rows) . ' rows and ' . count($cols) . ' cols found in content', __file__, __line__);
 	foreach ($cols as &$c) $c = format_text_code($c);

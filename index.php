@@ -171,6 +171,7 @@
 	if (!isset($_josh['email_admin']))		$_josh['email_admin']		= false;
 	if (!isset($_josh['email_default']))	$_josh['email_default']		= ((empty($_josh['request']['subdomain'])) ? 'www' : $_josh['request']['subdomain']) . '@' . $_josh['request']['domain'];
 	if (!isset($_josh['error_log_api']))	$_josh['error_log_api']		= false;
+	if (!isset($_josh['error_log_file']))	$_josh['error_log_file']	= false;
 		
 //establish write directory
 	if (!defined('DIRECTORY_WRITE')) define('DIRECTORY_WRITE', '/_' . $_josh['request']['sanswww']);
