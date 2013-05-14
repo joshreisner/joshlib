@@ -110,7 +110,7 @@ if (!function_exists('error_handle')) {
 			$errors[] = array(
 				'timestamp'=>time(), 
 				'title'=>$type, 
-				'description'=>$originalmessage, 
+				'description'=>str_replace(TAB, ' ', $originalmessage), 
 				'user'=>@$_SESSION['full_name'], 
 				'url'=>$_josh['request']['url'], 
 				'referrer'=>$_josh['referrer']['url'], 
