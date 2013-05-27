@@ -302,11 +302,11 @@ function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) 
 		if (!$columns = db_table('SELECT 
 					column_name name, 
 					data_type type, 
-					CASE WHEN is_nullable = "NO" THEN 1 ELSE 0 END required, 
+					CASE WHEN is_nullable = \'NO\' THEN 1 ELSE 0 END required, 
 					column_default [default],
-					"" comments
+					\'\' comments
 				FROM INFORMATION_SCHEMA.COLUMNS
-				WHERE table_name = "' . $tablename . '"
+				WHERE table_name = \'' . $tablename . '\'
 				ORDER BY ordinal_position')) return false;
 		foreach ($columns as &$c) {
 			if ($omitSystemFields && (in_array($c['name'], $_josh['system_columns']))) continue;
