@@ -557,8 +557,9 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 		if (extension_loaded('pdo_sqlsrv')) {
 			error_debug('<b>db_open</b> attempting to use pdo', __file__, __line__);
 			$_josh['db']['pdo'] = true;
+			$_josh['db']['encrypt'] = (empty($_josh['db']['encrypt'])) ? '' : ';Encrypt=1';
 			try {
-				$_josh['db']['pointer'] = new PDO('sqlsrv:Server=' . $_josh['db']['location'] . ';Database=' . $_josh['db']['database'] . ';', $_josh['db']['username'], $_josh['db']['password']);
+				$_josh['db']['pointer'] = new PDO('sqlsrv:Server=' . $_josh['db']['location'] . ';Database=' . $_josh['db']['database'] . $_josh['db']['encrypt'] . ';', $_josh['db']['username'], $_josh['db']['password']);
 				$_josh['db']['pointer']->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );  
 			} catch (PDOException $e) {
 				print 'Error!:' . $e->getMessage() . '<br>';
