@@ -89,7 +89,10 @@ function db_checkboxes($name, $linking_table, $object_col, $option_col, $object_
 	db_query('DELETE FROM ' . $linking_table . ' WHERE ' . $object_col . ' = ' . $object_id);
 	$categories = array_checkboxes($name);
 	error_debug('<b>' . __function__ . '</b> for ' . $name . ' is ' . draw_array($categories), __file__, __line__);
-	foreach ($categories as $category_id) db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $object_id . ', ' . $category_id . ' )');
+	foreach ($categories as $category_id) {
+		db_save($linking_table, false, array($object_col=>$object_id, $option_col=>$category_id));
+		//db_query('INSERT INTO ' . $linking_table . ' ( ' . $object_col . ', ' . $option_col . ' ) VALUES ( ' . $object_id . ', ' . $category_id . ' )');
+	}
 }
 
 function db_close($keepalive=false) { //close connection and quit
