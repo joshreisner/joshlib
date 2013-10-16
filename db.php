@@ -981,12 +981,12 @@ function db_table_create($tablename, $fields=false) {
 		  `created_user` int(11) DEFAULT NULL,
 		  `publish_date` datetime DEFAULT NULL,
 		  `publish_user` int(11) DEFAULT NULL,
-		  `is_published` tinyint(4) NOT NULL,
+		  `is_published` tinyint(4) NOT NULL DEFAULT 1,
 		  `updated_date` datetime DEFAULT NULL,
 		  `updated_user` int(11) DEFAULT NULL,
 		  `deleted_date` datetime DEFAULT NULL,
 		  `deleted_user` int(11) DEFAULT NULL,
-		  `is_active` tinyint(4) NOT NULL,
+		  `is_active` tinyint(4) NOT NULL DEFAULT 1,
 		  `precedence` int(11) DEFAULT NULL,
 		  PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;')) return $tablename;
 	
