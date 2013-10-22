@@ -1,6 +1,5 @@
 <?php
 //a collection of functions that facilitate interactions with the database
-//code needs review 
 
 error_debug('including db.php', __file__, __line__);
 
@@ -542,9 +541,7 @@ function db_open($location=false, $username=false, $password=false, $database=fa
 				$_josh['db']['pointer'] = new PDO('mysql:host=' . $_josh['db']['location'] . ';dbname=' . $_josh['db']['database'] . ';', $_josh['db']['username'], $_josh['db']['password'], array(PDO::MYSQL_ATTR_INIT_COMMAND=>'SET NAMES utf8'));
 				$_josh['db']['pointer']->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );  
 			} catch (PDOException $e) {
-				print 'Error!:' . $e->getMessage() . '<br>';
-				die();
-				//todo error handle
+				error_handle('Database Error', $e->getMessage(), __file__, __line__);
 			}
 		} else {
 			$_josh['db']['pdo'] = false;
