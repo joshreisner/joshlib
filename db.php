@@ -190,6 +190,10 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			$datatype = 'text';
 			break;
 			
+			case 'time': 
+			$datatype = 'time';
+			break;
+			
 			case 'email': 
 			case 'latlon': 
 			case 'text': 
@@ -236,7 +240,7 @@ function db_column_type($datatype, $length=false, $decimals=false) {
 	$datatype = strToUpper($datatype);
 	
 	//these have no explicit length
-	if (in_array($datatype, array('DATE', 'DATETIME', 'MEDIUMBLOB', 'LONGBLOB', 'TEXT'))) return $datatype;
+	if (in_array($datatype, array('DATE', 'DATETIME', 'MEDIUMBLOB', 'LONGBLOB', 'TEXT', 'TIME'))) return $datatype;
 	
 	//mssql INT and bit have no length
 	if ((db_language() == 'mssql') && in_array($datatype, array('INT', 'BIT'))) return $datatype;
@@ -767,6 +771,17 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 						}
 					} else {
 						$value = '"' . format_date($array[$c['name']], '', 'sql') . '"';
+					}
+				} elseif ($c['type'] == 'time') {
+					//new time field
+					if (empty($array[$c['name']])) {
+						if (!$c['required']) {
+							$value = 'NULL';
+						} else {
+							error_handle('required value', $c['name'] . ' is required', __file__, __line__);
+						}
+					} else {
+						$value = '"' . $array[$c['name']] . '"';
 					}
 				} else {
 					error_handle('unhandled data type', 'db_save hasn\'t been programmed yet to handle ' . $c['type'], __file__, __line__);

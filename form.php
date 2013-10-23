@@ -322,6 +322,13 @@ class form {
 						$return .= $value;
 					}
 					break;
+				case 'time':
+					if ($allow_changes) {
+						$return .= html::input('time', $name, $value);
+					} else {
+						$return .= format_time($value);
+					}
+					break;
 			}
 						
 			//wrap it up

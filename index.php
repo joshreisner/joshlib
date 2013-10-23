@@ -70,6 +70,7 @@
 										'typeahead'=>'Text (Typeahead)',
 										'textarea'=>'Textarea',
 										'textarea-plain'=>'Textarea (Plain)',
+										'time'=>'Time',
 										'url'=>'URL',
 										'url-local'=>'URL (local)'
 									);
