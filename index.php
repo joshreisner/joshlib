@@ -22,6 +22,7 @@
 	$_josh['date']['format']		= '%b %d, %Y'; //default date Oct 06, 2010 http://php.net/manual/en/function.strftime.php
 	$_josh['date']['strings']		= array('Yesterday', 'Today', 'Tomorrow');
 	$_josh['error_mode_html']		= true; //show errors in html (set to false for ajax or cli)
+	$_josh['tinymce_css']			= '/css/tinymce.css';
 	
 //constants
 	define('BR', '<br/>');
@@ -775,7 +776,7 @@ function lib_get($string) {
 					$("textarea.tinymce").each(function(){
 						$(this).tinymce({
 							// Location of TinyMCE script
-							content_css : "/css/tinymce.css?" + new Date().getTime(),
+							content_css : "' . $_josh['tinymce_css'] . '?" + new Date().getTime(),
 							custom_shortcuts : 0,
 							extended_valid_elements : "a[href|target|rel|name|class],caption,dd[class],dl[class],dt[class],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],iframe[src|width|height|frameborder|webkitAllowFullScreen|allowFullScreen],font[face|size|color|style],span[align|class|style],p[align|class],strike,table[cellspacing|align|border|cellpadding|class],tbody,td[align|class|colspan],th[class],tr[class],u",
 							plugins : "' . (($tinymce_mode == 'advanced') ? 'imagemanager,filemanager,' : '') . 'paste,legacyoutput",
