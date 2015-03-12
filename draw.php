@@ -697,23 +697,43 @@ function draw_google_tracker($id) {
 	return draw_google_analytics($id);
 }
 
-function draw_haml($template, $layout='layout', $path=false) {
+// usage is generally going to be include(draw_haml('page')); so that scope
+// is preserved
+// it's also possible to draw_haml('page', false) to render just a single template
+function draw_haml($template, $compile_only=true, $layout='layout', $path=false) {
   global $_josh;
   lib_get('phamlp');
   file_dir_writable('haml');
 
-  $haml = new HamlParser();
-  
+  $haml = new HamlParser();  
   $compiled_path = DIRECTORY_ROOT . DIRECTORY_WRITE . '/haml/';
   if(!$path) $path = $_josh['haml_path'];
-
-  $layout = $haml->parse($path . "$layout.haml");
-  $haml = str_replace('<?php echo draw_yield(); ?>', $haml->parse($path . "$template.haml"), $layout);
-  file_put($compiled_path . "/_$template.php", $haml);
-
-  ob_start();
-  include($compiled_path . "_$template.php");
-  return ob_get_clean();
+  
+  // we collect last mod times and existence for files
+  $layout_mtime = 0;
+          $exists = file_exists($compiled_path . "/_$template.php");
+  if($exists) $compiled_mtime = filemtime($compiled_path . "/_$template.php");
+  if($layout) $layout_mtime = filemtime($path . "$layout.haml");
+  $template_mtime = filemtime($path . "$template.haml");
+  
+  // don't recompile if nothing has changed
+  if(!$exists || $layout_mtime > $compiled_mtime || $template_mtime > $compiled_mtime) {
+    if($layout) {
+      $layout = $haml->parse($path . "$layout.haml");
+      $result = str_replace('<?php echo draw_yield(); ?>', $haml->parse($path . "$template.haml"), $layout);
+    } else {
+      $result = $haml->parse($path . "$template.haml");
+    }
+    file_put($compiled_path . "/_$template.php", $result);
+  }
+  
+  if(!$compile_only) {
+    ob_start();
+    include($compiled_path . "_$template.php");
+    return ob_get_clean();
+  }
+  
+  return $compiled_path . "_$template.php";
 }
 
 function draw_h1($content, $arguments=false) {
