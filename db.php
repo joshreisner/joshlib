@@ -267,7 +267,7 @@ function db_column_type_set($table, $column, $newtype) {
 
 function db_columns($tablename, $omitSystemFields=false, $includeMetaData=true) {
 	global $_josh;
-	error_debug('<b>db_columns</b> running', __file__, __line__);
+	error_debug('<b>db_columns</b> running for ' . $tablename, __file__, __line__);
 
 	//check for cached columns
 	if (isset($_josh['columns'][$tablename])) return $_josh['columns'][$tablename];
@@ -631,6 +631,7 @@ function db_pwdencrypt($string) {
 
 function db_query($sql, $limit=false, $suppress_error=false) {
 	global $_josh;
+	error_debug('about to run ' . $sql, __file__, __line__);
 	db_open();
 
 	$query = trim($sql);
@@ -1084,17 +1085,17 @@ function db_table_rename($before, $after) {
 
 function db_tables() {
 	global $_josh;
+	if (isset($_josh['tables'][$_josh['db']['database']])) return $_josh['tables'][$_josh['db']['database']];
 	if (db_language() == 'mssql') {
 		$tables = db_table('sp_tables @table_type = "\'TABLE\'"');
 		foreach ($tables as &$t) $t = $t['TABLE_NAME'];
-		sort($tables);
-		return $tables;
 	} elseif (db_language() == 'mysql') {
-		$tables = db_table('SHOW TABLES FROM ' . $_josh['db']['database']);
+		$tables = db_table('SHOW TABLES FROM `' . $_josh['db']['database'] . '`');
 		foreach ($tables as &$t) $t = strToLower($t['Tables_in_' . $_josh['db']['database']]);
-		sort($tables);
-		return $tables;
 	}
+	sort($tables);
+	$_josh['tables'][$_josh['db']['database']] = $tables;
+	return $tables;
 }
 
 function db_translate($sql, $from, $to) {
