@@ -126,7 +126,6 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 	//$datatype is an actual SQL datatype
 	
 	if (db_column_exists($table, $column)) return false;
-
 	$length = $decimals = false;
 	$default = 'DEFAULT NULL';
 		
@@ -197,6 +196,7 @@ function db_column_add($table, $column, $type=false, $datatype=false) {
 			case 'email': 
 			case 'latlon': 
 			case 'text': 
+			case 'token': 
 			case 'url': 
 			case 'url-local': 
 			$datatype = 'varchar';
@@ -218,6 +218,7 @@ function db_column_drop($table, $column) {
 function db_column_exists($table, $column) {
 	//return column array info if exists
 	$columns = db_columns($table);
+	if (!is_array($columns)) return false;
 	foreach ($columns as $c) if ($c['name'] == $column) return $c;
 	return false;
 }

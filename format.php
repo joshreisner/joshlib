@@ -1040,6 +1040,16 @@ function format_quotes($string, $reverse=false) {
 	return $string;
 }
 
+function format_random($length=40) {
+	$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	$charactersLength = strlen($characters) - 1;
+	$return = '';
+	for ($i = 0; $i < $length; $i++) {
+	    $return .= $characters[rand(0, $charactersLength)];
+	}
+	return $return;
+}
+
 function format_singular($string) {
 	if (format_text_ends('ies', $string)) {
 		return substr($string, 0, $string-3) . 'y';

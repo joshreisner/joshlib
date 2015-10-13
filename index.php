@@ -68,6 +68,7 @@
 										'int'=>'Integer',
 										'latlon'=>'Lat/Lon Coords',
 										'text'=>'Text',
+										'token'=>'Token',
 										'typeahead'=>'Text (Typeahead)',
 										'textarea'=>'Textarea',
 										'textarea-plain'=>'Textarea (Plain)',
