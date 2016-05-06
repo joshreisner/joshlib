@@ -1040,6 +1040,10 @@ function format_quotes($string, $reverse=false) {
 	return $string;
 }
 
+function format_quotes_remove($string) {
+	return str_replace('"', '', str_replace("'", '', $string));
+}
+
 function format_random($length=40) {
 	$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	$charactersLength = strlen($characters) - 1;

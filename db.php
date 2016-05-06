@@ -688,7 +688,7 @@ function db_query($sql, $limit=false, $suppress_error=false) {
 
 }
 
-function db_save($table, $id='get', $array='post', $create_index=true) {
+function db_save($table, $id='get', $array='post') {
 	global $_josh;
 		
 	//default behavior is to use $_GET['id'] as the id number to deal with
@@ -911,9 +911,6 @@ function db_save($table, $id='get', $array='post', $create_index=true) {
 		$id = db_query($query);
 	}
 	
-	//if possible, populate search indexes
-	if ($create_index && $full_text) db_words($full_text, $id, $table . '_to_words');
-	
 	return $id;
 }
 
@@ -1125,59 +1122,4 @@ function db_updated($table='', $alias='updated') {
 	//$table generally means a disambuiguator, eg SELECT t.id or SELECT table_name.id
 	if (!empty($table)) $table .= '.';
 	return 'IFNULL(' . $table . 'updated_date, ' . $table . 'created_date) ' . $alias;
-}
-
-function db_words($text, $object_id, $join_table='objects_to_words', $words_table='words') {
-	//maintain an index of words for searching.  requires a words table and a linking table
-	global $_josh;
-
-	//quick patch for mssql (since it's not using db_table_create, and that isn't mssql-compliant anyway)
-	if (db_language() == 'mssql') {
-		if (!db_table_exists($words_table) || !db_table_exists($join_table)) return false;
-	}
-
-	//todo make part of db_table_create
-	if (!db_table_exists($words_table)) db_query('CREATE TABLE `' . $words_table . '` ( `id` int(11) NOT NULL AUTO_INCREMENT, `word` varchar(255) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
-	if (!db_table_exists($join_table)) db_query('CREATE TABLE `' . $join_table . '` ( `object_id` int(11) NOT NULL, `word_id` int(11) NOT NULL, `count` int(11) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
-	
-	//todo need to fix usage of split here
-	$words = array_diff(@split('[^[:alpha:]]+', strtolower(format_accents_remove(strip_tags($text)))), $_josh['ignored_words']);
-	
-	$words_unique = array_unique($words);
-	//die(draw_array($words) . '<hr><pre>' . $text . '</pre>');
-
-	db_query('DELETE FROM ' . $join_table . ' WHERE object_id = ' . $object_id);
-	foreach ($words_unique as $word) {
-		if (!$word_id = db_grab('SELECT id FROM ' . $words_table . ' WHERE word = "' . $word . '"')) $word_id = db_query('INSERT INTO ' . $words_table . ' ( word ) VALUES ( "' . $word . '" )');
-		db_query('INSERT INTO ' . $join_table . ' ( word_id, object_id, count ) VALUES ( ' . $word_id . ', ' . $object_id . ', ' . array_instances($words, $word) . ' )');
-	}
-}
-
-function db_words_refresh($specific_tables=false, $words_table='words') {
-	
-	if ($specific_tables) $specific_tables = array_separated($specific_tables);
-
-	//refresh indexes for whole database
-	$tables = db_tables();
-	foreach ($tables as $t) {
-		if ($t == $words_table) continue;
-		if ($specific_tables && !in_array($t, $specific_tables)) continue;
-		$columns = db_columns($t);
-		$text_cols = array();
-		$id_present = false;
-		foreach ($columns as $c) {
-			if (($c['name'] == 'id') && ($c['type'] == 'int')) $id_present = true;
-			if ((($c['type'] == 'varchar') || ($c['type'] == 'text')) && ($c['name'] != 'url') && ($c['name'] != 'password')) $text_cols[] = $t . '.' . $c['name'];
-		}
-		if ($id_present && count($text_cols)) {
-			echo implode(', ', $text_cols) . BR;
-			if (count($text_cols) > 1) {
-				$values = db_table('SELECT id, CONCAT_WS(" ", ' . implode(', ', $text_cols) . ') text FROM ' . $t);
-			} else {
-				$values = db_table('SELECT id, ' . $text_cols[0] . ' text FROM ' . $t);
-			}
-			foreach ($values as $v) db_words($v['text'], $v['id'], $t . '_to_words', $words_table);
-		}
-	}
-	exit;
 }

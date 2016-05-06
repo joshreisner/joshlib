@@ -207,7 +207,7 @@ function array_insert_assoc($array, $position, $key, $value) {
 }
 
 function array_instances($array, $needle) {
-	//returns a count of all the instances of needle in array.  used by db_words()
+	//returns a count of all the instances of needle in array
 	$count = 0;
 	foreach ($array as $value) if ($needle == $value) $count++;
 	return $count;

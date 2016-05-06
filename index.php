@@ -352,9 +352,6 @@
 			case 'debug':
 				debug();
 				break;
-			case 'indexes':
-				db_words_refresh();
-				break;
 			case 'flushcache':
 				cache_clear();
 				echo 'caches cleared';

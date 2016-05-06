@@ -168,7 +168,7 @@ function url_parse($url) {
 	error_debug('<b>url_parse</b> running for  ' . $url, __file__, __line__);
 
 	//quotes don't belong in URLs
-	$url = str_replace('"', '', str_replace("'", '', $url));
+	$url = format_quotes_remove($url);
 
 	//add protocol if missing.  todo add substr
 	if (!strstr($url, 'http://') && !strstr($url, 'https://')) $url = 'http://' . $url; 
