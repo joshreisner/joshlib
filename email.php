@@ -48,7 +48,7 @@ function email($to, $message, $subject='Email from Your Website', $from=false, $
 	
 	//debug();
 	$failures = array();
-	$count = $mailer->batchSend($message, $failures);
+	$count = $mailer->send($message, $failures);
 	if (!empty($failures)) error_handle('email failures', __function__ . ' succeeded for ' . $count . ' and failed for the following addresses' . draw_array($failures), __file__, __line__);
 	error_debug(__function__ . ' sent ' . $count . ' messages successfully', __file__, __line__);
 	
