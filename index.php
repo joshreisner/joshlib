@@ -110,7 +110,7 @@
 		$_josh['request'] .= str_ireplace($_josh['request'], '', $_SERVER['REQUEST_URI']); //sometimes REQUEST_URI contains full http://www.example.com when it should not, due (i think) to redirection with url_query_add() or the like
 		$_GET = array_merge($_GET, url_query_parse($_josh['request']));
 	} else {
-		$_josh['request'] .= $_SERVER['SCRIPT_NAME'];
+		$_josh['request'] .= empty($_SERVER['REQUEST_URI']) ? $_SERVER['SCRIPT_NAME'] : $_SERVER['REQUEST_URI'];
 		if (isset($_SERVER['QUERY_STRING'])) $_josh['request'] .= '?' . $_SERVER['QUERY_STRING'];
 	}
 
