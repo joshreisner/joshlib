@@ -409,7 +409,7 @@ function format_html($text, $profile='user') {
 			//these are the tags we want.  if you're not one of these, remove but keep your contents eg <NYT_HEADLINE>
 			//what's a <text> tag?  maybe this means actual text to simple_html_dom
 			if (!in_array($e->tag, array(
-				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'caption', 'dir', 'div', 'dd', 'dl', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'i', 'iframe', 'img',
+				'a', 'article', 'aside', 'b', 'blockquote', 'br', 'caption', 'dir', 'div', 'dd', 'dl', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hgroup', 'hr', 'i', 'iframe', 'img',
 				'ol', 'li', 'p', 'section', 'span', 'strike', 'strong', 'tbody', 'text', 'table', 'td', 'th', 'tr', 'ul',
 				'object', 'embed', 'param'
 			))) $e->outertext = ($e->innertext) ? $e->innertext : '';

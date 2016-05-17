@@ -771,29 +771,21 @@ function lib_get($string) {
 			$tinymce_mode = (user() ? 'advanced' : 'simple');
 			if (isset($_josh['tinymce_mode'])) $tinymce_mode = $_josh['tinymce_mode'];
 			
-			//special statements for tinymce
 			$return = lib_get('jquery') . draw_javascript_ready('
-					$("textarea.tinymce").each(function(){
-						$(this).tinymce({
-							// Location of TinyMCE script
-							content_css : "' . $_josh['tinymce_css'] . '?" + new Date().getTime(),
-							custom_shortcuts : 0,
-							extended_valid_elements : "a[href|target|rel|name|class],caption,dd[class],dl[class],dt[class],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],dir,hr[class|width|size|noshade],iframe[src|width|height|frameborder|webkitAllowFullScreen|allowFullScreen],font[face|size|color|style],span[align|class|style],p[align|class],strike,table[cellspacing|align|border|cellpadding|class],tbody,td[align|class|colspan],th[class],tr[class],u",
-							plugins : "' . (($tinymce_mode == 'advanced') ? 'imagemanager,filemanager,' : '') . 'paste,legacyoutput",
-							relative_urls : false,
-							remove_script_host : false,
-							onchange_callback: function() { tinyMCE.triggerSave(); },
-							script_url : "' . str_replace('jquery.tinymce.js', 'tiny_mce.js', lib_location('tinymce')) . '",
-							theme : "advanced",
-							theme_advanced_buttons1 : "' . (($tinymce_mode == 'advanced') ? 
-								'styleselect,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,outdent,indent,|,link,unlink,image,hr,|,code' : 
-								'bold,italic,underline,strikethrough,|,justifyleft,justifycenter,blockquote,|,bullist,numlist,|,link,unlink'
-							) . '",
-							theme_advanced_buttons2 : "",
-							theme_advanced_toolbar_location : "top"
-						});
-					});
+				tinymce.init({
+					content_css : "' . $_josh['tinymce_css'] . '?" + new Date().getTime(),
+					selector: "textarea.tinymce",
+					width: 640,
+					menubar: false,
+					relative_urls: false,
+					statusbar: false,
+					toolbar: "styleselect | bold italic underline strikethrough | alignleft aligncenter blockquote | bullist numlist outdent indent | link unlink jbimages hr | code",
+					plugins: "advlist code hr image imagetools importcss' . ($tinymce_mode == 'simple' ?: ' jbimages') . ' link paste table",
+					advlist_bullet_styles: "square",
+					advlist_number_styles: "lower-alpha,lower-roman,upper-alpha,upper-roman"
+				});
 			') . $return;
+			
 			file_dir_writable('images');
 			file_dir_writable('files');
 		} elseif (in_array($string, array('bootstrap', 'google-code-prettify', 'latlon-picker', 'tablednd', 'validate', 'wysihtml5', 'fancybox', 'jscrollpane', 'uploadify'))) {
@@ -899,7 +891,7 @@ function lib_location($string) {
 		return DIRECTORY_WRITE . '/lib/jquery/jquery.tablednd_0_5.js';
 		
 		case 'tinymce' :
-		return $lib . 'jscripts/tiny_mce/jquery.tinymce.js';
+		return $lib . 'js/tinymce/tinymce.min.js';
 
 		case 'uploadify' :
 		return DIRECTORY_WRITE . '/lib/uploadify/jquery.uploadify.min.js';
