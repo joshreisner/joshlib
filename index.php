@@ -633,6 +633,10 @@ function daysInMonth($month=false, $year=false) {
 	return date('d', mktime(0,0,0, $month + 1, 0, $year));
 }
 
+function dd($object) {
+	die(draw_array($object));
+}
+
 function debug($html=true) {
 	global $_josh;
 	$_josh['error_mode_html'] = $html;
@@ -779,7 +783,7 @@ function lib_get($string) {
 					menubar: false,
 					relative_urls: false,
 					statusbar: false,
-					toolbar: "styleselect | bold italic underline strikethrough | alignleft aligncenter blockquote | bullist numlist outdent indent | link unlink jbimages hr | code",
+					toolbar: "styleselect | bold italic underline strikethrough | alignleft aligncenter blockquote | bullist numlist outdent indent | link unlink jbimages hr | removeformat code",
 					plugins: "advlist code hr image imagetools importcss' . ($tinymce_mode == 'simple' ?: ' jbimages') . ' link paste table",
 					advlist_bullet_styles: "square",
 					advlist_number_styles: "lower-alpha,lower-roman,upper-alpha,upper-roman"

@@ -326,12 +326,13 @@ function array_searchwords($string) {
 	global $_josh;
 	
 	//sanitize string
-	$string = trim(strtolower(format_accents_remove(strip_tags($string))));
-	$string = str_replace('"', '', $string);
-	$string = str_replace("'", '', $string);
+	$string = strip_tags($string);
+	$string = format_accents_convert($string);
+	$string = preg_replace("/[^a-zA-Z0-9]+/", ' ', $string);
+	$string = strtolower($string);
 	
 	//create array
-	$words = array_diff(array_unique(explode(' ', $string)), $_josh['ignored_words']);
+	$words = array_diff(array_unique(array_separated($string, ' ')), $_josh['ignored_words']);
 	
 	return (!count($words)) ? false : $words;
 }

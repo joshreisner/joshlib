@@ -707,7 +707,7 @@ function db_save($table, $id='get', $array='post') {
 	$query1		= array();
 	$query2		= array();
 	$required	= $_josh['system_columns'];
-	$full_text	= false;
+	$text		= array();
 	$col_names	= array();
 	//debug();
 	
@@ -748,14 +748,14 @@ function db_save($table, $id='get', $array='post') {
 					//die('length is ' . strlen($array[$c['name']]));
 				} elseif ($c['type'] == 'varchar') { //text
 					if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
+					if (($c['name'] != 'url') && ($c['name'] != 'password')) $text[] = $array[$c['name']];
 					$value = "'" . $array[$c['name']] . "'";
-					if (($c['name'] != 'url') && ($c['name'] != 'password')) $full_text .= $value;
 					if (($value == "''") && (!$c['required'])) $value = 'NULL'; //special null
 					if (($value == "'http://'")) $value = 'NULL'; //url special null
 				} elseif (($c['type'] == 'text') || ($c['type'] == 'longtext')) { //textarea
 					if ($_josh['db']['language'] == 'mssql') $array[$c['name']] = format_accents_encode($array[$c['name']]);
+					$text[] = $array[$c['name']];
 					$value = "'" . format_html($array[$c['name']] . "'");
-					$full_text .= $value;
 				} elseif ($c['type'] == 'datetime') {
 					//this happens in bb task mgmt
 					if (($array[$c['name']] == db_date()) || ($array[$c['name']] == 'NULL')) {
@@ -911,6 +911,9 @@ function db_save($table, $id='get', $array='post') {
 		$id = db_query($query);
 	}
 	
+	//maintain search index if possible
+	db_search_words($table . '_to_words', $id, implode(' ', $text));
+		
 	return $id;
 }
 
@@ -939,12 +942,48 @@ function db_schema_check($schema) {
 	return $passed;
 }
 
-function db_search_words($words=false) {
-	//pass this an array or string of words
-	if (is_string($words)) $words = array_separated($words, ' ');
-	foreach ($words as &$w) $w = 'w.word = "' . format_accents_encode($w) . '"';
+//maintain search index if possible
+function db_search_words($linking_table, $object_id, $words, $words_table='words') {
+	global $_josh;
+	
+	//going to need a words table (id, word) and connecting table (word_id, object_id, count)
+	if (!db_table_exists($words_table) || !db_table_exists($linking_table)) return false;
+	
+	//most likely $words is a string of html
+	if (is_string($words)) {
+		$words = strip_tags($words);
+		$words = format_accents_convert($words);
+		$words = preg_replace("/[^a-zA-Z0-9]+/", ' ', $words);
+		$words = array_separated($words, ' ');
+	} else {
+		$words = array_map('format_accents_convert', $words);
+	}
+	
+	//clean up $words array
+	$words = array_map('strtolower', $words);
+	$words = array_diff($words, $_josh['ignored_words']);
 	if (empty($words)) return false;
-	return 'AND (' . implode(' OR ', $words) . ')';
+
+	//convert to word => count index
+	$words = array_count_values($words);
+	
+	//make sure all those values are in the words table
+	$word_ids = array_key_promote(db_table('SELECT word, id FROM ' . $words_table));
+	foreach ($words as $word => $count) {
+		if (!array_key_exists($word, $word_ids)) {
+			$word_ids[$word] = db_query('INSERT INTO words ( word ) VALUES ( \'' . $word . '\' )');
+		}
+	}
+	
+	//loop through and populate the linking table
+	db_query('DELETE FROM ' . $linking_table . ' WHERE object_id = ' . $object_id);
+	foreach ($words as $word => $count) {
+		db_query('INSERT INTO ' . $linking_table . ' ( word_id, object_id, count ) VALUES ( 
+			' . $word_ids[$word] . ',
+			' . $object_id . ',
+			' . $count . '
+		)');
+	}
 }
 
 function db_switch($target=false) {
