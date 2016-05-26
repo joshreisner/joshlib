@@ -98,7 +98,9 @@ function db_close($keepalive=false) { //close connection and quit
 	global $_josh;
 	error_debug('<b>' . __function__ . '</b>', __file__, __line__);
 	if (db_connected()) {
-		if ($_josh['db']['language'] == 'mysql') {
+		if ($_josh['db']['pdo']) {
+			$_josh['db']['pointer'] = null;
+		} elseif ($_josh['db']['language'] == 'mysql') {
 			@mysql_close($_josh['db']['pointer']);
 		} elseif ($_josh['db']['language'] == 'mssql') {
 			@mssql_close($_josh['db']['pointer']);
